@@ -12,7 +12,6 @@ class CheckAttachmentGallery extends AbstractCheckGallery
 {
     /*
      * Holds current attachment type
-     * t    -   Tracker Attachments
      * w    -   Wiki Attachments
      * f    -   Forum Attachments
      */
@@ -79,9 +78,6 @@ class CheckAttachmentGallery extends AbstractCheckGallery
     private function getAttachments()
     {
         switch ($this->type) {
-            case 't':
-                $lib = TikiLib::lib('trk');
-                break;
             case 'w':
                 $lib = TikiLib::lib('wiki');
                 break;

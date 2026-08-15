@@ -11,12 +11,10 @@
   "license": "ISC",
   "devDependenciesComment": {
     "@event-calendar/core": "Used by tiki-calendar.js",
-    "async-es": "Used by tiki-async-loop.js",
-    "svelte": "This is an indirect dependency of @event-calendar/core. It is pinned to 5.51.0 because later versions break most calendar interactions. See: https://github.com/vkurko/calendar/issues/623"
+    "async-es": "Used by tiki-async-loop.js"
   },
   "devDependencies": {
     "@event-calendar/core": "^4.5.1",
-    "async-es": "^3.2.6",
-    "svelte": "5.51.0"
+    "async-es": "^3.2.6"
   }
 }

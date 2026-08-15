@@ -251,13 +251,6 @@ if (empty($_REQUEST['itemId'])) {
         } else {
             echo $data;
         }
-        if ($tracker_info['useAttachments'] == 'y' && ! empty($_REQUEST['zip'])) {
-            foreach ($items['data'] as $v) {
-                if (! $trklib->export_attachment($v['itemId'], $archive)) {
-                    Feedback::errorAndDie(tra('Problem zip'), \Laminas\Http\Response::STATUS_CODE_409);
-                }
-            }
-        }
     }
 } else {
     $items = [];

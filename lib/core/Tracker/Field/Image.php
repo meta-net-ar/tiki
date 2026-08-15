@@ -10,7 +10,7 @@
  * Letter key: ~i~
  *
  */
-class Tracker_Field_Image extends Tracker_Field_File
+class Tracker_Field_Image extends \Tracker\Field\AbstractItemField
 {
     private $imgMimeTypes;
     private $imgMaxSize;
@@ -113,11 +113,22 @@ class Tracker_Field_Image extends Tracker_Field_File
             return [ 'value' => 'blank' ];
         }
 
-        if (! empty($requestData)) {
-            return parent::getFieldData($requestData);
-        } else {
+        if (empty($requestData)) {
             return [ 'value' => $this->getValue() ];
         }
+
+        if (isset($_FILES[$ins_id]) && is_uploaded_file($_FILES[$ins_id]['tmp_name'])) {
+            return [
+                'old_value' => $this->getValue(),
+                'value' => file_get_contents($_FILES[$ins_id]['tmp_name']),
+                'file_type' => $_FILES[$ins_id]['type'],
+                'file_size' => $_FILES[$ins_id]['size'],
+                'file_name' => $_FILES[$ins_id]['name'],
+            ];
+        }
+
+        $data = ['value' => $this->getValue()];
+        return $data;
     }
 
     public function renderInnerOutput($context = [])

@@ -394,42 +394,41 @@ class XMPPLib extends TikiLib
 
     public function get_user_connection_info($user)
     {
-        global $prefs;
+        global $user_preferences, $prefs, $tikilib;
 
-        $query = 'SELECT'
-        . '     MAX(CASE WHEN `prefName`="xmpp_jid" THEN `value` END) AS `jid`,'
-        . '     MAX(CASE WHEN `prefName`="xmpp_password" THEN `value` END) AS `password`,'
-        . '     MAX(CASE WHEN `prefName`="xmpp_custom_server_endpoint" THEN `value` END) AS `endpoint`,'
-        . '     MAX(CASE WHEN `prefName`="xmpp_custom_server_http_bind" THEN `value` END) AS `legacy_http_bind`,'
-        . '     MAX(CASE WHEN `prefName`="realName" THEN `value` END) AS `nickname`'
-        . ' FROM `tiki_user_preferences` WHERE `user`=?'
-        . '     AND `prefName` IN ("xmpp_jid", "xmpp_password", "xmpp_custom_server_endpoint", "xmpp_custom_server_http_bind", "realName")';
+        $tikilib->get_user_preferences($user, [
+            'xmpp_jid',
+            'xmpp_password',
+            'xmpp_custom_server_http_bind',
+            'xmpp_custom_server_endpoint',
+            'realName',
+        ]);
 
-        $query = $this->query($query, [$user]);
-        $login = $query->fetchRow();
+        $u_jid = $user_preferences[$user]['xmpp_jid'] ?: $user;
+        $u_password = $user_preferences[$user]['xmpp_password'] ?: '';
+        $u_nickname = $user_preferences[$user]['realName'] ?: $user;
+        $u_httpBind = $user_preferences[$user]['xmpp_custom_server_http_bind'] ?? '';
+        $u_endpoint = $user_preferences[$user]['xmpp_custom_server_endpoint'] ?? '';
 
-        if (empty($login['jid']) && $user) {
-            $login['jid'] = $user;
-        }
 
         $info = [
             'domain'          => $this->server_host,
             'http_bind'       => $this->server_http_bind,
             'websocket_url'   => $prefs['xmpp_ws_url'] ?? '',
             'custom_endpoint' => false,
-            'jid'             => $prefs['xmpp_server_host'] ? JID::buildJid($login['jid'], $prefs['xmpp_server_host']) : '',
-            'password'        => $login['password'] ?: '',
-            'username'        => $login['jid'],
-            'nickname'        => $login['nickname'] ?: $user,
+            'jid'       => $prefs['xmpp_server_host'] ? JID::buildJid($u_jid, $prefs['xmpp_server_host']) : '',
+            'password'  => $u_password,
+            'username'  => $u_jid,
+            'nickname'  => $u_nickname,
         ];
 
-        $jid_parts = JID::parseJid($login['jid']);
+        $jid_parts = JID::parseJid($u_jid);
         if ($jid_parts) {
-            $info['jid']      = $login['jid'];
+            $info['jid']       = $u_jid;
             $info['username'] = $jid_parts['node'];
             $info['domain']   = $jid_parts['domain'];
 
-            $endpoint = trim($login['endpoint'] ?: $login['legacy_http_bind'] ?: '');
+            $endpoint = trim($u_endpoint ?: $u_httpBind ?: '');
             if ($endpoint) {
                 $transportOptions = $this->getEndpointTransportOptions($endpoint);
                 if ($transportOptions) {

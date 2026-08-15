@@ -495,16 +495,6 @@ class ObjectLib extends TikiLib
                         return 'tiki_p_modify_tracker_items';
                 }
                 // no return
-            case 'trackeritemattachments':
-                switch ($action) {
-                    case 'view':
-                    case 'read':
-                        return 'tiki_p_tracker_view_attachments';
-
-                    case 'edit':
-                        return 'tiki_p_modify_tracker_items';
-                }
-                // no return
             case 'trackeritem_closed':
                 switch ($action) {
                     case 'view':
@@ -768,24 +758,6 @@ class ObjectLib extends TikiLib
                     $itemInfo['itemId'],
                     ['data' => [$field]],
                     $itemInfo['status']
-                );
-                break;
-            case 'trackeritemattachments':
-                $trklib = TikiLib::lib('trk');
-                $info = $trklib->get_item_attachment($object);
-                $info = array_merge($info, $data);
-
-                $trklib->replace_item_attachment(
-                    $object,
-                    $info['filename'],
-                    $info['filetype'],
-                    $info['filesize'],
-                    $info['data'],
-                    $info['comment'],
-                    $info['user'],
-                    null,
-                    $info['version'],
-                    $info['longdesc'],
                 );
                 break;
             case 'article':
@@ -1455,8 +1427,6 @@ class ObjectLib extends TikiLib
                 return ['tiki_articles', 'articleId'];
             case 'post':
                 return ['tiki_blog_posts', 'postId'];
-            case 'trackeritemattachments':
-                return ['tiki_tracker_item_attachments', 'attId'];
             case 'surveys':
             case 'survey':
                 return ['tiki_surveys', 'surveyId'];

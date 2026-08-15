@@ -13,6 +13,8 @@
     {/if}
 
     {if not $preview}
+        {include file='calendar_header.tpl' viewlist='listEventView'}
+
         <div class="float-end">
             {permission name='change_events' type='calendaritem' object=$calitem.calitemId}
                 <a href="{service controller='calendar' action='edit_item' calitemId=$calitem.calitemId|escape}" class="btn btn-primary edit-calendar-item-btn">

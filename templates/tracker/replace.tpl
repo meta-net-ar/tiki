@@ -105,31 +105,6 @@
                     {tr}Save and Comment{/tr}
                 </label>
             </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" name="useAttachments" id="useAttachments" value="1"
-                        {if $info.useAttachments eq 'y'} checked="checked"{/if}>
-                <label class="form-check-label" for="useAttachments">
-                    {tr}Allow attachments (Deprecated. Will be removed after Tiki 29.x. Use files field instead.){/tr}
-                </label>
-            </div>
-            <div class="form-check depends" data-on="useAttachments">
-                <input type="checkbox" class="form-check-input" name="showAttachments" id="showAttachments" value="1"
-                        {if $info.showAttachments eq 'y'} checked="checked"{/if}>
-                <label class="form-check-label" for="showAttachments">
-                    {tr}Display attachments in listing{/tr}
-                </label>
-            </div>
-            <fieldset class="depends sortable" data-on="useAttachments" data-selector="div.checkbox">
-                <legend>{tr}Attachment attributes (sortable){/tr}</legend>
-                {foreach from=$attachmentAttributes key=name item=att}
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="orderAttachments[]" id="orderAttachments[]" value="{$name|escape}" {if !empty($att.selected)} checked="checked"{/if}>
-                        <label class="form-check-label" for="orderAttachments[]">
-                            {$att.label|escape}
-                        </label>
-                    </div>
-                {/foreach}
-            </fieldset>
             {if $prefs.ajax_inline_edit eq 'y'}
                 <div class="form-check">
                     <input type="checkbox" class="form-check-input" name="allowInlineEditing" id="allowInlineEditing" value="1"

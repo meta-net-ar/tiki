@@ -80,7 +80,6 @@ $safePaths = [
     '\./tiki-live_support_chat_frame.php',
     '\./tiki-login_scr.php',
     '\./tiki-channel.php',            // does its own checks
-
     /* This file is just comments */
     './about.php',
     './db/preconfiguration.php', // contains comments
@@ -241,43 +240,37 @@ function tikisetup_pattern() // {{{
 function scanfiles($folder, &$files, &$filesHash)
 {
     global $safePaths, $skipDirs;
-    $handle = opendir($folder);
-    if (! $handle) {
+
+    try {
+        $iterator = new FilesystemIterator($folder, FilesystemIterator::SKIP_DOTS);
+    } catch (UnexpectedValueException $e) {
         printf("Could not open folder: %s\n", $folder);
         return;
     }
 
-    while (false !== $file = readdir($handle)) {
-        // Skip self and parent
-        if ($file[0] == '.' || $file[0] == '..') {
-            continue;
-        }
+    foreach ($iterator as $fileInfo) {
+        $path = $fileInfo->getPathname();
 
-        $path = "$folder/$file";
-
-        if (is_link($path)) {
-            continue;
-        }
-
-        if (is_dir($path)) {
-            // Directory is safe, skip recursion
-            foreach ($skipDirs as $skipDir) {
-                if ($path === $skipDir) {
-                    continue 2; // skip this directory entirely
-                }
+        if ($fileInfo->isDir()) {
+            // Check if directory should be skipped
+            if (in_array($path, $skipDirs)) {
+                continue;
             }
+
             scanfiles($path, $files, $filesHash);
         } else {
             // Skip files that match safe paths
-            if (regex_match($path, $safePaths)) {
+            if (regex_match($path, $safePaths) || str_starts_with($path, '.')) {
                 continue;
             }
+
             $analysis = analyse_file_path($path);
             $files[] = $analysis;
             $filesHash[$path] = $analysis;
         }
     }
 }
+
 // }}}
 
 // TODO This is an inefficient function, but more flexible than in_array

@@ -24,6 +24,9 @@ class Services_Cypht_Controller
 
         /* get configuration */
         $config = new Tiki_Hm_Site_Config_File([], $session_prefix, @$_SESSION[$session_prefix]['settings_per_page']);
+        if ($input->page->text()) {
+            $config->set('append_url_query', 'page=' . urlencode($input->page->text()));
+        }
         $environment->define_default_constants($config);
 
         /* process the request */
@@ -39,7 +42,7 @@ class Services_Cypht_Controller
         Feedback::sendHeaders();
 
         // either html or already json encoded, so skip broker/accesslib output and do it here
-        echo $dispatcher->session->dedup_page_links($dispatcher->output);
+        echo $dispatcher->output;
         exit;
     }
 }

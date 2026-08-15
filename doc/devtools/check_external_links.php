@@ -11,7 +11,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 require_once __DIR__ . '/../../path_constants.php';
-require __DIR__ . '/vcscommons.php';
+require_once __DIR__ . '/vcscommons.php';
 require_once __DIR__ . '/FileScanner.php';
 
 /**
@@ -30,6 +30,7 @@ class ExternalLinksChecker
         'high' => [], // User visible (HIGH)
         'low' => [], // Source code (LOW)
     ];
+    private $allUrls = []; // Complete index for full liveness audit
     private $suppressed = []; // Links with @tiki-external-link-ok comments
     private $whitelistDomains = [];
     private $whitelistPatterns = [];
@@ -392,27 +393,34 @@ class ExternalLinksChecker
 
             $categorized = $this->categorizeUrl('', $line, $filePath, $lineNumber, $content);
 
-            if ($categorized && ! $this->isWhitelisted($categorized['url'])) {
+            if ($categorized) {
+                $this->allUrls[] = array_merge($categorized, [
+                    'file' => $relativePath,
+                    'line' => $lineNumber,
+                ]);
+
+                if (! $this->isWhitelisted($categorized['url'])) {
                 // Check for inline suppression comment
-                $suppression = $this->hasSuppressionComment($content, $lineNumber);
-                if ($suppression['suppressed']) {
-                    $this->suppressed[] = [
+                    $suppression = $this->hasSuppressionComment($content, $lineNumber);
+                    if ($suppression['suppressed']) {
+                        $this->suppressed[] = [
                         'file' => $relativePath,
                         'line' => $lineNumber,
                         'url' => $categorized['url'],
                         'context' => $categorized['context'],
                         'reason' => $suppression['reason'],
-                    ];
-                    continue; // Skip flagging this link
-                }
+                        ];
+                        continue; // Skip flagging this link
+                    }
 
-                $this->severity[$categorized['severity']][] = [
+                    $this->severity[$categorized['severity']][] = [
                     'file' => $relativePath,
                     'line' => $lineNumber,
                     'url' => $categorized['url'],
                     'context' => $categorized['context'],
                     'code' => trim($line),
-                ];
+                    ];
+                }
             }
         }
     }
@@ -460,6 +468,183 @@ class ExternalLinksChecker
     {
         return ! empty($this->severity['critical']) || ! empty($this->severity['high']) || ! empty($this->severity['low']);
     }
+
+    /**
+     * Directories to skip when checking URL availability (test fixtures, 3rd party libs)
+     */
+    private const EXCLUDED_DIRECTORIES = [
+        'test', 'tests', 'fixtures', 'tikihelp', 'xmpp',
+        'nusoap', 'openlayers', 'metadata', 'dracula'
+    ];
+
+    /**
+     * Directory paths with subdirectory structure to exclude
+     */
+    private const EXCLUDED_DIRECTORY_PATHS = [
+        'Sheet' . DIRECTORY_SEPARATOR . 'include'
+    ];
+
+    /**
+     * Placeholder/package registry domain patterns that cannot or should not be checked
+     */
+    private const PLACEHOLDER_DOMAINS = '#(anothersite|testuri|dummydsn|yourdomain|tiki-site)#i';
+
+    /**
+     * XML namespace URI patterns (identifiers, not fetchable URLs)
+     */
+    private const NAMESPACE_PATTERNS = '#/200[0-9]/|/ns/|/protocol/|/schema/|\\}#';
+
+    /**
+     * Get unique URLs for availability checking, with smart filtering.
+     *
+     * @param array|null $severityFilter Array of severities to include (e.g., ['critical', 'high'])
+     * @return array Array of URL data for checking
+     */
+    public function getUrlsForAvailabilityCheck($severityFilter = null)
+    {
+        $urls = [];
+        $seenUrls = [];
+
+        foreach ($this->allUrls as $finding) {
+            if ($severityFilter !== null && ! in_array($finding['severity'], $severityFilter)) {
+                continue;
+            }
+
+            if ($this->shouldSkipUrl($finding, $seenUrls)) {
+                continue;
+            }
+
+            $seenUrls[$finding['url']] = true;
+            $urls[] = [
+                'url' => $finding['url'],
+                'file' => $finding['file'],
+                'line' => $finding['line'],
+                'severity' => $finding['severity'],
+            ];
+        }
+
+        return $urls;
+    }
+
+    /**
+     * Determine if a URL should be skipped from availability checking.
+     */
+    private function shouldSkipUrl(array $finding, array $seenUrls): bool
+    {
+        $url = $finding['url'];
+        $parsed = parse_url($url);
+        $host = strtolower($parsed['host'] ?? '');
+
+        // Check in order of least to most expensive
+        return isset($seenUrls[$url])
+            || ! $this->hasValidHost($parsed)
+            || $this->isReservedDomain($host)
+            || $this->isExcludedDirectory($finding['file'])
+            || $this->isNamespaceUri($url)
+            || $this->isPlaceholderUrl($url, $host)
+            || $this->isDevelopmentUrl($host)
+            || $this->isIncompleteUrl($url);
+    }
+
+    private function hasValidHost(array|false|null $parsed): bool
+    {
+        if (! is_array($parsed) || ! isset($parsed['host']) || empty($parsed['host'])) {
+            return false;
+        }
+        // Reject hosts that are only punctuation (malformed like "http://,")
+        return (bool) preg_match('/[a-z0-9]/i', $parsed['host']);
+    }
+
+    private function isReservedDomain(string $host): bool
+    {
+        // Strip trailing dot (DNS root) for matching
+        $host = rtrim($host, '.');
+        // Only reserve example.org as per Tiki standard (see RFC 2606)
+        return $host === 'example.org' || str_ends_with($host, '.example.org');
+    }
+
+    private function isExcludedDirectory(string $filePath): bool
+    {
+        // Skip lang/ directory (translation examples)
+        if (str_contains($filePath, 'lang' . DIRECTORY_SEPARATOR)) {
+            return true;
+        }
+
+        if (str_ends_with($filePath, 'package-lock.json')) {
+            return true;
+        }
+
+        $normalizedFile = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $filePath);
+
+        foreach (self::EXCLUDED_DIRECTORIES as $dir) {
+            if (str_contains($normalizedFile, DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR)) {
+                return true;
+            }
+        }
+
+        foreach (self::EXCLUDED_DIRECTORY_PATHS as $path) {
+            if (str_contains($normalizedFile, DIRECTORY_SEPARATOR . $path . DIRECTORY_SEPARATOR)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isNamespaceUri(string $url): bool
+    {
+        return (bool) preg_match(self::NAMESPACE_PATTERNS, $url);
+    }
+
+    private function isPlaceholderUrl(string $url, string $host): bool
+    {
+        // Template/placeholder URL patterns
+        if (preg_match('#^https?://%|^https?://path_to_#', $url)) {
+            return true;
+        }
+        // Malformed URLs (regex patterns, escape sequences, no TLD)
+        if (preg_match('#\\\\|^https?://[^/]+,$|^https?://[a-z]+$#', $url)) {
+            return true;
+        }
+        // Incomplete API base URLs (ending with / followed by concatenation)
+        if (preg_match('#(repo\.packagist\.org|api\.github\.com|registry\.npmjs\.org)/[^/]*/?$#', $url)) {
+            return true;
+        }
+        // Placeholder domains
+        if (! empty($host) && preg_match(self::PLACEHOLDER_DOMAINS, $host)) {
+            return true;
+        }
+        return false;
+    }
+
+    private function isDevelopmentUrl(string $host): bool
+    {
+        return $host === 'localhost'
+            || str_starts_with($host, '127.')
+            || $host === 'foo'
+            || $host === 'foo.bar';
+    }
+
+    private function isIncompleteUrl(string $url): bool
+    {
+        // URLs with PHP variables
+        if (preg_match('/\$[a-zA-Z_]|\{\$|%[sd]/', $url)) {
+            return true;
+        }
+        // Search engine base URLs (query parameter will be appended at runtime)
+        if (preg_match('/[?&](q|query|p|search|eq|url)=$/i', $url)) {
+            return true;
+        }
+        // Templated/incomplete URLs
+        return str_contains($url, '...') || str_contains($url, '{') || str_contains($url, '[');
+    }
+}
+
+
+
+// Only run CLI entry point when executed directly
+if (realpath(__FILE__) !== realpath($_SERVER['argv'][0] ?? '')) {
+    return;
 }
 
 $dir = realpath(__DIR__ . '/../../');
@@ -467,11 +652,12 @@ $paramList = $_SERVER['argv'] ?? [];
 $listFiles = [];
 $ciMode = false;
 
+
 foreach ($paramList as $param) {
     if ($param === '--ci') {
         $ciMode = true;
     } elseif (basename(__FILE__) != basename($param)) {
-        $file = $dir . $param;
+        $file = $dir . DIRECTORY_SEPARATOR . $param;
         if (file_exists($file)) {
             $listFiles[] = $param;
         }
@@ -484,6 +670,8 @@ $checker->scan($listFiles);
 $summary = $checker->getSummary();
 $findings = $checker->getFindings();
 $suppressed = $checker->getSuppressed();
+
+
 
 echo PHP_EOL;
 info('Scanning for external links...');
@@ -541,9 +729,11 @@ if ($checker->hasIssues()) {
     if ($summary['suppressed_count'] > 0) {
         echo '  SUPPRESSED (with @tiki-external-link-ok): ' . color($summary['suppressed_count'], 'green') . PHP_EOL;
     }
+
     echo '  Total flagged: ' . $summary['total'] . ' external links found' . PHP_EOL;
     echo PHP_EOL;
 
+    // Exit with error if CRITICAL issues found
     if (! empty($findings['critical'])) {
         echo color('ERROR: CRITICAL external links detected. These must be fixed before merging.', 'red') . PHP_EOL;
         echo PHP_EOL;

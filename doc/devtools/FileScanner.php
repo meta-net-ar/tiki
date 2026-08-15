@@ -162,7 +162,7 @@ class FileScanner
             if ($item instanceof \SplFileInfo) {
                 $filePath = $item->getPathname();
             } elseif (is_string($item)) {
-                $filePath = $this->dir . $item;
+                $filePath = $this->dir . DIRECTORY_SEPARATOR . $item;
                 if (! file_exists($filePath)) {
                     continue;
                 }

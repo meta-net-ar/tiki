@@ -157,27 +157,6 @@ class Tiki_Hm_Custom_Session extends Hm_Session
         $this->set('changed_settings', $list);
     }
 
-    /**
-     * When Cypht runs in a wiki page as a wiki plugin and SEFURL is off
-     * replace all Cypht links to include the page_id of the wiki page
-     * so tiki-index can load the correct wiki page. Cypht reuses page param
-     * for its internal uses.
-     */
-    public function dedup_page_links($output)
-    {
-        global $prefs;
-        if ($prefs['feature_sefurl'] === 'y') {
-            return $output;
-        }
-        if (! $this->get('page_id')) {
-            return $output;
-        }
-        $output = str_replace("?page=", "?page_id=" . $this->get('page_id') . "&page=", $output);
-        $output = str_replace('<input type="hidden" name="page" value=', '<input type="hidden" name="page_id" value="' . $this->get('page_id') . '"><input type="hidden" name="page" value=', $output);
-        $output = str_replace('<input type=\\"hidden\\" name=\\"page\\" value=', '<input type=\\"hidden\\" name=\\"page_id\\" value=\\"' . $this->get('page_id') . '\\"><input type=\\"hidden\\" name=\\"page\\" value=', $output);
-        return $output;
-    }
-
     protected function session_prefix()
     {
         return $this->site_config->get('session_prefix') ?? 'cypht';

@@ -184,23 +184,6 @@ function wikiplugin_attach($data, $params)
     if (! is_array($atts) || ! array_key_exists("data", $atts) || ! is_array($atts['data']) || count($atts["data"]) < 1) {
         // We're being called from a preview or something; try to build the atts ourselves.
 
-        // See if we're being called from a tracker page.
-        if (Sections::isCurrentSection(Sections::SECTION_TRACKERS)) {
-            $trklib = TikiLib::lib('trk');
-            $atts_item_name = $_REQUEST["itemId"];
-
-            // First get the tracker ID for this item
-            $trackerId = $trklib->get_tracker_for_item($atts_item_name);
-            $tracker_info = $trklib->get_tracker($trackerId);
-            $tracker_options = $trklib->get_tracker_options($trackerId);
-
-            if (! is_array($tracker_info) || ! is_array($tracker_options)) {
-                throw new Exception(tr('No tracker found matching id %0', $atts_item_name));
-            }
-
-            $atts = $trklib->list_item_attachments($atts_item_name, 0, -1, 'comment_asc', '');
-        }
-
         // See if we're being called from a wiki page.
         if ($section_class && str_contains($section_class, Sections::SECTION_WIKI_PAGE)) {
             $atts_item_name = $_REQUEST["page"];

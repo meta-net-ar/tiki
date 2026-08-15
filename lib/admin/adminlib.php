@@ -234,19 +234,23 @@ class AdminLib extends TikiLib
         if ($tikidomain) {
             $path .= "/$tikidomain";
         }
-        $h = opendir($path);
+        $dir = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
 
-        while (($file = readdir($h)) !== false) {
-            if (is_file("$path/$file") && $file != 'license.txt' && $file != 'index.php' && $file != '.cvsignore' && $file != 'README') {
-                $filename = "$path/$file";
+        foreach ($dir as $fileInfo) {
+            if ($fileInfo->isFile()) {
+                $filename = $fileInfo->getPathname();
+                $baseName = $fileInfo->getBasename();
+
+                $protected = ['license.txt', 'index.php', '.cvsignore', 'README'];
+                if (in_array($baseName, $protected)) {
+                    continue;
+                }
 
                 if (! in_array($filename, $pictures)) {
                     @unlink($filename);
                 }
             }
         }
-
-        closedir($h);
     }
 
     /**

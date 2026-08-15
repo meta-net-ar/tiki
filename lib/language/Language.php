@@ -170,28 +170,21 @@ class Language extends TikiDb_Bridge
      * @param $path
      * @return array
      */
-    private static function list_disk_languages($path)
+    private static function list_disk_languages($path = 'lang')
     {
-        $languages = [];
-
-        if (! $path) {
-            $path = "lang";
-        }
-
         if (! is_dir($path)) {
             return [];
         }
 
-        $h = opendir($path);
+        $languages = [];
+        $iterator = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
 
-        while ($file = readdir($h)) {
-            if (! str_contains($file, '.') && $file != 'CVS' && $file != 'index.php' && is_dir("$path/$file") && file_exists("$path/$file/language.php")) {
-                $languages[] = $file;
+        foreach ($iterator as $fileInfo) {
+            $name = $fileInfo->getFilename();
+            if ($fileInfo->isDir() && ! str_contains($name, '.') && $name !== 'CVS' && file_exists($fileInfo->getPathname() . '/language.php')) {
+                $languages[] = $name;
             }
         }
-
-        closedir($h);
-
         return $languages;
     }
 

@@ -308,6 +308,7 @@ return [
     'restore_error' => [FILTER_VALIDATE_BOOLEAN, false],
     'show_archive' => [FILTER_VALIDATE_BOOLEAN, false],
     'show_restore' => [FILTER_VALIDATE_BOOLEAN, false],
+    'msg_current_folder' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'flag_state' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'trackers' => [FILTER_DEFAULT, false],
     'tracker_data' => [FILTER_DEFAULT, false],

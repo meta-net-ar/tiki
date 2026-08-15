@@ -123,28 +123,25 @@ function wikiplugin_lsdir($data, $params)
         $getkey = 'filesize';
     }
 
-    // supress the PHP error because that causes Tiki to crash
-    $dh = @opendir($dir);
-
-    if (! $dh) {
-        $error = "<span class='attention'><b>" . htmlspecialchars($dir, ENT_QUOTES, 'UTF-8') . '</b> ' . tra("could not be opened because it doesn't exist or permission was denied") . '</span>';
-        return $error;
+    try {
+        $iterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+    } catch (Exception $e) {
+        return "<span class='attention'><b>$dir</b> " . tra("could not be opened because it doesn't exist or permission was denied") . "</span>";
     }
 
-    while ($file = readdir($dh)) {
-        if (empty($filter) || stristr($file, $filter)) {
-            //Don't list subdirectories
-            if (! is_dir("$dir/$file")) {
-                if ($sort == 'name') {
-                    $key = "$file";
-                } else {
-                    $key = $getkey("$dir/$file");
-                }
-                $tmp_array["$key"] = "$file";
+    foreach ($iterator as $fileInfo) {
+        $file = $fileInfo->getFilename();
+        if ((empty($filter) || stristr($file, $filter)) && $fileInfo->isFile()) {
+            if ($sort === 'name') {
+                $key = $file;
+            } else {
+                // Use getPathname() to avoid manual string joining "$dir/$file"
+                $key = $getkey($fileInfo->getPathname());
             }
+            $tmp_array[$key] = $file;
         }
     }
-    closedir($dh);
+
 
     if ($sortmode == 'asc') {
         ksort($tmp_array);

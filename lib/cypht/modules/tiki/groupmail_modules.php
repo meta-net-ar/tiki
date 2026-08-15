@@ -268,7 +268,7 @@ class Hm_Output_groupmail_page_link extends Hm_Output_Module
         if (! $this->get('groupmail_enabled')) {
             return '';
         }
-        $res = '<li class="menu_groupmail"><a class="unread_link" href="?page=groupmail">';
+        $res = '<li class="menu_groupmail"><a class="unread_link" href="' . $this->build_page_url('groupmail') . '">';
         if (! $this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-people account_icon"></i> ';
         }
@@ -414,8 +414,8 @@ class Hm_Output_filter_groupmail_data extends Hm_Output_Module
                 $row_class .= ' ' . str_replace(' ', '_', $source);
                 if ($msg['folder'] && hex2bin($msg['folder']) != 'INBOX') {
                     $source .= '-' . preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
-                }
-                $url = '?page=message&uid=' . $msg['uid'] . '&list_path=' . sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']) . '&list_parent=' . $parent_value;
+                };
+                $url = $this->build_page_url('message', ['uid' => $msg['uid'], 'list_path' => sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']), 'list_parent' => $parent_value]);
                 if ($list_page) {
                     $url .= '&list_page=' . $this->html_safe($list_page);
                 }

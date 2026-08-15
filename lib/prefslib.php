@@ -1056,13 +1056,11 @@ class PreferencesLib
         $file = TEMP_CACHE_PATH . '/preference-usage-index';
         if (! file_exists($file)) {
             $prefs_usage_array = [];
-            $fp = opendir(TEMPLATES_ADMIN_PATH . '/');
-
-            while (false !== ($f = readdir($fp))) {
-                preg_match('/^include_(.*)\.tpl$/', $f, $m);
-                if (count($m) > 0) {
+            $iterator = new FilesystemIterator(TEMPLATES_ADMIN_PATH, FilesystemIterator::SKIP_DOTS);
+            foreach ($iterator as $fileInfo) {
+                if (preg_match('/^include_(.*)\.tpl$/', $fileInfo->getFilename(), $m)) {
                     $page = $m[1];
-                    $filePath = TEMPLATES_ADMIN_PATH . '/' . $f;
+                    $filePath = $fileInfo->getPathname();
                     $c = file_get_contents($filePath);
 
                     // Replace {include file='admin/template.tpl'} with the content of the file
@@ -1070,24 +1068,16 @@ class PreferencesLib
                         '/\{include file=[\'"]([^\'"]+)[\'"]\}/i',
                         function ($matches) {
                             $includeFile = TEMPLATES_ADMIN_PATH . '/' . ltrim($matches[1], 'admin/');
-                            if (file_exists($includeFile)) {
-                                return file_get_contents($includeFile);
-                            }
-                            return '';
+                            return file_exists($includeFile) ? file_get_contents($includeFile) : '';
                         },
                         $c
                     );
 
-                    preg_match_all('/{preference.*name=[\'"]?(\w*)[\'"]?.*}/i', $c, $m2, PREG_OFFSET_CAPTURE);
-                    if (count($m2[1]) > 0) {
-                        // count number of tabs in front of each found pref
-                        foreach ($m2[1] as & $found) {
+                    if (preg_match_all('/{preference.*name=[\'"]?(\w*)[\'"]?.*}/i', $c, $m2, PREG_OFFSET_CAPTURE)) {
+                        foreach ($m2[1] as &$found) {
                             $tabs = preg_match_all('/{\/tab}/i', substr($c, 0, $found[1]), $m3);
-                            if ($tabs === false) {
-                                $tabs = 0;
-                            } else {
-                                $tabs++;
-                            }
+                            $tabs = ($tabs === false) ? 0 : $tabs + 1;
+
                             if ($prefs['site_layout'] !== 'classic' && $page === 'look' && $tabs > 2) {
                                 $tabs--;    // hidden tab #3 for shadow layers
                             }
@@ -1097,6 +1087,7 @@ class PreferencesLib
                     }
                 }
             }
+
             file_put_contents($file, serialize($prefs_usage_array));
         } else {
             $prefs_usage_array = unserialize(file_get_contents($file));

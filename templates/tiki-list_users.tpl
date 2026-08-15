@@ -30,11 +30,7 @@
             {/if}
             {if $prefs.feature_community_list_country eq 'y'}
                 <td class="text">
-                    {if $listuserscountry[changes] == "None" || $listuserscountry[changes] == "Other" || $listuserscountry[changes] == ""}
-                        {html_image file='img/flags/Other.png' hspace='4' vspace='1' alt="{tr}Flag{/tr}" title="{tr}Flag{/tr}"}
-                    {else}
-                        {html_image file="img/flags/{$listuserscountry[changes]}.png" hspace='4' vspace='1' alt="{tr}Flag{/tr}" title="{tr}Flag{/tr}"}&nbsp;{tr}{$listuserscountry[changes]}{/tr}
-                    {/if}&nbsp;
+                    {$listuserscountry[changes]|countryflagwithlabel}&nbsp;{tr}{$listuserscountry[changes]}{/tr}&nbsp;
                 </td>
             {/if}
             {if $prefs.feature_community_list_distance eq 'y'}

@@ -201,13 +201,6 @@
             {/tab}
         {/if}
 
-        {* ---------------------------------------- tab with attachments --- *}
-        {if $tracker_info.useAttachments eq 'y' and $tiki_p_tracker_view_attachments eq 'y'}
-            {tab name="{tr}Attachments{/tr} (`$attCount`)" print=n}
-                {include file='attachments_tracker.tpl'}
-            {/tab}
-        {/if}
-
     {* --------------------------------------------------------------- tab with edit --- *}
     {if (! isset($print_page) || $print_page ne 'y') && $canModify && $prefs.tracker_legacy_insert eq 'y'}
         {tab name=$editTitle}

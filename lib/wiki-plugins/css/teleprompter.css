@@ -14,12 +14,14 @@
   width: 100% !important;
   height: 100% !important;
   background: #000;
+  color: #f8f9fa;
 }
 
 .teleprompter-container:-webkit-full-screen {
   width: 100% !important;
   height: 100% !important;
   background: #000;
+  color: #f8f9fa;
 }
 
 .teleprompter-container:focus-visible {
@@ -107,9 +109,23 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: rgba(255, 255, 255, 0.6);
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
   top: 50%;
   display: block;
+}
+
+.teleprompter-container:fullscreen .tp-focus-mask,
+.teleprompter-container:-webkit-full-screen .tp-focus-mask {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.teleprompter-container:fullscreen .tp-focus-guide,
+.teleprompter-container:-webkit-full-screen .tp-focus-guide {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.75);
 }
 
 .teleprompter-focus-none .teleprompter-focus-overlay {

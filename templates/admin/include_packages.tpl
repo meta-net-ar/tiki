@@ -235,7 +235,7 @@
                     <th width="200">{tr}Action{/tr}</th>
                 </tr>
                 {foreach item=entry from=$composer_packages_available}
-                    <tr>
+                    <tr class="{if $entry.name == $package_highlight}table-warning{/if}">
                         <td>
                         {$entry.name}
                         {if $entry.state == 'replaced'}
