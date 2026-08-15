@@ -29,6 +29,7 @@ class Executor
 
     private $formatterPlugins = [];
     private $reverseMapping = [];
+    private $paginationRequested = false;
 
     public function __construct(Record $record, Search_Formatter $sf)
     {
@@ -44,6 +45,7 @@ class Executor
         $body = $this->replacePlaceholders();
         $result = $this->performSearch($body);
         $this->formatResult($result);
+        $this->stampPaginationInfo($result);
         $this->processSublists();
     }
 
@@ -192,19 +194,68 @@ class Executor
     {
         $matches = (new Parser())->getMatches($body);
 
+        foreach ($matches as $match) {
+            if ($match->getName() == 'pagination') {
+                $this->paginationRequested = true;
+                break;
+            }
+        }
+
         $query = new Search_Query();
         TikiLib::lib('unifiedsearch')->initQuery($query);
 
         $builder = new Search_Query_WikiBuilder($query);
         $builder->enableAggregate();
-        $builder->skipPagination();
+        if (! $this->paginationRequested) {
+            $builder->skipPagination();
+        }
         $builder->apply($matches);
 
-        // try to retrieve as many as possible from the sublist subqueries
-        $query->setRange(0, 9999);
+        if (! $this->paginationRequested) {
+            // try to retrieve as many as possible from the sublist subqueries
+            $query->setRange(0, 9999);
+        }
 
         $index = TikiLib::lib('unifiedsearch')->getIndex();
         return $query->search($index);
+    }
+
+    /**
+     * When the sublist body includes an explicit {pagination} block, expose the search's
+     * count/offset/max alongside the formatted entries (as `<key>_count`, `<key>_offset`,
+     * `<key>_max`) so the enclosing template can build {pagination_links} for this specific
+     * sublist. Sublists without a {pagination} block keep their previous "fetch everything"
+     * behavior and no metadata is added, to avoid changing the shape of existing datasets.
+     */
+    protected function stampPaginationInfo(Search_ResultSet $result): void
+    {
+        if (! $this->paginationRequested) {
+            return;
+        }
+
+        $key = $this->record->getKey();
+        $info = [
+            $key . '_count' => count($result),
+            $key . '_offset' => $result->getOffset(),
+            $key . '_max' => $result->getMaxRecords(),
+        ];
+
+        foreach ($this->data as $i => $row) {
+            if (empty($row)) {
+                continue;
+            }
+            if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
+                foreach ($row as $j => $_) {
+                    foreach ($info as $infoKey => $value) {
+                        $this->data[$i][$j][$infoKey] = $value;
+                    }
+                }
+            } else {
+                foreach ($info as $infoKey => $value) {
+                    $this->data[$i][$infoKey] = $value;
+                }
+            }
+        }
     }
 
     /** This applies formatters, which will rewrite $this->data */
