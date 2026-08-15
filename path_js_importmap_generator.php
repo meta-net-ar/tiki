@@ -25,7 +25,6 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
             // NOTE: Keep the list alphabetically sorted.
             //IMPORTANT:  All these have to be ESM modules, TEST them, don't assume that they are.
             "imports" => [
-                "@tiki/annotator/annotator" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/annotator/annotator.js",
                 "@tiki/editor-toolbar/fileRecording" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/editor-toolbar/fileRecording.js",
                 "@tiki/modules/search" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/modules/search.js",
                 "@tiki/plugin-base/buttonParamHandler" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/buttonParamHandler.js",
@@ -136,6 +135,9 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/languageCheckTextarea" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/languageCheckTextarea.js",
                 "@jquery-tiki/timeago" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/timeago.js",
                 "@jquery-tiki/validate-alt-image" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/validate-alt-image.js",
+
+                /* src/js/tiki-annotator */
+                "@tiki-annotator/annotator" => $tikiUrl . JS_ASSETS_PATH . "/tiki-annotator.js",
 
                 /* src/js/tiki-3d-model-viewer */
                 "@tiki-3d-model-viewer/model3dviewer" => $tikiUrl . JS_ASSETS_PATH . "/tiki-3d-model-viewer.js",

@@ -53,7 +53,6 @@ class Services_Comment_AnnotationController
     {
         global $user, $headerlib;
 
-        // Read JSON request body directly.
         $rawJson = file_get_contents('php://input');
         $params = new JitFilter(json_decode((string) $rawJson, true) ?? []);
 
@@ -121,7 +120,6 @@ class Services_Comment_AnnotationController
     {
         $threadId = $input->threadId->int();
 
-        // Read JSON request body directly.
         $rawJson = file_get_contents('php://input');
         $params = new JitFilter(json_decode((string) $rawJson, true) ?? []);
 
@@ -165,15 +163,11 @@ class Services_Comment_AnnotationController
 
     public function action_destroy($input)
     {
-         // ensure threadId exists even if JSON was used
+
         $rawJson = file_get_contents('php://input');
         $params = new JitFilter(json_decode((string) $rawJson, true) ?? []);
 
-        $threadId = $input->threadId->int();
-
-        if (! $threadId) {
-            $threadId = $params->threadId->int();
-        }
+        $threadId = $params->threadId->int();
 
         if (! $threadId) {
             throw new Services_Exception("Thread not specified.");
@@ -184,7 +178,7 @@ class Services_Comment_AnnotationController
 
         $ret = $this->commentController->action_remove($input);
 
-        $ret['id'] = $ret['threadId'] ?? $threadId;
+        $ret['id'] = $ret['threadId'];
 
         return $ret;
     }

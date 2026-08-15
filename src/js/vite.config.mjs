@@ -103,7 +103,6 @@ export default defineConfig(({ command, mode }) => {
         { prefix: "@tiki/editor-toolbar/", src: "src/js/@tiki/editor-toolbar" },
         { prefix: "@tiki/plugin-base/", src: "src/js/@tiki/plugin-base" },
         { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
-        { prefix: "@tiki/annotator/", src: "src/js/@tiki/annotator" },
         { prefix: "@tiki/tracker-field-base/", src: "src/js/@tiki/tracker-field-base" },
         { prefix: "@tiki/tracker-fields/", src: "src/js/@tiki/tracker-fields" },
     ]);
@@ -131,6 +130,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-html5-qrcode": resolve(import.meta.dirname, "tiki-html5-qrcode/index.js"),
         kanban: resolve(import.meta.dirname, "vue-mf/kanban/src/kanban.js"),
         "root-config": resolve(import.meta.dirname, "vue-mf/root-config/src/root-config.js"),
+        "tiki-annotator": resolve(import.meta.dirname, "tiki-annotator/annotator.js"),
         "tiki-3d-model-viewer": resolve(import.meta.dirname, "tiki-model3dviewer/model3dviewer.js"),
         "tiki-glightbox": resolve(import.meta.dirname, "tiki-glightbox/glightbox-index.js"),
         "tiki-sentry-browser": resolve(import.meta.dirname, "tiki-sentry-browser/sentry-browser.js"),

@@ -255,7 +255,7 @@ Sections::onSectionChange(function ($section) use ($prefs) {
     $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
 
     $headerlib->add_js_module('
-        import { initRecogito } from "@tiki/annotator/annotator";
+        import { initRecogito } from "@tiki-annotator/annotator";
 
         initRecogito({
             containerId: "top",
