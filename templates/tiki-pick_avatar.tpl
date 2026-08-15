@@ -20,7 +20,9 @@
                 {icon name='remove'}
             </a>
         {/if}
-        <button class="btn btn-sm btn-outline-secondary rounded tips" id="show-avatar-picker" title=":{tr}Choose an avatar{/tr}">{icon name="user-edit"}</button>
+        {if $prefs.user_dicebear_avatar eq 'y'}
+            <button class="btn btn-sm btn-outline-secondary rounded tips" id="show-avatar-picker" title=":{tr}Choose an avatar{/tr}">{icon name="user-edit"}</button>
+        {/if}
     </div>
 <div class="d-flex flex-column gap-2 mb-2 mt-4 border-top border-light p-2">
     {if $avatar}
@@ -41,12 +43,14 @@
 
 {ticket}
 
-<script type="module">
-    import { showPickerModal, renderAvatars } from 'avatar-generator';
+{if $prefs.user_dicebear_avatar eq 'y'}
+    <script type="module">
+        import { showPickerModal, renderAvatars } from 'avatar-generator';
 
-    $('#show-avatar-picker').on('click', showPickerModal);
-    renderAvatars();
-</script>
+        $('#show-avatar-picker').on('click', showPickerModal);
+        renderAvatars();
+    </script>
+{/if}
 
 {if sizeof($avatars) > 0}
 

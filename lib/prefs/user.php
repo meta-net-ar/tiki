@@ -403,11 +403,20 @@ function prefs_user_list($partial = false)
             'default' => 'n',
             'tags' => ['basic'],
         ],
+        'user_dicebear_avatar' => [
+            'name' => tr('Use DiceBear for user avatars'),
+            'description' => tr('Use DiceBear to generate user avatars.'),
+            'help' => 'https://www.dicebear.com',
+            'type' => 'flag',
+            'tags' => ['advanced'],
+            'default' => 'y',
+        ],
         'user_default_avatar_style' => [
             'name' => tr('Default avatar style'),
             'description' => tr('Default avatar style for users when registering.'),
             'help' => 'https://www.dicebear.com/styles/',
             'type' => 'list',
+            'dependencies' => ['user_dicebear_avatar'],
             'tags' => ['advanced'],
             'default' => 'initials',
             'options' => [
