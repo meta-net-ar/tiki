@@ -60,6 +60,7 @@ export default function showPickerModal() {
                             showMessage(tr("Avatar updated"), "success");
 
                             $("#user-picture").empty().append(selectedAvatar.html());
+                            $("#full-size-picture").remove();
                             $(".mod-login-avatar")
                                 .find("img")
                                 .attr(
