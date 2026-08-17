@@ -15,6 +15,7 @@ function prefs_indexnow_list()
             'default' => 'n',
             'since' => '30',
             'admin' => 'seoprefs',
+            'packages_required' => ['melbahja/seo' => '\Melbahja\Seo\Indexing\IndexNowIndexer'],
         ],
         'indexnow_key' => [
             'name' => tra('IndexNow API Key'),
