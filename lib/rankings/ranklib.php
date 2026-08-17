@@ -16,6 +16,34 @@ if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
 class RankLib extends TikiLib
 {
     /**
+     * Build a parameterized wiki-page category join filter.
+     *
+     * @param array $categ Category ids (non-integers and non-positive values are ignored)
+     * @return array{0: string, 1: array} SQL fragment and bind values
+     */
+    private function buildWikiCategoryJoin(array $categ): array
+    {
+        $categIds = [];
+        foreach ($categ as $categId) {
+            $categId = (int) $categId;
+            if ($categId > 0) {
+                $categIds[] = $categId;
+            }
+        }
+
+        if (! $categIds) {
+            return ['', []];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($categIds), '?'));
+        $mid = " INNER JOIN (`tiki_objects` as tob, `tiki_category_objects` as tco)"
+            . " ON (tp.`pageName` = tob.`itemId` and tob.`objectId` = tco.`catObjectId`)"
+            . " WHERE tob.`type` = 'wiki page' AND tco.`categId` IN ($placeholders)";
+
+        return [$mid, $categIds];
+    }
+
+    /**
      * @param $limit
      * @param array $categ
      * @param null $lang
@@ -26,17 +54,7 @@ class RankLib extends TikiLib
         global $prefs;
         $pagesAdded = [];
 
-        $bindvals = [];
-        $mid = '';
-        if ($categ) {
-            $mid .= " INNER JOIN (`tiki_objects` as tob, `tiki_category_objects` as tco) ON (tp.`pageName` = tob.`itemId` and tob.`objectId` = tco.`catObjectId`) WHERE tob.`type` = 'wiki page' AND (tco.`categId` = ?";
-            $bindvals[] = $categ[0];
-            //FIXME
-            for ($i = 1, $icount_categ = count($categ); $i < $icount_categ; $i++) {
-                $mid .= " OR tco.`categId` = " . $categ[$i];
-            }
-            $mid .= ")";
-        }
+        [$mid, $bindvals] = $this->buildWikiCategoryJoin($categ);
 
         $query = "select distinct tp.`pageName`, tp.`hits`, tp.`lang`, tp.`page_id` from `tiki_pages` tp $mid order by `hits` desc";
 
@@ -93,17 +111,7 @@ class RankLib extends TikiLib
             $this->pageRank();
         }
 
-        $bindvals = [];
-        $mid = '';
-        if ($categ) {
-            $mid .= " INNER JOIN (`tiki_objects` as tob, `tiki_category_objects` as tco) ON (tp.`pageName` = tob.`itemId` and tob.`objectId` = tco.`catObjectId`) WHERE tob.`type` = 'wiki page' AND (tco.`categId` = ?";
-        //FIXME
-            $bindvals[] = $categ[0];
-            for ($i = 1, $icount_categ = count($categ); $i < $icount_categ; $i++) {
-                $mid .= " OR tco.`categId` = " . $categ[$i];
-            }
-            $mid .= ")";
-        }
+        [$mid, $bindvals] = $this->buildWikiCategoryJoin($categ);
 
         $query = "select tp.`pageName`, tp.`pageRank` from `tiki_pages` tp $mid order by `pageRank` desc";
 
@@ -136,17 +144,7 @@ class RankLib extends TikiLib
     {
         global $user;
 
-        $bindvals = [];
-        $mid = '';
-        if ($categ) {
-            $mid .= " INNER JOIN (`tiki_objects` as tob, `tiki_category_objects` as tco) ON (tp.`pageName` = tob.`itemId` and tob.`objectId` = tco.`catObjectId`) WHERE tob.`type` = 'wiki page' AND (tco.`categId` = ?";
-            //FIXME
-            $bindvals[] = $categ[0];
-            for ($i = 1, $icount_categ = count($categ); $i < $icount_categ; $i++) {
-                $mid .= " OR tco.`categId` = " . $categ[$i];
-            }
-            $mid .= ")";
-        }
+        [$mid, $bindvals] = $this->buildWikiCategoryJoin($categ);
 
         $query = "select tp.`pageName`, tp.`lastModif`, tp.`hits` from `tiki_pages` tp $mid order by `lastModif` desc";
 
@@ -587,21 +585,7 @@ $query = "select a.*, tf.*, max(b.`commentDate`) as `lastPost` from
      */
     public function wiki_ranking_top_authors($limit, $categ = [])
     {
-        $bindvals = [];
-        $mid = '';
-        if ($categ) {
-            $mid .= " INNER JOIN (`tiki_objects` as tob, `tiki_category_objects` as tco) ON (tp.`pageName` = tob.`itemId` and tob.`objectId` = tco.`catObjectId`)
-                WHERE tob.`type` = 'wiki page'
-                AND (tco.`categId` = ?"
-            ;
-
-            //FIXME
-            $bindvals[] = $categ[0];
-            for ($i = 1, $icount_categ = count($categ); $i < $icount_categ; $i++) {
-                $mid .= " OR tco.`categId` = " . $categ[$i];
-            }
-            $mid .= ")";
-        }
+        [$mid, $bindvals] = $this->buildWikiCategoryJoin($categ);
         $query = "select distinct tp.`user`, count(*) as `numb` from `tiki_pages` tp $mid group by `user` order by " . $this->convertSortMode("numb_desc");
 
         $result = $this->query($query, $bindvals, $limit, 0);
