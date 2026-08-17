@@ -45,6 +45,14 @@ if ($item_path == '/') {
     $orig_url = $prefs['tikiIndex'];
 }
 
+function getWikiPageParamFromSefurl($slug)
+{
+    $wikiLib = TikiLib::lib('wiki');
+    $page = $wikiLib->get_page_by_slug(rawurldecode($slug));
+
+    return rawurlencode($wikiLib->get_slug_by_page($page));
+}
+
 if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
     if (preg_match('/cat[0-9]+-?/', $orig_url)) {
         include_once('tiki-sefurl.php');
@@ -53,13 +61,31 @@ if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
         $orig_url = preg_replace('#\/article([0-9]+)(.*)#', '/tiki-read_article.php?articleId=$1', $orig_url);
     } else {
         if (str_contains($orig_url, '?')) {
-            $orig_url = preg_replace('#\/([^\/\?]+)\?(.*)?$#', '/tiki-index.php?page=$1&$2', $orig_url);
+            $orig_url = preg_replace_callback(
+                '#\/([^\/\?]+)\?(.*)?$#',
+                function ($matches) {
+                    return '/tiki-index.php?page=' . getWikiPageParamFromSefurl($matches[1]) . '&' . ($matches[2] ?? '');
+                },
+                $orig_url
+            );
         } else {
-            $orig_url = preg_replace('#\/([^\/\?]+)$#', '/tiki-index.php?page=$1', $orig_url);
+            $orig_url = preg_replace_callback(
+                '#\/([^\/\?]+)$#',
+                function ($matches) {
+                    return '/tiki-index.php?page=' . getWikiPageParamFromSefurl($matches[1]);
+                },
+                $orig_url
+            );
         }
     }
 } elseif (! str_contains($orig_url, '.php')) {
-    $orig_url = preg_replace('#\/([^\/\?]+)(\?.*)?$#', '/tiki-index.php?page=$1', $orig_url);
+    $orig_url = preg_replace_callback(
+        '#\/([^\/\?]+)(\?.*)?$#',
+        function ($matches) {
+            return '/tiki-index.php?page=' . getWikiPageParamFromSefurl($matches[1]);
+        },
+        $orig_url
+    );
     $params = parse_url($orig_url);
     if (empty($params['query'])) {
             $orig_url = $prefs['tikiIndex'];
@@ -68,7 +94,6 @@ if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
 
 if (str_contains($orig_url, 'tiki-index.php') || str_contains($orig_url, 'tiki-read_article.php')) {
     $multilinguallib = TikiLib::lib('multilingual');
-    $orig_url = urldecode($orig_url);
     if (! ($txt = strstr($orig_url, '?'))) {
         $txt = '';
     } else {
@@ -102,8 +127,8 @@ if (str_contains($orig_url, 'tiki-index.php') || str_contains($orig_url, 'tiki-r
         } else {
             $newPage = $tikilib->get_page_name_from_id($bestLangPageId);
             $newPage = TikiLib::lib('wiki')->get_slug_by_page($newPage);
-            $newPage = urlencode($newPage);
-            $orig_url = preg_replace('/(.*[&?]page=)' . preg_quote($page) . '(.*)/', '${1}' . $newPage . '$2', $orig_url);
+            $newPage = rawurlencode($newPage);
+            $orig_url = preg_replace('/([&?]page=)[^&]*/', '${1}' . $newPage, $orig_url);
             $orig_url = preg_replace('/(.*)(tiki-index.php)$/', "$1$2?page=$newPage", $orig_url);
         }
     }
