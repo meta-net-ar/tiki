@@ -12,8 +12,8 @@ $section = 'blogs';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'which'                    => 'string',              //post
-            'limit'                    => 'string',              //post
+            'which'                    => 'word',                //post
+            'limit'                    => 'digits',              //post
         ],
     ]
 ];
@@ -37,17 +37,18 @@ $allrankings = [
     ]
 ];
 $smarty->assign('allrankings', $allrankings);
-if (! isset($_REQUEST["which"])) {
-    $which = 'blog_ranking_top_blogs';
+$allowedRankings = array_column($allrankings, 'value');
+$defaultWhich = 'blog_ranking_top_blogs';
+if (! isset($_REQUEST["which"]) || ! in_array($_REQUEST["which"], $allowedRankings, true)) {
+    $which = $defaultWhich;
 } else {
     $which = $_REQUEST["which"];
 }
 $smarty->assign('which', $which);
 // Get the page from the request var or default it to HomePage
-if (! isset($_REQUEST["limit"])) {
+$limit = isset($_REQUEST["limit"]) ? (int) $_REQUEST["limit"] : 10;
+if ($limit < 1) {
     $limit = 10;
-} else {
-    $limit = $_REQUEST["limit"];
 }
 $smarty->assign_by_ref('limit', $limit);
 // Rankings:
