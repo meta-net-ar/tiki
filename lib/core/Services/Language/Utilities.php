@@ -174,27 +174,78 @@ class Services_Language_Utilities
     }
 
     /**
+     * Ensure $language is a real on-disk language code (no path segments / traversal).
+     *
+     * @param string $language Language code (eg: en)
+     *
+     * @throws Services_Exception
+     */
+    public function assertValidLanguage($language)
+    {
+        if (! is_string($language) || $language === '' || ! Language::is_valid_language($language)) {
+            throw new Services_Exception(tr('Invalid language provided'), 400);
+        }
+    }
+
+    /**
      * Get language directory generally and for a specific language too
      *
      * @param string $language Optional language code (eg: en)
      *
      * @return string $langDir The directory path languages or to a language specifically
      *
+     * @throws Services_Exception
      */
     public function getLanguageDirectory($language = '')
     {
         $langDir = "lang/";
 
         if (! empty($language)) {
+            $this->assertValidLanguage($language);
             $langDir .= "$language/";
         }
 
         global $tikidomain;
         if (! empty($tikidomain)) {
+            // tikidomain is an internal install path segment; reject traversal if ever set from untrusted input
+            if (! is_string($tikidomain) || $tikidomain === '' || strpbrk($tikidomain, '/\\') !== false || str_contains($tikidomain, '..')) {
+                throw new Services_Exception(tr('Invalid language provided'), 400);
+            }
             $langDir .= "$tikidomain/";
         }
 
         return $langDir;
+    }
+
+    /**
+     * Resolve custom.php path for a language and ensure it stays under lang/.
+     *
+     * @param string $language Language code (eg: en)
+     *
+     * @return string Relative path to custom.php
+     *
+     * @throws Services_Exception
+     */
+    public function getCustomPhpPath($language)
+    {
+        $this->assertValidLanguage($language);
+
+        $custom_file = $this->getLanguageDirectory($language) . LANG_CUSTOM_PHP_BASENAME;
+        $langRoot = realpath('lang');
+        $languageDir = realpath(dirname($custom_file));
+
+        if (
+            $langRoot === false
+            || $languageDir === false
+            || (
+                $languageDir !== $langRoot
+                && ! str_starts_with($languageDir, $langRoot . DIRECTORY_SEPARATOR)
+            )
+        ) {
+            throw new Services_Exception(tr('Invalid language provided'), 400);
+        }
+
+        return $custom_file;
     }
 
     /**
@@ -264,8 +315,7 @@ class Services_Language_Utilities
      */
     public function getCustomPhpTranslations($language)
     {
-        $custom_file = $this->getLanguageDirectory($language);
-        $custom_file .= LANG_CUSTOM_PHP_BASENAME;
+        $custom_file = $this->getCustomPhpPath($language);
 
         if (file_exists($custom_file)) {
             global $lang;
@@ -312,23 +362,19 @@ class Services_Language_Utilities
      */
     public function writeCustomPhpTranslations($language, $data)
     {
-        //prepare custom file path
-        $custom_file = $this->getLanguageDirectory($language);
-
-        //add file name
-        $custom_file .= LANG_CUSTOM_PHP_BASENAME;
-
-        //prepare php file
-        $custom_code = "<?php\r\n\$lang_custom = array(\r\n";
+        $custom_file = $this->getCustomPhpPath($language);
 
         if (! is_array($data)) {
             throw new Services_Exception(tr('String translation set is not an array'), 400);
         }
 
-        //add translations
+        //prepare php file — escape for double-quoted PHP strings (backslash before quote, etc.)
+        $custom_code = "<?php\r\n\$lang_custom = array(\r\n";
+
         foreach ($data as $from => $to) {
-            if (! empty($from)) {
-                $custom_code .= '"' . str_replace('"', '\\"', $from) . '" => "' . str_replace('"', '\\"', $to) . "\",\r\n";
+            if ($from !== '' && $from !== null) {
+                $custom_code .= '"' . Language::addPhpSlashes((string) $from) . '" => "'
+                    . Language::addPhpSlashes((string) $to) . "\",\r\n";
             }
         }
 
