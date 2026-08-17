@@ -7,9 +7,7 @@
 
 require_once 'tiki-setup.php';
 
-if ($prefs['indexnow_enable'] !== 'y') {
-    Feedback::errorAndDie(tra('IndexNow is not enabled.'), 404);
-}
+$access->check_feature('indexnow_enable');
 
 $indexer = new \Melbahja\Seo\Indexing\IndexNowIndexer($prefs['indexnow_key'] ?? '');
 $indexer->serveKeyFile();
