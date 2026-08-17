@@ -59,9 +59,19 @@ class ThemeLib extends TikiLib
     {
         global $prefs, $smarty;
         $section = Sections::getCurrentSection();
+
+        // lib/setup/theme.php writes the resolved theme back into $prefs['theme'], so snapshot
+        // it once per request instead of re-reading it - otherwise a later section change
+        // would reuse an earlier call's resolved admin theme as its base.
+        static $baseTheme;
+        static $baseThemeOption;
+        if (! isset($baseTheme)) {
+            $baseTheme = $prefs['theme'] ?? '';
+            $baseThemeOption = $prefs['theme_option'] ?? '';
+        }
         //Initialize variables for the actual theme and theme option to be displayed
-        $theme_active = $prefs['theme'] ?? '';
-        $theme_option_active = $prefs['theme_option'] ?? '';
+        $theme_active = $baseTheme;
+        $theme_option_active = $baseThemeOption;
 
         // User theme previously set up in lib/setup/user_prefs.php
 
