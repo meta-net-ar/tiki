@@ -25,6 +25,31 @@ class LanguageTest extends TikiTestCase
         $this->assertEquals($expectedResult, Language::removePhpSlashes($string));
     }
 
+    public function testListDiskLanguagesFalsyPathUsesDefaultDirectory(): void
+    {
+        $listDiskLanguages = new ReflectionMethod(Language::class, 'list_disk_languages');
+        $listDiskLanguages->setAccessible(true);
+
+        $expected = $listDiskLanguages->invoke(null, 'lang');
+        $this->assertNotEmpty($expected, 'The lang directory should contain language directories');
+
+        foreach ([false, null, ''] as $falsyPath) {
+            $this->assertEqualsCanonicalizing(
+                $expected,
+                $listDiskLanguages->invoke(null, $falsyPath),
+                'Falsy path ' . var_export($falsyPath, true) . ' should fall back to the lang directory'
+            );
+        }
+    }
+
+    public function testListDiskLanguagesMissingDirectoryReturnsEmptyArray(): void
+    {
+        $listDiskLanguages = new ReflectionMethod(Language::class, 'list_disk_languages');
+        $listDiskLanguages->setAccessible(true);
+
+        $this->assertSame([], $listDiskLanguages->invoke(null, 'lang/does_not_exist'));
+    }
+
     // TODO: We need a way to create a Tiki database just for the tests
     /*public function testGetDbTranslatedLanguages() {
     }*/
