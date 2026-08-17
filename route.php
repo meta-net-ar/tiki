@@ -226,6 +226,12 @@ function tiki_route($path)
         }
     );
 
+    tiki_route_attempt(
+        '|^indexnow-([a-f0-9]+)\.txt$|',
+        'tiki-indexnow.php',
+        tiki_route_single(0, 'key')
+    );
+
     if (false !== $dot = strrpos($path, '.')) {
         // Prevent things that look like filenames from being considered for wiki page names
         $extension = substr($path, $dot + 1);
