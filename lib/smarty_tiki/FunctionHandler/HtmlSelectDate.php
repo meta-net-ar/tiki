@@ -172,6 +172,17 @@ class HtmlSelectDate extends Base
         // Now split this in pieces, which later can be used to set the select
         $time = explode("-", $time);
 
+        $instance_id = str_replace('.', '_', uniqid('hsd_', true));
+        $instance_id_esc = htmlspecialchars($instance_id, ENT_QUOTES, 'UTF-8');
+        $dayValueWidth = max(
+            strlen((string) sprintf($day_format, 1)),
+            strlen((string) sprintf($day_format, 31))
+        );
+        $dayLabelWidth = max(
+            strlen((string) sprintf($day_value_format, 1)),
+            strlen((string) sprintf($day_value_format, 31))
+        );
+
         // make syntax "+N" or "-N" work with start_year and end_year
         if (preg_match('!^(\+|\-)\s*(\d+)$!', $end_year, $match)) {
             $tikidate->setDate(time());
@@ -238,7 +249,7 @@ class HtmlSelectDate extends Base
             if (null !== $all_extra) {
                 $month_result .= ' ' . $all_extra;
             }
-            $month_result .= $extra_attrs . '>' . "\n";
+            $month_result .= $extra_attrs . ' data-date-part="month">' . "\n";
 
             $tikidate->setLocalTime(1, (int) $time[1], 2000, 0, 0, 0, 0);
             $month_result .= smarty_function_html_options(
@@ -256,11 +267,21 @@ class HtmlSelectDate extends Base
         if ($display_days) {
             $field_separator_count++;
             $days = [];
+            $day_values = [];
             if (isset($day_empty)) {
                 $days[''] = '';
                 $day_values[''] = $day_empty;
             }
-            for ($i = 1; $i <= 31; $i++) {
+            $yearForDays = isset($time[0]) ? (int) $time[0] : (int) date('Y');
+            $monthForDays = isset($time[1]) ? (int) $time[1] : 1;
+            if ($monthForDays < 1 || $monthForDays > 12) {
+                $monthForDays = 1;
+            }
+            if ($yearForDays < 1) {
+                $yearForDays = (int) date('Y');
+            }
+            $maxDaysInMonth = cal_days_in_month(CAL_GREGORIAN, $monthForDays, $yearForDays);
+            for ($i = 1; $i <= $maxDaysInMonth; $i++) {
                 $days[] = sprintf($day_format, $i);
                 $day_values[] = sprintf($day_value_format, $i);
             }
@@ -280,7 +301,7 @@ class HtmlSelectDate extends Base
             if (null !== $day_extra) {
                 $day_result .= ' ' . $day_extra;
             }
-            $day_result .= $extra_attrs . '>' . "\n";
+            $day_result .= $extra_attrs . ' data-date-part="day">' . "\n";
             $day_result .= smarty_function_html_options(
                 [
                     'output'       => $day_values,
@@ -331,7 +352,7 @@ class HtmlSelectDate extends Base
                 if (null !== $year_extra) {
                     $year_result .= ' ' . $year_extra;
                 }
-                $year_result .= $extra_attrs . '>' . "\n";
+                $year_result .= $extra_attrs . ' data-date-part="year">' . "\n";
                 $year_result .= smarty_function_html_options(
                     [
                         'output' => $years,
@@ -367,6 +388,13 @@ class HtmlSelectDate extends Base
             }
         }
 
-        return "<div class='row gy-2 gx-3 align-items-center mb-3'>$html_result</div>";
+        \TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/html_select_date.js');
+
+        return '<div id="html_select_date_' . $instance_id_esc
+            . '" class="row gy-2 gx-3 align-items-center mb-3 html-select-date"'
+            . ' data-day-value-width="' . (int) $dayValueWidth . '"'
+            . ' data-day-label-width="' . (int) $dayLabelWidth . '">'
+            . $html_result
+            . '</div>';
     }
 }
