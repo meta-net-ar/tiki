@@ -108,6 +108,10 @@ if ($isvalid) {
             if (! empty($_SESSION['last_validation']['pass'])) {
                 $smarty->assign('oldpass', $_SESSION['last_validation']['pass']);
             }
+            $_SESSION['pending_new_user_password'] = [
+                'user' => $_REQUEST['user'],
+                'created' => $tikilib->now,
+            ];
             $smarty->assign('new_user_validation', 'y');
             $smarty->assign('userlogin', $_REQUEST['user']);
             if ($prefs['login_is_email'] === 'y') {

@@ -661,7 +661,8 @@ if ($install_step == '9') {
         // sefurl() falls back to the edit url and the admin lands on an empty editor instead of the home page.
         TikiLib::lib('wiki')->createDefaultHomePage();
         TikiLib::lib('unifiedsearch')->rebuild();
-        $u = isset($defaultpass) ? 'tiki-change_password.php?user=admin&oldpass=' . $defaultpass . '&newuser=y' : 'tiki-change_password.php?user=admin&newuser=y';
+        // Always pass oldpass so first admin password setup cannot rely on a forgeable flag
+        $u = 'tiki-change_password.php?user=admin&oldpass=' . urlencode($defaultpass ?? 'admin') . '&newuser=y';
         $tikilib = TikiLib::lib('tiki');
         $tikilib->set_preference('tiki_install_version', $TWV->version);
     } else {
