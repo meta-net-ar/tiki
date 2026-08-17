@@ -143,7 +143,7 @@ class Language extends TikiDb_Bridge
     }
 
     /**
-     * @param bool $path
+     * @param string|bool $path Directory to scan, or false to use the default 'lang' directory
      * @param null $short
      * @param bool $all
      * @return array|mixed
@@ -172,6 +172,11 @@ class Language extends TikiDb_Bridge
      */
     private static function list_disk_languages($path = 'lang')
     {
+        // Callers pass false to mean "use the default path"
+        if (! $path) {
+            $path = 'lang';
+        }
+
         if (! is_dir($path)) {
             return [];
         }
