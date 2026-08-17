@@ -8,7 +8,7 @@
  * THERE IS NO UNDO (and you'll need to reindex afterwards)
  * You will need to set some variables below before it will run to avoid accidental usage, then do:
  *
- * `php doc/devtools/process_user_logins.php` from the root of your tiki
+ * `php src/devtools/process_user_logins.php` from the root of your tiki
  *
  * Good luck!
  */

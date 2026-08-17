@@ -99,7 +99,7 @@ As of $now, the community has:
   * $nbCommiters of those people who made at least one code commit
 
 This list is automatically generated and alphabetically sorted
-by the following script: php doc/devtools/release.php
+by the following script: php src/devtools/release.php
 
 ====================================================================
 

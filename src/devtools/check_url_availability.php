@@ -14,8 +14,8 @@
  * This is NOT part of CI. CI handles link governance via check_external_links.php.
  *
  * Usage:
- *   php doc/devtools/check_url_availability.php
- *   php doc/devtools/check_url_availability.php --severity=critical,high
+ *   php src/devtools/check_url_availability.php
+ *   php src/devtools/check_url_availability.php --severity=critical,high
  */
 
 namespace TikiDevTools;
@@ -24,8 +24,8 @@ if (PHP_SAPI !== 'cli') {
     die('Only available through command-line.' . PHP_EOL);
 }
 
-require_once __DIR__ . '/vcscommons.php';
-require_once __DIR__ . '/check_external_links.php';
+require_once __DIR__ . '/../ci/vcscommons.php';
+require_once __DIR__ . '/../ci/check_external_links.php';
 
 /**
  * URL Availability Checker using curl_multi for parallel requests.

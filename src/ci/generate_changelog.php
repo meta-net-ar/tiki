@@ -54,7 +54,7 @@ function get_changelog_header(): string
         ### Generate Technical Changelog
         
          ```bash
-        php doc/devtools/generate_changelog.php --help
+        php src/ci/generate_changelog.php --help
         ```
         
         ### Below is a summary of the changes included in this release:
@@ -313,7 +313,7 @@ function render_summary(array $groups, array $options): string
         if (in_array($tag, $low_priority_tags) && $count > 10 && ! in_array($tag, $options['expand'])) {
             $out .= "   Details hidden for readability\n\n";
             $out .= "```sh\n";
-            $out .= "   php doc/devtools/generate_changelog.php --expand=$tag\n\n";
+            $out .= "   php src/ci/generate_changelog.php --expand=$tag\n\n";
             $out .= "```\n";
 
             continue;

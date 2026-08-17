@@ -72,13 +72,13 @@
         # blindly all the file, allowing to catch new violations in existing files.
     -->
 
-    <rule ref="./doc/devtools/codesniffer/standards/TikiIgnore"/>
+    <rule ref="./src/ci/codesniffer/standards/TikiIgnore"/>
 
     <!--
         # Tiki specific rules
     -->
 
-    <rule ref="./doc/devtools/codesniffer/standards/Tiki"/>
+    <rule ref="./src/ci/codesniffer/standards/Tiki"/>
 
     <!--
         # Compatibility check with PHP versions supported

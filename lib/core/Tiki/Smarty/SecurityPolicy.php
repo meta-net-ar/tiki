@@ -122,7 +122,7 @@ class SecurityPolicy extends \Smarty\Security
     public function isTrustedModifier($modifier_name, $compiler)
     {
         // TikiLib is absent when templates are compiled outside a full Tiki bootstrap
-        // (doc/devtools/check_smarty_syntax.php): fall back to the default policy.
+        // (src/ci/check_smarty_syntax.php): fall back to the default policy.
         if (class_exists('TikiLib') && ($tikilib = TikiLib::lib('tiki'))) {
             $allowed_builtin_php_functions = array_filter($tikilib->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
             if (in_array($modifier_name, $allowed_builtin_php_functions)) {

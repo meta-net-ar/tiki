@@ -155,7 +155,6 @@ This is the documentation for subdirectories, with hyperlinks to their respectiv
 
 * **tools/**
   * Developer tools and scripts. The difference with bin is that these cannot be called directly
-    * ^= [doc/devtools](README.md)
     * <= [permissioncheck/](permissioncheck/README.md)
 
 * **src/**
@@ -206,8 +205,8 @@ Some generated files will always be in git (ex:  package manager lock files like
   * Generated from vendor_bundled/composer.json using ``composer -d vendor_bundled update``
 * **package.lock.json**
   * Generated from */package.json using ``npm install``
-* **doc/devtools/codesniffer/standards/TikiIgnore/ignore_list.json**
-  * Generated using `cd doc/devtools/codesniffer/standards/TikiIgnore/; php generate_ignore_list.php`.
+* **src/ci/codesniffer/standards/TikiIgnore/ignore_list.json**
+  * Generated using `cd src/ci/codesniffer/standards/TikiIgnore/; php generate_ignore_list.php`.
 
 It is useful to list theme here, so developers that hit merge conflicts can regenerate them instead of spending hours resolving conflicts manually.
 
@@ -247,7 +246,7 @@ We need to unify these in proper constants, and end up with 2 files to update, o
 
 There are currently many generated files (or trivially generatable files) in git:
 
-* index.php and .htaccess designed to disallow directory listing in apache.  We already have code in php doc/devtools/check_tiki_directories.php to check and even generate (php doc/devtools/check_tiki_directories.php fix-index).  And another, different one, in lib/core/Tiki/Composer/CleanVendors.php (addIndexFiles())
+* index.php and .htaccess designed to disallow directory listing in apache.  We already have code in php src/devtools/check_tiki_directories.php to check and even generate (php src/devtools/check_tiki_directories.php fix-index).  And another, different one, in lib/core/Tiki/Composer/CleanVendors.php (addIndexFiles())
 * Vue3 javascript files currently in /lib/vue_mf
 * A limited number of other js files.
 * scss files

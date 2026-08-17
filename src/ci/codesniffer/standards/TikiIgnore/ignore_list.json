@@ -3552,10 +3552,10 @@
         "db/tiki-db.php": {
             "class:TikiDbLegacyErrorHandler": true
         },
-        "doc/devtools/composer_packages_in_use.php": {
+        "src/devtools/composer_packages_in_use.php": {
             "class:ComposerGetPackages": true
         },
-        "doc/devtools/ggg-trace.php": {
+        "src/devtools/ggg-trace.php": {
             "class:GggTrace": true
         }
     },

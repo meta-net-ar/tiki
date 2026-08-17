@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 $composerJsonPath = __DIR__ . '/../../vendor_bundled/composer.json';
-$satisJsonPath = __DIR__ . '/satis.json';
+$satisJsonPath = __DIR__ . '/../config/satis.json';
 
 // Function to read and decode JSON from a file
 function readJsonFile($filePath)
@@ -53,13 +53,13 @@ foreach ($allComposerPackages as $package) {
 }
 
 if (empty($missingPackages)) {
-    echo "Success: All packages from vendor_bundled/composer.json are present in doc/devtools/satis.json." . PHP_EOL;
+    echo "Success: All packages from vendor_bundled/composer.json are present in src/config/satis.json." . PHP_EOL;
     exit(0);
 } else {
-    echo "Fail: The following packages from vendor_bundled/composer.json are missing in doc/devtools/satis.json." . PHP_EOL;
+    echo "Fail: The following packages from vendor_bundled/composer.json are missing in src/config/satis.json." . PHP_EOL;
     foreach ($missingPackages as $missingPackage) {
         echo "- {$missingPackage}\n";
     }
-    echo "All composer dependencies should be cached in satis (https://composer.tiki.org), Make sure you add them to doc/devtools/satis.json in the master branch." . PHP_EOL;
+    echo "All composer dependencies should be cached in Satis (https://composer.tiki.org). Make sure you add them to src/config/satis.json in the master branch." . PHP_EOL;
     exit(1); // Exit with error code to indicate failure in CI pipeline
 }

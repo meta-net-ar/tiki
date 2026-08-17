@@ -16,7 +16,7 @@ The full changelog is generated dynamically, It is not stored in the repository 
 Run:
 
 ```sh
-php doc/devtools/generate_changelog.php --help
+php src/ci/generate_changelog.php --help
 ```
 This will generate a readable summary of changes.
 

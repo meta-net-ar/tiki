@@ -20,7 +20,7 @@ variables:
   BASE_QA_IMAGE: tikiwiki/tikiwiki-ci:8.1-qa
   #DBDiff is sensitive to mysql version.
   #The schemas dumped for prior tikis on https://gitlab.com/tikiwiki/tikiwiki-ci-databases have explicit COLLATION() statements for each table column.  Later versions of mysql (8.0.11+, but not sure) will not dump the same whits explicit collations.
-  #Running php doc/devtools/check_schema_upgrade.php -m 22 --db1=tiki:tiki@localhost:tikiold --db2=tiki:tiki@localhost:tikinew gives other errors localy that are false positives.  But locally, unless you decompress https://gitlab.com/tikiwiki/tikiwiki-ci-databases into doc/devtool/dbdiff/cache, tiki.org won't give the schemas to you, and will blacklist your IP address!  benoitg - 2023-05-16
+  #Running php src/ci/check_schema_upgrade.php -m 22 --db1=tiki:tiki@localhost:tikiold --db2=tiki:tiki@localhost:tikinew gives other errors localy that are false positives.  But locally, unless you decompress https://gitlab.com/tikiwiki/tikiwiki-ci-databases into src/ci/dbdiff/cache, tiki.org won't give the schemas to you, and will blacklist your IP address!  benoitg - 2023-05-16
 
   # Database Version Testing Strategy:
   # - OLDEST versions: Minimum compatibility baseline, ensures backward compatibility
@@ -91,7 +91,7 @@ node_modules:
   needs: []
   script:
     #Note: If you are trying to run this from a git worktree, you'll need to mount your main git volume with something like: gitlab-ci-local --volume "/home/myusername/development/tiki:/home/myusername/development/tiki:ro" node_modules
-    - src/ci/build_frontend.sh install 
+    - src/ci/build_frontend.sh install
     - src/ci/checks/noUnanticipatedNodeModules.sh
   extends: .node_dependencies_cache
   cache:
@@ -148,7 +148,7 @@ composer-ext-check:
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php doc/devtools/check_composer_extensions.php
+    - php src/ci/check_composer_extensions.php
 
 composer:
   stage: build
@@ -180,18 +180,18 @@ composer-dbdiff:
     COMPOSER_CACHE_DIR: ${CI_PROJECT_DIR}/.composercache-dbdiff
   script:
     - composer -V | grep "version 2" || composer self-update --2
-    - composer --ansi install -d doc/devtools/dbdiff/ --no-progress --prefer-dist -n
+    - composer --ansi install -d src/ci/dbdiff/ --no-progress --prefer-dist -n
   cache:
     key:
       prefix: "composer-dbdiff"
       files:
-        - doc/devtools/dbdiff/composer.lock
+        - src/ci/dbdiff/composer.lock
     paths:
       - .composercache-dbdiff/
     policy: pull-push
   artifacts:
     paths:
-      - doc/devtools/dbdiff/vendor/
+      - src/ci/dbdiff/vendor/
     expire_in: 2 days
     when: always
 
@@ -212,7 +212,7 @@ phpcs:
         prefix: "phpcs"
         files:
           - phpcs.xml.dist
-          - doc/devtools/codesniffer/standards/TikiIgnore/ignore_list.json
+          - src/ci/codesniffer/standards/TikiIgnore/ignore_list.json
       paths:
         - phpcs.cache
       policy: pull-push
@@ -235,7 +235,7 @@ smarty-lint:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
+    - php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --files=lib/test,templates,themes --rules=src/ci/smartyl.rules.xml
 
 smarty-syntax-check:
   stage: code-quality
@@ -244,7 +244,7 @@ smarty-syntax-check:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php console.php smarty:generate-mapping
-    - php doc/devtools/check_smarty_syntax.php
+    - php src/ci/check_smarty_syntax.php
 
 smarty-mapping-check:
   stage: code-quality
@@ -271,21 +271,21 @@ shlint:
   image: koalaman/shellcheck-alpine:latest
   script:
     - shellcheck ./*.sh
-    - shellcheck ./doc/devtools/*.sh
+    - shellcheck ./src/ci/*.sh
 
 check-bom-encoding:
   stage: code-quality
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php doc/devtools/check_bom_encoding.php
+    - php src/ci/check_bom_encoding.php
 
 unix-ending-line:
   stage: code-quality
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php doc/devtools/check_unix_ending_line.php
+    - php src/ci/check_unix_ending_line.php
 
 translation-standards:
   stage: code-quality
@@ -293,7 +293,7 @@ translation-standards:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php doc/devtools/check_template_translation_standards.php --all
+    - php src/ci/check_template_translation_standards.php --all
 
 phpstan:
   stage: code-quality
@@ -333,42 +333,42 @@ check-platform-binaries:
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php doc/devtools/check_platform_binaries.php
+    - php src/ci/check_platform_binaries.php
 
 sql-engine:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php -d display_errors=On doc/devtools/check_sql_engine.php
+    - php -d display_errors=On src/ci/check_sql_engine.php
 
 schema-sql-drop:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php -d display_errors=On doc/devtools/check_schema_sql_drop.php
+    - php -d display_errors=On src/ci/check_schema_sql_drop.php
 
 schema-naming-convention:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php -d display_errors=On doc/devtools/check_schema_naming_convention.php
+    - php -d display_errors=On src/ci/check_schema_naming_convention.php
 
 check-external-links:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php -d display_errors=On doc/devtools/check_external_links.php
+    - php -d display_errors=On src/ci/check_external_links.php
 
 check-security-static:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php -d display_errors=On doc/devtools/securitycheck.php
+    - php -d display_errors=On src/ci/securitycheck.php
 
 translation:
   stage: tiki-check
@@ -384,7 +384,7 @@ translation:
 #  needs: []
 #  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
 #  script:
-#    - php doc/devtools/check_satis_validation.php
+#    - php src/ci/check_satis_validation.php
 #  rules:
 #    - if: '$CI_COMMIT_BRANCH == "master"'
 #    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
@@ -397,7 +397,7 @@ composer-validates:
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer validate -d vendor_bundled --no-check-all
-    # - php doc/devtools/check_composer_dist_urls.php
+    # - php src/ci/check_composer_dist_urls.php
 
 #This tests if composer COULD update the current composer.lock (it is coherent and installable).  This is important because a developer wanting to update or add a dependency wouldn't be able to do so without figuring out why a composer.lock cannot be generated even before his changes.
 #What we want to know is if a developer could successfully generate a new composer.lock file to update minor versions, or when adding dependencies.  Not if he could generate a minimal-impact composer.lock file with composer update --lock on stable branches, which is much harder, and not necessary for the master branch.
@@ -423,7 +423,7 @@ composer-could-update-lock:
   script:
     - cp $(command -v composer) temp/composer.phar
     - php temp/composer.phar -V | grep "version 2" || php temp/composer.phar self-update --2
-    - php doc/devtools/update_composer_lock.php
+    - php src/ci/update_composer_lock.php
   before_script:
     - mkdir before || true
     - cp vendor_bundled/composer.json vendor_bundled/composer.lock before
@@ -457,10 +457,10 @@ composer-could-update-lock:
     - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode);SET GLOBAL log_bin_trust_function_creators = 1;"'
     - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
     - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
-    - '[ ! -d doc/devtools/dbdiff/cache ] && mkdir doc/devtools/dbdiff/cache'
-    - '[ ! -f doc/devtools/dbdiff/cache/$DBFILE ] && curl -sS https://gitlab.com/tikiwiki/tikiwiki-ci-databases/raw/master/$DBFILE.gz -o doc/devtools/dbdiff/cache/$DBFILE.gz && gzip -d doc/devtools/dbdiff/cache/$DBFILE.gz'
+    - '[ ! -d src/ci/dbdiff/cache ] && mkdir src/ci/dbdiff/cache'
+    - '[ ! -f src/ci/dbdiff/cache/$DBFILE ] && curl -sS https://gitlab.com/tikiwiki/tikiwiki-ci-databases/raw/master/$DBFILE.gz -o src/ci/dbdiff/cache/$DBFILE.gz && gzip -d src/ci/dbdiff/cache/$DBFILE.gz'
     - export TIKI_CATCH_UPDATE_WARNINGS=1
-    - php -d display_errors=On doc/devtools/check_schema_upgrade.php -m $DBVER -e $ENGINE --db1=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikinew
+    - php -d display_errors=On src/ci/check_schema_upgrade.php -m $DBVER -e $ENGINE --db1=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikinew
     - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
     - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
     - mysqldump --column-statistics=0  --default-character-set=utf8mb4 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikiold > tikiold.sql
@@ -525,7 +525,7 @@ sql-engine-conversion:
     - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode)"'
     - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
     - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
-    - php -d display_errors=On doc/devtools/check_sql_engine_conversion.php --db1=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikinew
+    - php -d display_errors=On src/ci/check_sql_engine_conversion.php --db1=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikinew
     - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
     - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
     - mysqldump --column-statistics=0 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikiold > tikiold.sql
@@ -784,7 +784,7 @@ tiki-generate-changelog:
     - LAST_TAG=$(git tag --sort=-v:refname | head -n 1)
     - echo "LAST_TAG=${LAST_TAG}"
 
-    - php ${CI_PROJECT_DIR}/doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
+    - php ${CI_PROJECT_DIR}/src/ci/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
     - mv generated_changelog.md ${CI_PROJECT_DIR}/CHANGELOG.generated.md
     # Next line is for gitlab-ci-local, where the checkout is actually the developper's
     - rm -rf ${CI_PROJECT_DIR}/temp/ci/treeless_checkout
@@ -811,7 +811,7 @@ tiki-package:
     - composer
     - node_build
     - tiki-generate-changelog
-# No reason not to run packaging all the time, changelog generation is fast now.  However, see the comment about tiki-generate-changelog and developper forks above. 
+# No reason not to run packaging all the time, changelog generation is fast now.  However, see the comment about tiki-generate-changelog and developper forks above.
 # If the assumption about tags on developper forks can't be fixed (such as by fetching all the release tags refspect from the upstream repo during changelog generation),
 # rules should be added again not to run changelog generation when not on the main repo. (No changelog being better than a wrong changelog) - benoitg - 2026-09-22
 #  rules:
@@ -900,7 +900,7 @@ update_vendor_bundled_dependencies:
     - composer -V | grep "version 2" || composer self-update --2
     - DATE=`date +%Y%m%d`
     - BRANCH_NAME="${BRANCH_NAME}_${DATE}"
-    - php doc/devtools/update_vendor_bundled.php
+    - php src/ci/update_vendor_bundled.php
     - if git diff --quiet --exit-code vendor_bundled/composer.lock; then exit 0; fi;
     - if git rev-parse --verify ${BRANCH_NAME}; then git branch -D ${BRANCH_NAME}; fi;
     - git checkout -b ${BRANCH_NAME}
@@ -909,7 +909,7 @@ update_vendor_bundled_dependencies:
     - git push ${CI_REPOSITORY_URL} HEAD:${BRANCH_NAME} --quiet
     - |
       HOST=${CI_PROJECT_URL} CI_PROJECT_ID=${CI_PROJECT_ID} SOURCE_BRANCH=${BRANCH_NAME} TARGET_BRANCH=${CI_COMMIT_REF_NAME} GITLAB_USER_ID=${GITLAB_USER_ID} PRIVATE_TOKEN=${GITLAB_USER_TOKEN} TARGET_PROJECT_ID=${TARGET_PROJECT_ID} SET_MERGE=${SET_MERGE} \
-      /bin/bash ./doc/devtools/gitlab/auto_merge_request.sh "${COMMIT_MESSAGE} (${DATE})"
+      /bin/bash ./src/ci/gitlab/auto_merge_request.sh "${COMMIT_MESSAGE} (${DATE})"
   only:
     refs:
       - schedules
@@ -922,7 +922,7 @@ composer-stability:
   needs:
     - composer
   script:
-    - php doc/devtools/check_composer_stability.php --ci
+    - php src/ci/check_composer_stability.php --ci
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
       when: never
@@ -939,7 +939,7 @@ composer-operator-check:
   needs:
     - composer
   script:
-    - php doc/devtools/check_caret_operator.php
+    - php src/ci/check_caret_operator.php
 
 check-alphabetical-list:
   stage: unit-tests
@@ -947,5 +947,5 @@ check-alphabetical-list:
   needs:
     - composer
   script:
-    - php doc/devtools/check_alphabetical_list.php
+    - php src/ci/check_alphabetical_list.php
   allow_failure: false

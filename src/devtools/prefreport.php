@@ -5,9 +5,9 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // Usage: From the command line:
-// php doc/devtools/prefreport.php > prefreport.csv
+// php src/devtools/prefreport.php > prefreport.csv
 //
-// also check out  doc/devtools/securitycheck.php to see in which files are
+// also check out  src/ci/securitycheck.php to see in which files are
 // used each pref (and permission name too)
 //
 

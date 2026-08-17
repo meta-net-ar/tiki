@@ -48,9 +48,9 @@ index.php
 /bin
 /composer.json
 /composer.lock
-/doc/devtools/dbdiff/cache
-/doc/devtools/dbdiff/vendor
-/doc/devtools/etc/update/.htaccess
+/src/ci/dbdiff/cache
+/src/ci/dbdiff/vendor
+/src/devtools/etc/update/.htaccess
 /dummy.php
 /files
 #From lib/core/Tracker/Field/Image.php

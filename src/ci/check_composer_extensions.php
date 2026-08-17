@@ -110,7 +110,7 @@ if (! empty($unexpectedExtensions)) {
 
     echo 'If this extension is required for core Tiki functionality:' . PHP_EOL;
     echo '  - Make sure it makes sense to add a new base php module dependency.' . PHP_EOL;
-    echo '  - Add it to $baseExtensions in doc/devtools/check_composer_extensions.php' . PHP_EOL;
+    echo '  - Add it to $baseExtensions in src/ci/check_composer_extensions.php' . PHP_EOL;
     echo '  - Ensure that it is available in CI/CD images before merging.' . PHP_EOL;
 
     echo 'In all cases, if you are introducing a new PHP extension dependency:' . PHP_EOL;

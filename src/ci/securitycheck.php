@@ -11,7 +11,7 @@
  *
  * Usage:
  *   From the Tiki root directory, run:
- *       php doc/devtools/securitycheck.php
+ *       php src/ci/securitycheck.php
  *
  * Purpose:
  *   This script scans all PHP files in the Tiki codebase to detect potentially unsafe files.
@@ -60,7 +60,8 @@ $skipDirs = [
     './' . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH . '/vendor', // generated files
     './' . TIKI_VENDOR_NONBUNDLED_PATH, // generated files
     './' . TIKI_CUSTOMIZATIONS_SRC_PATH,
-    './' . DEPRECATED_DEVTOOLS_PATH,
+    './' . CI_TOOLS_PATH,
+    './' . DEV_SCRIPTS_PATH,
     './' . TIKI_CUSTOMIZATIONS_SRC_DIST_PATH,
     './' . BIN_PATH,
     './' . PUBLIC_GENERATED_PATH, // generated files

@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * index.php and .htaccess are designed to disallow directory listing in apache.
  *
- * This command replaces the deprecated doc/devtools/check_tiki_directories.php
+ * This command replaces the deprecated src/devtools/check_tiki_directories.php
  * @package Tiki\Command
  */
 #[AsCommand(

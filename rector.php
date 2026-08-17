@@ -62,7 +62,8 @@ return RectorConfig::configure()
         //TO debug these paths, add --debug to your rector commands, and you will see every file processed.
         __DIR__ . '/' . ADMIN_PATH,
         __DIR__ . '/' . TIKI_CONFIG_PATH,
-        __DIR__ . '/' . DEPRECATED_DEVTOOLS_PATH,
+        __DIR__ . '/' . CI_TOOLS_PATH,
+        __DIR__ . '/' . DEV_SCRIPTS_PATH,
         __DIR__ . '/' . INSTALLER_PATH,
         //__DIR__ . '/' . LANG_SRC_PATH,
         __DIR__ . '/' . LIB_PATH,

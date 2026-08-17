@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once 'vcscommons.php';
+require_once __DIR__ . '/../ci/vcscommons.php';
 
 define('GIT_MIN_VERSION', 2.0);
 define('TIKIVCS', 'https://gitlab.com/tikiwiki/tiki.git');
