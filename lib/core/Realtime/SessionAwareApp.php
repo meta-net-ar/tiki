@@ -32,7 +32,7 @@ class SessionAwareApp implements MessageComponentInterface
         global $user;
 
         parse_str($conn->httpRequest->getUri()->getQuery(), $queryParameters);
-        $this->sessions->attach($conn, $queryParameters['token']);
+        $this->sessions->attach($conn, $queryParameters['token'] ?? '');
 
         // TODO: divide session switch and user retrival with a new preference
         $this->switchSession($conn);
@@ -63,6 +63,9 @@ class SessionAwareApp implements MessageComponentInterface
 
         $session_id = $this->sessions[$conn];
         if (empty($session_id)) {
+            $user = null;
+            $_permissionContext = new Perms_Context($user, false);
+            $_permissionContext->activatePermanently();
             return;
         }
 
