@@ -2,11 +2,13 @@
 
 import ReplyForm from "./ReplyForm.vue";
 import {inject, onMounted} from "vue";
-import useMessageStore from "../store";
+import useCommentsStore from "../store/comments";
+import useCommentsUiStore from "../store/commentsUi";
 import {highlightMatches} from "../utils/highlight";
 
 const tr = inject('tr')
-const store = useMessageStore();
+const store = useCommentsStore();
+const uiStore = useCommentsUiStore();
 </script>
 <script>
 export default {
@@ -22,20 +24,20 @@ export default {
         },
     },
     mounted() {
-        useMessageStore().drawMessagesTree();
+        useCommentsUiStore().drawMessagesTree();
     },
     computed: {
         highlightedTitle() {
-            return highlightMatches(this.item.title, useMessageStore().searchQuery);
+            return highlightMatches(this.item.title, useCommentsUiStore().searchQuery);
         },
         highlightedMessage() {
-            return highlightMatches(this.item.message, useMessageStore().searchQuery);
+            return highlightMatches(this.item.message, useCommentsUiStore().searchQuery);
         },
         isSearchMatch() {
-            return useMessageStore().itemMatchesSearch(this.item);
+            return useCommentsUiStore().itemMatchesSearch(this.item);
         },
         repliesVisible() {
-            return useMessageStore().isThreadForciblyVisible(this.item.messageId);
+            return useCommentsUiStore().isThreadForciblyVisible(this.item.messageId);
         },
     },
     methods: {
@@ -46,7 +48,7 @@ export default {
             $("#message-" + this.item.messageId + " textarea[name='message']").val("");
             $("#message-" + this.item.messageId + " .submit-btn").text("Preview/Publish");
             setTimeout(() => {
-                useMessageStore().drawMessagesTree();
+                useCommentsUiStore().drawMessagesTree();
             }, 20);//TODO: find a better way to do this
         },
         update: function(messageId) {
@@ -56,34 +58,35 @@ export default {
             $("#message-" + this.item.messageId + " textarea[name='message']").val(this.item.message);
             $("#message-" + this.item.messageId + " .submit-btn").text("Edit message");
             setTimeout(() => {
-                useMessageStore().drawMessagesTree();
+                useCommentsUiStore().drawMessagesTree();
             }, 20);//TODO: find a better way to do this
         },
         toggleResolved: function(messageId) {
-            const resolved = useMessageStore().toggleResolved(messageId);
+            const resolved = useCommentsStore().toggleResolved(messageId);
             const timeout = resolved === 1 ? 20 : 500;
             setTimeout(() => {
-                useMessageStore().drawMessagesTree();
+                useCommentsUiStore().drawMessagesTree();
             }, timeout);//TODO: find a better way to do this
         },
         toggleThreadVisibility: function(messageId) {
-            useMessageStore().toggleManualExpand(messageId);
+            useCommentsUiStore().toggleManualExpand(messageId);
             setTimeout(() => {
-                useMessageStore().drawMessagesTree();
+                useCommentsUiStore().drawMessagesTree();
             }, 20);//TODO: find a better way to do this
         },
         goToThread: function(messageId) {
-            const store = useMessageStore();
+            const store = useCommentsStore();
+            const uiStore = useCommentsUiStore();
             let root = store.getThreads.find((thread) => thread.messageId === messageId);
             while (root && root.parentId !== 0) {
                 root = store.getThreads.find((thread) => thread.messageId === root.parentId);
             }
-            if (root && root.resoved === 1 && !store.isManuallyExpanded(root.messageId)) {
-                store.toggleManualExpand(root.messageId);
+            if (root && root.resoved === 1 && !uiStore.isManuallyExpanded(root.messageId)) {
+                uiStore.toggleManualExpand(root.messageId);
             }
             document.getElementById("tab-recent").click();
             setTimeout(() => {
-                store.drawMessagesTree();
+                uiStore.drawMessagesTree();
                 const target = document.getElementById("body-" + messageId);
                 target?.scrollIntoView({ behavior: "smooth", block: "center" });
                 target?.classList.add("search-match");
@@ -115,8 +118,8 @@ export default {
             <div :id="'message-'+item.messageId" class="thread-messages ps-2">
                 <p class="card-text" v-html="highlightedMessage"></p>
                 <div class="message-footer ms-3">
-                    <i v-if="!pinnedTab" class="icon fa-solid fa-thumbs-up fa-xs mt-3" :class="{ 'text-primary': item.likedBy.includes(store.currentUser) }" @click="store.like(item.messageId, store.currentUser)"></i><span v-if="!pinnedTab" class="like small text-muted mx-1 me-4">{{ item.like }}</span>
-                    <i v-if="!pinnedTab" class="icon fa-solid fa-thumbs-down fa-xs mt-3" :class="{ 'text-danger': item.dislikedBy.includes(store.currentUser) }" @click="store.dislike(item.messageId, store.currentUser)"></i><span v-if="!pinnedTab" class="dislike small text-muted mx-1">{{ item.dislike }}</span>
+                    <i v-if="!pinnedTab" class="icon fa-solid fa-thumbs-up fa-xs mt-3" :class="{ 'text-primary': item.likedBy.includes(uiStore.currentUser) }" @click="store.like(item.messageId, uiStore.currentUser)"></i><span v-if="!pinnedTab" class="like small text-muted mx-1 me-4">{{ item.like }}</span>
+                    <i v-if="!pinnedTab" class="icon fa-solid fa-thumbs-down fa-xs mt-3" :class="{ 'text-danger': item.dislikedBy.includes(uiStore.currentUser) }" @click="store.dislike(item.messageId, uiStore.currentUser)"></i><span v-if="!pinnedTab" class="dislike small text-muted mx-1">{{ item.dislike }}</span>
                     <div :class="[{'d-thread-button-block' : item.parentId != 0 || pinnedTab}, 'thread-button-block float-end']">
                         <a href="#" data-bs-toggle="collapse" :data-bs-target="`.replies-${item.messageId}`" class="btn resolved-btn m-1 btn-sm" :class="item.resoved === 1 ? 'bg-success border-success text-white' : 'btn-outline-primary'" :aria-expanded="item.resoved !== 1" @click="toggleResolved(item.messageId)" v-if="item.parentId == 0 && !pinnedTab">{{ item.resoved === 1 ? tr('Resolved') : tr('Mark as resolved') }}</a>
                         <a href="#" class="btn btn-outline-secondary m-1 btn-sm" :class="{ active: repliesVisible }" :aria-expanded="repliesVisible" @click.prevent="toggleThreadVisibility(item.messageId)" v-if="item.parentId == 0 && item.resoved === 1 && !pinnedTab">{{ repliesVisible ? tr('Hide replies') : tr('Show replies') }}</a>

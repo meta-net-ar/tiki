@@ -1,8 +1,8 @@
 <script setup>
 import Message from "./Message.vue";
 import Replies from "./Replies.vue";
-import useMessageStore from "../store";
-const store = useMessageStore();
+import useCommentsUiStore from "../store/commentsUi";
+const uiStore = useCommentsUiStore();
 
 defineProps({
     messages: {
@@ -20,7 +20,7 @@ defineProps({
     <div class="row">
         <div :class="[
           {'card thread-card bg-body mt-5 pt-2 pb-2' : item.parentId == 0},
-          item.parentId != 0 ? `ps-5 thread-replies replies-${item.parentId} collapse${(resolved && !store.isThreadForciblyVisible(item.parentId)) ? '' : ' show'}` : '',
+          item.parentId != 0 ? `ps-5 thread-replies replies-${item.parentId} collapse${(resolved && !uiStore.isThreadForciblyVisible(item.parentId)) ? '' : ' show'}` : '',
           'col-md-12 thread-block'
         ]" v-for="item in messages">
             <Message :item=item />

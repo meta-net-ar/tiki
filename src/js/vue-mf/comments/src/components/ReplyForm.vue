@@ -5,7 +5,8 @@ const tr = inject('tr')
 </script>
 
 <script>
-import useMessageStore from "../store";
+import useCommentsStore from "../store/comments";
+import useCommentsUiStore from "../store/commentsUi";
 
 export default {
     name: 'ReplyForm',
@@ -20,12 +21,12 @@ export default {
         },
     },
     mounted() {
-        useMessageStore().drawMessagesTree();
+        useCommentsUiStore().drawMessagesTree();
     },
     methods: {
         updateMsg: function() {
             if ($("#message-" + this.parentId + " input[name='updatemessage']").val() == "0") {
-                useMessageStore().addMessage(
+                useCommentsStore().addMessage(
                         $("#message-" + this.parentId + " input[name='title']").val(),
                         parseInt($("#message-" + this.parentId + " input[name='parentid']").val()),
                         $("#message-" + this.parentId + " input[name='author']").val(),
@@ -33,7 +34,7 @@ export default {
                         new Date().toLocaleString()
                 );
             } else {
-                useMessageStore().updateMessage(
+                useCommentsStore().updateMessage(
                         parseInt($("#message-" + this.parentId + " input[name='parentid']").val()),
                         $("#message-" + this.parentId + " input[name='title']").val(),
                         $("#message-" + this.parentId + " textarea[name='message']").val()
@@ -42,7 +43,7 @@ export default {
             $("#message-" + this.parentId + " textarea[name='message']").val("");
             $("#message-" + this.parentId + " input[name='title']").val("");
             setTimeout(() => {
-                useMessageStore().drawMessagesTree();
+                useCommentsUiStore().drawMessagesTree();
             }, 20);//TODO: find a better way to do this
         }
     }

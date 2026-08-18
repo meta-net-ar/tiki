@@ -41,12 +41,14 @@
     import PinnedMessages from "./components/PinnedMessages.vue";
     import {provide} from "vue";
     import { computed } from 'vue';
-    import useMessageStore from "./store";
+    import useCommentsStore from "./store/comments";
+    import useCommentsUiStore from "./store/commentsUi";
     provide('tr', tr)
 
-    const store = useMessageStore();
+    const store = useCommentsStore();
+    const uiStore = useCommentsUiStore();
 
-    const msgs = computed(() => store.getFilteredParentMessages);
+    const msgs = computed(() => uiStore.getFilteredParentMessages);
     const pinnedMsgs = computed(() => store.getPinnedMessages);
 </script>
 

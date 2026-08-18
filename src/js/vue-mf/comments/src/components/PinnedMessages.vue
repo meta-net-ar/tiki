@@ -1,8 +1,6 @@
 <script setup>
 import { inject } from "vue";
 import Message from "./Message.vue";
-import useMessageStore from "../store";
-const store = useMessageStore();
 const tr = inject('tr')
 
 defineProps({

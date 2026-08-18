@@ -1,8 +1,8 @@
 <script setup>
 import Messages from "./Messages.vue";
 import Message from "./Message.vue";
-import useMessageStore from "../store";
-const store = useMessageStore();
+import useCommentsStore from "../store/comments";
+const store = useCommentsStore();
 
 function getDescendants(threadId) {
     //console.log("getDescendants:", threadId);

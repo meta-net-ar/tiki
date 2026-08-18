@@ -1,8 +1,8 @@
 <script setup>
 import { nextTick, watch } from "vue";
-import useMessageStore from "../store";
+import useCommentsUiStore from "../store/commentsUi";
 
-const store = useMessageStore();
+const store = useCommentsUiStore();
 
 watch(
     () => store.searchQuery,
