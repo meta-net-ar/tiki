@@ -99,12 +99,21 @@ $(document).ready(function () {
 
     function validateUserCredentials(username, password) {
         return new Promise((resolve, reject) => {
+            const $form = $("#loginbox-{{$module_logo_instance}}");
+            const ticket = $form.find("input[name=ticket]").val() || "";
             $.ajax({
                 url: $.service("user", "ValidateUser"),
                 type: 'POST',
-                data: { username: username, password: password },
+                data: { username: username, password: password, ticket: ticket },
                 success: function (res) {
-                    resolve(res);
+                    if (res && typeof res === 'object') {
+                        if (res.ticket) {
+                            $form.find("input[name=ticket]").val(res.ticket);
+                        }
+                        resolve(!!res.valid);
+                    } else {
+                        resolve(!!res);
+                    }
                 },
                 error: function (req, status, error) {
                     displayFeedback("error", error);
