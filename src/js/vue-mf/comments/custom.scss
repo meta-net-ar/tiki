@@ -131,7 +131,7 @@
 .thread-replies .thread-border:hover::before {
     background: #000000;
 }*/
-.thread-messages:hover .d-thread-button-block, .thread-messages:hover .d-thread-button-block .btn {
+.thread-messages:hover .d-thread-button-block, .thread-messages:hover .d-thread-button-block .btn, .pinnedMessageCard:hover .d-thread-button-block, .pinnedMessageCard:hover .d-thread-button-block .btn {
     pointer-events: inherit;
     opacity: 1;
     visibility: visible;
@@ -139,6 +139,11 @@
 }
 
 .message-body:hover {
+    background: #F0F7FF !important;
+    z-index: 3;
+}
+
+.pinnedMessageBody:hover {
     background: #F0F7FF !important;
     z-index: 3;
 }

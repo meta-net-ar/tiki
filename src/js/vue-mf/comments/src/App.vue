@@ -6,13 +6,13 @@
                     <p class="lead"><span class="fw-bold">144</span> previously read comments in <span class="fw-bold">17</span> discussions</p>
                     <p class="text-muted sub-lead">From February 4th, 2021 to July 1st, 2024</p>
                     <div id="tab" class="tabs btn-group mt-3" role="tablist">
-                        <a class="btn" id="fill-tab-0" data-bs-toggle="tab" href="#fill-tabpanel-0" role="tab" aria-controls="fill-tabpanel-0" aria-selected="true"> Show everything </a>
-                        <a class="btn active" id="fill-tab-1" data-bs-toggle="tab" href="#fill-tabpanel-1" role="tab" aria-controls="fill-tabpanel-1" aria-selected="false"> Show recent </a>
-                        <a class="btn" id="fill-tab-2" data-bs-toggle="tab" href="#fill-tabpanel-2" role="tab" aria-controls="fill-tabpanel-2" aria-selected="false"> Show pinned only </a>
+                        <a class="btn" id="tab-everything" data-bs-toggle="tab" href="#tabpanel-everything" role="tab" aria-controls="tabpanel-everything" aria-selected="false"> Show everything </a>
+                        <a class="btn active" id="tab-recent" data-bs-toggle="tab" href="#tabpanel-recent" role="tab" aria-controls="tabpanel-recent" aria-selected="true"> Show recent </a>
+                        <a class="btn" id="tab-pinned" data-bs-toggle="tab" href="#tabpanel-pinned" role="tab" aria-controls="tabpanel-pinned" aria-selected="false"> Show pinned only </a>
                     </div>
                     <div class="tab-content pt-5 mx-4" id="tab-content">
-                        <div class="tab-pane" id="fill-tabpanel-0" role="tabpanel" aria-labelledby="fill-tab-0">Everything content</div>
-                        <div class="tab-pane active" id="fill-tabpanel-1" role="tabpanel" aria-labelledby="fill-tab-1">
+                        <div class="tab-pane" id="tabpanel-everything" role="tabpanel" aria-labelledby="tab-everything">Everything content</div>
+                        <div class="tab-pane active" id="tabpanel-recent" role="tabpanel" aria-labelledby="tab-recent">
                             <SearchBar />
                             <p class="lead mt-5"><span class="fw-bold">10</span> comments in <span class="fw-bold">3</span> discussions in the last 3 months</p>
                             <p class="text-muted sub-lead"><span class="fw-bold">1 new comment</span> since your last visit</p>
@@ -24,7 +24,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane" id="fill-tabpanel-2" role="tabpanel" aria-labelledby="fill-tab-2">Pinned Content</div>
+                        <div class="tab-pane" id="tabpanel-pinned" role="tabpanel" aria-labelledby="tab-pinned">
+                            <PinnedMessages :messages=pinnedMsgs :key="identifier" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -36,6 +38,7 @@
     import Messages from "./components/Messages.vue";
     import SearchBar from "./components/SearchBar.vue";
     import ReplyForm from "./components/ReplyForm.vue";
+    import PinnedMessages from "./components/PinnedMessages.vue";
     import {provide} from "vue";
     import { computed } from 'vue';
     import useMessageStore from "./store";
@@ -44,6 +47,7 @@
     const store = useMessageStore();
 
     const msgs = computed(() => store.getFilteredParentMessages);
+    const pinnedMsgs = computed(() => store.getPinnedMessages);
 </script>
 
 <script>

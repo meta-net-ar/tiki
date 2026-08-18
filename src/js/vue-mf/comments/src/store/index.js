@@ -20,6 +20,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 1,
+                pinned: 0,
             },
             {
                 title: "This is a reply title",
@@ -34,6 +35,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "",
@@ -47,6 +49,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "This is a reply title",
@@ -60,6 +63,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "",
@@ -73,6 +77,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "This is a reply title",
@@ -86,6 +91,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "",
@@ -99,6 +105,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "",
@@ -112,6 +119,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "",
@@ -125,6 +133,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "What is Lorem Ipsum?",
@@ -139,6 +148,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "",
@@ -153,6 +163,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "",
@@ -167,6 +178,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "",
@@ -181,6 +193,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
             {
                 title: "",
@@ -195,6 +208,7 @@ export default defineStore("messageStore", {
                 likedBy: [],
                 dislikedBy: [],
                 resoved: 0,
+                pinned: 0,
             },
         ],
     }),
@@ -249,6 +263,9 @@ export default defineStore("messageStore", {
             }
 
             return parents.filter((root) => this.subtreeMatchesSearch(root.messageId));
+        },
+        getPinnedMessages(state) {
+            return state.threads.filter((item) => item.pinned === 1);
         },
         // Whether a resolved thread's replies should be shown despite the collapse: either the user expanded them manually, or the current search matches inside.
         isThreadForciblyVisible(state) {
@@ -315,6 +332,10 @@ export default defineStore("messageStore", {
                 thread.dislikedBy.push(user);
                 thread.dislike += 1;
             }
+        },
+        togglePinned(messageId) {
+            const message = this.threads[this.threads.findIndex((element) => element.messageId === messageId)];
+            message.pinned = message.pinned === 1 ? 0 : 1;
         },
         toggleResolved(messageId) {
             const index = this.threads.findIndex((element) => element.messageId === messageId);
