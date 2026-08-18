@@ -135,28 +135,34 @@ class Email2FA implements TwoFactorAuthInterface
     private function generateRandomString($length = 6, $chars = '')
     {
         if (! empty($chars)) {
-            $list = [];
+            $alphabet = '';
             if (preg_match_all('/(.)-(.)/', $chars, $m)) {
                 foreach ($m[0] as $k => $_) {
-                    $class = '';
-                    for ($i = ord($m[1][$k]); $i <= max(ord($m[1][$k]), ord($m[2][$k])); $i++) {
-                        $class .= chr($i);
+                    $start = ord($m[1][$k]);
+                    $end = ord($m[2][$k]);
+                    if ($start > $end) {
+                        [$start, $end] = [$end, $start];
                     }
-                    $list[] = $class;
+                    for ($i = $start; $i <= $end; $i++) {
+                        $alphabet .= chr($i);
+                    }
                 }
                 $chars = str_replace($m[0], '', $chars);
             }
-            if ($chars) {
-                $list[] = $chars;
-            }
+            $alphabet .= $chars;
         } else {
-            $list = ['aeiou', 'AEIOU', 'bcdfghjklmnpqrstvwxyz', 'BCDFGHJKLMNPQRSTVWXYZ', '0123456789'];
+            $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         }
-        shuffle($list);
+
+        $alphabet = implode('', array_unique(str_split($alphabet)));
+        $alphabetLength = strlen($alphabet);
+        if ($alphabetLength < 1) {
+            throw new TwoFactorAuthException(tr('Email 2FA token charset is empty.'));
+        }
+
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
-            $ch = $list[$i % count($list)];
-            $randomString .= $ch[rand(0, strlen($ch) - 1)];
+            $randomString .= $alphabet[random_int(0, $alphabetLength - 1)];
         }
         return $randomString;
     }
