@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once(__DIR__ . '/../debug/Tracer.php');
+require_once(__DIR__ . '/../language/Language.php');
 
 //this script may only be included - so its better to die if called directly.
 if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
@@ -255,30 +256,17 @@ class MultilingualLib extends TikiLib
         }
 
         if ($langContext) {
-            $langs[] = $langContext;
-            if (strchr($langContext, "-")) { // add en if en-uk
-                $langs[] = $this->rootLang($langContext);
-            }
+            $this->addPreferredLang($langs, $langContext);
         }
 
-        if ($prefs['language'] && ! in_array($prefs['language'], $langs)) {
-            $langs[] = $prefs['language'];
-            $l = $this->rootLang($prefs['language']);
-            if (! in_array($l, $langs)) {
-                $langs[] = $l;
-            }
+        if ($prefs['language']) {
+            $this->addPreferredLang($langs, $prefs['language']);
         }
 
         if (isset($prefs['read_language'])) {
             $tok = strtok($prefs['read_language'], ' ');
             while (false !== $tok) {
-                if (! in_array($tok, $langs)) {
-                    $langs[] = $tok;
-                }
-                $l = $this->rootLang($tok);
-                if (! in_array($l, $langs)) {
-                    $langs[] = $l;
-                }
+                $this->addPreferredLang($langs, $tok);
                 $tok = strtok(' ');
             }
         }
@@ -286,32 +274,38 @@ class MultilingualLib extends TikiLib
         if (($include_browser_lang) && (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']))) {
             $ls = preg_split('/\s*,\s*/', preg_replace('/;q=[0-9.]+/', '', $_SERVER['HTTP_ACCEPT_LANGUAGE'])); // browser
             foreach ($ls as $l) {
-                if (! in_array($l, $langs)) {
-                    $langs[] = $l;
-                    $l = $this->rootLang($l);
-                    if (! in_array($l, $langs)) {
-                        $langs[] = $l;
-                    }
-                }
+                $this->addPreferredLang($langs, $l);
             }
         }
 
         $l = $prefs['site_language'];
-        if (! in_array($l, $langs)) {
-            $langs[] = $l; // site language
-            $l = $this->rootLang($l);
-            if (! in_array($l, $langs)) {
-                $langs[] = $l;
-            }
-        }
+        $this->addPreferredLang($langs, $l); // site language
 
         if ($prefs['restrict_language'] === 'y' && $prefs['available_languages'] && $prefs['language_inclusion_threshold'] >= count($prefs['available_languages'])) {
             foreach (array_diff($prefs['available_languages'], $langs) as $lang) {
-                $langs[] = $lang;
+                $this->addPreferredLang($langs, $lang);
             }
         }
 
         return $langs;
+    }
+
+    private function addPreferredLang(array &$langs, $lang): void
+    {
+        if (! is_string($lang) || ! Language::isValidLocaleIdentifier($lang)) {
+            return;
+        }
+
+        if (! in_array($lang, $langs, true)) {
+            $langs[] = $lang;
+        }
+
+        if (strchr($lang, "-")) { // add en if en-uk
+            $rootLang = $this->rootLang($lang);
+            if (Language::isValidLocaleIdentifier($rootLang) && ! in_array($rootLang, $langs, true)) {
+                $langs[] = $rootLang;
+            }
+        }
     }
 
     /**
