@@ -453,6 +453,9 @@ class PdoClient
         } else {
             $sql .= " ORDER BY weight() desc, id asc";
         }
+        // Cast to int to prevent SQL injection — SphinxQL LIMIT does not support bound parameters
+        $resultStart = (int)$resultStart;
+        $resultCount = (int)$resultCount;
         $sql .= " LIMIT $resultStart, $resultCount option not_terms_only_allowed=1,cutoff=0,expand_keywords=1";
         if ($resultStart + $resultCount > 1000) {
             $sql .= ',max_matches=' . ($resultStart + $resultCount);
