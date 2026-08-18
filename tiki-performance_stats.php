@@ -18,7 +18,26 @@ $find = $_REQUEST['find'] ?? '';
 $averageStatOffset = $_REQUEST['average_stat_offset'] ?? 0;
 $averageStatOrder = $_REQUEST['average_stat_order'] ?? 'DESC';
 $maximumStatOffset = $_REQUEST['maximum_stat_offset'] ?? 0;
+$detailsUrl = $_REQUEST['details_url'] ?? '';
 $maximumStatOrder = $_REQUEST['maximum_stat_order'] ?? 'DESC';
+$maximumStatOrder = strtoupper($maximumStatOrder);
+if (! in_array($maximumStatOrder, ['ASC', 'DESC'])) {
+    $maximumStatOrder = 'DESC';
+}
+$averageStatOrder = $_REQUEST['average_stat_order'] ?? 'DESC';
+$averageStatOrder = strtoupper($averageStatOrder);
+if (! in_array($averageStatOrder, ['ASC', 'DESC'])) {
+    $averageStatOrder = 'DESC';
+}
+$orderType = 'average_stat_order';
+$noOfRequests = $_REQUEST['no_of_requests'] ?? '';
+if (! empty($noOfRequests)) {
+    $noOfRequests = strtoupper($noOfRequests);
+    $averageStatOrder = in_array($noOfRequests, ['ASC', 'DESC']) ? $noOfRequests : 'DESC';
+    $orderType = 'no_of_requests';
+} else {
+    $orderType = 'average_stat_order';
+}
 
 $smarty->assign('performance_stats_lib', $performanceLib);
 $smarty->assign('find', $find);
