@@ -206,6 +206,14 @@ if (isset($_REQUEST["change"]) && $access->checkCsrf()) {
 
             // One-time marker: do not allow reuse of the validation session for another change
             unset($_SESSION['pending_new_user_password'], $_SESSION['last_validation']);
+            if ($res) {
+                // Invalidate remember-me cookies after password change
+                $userInfo = $userlib->get_user_info($user);
+                if (! empty($userInfo['userId'])) {
+                    $userlib->delete_user_cookie((int)$userInfo['userId']);
+                }
+                $userlib->clearRememberMeCookieForSite();
+            }
 
             // Mark reset token as used only after successful password change
             if (! empty($secure_token) && ! $server_new_user_validation && ! $must_change_password) {

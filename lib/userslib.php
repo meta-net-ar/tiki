@@ -270,6 +270,76 @@ class UsersLib extends TikiLib
     }
 
     /**
+     * Remember-me cookie name and session key, derived from the cookie_name preference.
+     * Bootstrap sets global user_cookie_site to this value once for the whole request.
+     */
+    public function getRememberMeCookieName()
+    {
+        global $prefs;
+
+        $cookie_site = preg_replace("/[^a-zA-Z0-9]/", "", $prefs['cookie_name']);
+        return 'tiki-user-' . $cookie_site;
+    }
+
+    /**
+     * Remember-me setcookie options: path and domain from prefs, Secure and HttpOnly and SameSite from TikiLib.
+     *
+     * @param int $expires Unix timestamp
+     * @return array
+     */
+    public function getRememberMeCookieOptions($expires)
+    {
+        global $prefs;
+
+        $tikilib = TikiLib::lib('tiki');
+        return array_merge(
+            [
+                'expires' => $expires,
+                'path' => $prefs['feature_intertiki_sharedcookie'] == 'y' ? '/' : $prefs['cookie_path'],
+                'domain' => $prefs['cookie_domain'],
+            ],
+            $tikilib->getSetcookieSecurityAttributesFromSession()
+        );
+    }
+
+    /**
+     * Remember me on login: create the stored token and set the browser cookie.
+     */
+    public function issueRememberMeCookieForUserId($userId)
+    {
+        global $prefs;
+
+        $tikilib = TikiLib::lib('tiki');
+        $secret = $this->create_user_cookie($userId);
+        $value = $secret . '.' . $userId;
+        setcookie($this->getRememberMeCookieName(), $value, $this->getRememberMeCookieOptions($tikilib->now + $prefs['remembertime']));
+    }
+
+    /**
+     * Refresh remember-me expiry from the incoming cookie value and user id.
+     */
+    public function refreshRememberMeCookieFromLoginValue($loginCookieValue, $userId)
+    {
+        global $prefs;
+
+        $cookie_parts = explode('.', $loginCookieValue, 2);
+        if (count($cookie_parts) < 2) {
+            return;
+        }
+        $secret = array_shift($cookie_parts);
+        $secret = $this->create_user_cookie((int)$userId, $secret);
+        $value = $secret . '.' . $userId;
+        $tikilib = TikiLib::lib('tiki');
+        setcookie($this->getRememberMeCookieName(), $value, $this->getRememberMeCookieOptions($tikilib->now + $prefs['remembertime']));
+    }
+
+    /** Remove the remember-me cookie using the same options as issue and refresh. */
+    public function clearRememberMeCookieForSite()
+    {
+        setcookie($this->getRememberMeCookieName(), '', $this->getRememberMeCookieOptions(time() - 3600));
+    }
+
+    /**
      * @param string $user : username
      * @param bool $remote_logout : logged out remotely (so do not redirect)
      * @param string $redir : url to redirect to. Uses home page according to prefs if empty
@@ -277,7 +347,9 @@ class UsersLib extends TikiLib
      */
     public function user_logout($user, $remote_logout = false, $redir = '')
     {
-        global $prefs, $user_cookie_site;
+        global $prefs;
+
+        $rememberMeCookieName = $this->getRememberMeCookieName();
 
         $logslib = TikiLib::lib('logs');
         $logslib->add_log('login', 'logged out');
@@ -285,8 +357,8 @@ class UsersLib extends TikiLib
         $userInfo = $this->get_user_info($user);
         if ($prefs['login_multiple_forbidden'] === 'y') {
             $this->delete_user_cookie($userInfo['userId']);
-        } elseif (! empty($_COOKIE[$user_cookie_site])) {
-            $secret = explode('.', $_COOKIE[$user_cookie_site]);
+        } elseif (! empty($_COOKIE[$rememberMeCookieName])) {
+            $secret = explode('.', $_COOKIE[$rememberMeCookieName]);
             $this->delete_user_cookie($userInfo['userId'], $secret[0]);
         }
 
@@ -332,7 +404,7 @@ class UsersLib extends TikiLib
             }
         }
 
-        setcookie($user_cookie_site, '', -3600, $prefs['feature_intertiki_sharedcookie'] == 'y' ? '/' : $prefs['cookie_path'], $prefs['cookie_domain']);
+        $this->clearRememberMeCookieForSite();
 
         /* change group home page or deactivate if no page is set */
         if (! empty($redir)) {
@@ -351,7 +423,7 @@ class UsersLib extends TikiLib
             $url .= '?' . SID;
         }
 
-        unset($_SESSION['cas_validation_time'], $_SESSION[$user_cookie_site], $_SESSION['phpCAS']);
+        unset($_SESSION['cas_validation_time'], $_SESSION[$rememberMeCookieName], $_SESSION['phpCAS']);
         if (session_status() !== PHP_SESSION_NONE) {
             if (ini_get('session.use_cookies')) {
                 $params = session_get_cookie_params();
@@ -853,9 +925,7 @@ class UsersLib extends TikiLib
                     $username = $saml_username;
                 }
 
-                $cookie_site = preg_replace("/[^a-zA-Z0-9]/", "", $prefs['cookie_name']);
-                $user_cookie_site = 'tiki-user-' . $cookie_site;
-                $_SESSION["$user_cookie_site"] = $username;
+                $_SESSION[$this->getRememberMeCookieName()] = $username;
 
                 $randompass = $this->genPass();
                 if (! $userTikiPresent) {

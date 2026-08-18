@@ -612,9 +612,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
             // Now if the remember me feature is on and the user checked the rememberme checkbox then ...
             if ($prefs['rememberme'] == 'always' || $prefs['rememberme'] != 'disabled' && isset($_REQUEST['rme']) && $_REQUEST['rme'] == 'on') {
                 $userInfo = $userlib->get_user_info($user);
-                $userId = $userInfo['userId'];
-                $secret = $userlib->create_user_cookie($userId);
-                setcookie($user_cookie_site, $secret . '.' . $userId, $tikilib->now + $prefs['remembertime'], $prefs['feature_intertiki_sharedcookie'] == 'y' ? '/' : $prefs['cookie_path'], $prefs['cookie_domain']);
+                $userlib->issueRememberMeCookieForUserId((int)$userInfo['userId']);
                 $logslib->add_log('login', 'got a cookie for ' . $prefs['remembertime'] . ' seconds');
             }
         }
