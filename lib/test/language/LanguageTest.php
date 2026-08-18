@@ -11,6 +11,55 @@
  */
 class LanguageTest extends TikiTestCase
 {
+    public function testLocaleIdentifierValidationRejectsPaths(): void
+    {
+        $this->assertTrue(Language::isValidLocaleIdentifier('en'));
+        $this->assertTrue(Language::isValidLocaleIdentifier('pt-br'));
+        $this->assertTrue(Language::isValidLocaleIdentifier('fy-NL'));
+        $this->assertTrue(Language::isValidLocaleIdentifier('ts_0'));
+
+        $this->assertFalse(Language::isValidLocaleIdentifier(''));
+        $this->assertFalse(Language::isValidLocaleIdentifier('../lang/en'));
+        $this->assertFalse(Language::isValidLocaleIdentifier('en/../../en'));
+        $this->assertFalse(Language::isValidLocaleIdentifier('en.php'));
+        $this->assertFalse(Language::isValidLocaleIdentifier('en\\..\\en'));
+    }
+
+    public function testIsValidLocaleRejectsTraversalThatResolvesToExistingLanguage(): void
+    {
+        global $prefs;
+
+        $oldRestrictLanguage = $prefs['restrict_language'] ?? null;
+        $oldAvailableLanguages = $prefs['available_languages'] ?? null;
+
+        $prefs['restrict_language'] = 'n';
+        $prefs['available_languages'] = [];
+
+        try {
+            $this->assertTrue(Language::isValidLocale('en'));
+            $this->assertFalse(Language::isValidLocale('../lang/en'));
+            $this->assertFalse(Language::isValidLocale('en/../../en'));
+            $this->assertFalse(Language::isValidLocale('../../tiki/lang/en'));
+        } finally {
+            if ($oldRestrictLanguage === null) {
+                unset($prefs['restrict_language']);
+            } else {
+                $prefs['restrict_language'] = $oldRestrictLanguage;
+            }
+
+            if ($oldAvailableLanguages === null) {
+                unset($prefs['available_languages']);
+            } else {
+                $prefs['available_languages'] = $oldAvailableLanguages;
+            }
+        }
+    }
+
+    public function testLoadExtensionsRejectsPathTraversalLanguage(): void
+    {
+        $this->assertSame([], Language::loadExtensions('../lang/en'));
+    }
+
     public function testAddPhpSlashes(): void
     {
         $string = "\n \t \r " . '\\ $ "';

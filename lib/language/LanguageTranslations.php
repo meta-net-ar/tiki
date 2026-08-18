@@ -13,7 +13,8 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     exit;
 }
 
-require_once('Exception.php');
+require_once(__DIR__ . '/Exception.php');
+require_once(__DIR__ . '/Language.php');
 
 /**
  * @package   Tiki
@@ -61,6 +62,10 @@ class LanguageTranslations extends TikiDb_Bridge
             $this->lang = $lang;
         } else {
             $this->lang = Language::getCurrentLanguage();
+        }
+
+        if (! Language::isValidLocaleIdentifier($this->lang)) {
+            throw new Language_Exception('Invalid language code.');
         }
 
         $this->filePath = "lang/{$this->lang}/language.php";
