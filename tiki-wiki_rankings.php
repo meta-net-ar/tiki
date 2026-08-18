@@ -12,6 +12,15 @@
 
 $section = 'wiki page';
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
+$inputConfiguration = [
+    [
+        'staticKeyFilters'                => [
+            'which'                     => 'word',              //post
+            'limit'                     => 'digits',            //post
+            'categId'                   => 'striptags',         //get
+        ],
+    ],
+];
 require_once('tiki-setup.php');
 
 include_once('lib/rankings/ranklib.php');
@@ -19,10 +28,9 @@ include_once('lib/rankings/ranklib.php');
 $access->check_feature(['feature_wiki', 'feature_wiki_rankings']);
 $access->check_permission('tiki_p_view');
 
-if (! isset($_REQUEST["limit"])) {
+$limit = isset($_REQUEST["limit"]) ? (int) $_REQUEST["limit"] : 10;
+if ($limit < 1) {
     $limit = 10;
-} else {
-    $limit = $_REQUEST["limit"];
 }
 
 $categs = [];
@@ -58,8 +66,10 @@ $allrankings = [
 
 $smarty->assign('allrankings', $allrankings);
 
-if (! isset($_REQUEST["which"])) {
-    $which = 'wiki_ranking_top_pages';
+$allowedRankings = array_column($allrankings, 'value');
+$defaultWhich = 'wiki_ranking_top_pages';
+if (! isset($_REQUEST["which"]) || ! in_array($_REQUEST["which"], $allowedRankings, true)) {
+    $which = $defaultWhich;
 } else {
     $which = $_REQUEST["which"];
 }
