@@ -87,22 +87,84 @@ try {
 
 require_once('tiki-filter-base.php');
 
-// Define and load Smarty components
-global $prefs;
-$prefs = [];
-$prefs['smarty_notice_reporting'] = 'n';
-$prefs['smarty_compilation'] = 'always';
-$prefs['smarty_security'] = 'y';
+global $prefs, $tikilib;
+// we can't call the normal code for loading preferences (always) as many depends on DB being setup,
+// so we need to define here a few preferences to make things work and/or to avoid warnings in templates, etc.
+// we will load the actual preferences from step 6 (after tiki DB install).
+$prefs = [
+    // Define and load Smarty components
+    'smarty_notice_reporting' => 'n',
+    'smarty_compilation' => 'always',
+    'smarty_security' => 'y',
+
+    // define error reporting related preferences
+    'error_reporting_level' => E_ALL & ~E_NOTICE & ~E_WARNING,
+    'error_reporting_adminonly'  => 'y',
+    'error_tracking_enabled_js' => 'n',
+    'error_tracking_enabled_php' => 'n',
+
+    // define other preferences expected by templates, etc. using the default value, avoids warnings
+    // tiki-setup.php
+    'switch_color_module_assigned' => 'n',
+    // lib/prefs/global.php
+    'browsertitle' => '',
+    // lib/prefs/restrict.php
+    'restrict_language' => 'n',
+    // lib/prefs/feature.php
+    'feature_canonical_url' => 'y',
+    'feature_breadcrumbs' => 'n',
+    'feature_wiki' => 'y',
+    'feature_blogs' => 'n',
+    'feature_articles' => 'n',
+    'feature_file_galleries' => 'y',
+    'feature_forums' => 'n',
+    'feature_directory' => 'n',
+    'feature_calendar' => 'n',
+    'feature_trackers' => 'y',
+    'feature_inline_comments' => 'n',
+    'feature_scheduler' => 'y',
+    'feature_wiki_sharethis' => 'n',
+    // lib/prefs/metatag.php
+    'metatag_keywords' => '',
+    'metatag_author' => '',
+    'metatag_threadtitle' => 'n',
+    'metatag_pagedesc' => 'n',
+    'metatag_geoposition' => '',
+    'metatag_georegion' => '',
+    'metatag_geoplacename' => '',
+    'metatag_robotscustom' => 'n',
+    'metatag_revisitafter' => '',
+    // lib/prefs/site.php
+    'site_nav_seper' => '|',
+    'site_title_location' => 'after',
+    'site_title_breadcrumb' => 'invertfull',
+    'site_mautic_enable' => 'n',
+    // lib/prefs/tiki.php
+    'tiki_cdn' => '',
+    'tiki_cdn_ssl' => '',
+    'tiki_minify_css' => 'n',
+    'tiki_monitor_performance' => 'n',
+    // lib/prefs/feed.php
+    'feed_wiki' => 'n',
+    'feed_file_galleries' => 'n',
+    'feed_tracker' => 'n',
+    // lib/prefs/webcron.php
+    'webcron_enabled' => 'n',
+    //tiki-user_preferences.php
+    'remember_closed_rboxes' => 'n',
+    // \Tiki\Smarty\SmartyTiki::initializePaths
+    'feature_webservices' => 'n',
+];
+
 require_once 'lib/init/initlib.php';
 require_once 'lib/tikilib.php';
-set_error_handler("tiki_error_handling", error_reporting());
-require_once('lib/init/smarty.php');
+require_once('lib/setup/error_reporting.php');
 require_once('installer/installlib.php');
 include_once('lib/setup/twversion.class.php');
 
 $dbTiki = false;
 $commands = [];
-
+$tikilib = new TikiLib();
 // tra() should not use $tikilib because this lib is not available in every steps of the installer
 //  and because we want to be sure that translations of the installer are the original ones, even for an upgrade
 $prefs['lang_use_db'] = 'n';
@@ -110,15 +172,6 @@ $prefs['lang_use_db'] = 'n';
 // Which step of the installer
 if (empty($_POST['install_step'])) {
     $install_step = '0';
-
-    if (isset($_REQUEST['setdbversion'])) {
-        // Sets dbversion_tiki when installing the WebDeploy package
-        $db = fopen('db/' . $tikidomainslash . 'local.php', 'a');
-        require_once 'lib/setup/twversion.class.php';
-        $TWV = new TWVersion();
-        fwrite($db, "\n\$dbversion_tiki='" . $TWV->getBaseVersion() . "';\n");
-        fclose($db);
-    }
 } else {
     $install_step = $_POST['install_step'];
 
@@ -254,20 +307,6 @@ if ($errors) {
 // if local then build dsn and try to connect
 //   then get con or nocon
 
-//adodb settings
-
-if (! defined('ADODB_FORCE_NULLS')) {
-    define('ADODB_FORCE_NULLS', 1);
-}
-
-if (! defined('ADODB_ASSOC_CASE')) {
-    define('ADODB_ASSOC_CASE', 2);
-}
-
-if (! defined('ADODB_CASE_ASSOC')) { // typo in adodb's driver for sybase? // so do we even need this without sybase? What's this?
-    define('ADODB_CASE_ASSOC', 2);
-}
-
 require_once('lib/tikilib.php');
 
 // Get list of available languages
@@ -285,38 +324,21 @@ $dbconn = (TikiDb::isAvailable()) ? TikiDb::get() : false;
 $installer = null;
 if (file_exists($local)) {
     // include the file to get the variables
-    $default_api_tiki = $api_tiki;
-    $api_tiki = '';
     include $local;
     if (! $client_charset_forced = isset($client_charset)) {
         $client_charset = '';
     }
-    $previousDbApi = $api_tiki;
-    if (empty($api_tiki)) {
-        $api_tiki_forced = false;
-        $api_tiki = $default_api_tiki;
-        if (! empty($dbversion_tiki) && $dbversion_tiki[0] < 4) {
-            $previousDbApi = 'adodb'; // AdoDB was the default DB abstraction layer before 4.0
-        }
-    } else {
-        $api_tiki_forced = true;
-    }
-
-    unset($default_api_tiki);
 
     // In case of replication, ignore it during installer.
     unset($shadow_dbs, $shadow_user, $shadow_pass, $shadow_host);
-    if ($dbversion_tiki == '1.10') {
-        $dbversion_tiki = '2.0';
-    }
 
     $dbconn = false;
     $smarty->assign('resetdb', 'n');
-    if ($dbconn = initTikiDB($api_tiki, $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, $dbTiki)) {
+    if ($dbconn = initTikiDB($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, $dbTiki)) {
         $smarty->assign('resetdb', isset($_POST['reset']) ? 'y' : 'n');
         $installer = Installer::getInstance();
         if (! $client_charset_forced) {
-            write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, ($api_tiki_forced ? $api_tiki : ''), $dbversion_tiki);
+            write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, '');
             $logslib->add_log('install', 'database credentials written to file with hostname=' . $host_tiki
                 . '; dbname=' . $dbs_tiki . '; dbuser=' . $user_tiki);
         }
@@ -343,8 +365,8 @@ if (file_exists($local)) {
     }
 }
 
-if ($dbconn) {
-    $admin_acc = has_admin($api_tiki);
+if ($dbconn && has_tiki_db()) {
+    $admin_acc = has_admin();
 }
 
 if ($admin_acc == 'n') {
@@ -390,7 +412,6 @@ if (
             && ! empty($_POST['root_pass'])
         ) {
             $dbconn = initTikiDB(
-                $api_tiki,
                 $_POST['host'],
                 $_POST['root_user'],
                 $_POST['root_pass'],
@@ -400,7 +421,6 @@ if (
             );
         } else {
             $dbconn = initTikiDB(
-                $api_tiki,
                 $_POST['host'],
                 $_POST['user'],
                 $_POST['pass'],
@@ -420,7 +440,7 @@ if (
             }
             write_local_php($_POST['host'], $_POST['user'], $_POST['pass'], $_POST['name'], $client_charset);
 
-            // TODO: it is not possible to add_log if we don't have tables created
+            // TODO: it is not possible to add_log if we don't have tables created => Maybe log to a file for now, and to database after
             //$logslib->add_log('install', 'database credentials updated with hostname=' . $_POST['host'] . '; dbname='
             //  . $_POST['name'] .'; dbuser=' . $_POST['user']);
 
@@ -456,19 +476,17 @@ $smarty->assign('tikidb_is20', false);
 if ($dbconn) {
     $has_tiki_db = has_tiki_db();
     $smarty->assign('tikidb_created', $has_tiki_db);
-    $oldPerms = $installer->getOne('SELECT COUNT(*) FROM `users_permissions` WHERE `permDesc` = \'Can view categorized items\'');
-    $smarty->assign('tikidb_oldPerms', $oldPerms);
 
     if ($install_step == '6' && $has_tiki_db) {
         if (isset($_POST['install_type']) && $_POST['install_type'] === 'scratch') {
             require_once('lib/setup/prefs.php');
             // fix some prefs thwt get reset here
             $prefs['language'] = $language;
-            $prefs['javascript_enabled'] = null;    // seems the check is for $prefs['javascript_enabled'] == 'n'
+            $prefs['switch_color_module_assigned'] = 'n';
         }
         update_preferences($prefs);
         $smarty->assign('admin_email', get_admin_email());
-        $smarty->assign('upgradefix', (empty($dbversion_tiki) || $dbversion_tiki[0] < 4) ? 'y' : 'n');
+        $smarty->assign('upgradefix', 'y');
     }
     $smarty->assign('tikidb_is20', has_tiki_db_20());
 }
@@ -499,6 +517,12 @@ if (
         $installer->attach(new ProgressBar());
 
         $installer->cleanInstall();
+        // Set Administrator password
+        $randompass = TikiLib::lib('user')->genPass();
+        set_system_administrator_password($randompass);
+        $smarty->assign('defaultpass', $randompass);
+        $default_password_field = '<input type="hidden" name="defaultpass" value="' . $randompass . '">';
+        $smarty->assign('default_password_field', $default_password_field);
         if ($has_tiki_db) {
             $logmsg = 'database "' . $dbs_tiki . '" destroyed and reinstalled';
         } else {
@@ -507,8 +531,6 @@ if (
         $logslib->add_log('install', $logmsg);
         $smarty->assign('dbdone', 'y');
         $install_type = 'scratch';
-        require_once 'lib/tikilib.php';
-        $tikilib = new TikiLib();
         $userlib = TikiLib::lib('user');
         $tikidate = TikiLib::lib('tikidate');
     }
@@ -575,6 +597,12 @@ if (
 if (! isset($install_type)) {
     if (isset($_POST['install_type'])) {
         $install_type = $_POST['install_type'];
+        if ($install_type == 'scratch' && isset($_POST['defaultpass'])) {
+            $defaultpass = $_POST['defaultpass'];
+            $smarty->assign('defaultpass', $defaultpass);
+            $default_password_field = '<input type="hidden" name="defaultpass" value="' . $defaultpass . '">';
+            $smarty->assign('default_password_field', $default_password_field);
+        }
     } else {
         $install_type = '';
     }
@@ -595,7 +623,10 @@ if ($install_step == '9') {
     if ($install_type == 'scratch') {
         initialize_prefs(true);
         TikiLib::lib('unifiedsearch')->rebuild();
-        $u = 'tiki-change_password.php?user=admin&oldpass=admin&newuser=y';
+        // Always pass oldpass so first admin password setup cannot rely on a forgeable flag
+        $u = 'tiki-change_password.php?user=admin&oldpass=' . urlencode($defaultpass ?? 'admin') . '&newuser=y';
+        $tikilib = TikiLib::lib('tiki');
+        $tikilib->set_preference('tiki_install_version', $TWV->version);
     } else {
         $u = '';
     }
@@ -667,6 +698,7 @@ if ($install_step == '2') {
     // copy of most of $tikilib->return_bytes() not available at this stage
     $memory_limit = trim(ini_get('memory_limit'));
     $last = strtolower($memory_limit[strlen($memory_limit) - 1]);
+    $memory_limit = (int)$memory_limit;
     switch ($last) {
         // The 'G' modifier is available since PHP 5.1.0
         case 'g':
@@ -767,9 +799,10 @@ if (isset($_POST['general_settings']) && $_POST['general_settings'] == 'y') {
 $headerlib = TikiLib::lib('header');
 $headerlib->add_js("var tiki_cookie_jar=new Array();");
 $headerlib->add_cssfile('public/generated/js/vendor_dist/bootstrap/dist/css/bootstrap.min.css');
-$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/@fortawesome/fontawesome/all.css');
+$headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
 $headerlib->add_cssfile('themes/base_files/css/tiki_base.css');
 $headerlib->add_jsfile('lib/tiki-js.js');
+$headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery/dist/jquery.min.js");
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-migrate/dist/jquery-migrate.min.js", true);
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-ui/dist/jquery-ui.js");
@@ -780,11 +813,8 @@ var jqueryTiki = new Object();
 jqueryTiki.ui = false;
 jqueryTiki.ui_theme = "";
 jqueryTiki.tooltips = false;
-jqueryTiki.autocomplete = false;
-jqueryTiki.reflection = false;
 jqueryTiki.tablesorter = false;
 jqueryTiki.colorbox = false;
-jqueryTiki.cboxCurrent = "{current} / {total}";
 jqueryTiki.carousel = false;
 
 jqueryTiki.effect = "";
@@ -840,12 +870,12 @@ if ($install_step == '4') {
     $smarty->assign('database_charset', $value);
 }
 
-if (((isset($value) && $value == 'utf8mb4') || $install_step == '7') && $db = TikiDb::get()) {
+if (((isset($value) && $value == 'utf8mb4') || $install_step == '7') && ($db = TikiDb::get()) && ! empty($dbs_tiki)) {
     $result = $db->fetchAll(
         'SELECT TABLE_COLLATION FROM INFORMATION_SCHEMA.TABLES '
         . ' WHERE TABLE_SCHEMA = ? AND TABLE_COLLATION NOT LIKE "utf8mb4%" '
         . ' AND NOT (TABLE_NAME LIKE "index_%" OR TABLE_NAME LIKE "zzz_unused_%")', // Ignore tables that are not converted - but are generated
-        $dbs_tiki
+        [$dbs_tiki]
     );
     if (! empty($result)) {
         $smarty->assign('legacy_collation', $result[0]['TABLE_COLLATION']);
