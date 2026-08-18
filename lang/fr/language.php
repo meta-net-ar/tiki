@@ -25464,5 +25464,13 @@ $lang_current = array(
 "Machine Learning" => "Apprentissage automatique",
 "Offline mode" => "Mode hors ligne",
 "Wiki configs" => "Configurations Wiki",
+"Active hash:" => "Hachage actif:",
+"Git Information:" => "Informations Git:",
+"Look under \"External Feeds\" on the application menu if you are searching for the \"Article Generator\" on RSS feeds" => "Regardez sous \"Flux externes\" dans le menu de l'application, si vous recherchez le \"générateur d'articles\" sur les flux RSS",
+"No matching results." => "Aucun résultat correspondant.",
+"Permissions involved: %0. Also, when configuring articles, \"Admin Types  Comment can rate article\" needs to be set." => "Permissions impliquées : %0. De plus, lors de la configuration des articles, \"Admin Types  Comment can rate article\" doit être défini.",
+"Reference hash:" => "Hachage de référence:",
+"Search and select what you are looking for from the options that appear." => "Recherchez et sélectionnez ce que vous cherchez parmi les options qui apparaissent.",
+"Your active .htaccess does not match the reference _htaccess shipped with Tiki." => "Votre .htaccess actif ne correspond pas au _htaccess de référence fourni avec Tiki.",
 );
 $lang = array_replace($lang, $lang_current);
