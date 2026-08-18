@@ -41,12 +41,23 @@ class CommonMarkPurifier implements MarkdownPurifierInterface
         return ['markdown' => $out, 'notes' => $notes];
     }
 
-    /** Remove YAML front-matter if present. */
+    /**
+     * Remove YAML front-matter if present. The single implementation shared by
+     * every purifier and by MarkdownFileAnalyzer's title resolution, so the two
+     * can never disagree on what counts as front-matter.
+     *
+     * Delimiters must each be alone on their own line (per the YAML front-matter
+     * convention), not merely appear anywhere in the text — otherwise an
+     * ordinary document that happens to contain two "---" sequences (e.g. a
+     * Markdown horizontal rule) could be misread as having front-matter.
+     *
+     * @return array{0: string, 1: bool, 2: ?string} [body without front-matter, had front-matter, raw front-matter block]
+     */
     public static function removeFrontMatter(string $s): array
     {
-        if (preg_match('/^---\s*(.*?)\s*---\s*(.*)$/s', $s, $m)) {
-            return [$m[2], true];
+        if (preg_match('/^---\s*\r?\n(.*?)\r?\n---\s*(?:\r?\n|$)/s', $s, $m)) {
+            return [(string)substr($s, \strlen($m[0])), true, $m[1]];
         }
-        return [$s, false];
+        return [$s, false, null];
     }
 }
