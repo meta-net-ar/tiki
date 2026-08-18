@@ -47,10 +47,11 @@ class MultilineGraphic extends GridBasedGraphic
             case 'independant':
                 $extremes = [];
                 foreach ($this->lines as $line) {
-                    $extremes[] = min(array_keys($line));
+                    $extremes[] = min(array_map('floatval', array_keys($line)));
                 }
 
                 $min = min($extremes);
+                break;
         }
 
         if ($min > 0) {
@@ -74,7 +75,7 @@ class MultilineGraphic extends GridBasedGraphic
             case 'independant':
                 $extremes = [];
                 foreach ($this->lines as $line) {
-                    $extremes[] = max(array_keys($line));
+                    $extremes[] = max(array_map('floatval', array_keys($line)));
                 }
 
                 return max($extremes);
@@ -120,11 +121,13 @@ class MultilineGraphic extends GridBasedGraphic
             foreach ($line as $key => $value) {
                 $x = $data['x'][$key];
                 if (! empty($value) || $value === 0) {
-                    $this->lines[$style][$x] = $value;
+                    $this->lines[$style][(string) (float) $x] = $value;
                 }
             }
 
-            ksort($this->lines[$style]);
+            uksort($this->lines[$style], static function ($a, $b) {
+                return (float) $a <=> (float) $b;
+            });
         }
 
         return true;
@@ -139,6 +142,7 @@ class MultilineGraphic extends GridBasedGraphic
             $style = $renderer->getStyle($style);
 
             foreach ($line as $x => $y) {
+                $x = (float) $x;
                 if ($layout['grid-independant-location'] == 'horizontal') {
                     $xPos = $this->independant->getLocation($x);
                     $yPos = $this->dependant->getLocation($y);
