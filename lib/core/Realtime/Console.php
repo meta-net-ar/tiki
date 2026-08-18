@@ -78,6 +78,9 @@ class Console extends SessionAwareApp
 
     protected function formatHtml($text)
     {
+        if (! class_exists(\TikiManager\Config\App::class)) {
+            return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+        }
         $formatter = \TikiManager\Config\App::get('ConsoleHtmlFormatter');
         return $formatter->format($text);
     }
