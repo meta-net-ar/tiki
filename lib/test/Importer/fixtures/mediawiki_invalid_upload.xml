@@ -8,7 +8,7 @@
       </contributor>
       <comment>adsfasdf</comment>
       <filename>Qlandkartegt-0.11.1.tar.gz</filename>
-      <src>fixtures/test3.jpg</src>
+      <src>https://example.com/missing-qlandkartegt.tar.gz</src>
       <size>3252598</size>
     </upload>
     <upload>
@@ -19,7 +19,7 @@
       </contributor>
       <comment>adsfasdf</comment>
       <filename>Qlandkartegt-0.11.1.tar.gz</filename>
-      <src>fixtures/test3.jpg</src>
+      <src>https://example.com/missing-qlandkartegt.tar.gz</src>
       <size>3252598</size>
     </upload>
   </page>
@@ -32,7 +32,7 @@
       </contributor>
       <comment />
       <filename>Passelivre.jpg</filename>
-      <src>fixtures/test3.jpg</src>
+      <src>https://example.com/missing-passelivre.jpg</src>
       <size>94751</size>
     </upload>
   </page>
