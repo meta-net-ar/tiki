@@ -485,8 +485,23 @@ class Services_Wiki_Controller
                         ];
                         Feedback::warning($feedback);
                     } else {
-                        $appendString = "";
-                        foreach ($util->items as $page) {
+                        $tikilib = TikiLib::lib('tiki');
+                        $destinationExists = $tikilib->page_exists($destinationPage);
+                        // Creating or updating the redirect destination requires edit permission
+                        if ($destinationExists) {
+                            $canEditDestination = Perms::get('wiki page', $destinationPage)->edit;
+                        } else {
+                            $canEditDestination = Perms::get()->edit;
+                        }
+                        if (! $canEditDestination) {
+                            $msg = tr('You do not have permission to edit the redirect destination page. 301 redirect not created.');
+                            $feedback = [
+                                'tpl' => 'action',
+                                'mes' => $msg,
+                            ];
+                            Feedback::error($feedback);
+                        } else {
+                            $appendString = "";
                             // Append on the destination page's content the following string,
                             // where $page is the name of the deleted page:
                             // "\r\n~tc~(alias($page))~/tc~"
@@ -494,42 +509,44 @@ class Services_Wiki_Controller
                             if (count($util->items) > 1) {
                                 $comment = tr('Semantic aliases (301 Redirects) to this page were created when other pages were deleted');
                             } else {
-                                $comment = tr('A semantic alias (301 Redirect) to this page was created when page %0 was deleted', $page);
+                                $comment = tr('A semantic alias (301 Redirect) to this page was created when page %0 was deleted', $util->items[0]);
                             }
-                            $appendString .= "\r\n~tc~ (alias($page)) ~/tc~";
+                            foreach ($util->items as $page) {
+                                $appendString .= "\r\n~tc~ (alias($page)) ~/tc~";
+                            }
+                            if ($destinationExists) {
+                                // Get wiki page content
+                                $infoDestinationPage = $tikilib->get_page_info($destinationPage);
+                                $page_data = $infoDestinationPage['data'];
+                                $page_data .= $appendString;
+                                $tikilib->update_page($destinationPage, $page_data, $comment, $user, $tikilib->get_ip_address());
+                                if (count($util->items) > 1) {
+                                    $msg = tr('301 Redirects to the following page were created:');
+                                } else {
+                                    $msg = tr('A 301 Redirect to the following page was created:');
+                                }
+                            } else {
+                                if (count($util->items) > 1) {
+                                    $page_data = tr("THIS PAGE WAS CREATED AUTOMATICALLY when other pages were removed. Please edit and write the definitive contents.");
+                                } else {
+                                    $page_data = tr("THIS PAGE WAS CREATED AUTOMATICALLY when another page was removed. Please edit and write the definitive contents.");
+                                }
+                                $page_data .= $appendString;
+                                // Create a new page
+                                $tikilib->create_page($destinationPage, 0, $page_data, $tikilib->now, $comment, $user, $tikilib->get_ip_address());
+                                if (count($util->items) > 1) {
+                                    $msg = tr('The following page and 301 Redirects to it were created:');
+                                } else {
+                                    $msg = tr('The following page and a 301 Redirect to it were created:');
+                                }
+                            }
+                            $feedback = [
+                                'tpl' => 'link',
+                                'mes' => $msg,
+                                'items' => is_array($destinationPage) ? $destinationPage : [$destinationPage],
+                            ];
+                            Feedback::note($feedback);
                         }
-                        if (TikiLib::lib('tiki')->page_exists($destinationPage)) {
-                            // Get wiki page content
-                            $infoDestinationPage = TikiLib::lib('tiki')->get_page_info($destinationPage);
-                            $page_data = $infoDestinationPage['data'];
-                            $page_data .= $appendString;
-                            TikiLib::lib('tiki')->update_page($destinationPage, $page_data, $comment, $user, TikiLib::lib('tiki')->get_ip_address());
-                            if (count($util->items) > 1) {
-                                $msg = tr('301 Redirects to the following page were created:');
-                            } else {
-                                $msg = tr('A 301 Redirect to the following page was created:');
-                            }
-                        } else {
-                            if (count($util->items) > 1) {
-                                $page_data = tr("THIS PAGE WAS CREATED AUTOMATICALLY when other pages were removed. Please edit and write the definitive contents.");
-                            } else {
-                                $page_data = tr("THIS PAGE WAS CREATED AUTOMATICALLY when another page was removed. Please edit and write the definitive contents.");
-                            }
-                            $page_data .= $appendString;
-                            // Create a new page
-                            TikiLib::lib('tiki')->create_page($destinationPage, 0, $page_data, TikiLib::lib('tiki')->now, $comment, $user, TikiLib::lib('tiki')->get_ip_address());
-                            if (count($util->items) > 1) {
-                                $msg = tr('The following page and 301 Redirects to it were created:');
-                            } else {
-                                $msg = tr('The following page and a 301 Redirect to it were created:');
-                            }
-                        }
-                        $feedback = [
-                            'tpl' => 'link',
-                            'mes' => $msg,
-                            'items' => is_array($destinationPage) ? $destinationPage : [$destinationPage],
-                        ];
-                        Feedback::note($feedback);
                     }
                 }
             }
