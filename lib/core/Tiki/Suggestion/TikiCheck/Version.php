@@ -15,6 +15,14 @@ class Version implements SuggestionRules
         include_once(__DIR__ . '/../../../../setup/twversion.class.php');
         $TWV = new \TWVersion();
         $versionUtils = new \Tiki_Version_Utils();
-        return $versionUtils->checkUpdatesForVersion($TWV->version);
+        $upgrades = $versionUtils->checkUpdatesForVersion($TWV->version);
+
+        // Suggestions are displayed as plain feedback messages, so only keep the text
+        return array_map(
+            function ($upgrade) {
+                return $upgrade->getMessage();
+            },
+            $upgrades
+        );
     }
 }
