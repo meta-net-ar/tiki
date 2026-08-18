@@ -314,12 +314,11 @@ class FreetagLib extends ObjectLib
         $ret = [];
         $permMap = TikiLib::lib('object')->map_object_type_to_permission();
         while ($row = $result->fetchRow()) {
-
             if ($row['type'] == "trackeritem" && $prefs['feature_sefurl'] == 'y') {
                 $href = explode("&", $row['href']);
                 $row['href'] = $href[0];
             }
-            
+
             $ok = false;
             if ($row['type'] == 'blog post') {
                 $bloglib = TikiLib::lib('blog');
@@ -1085,13 +1084,17 @@ class FreetagLib extends ObjectLib
             $lang = $prefs['language'];
         }
 
+        $max = filter_var($max, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if ($max === false) {
+            $max = 10;
+        }
+
         $query = 'SELECT t.* FROM `tiki_freetags` t, `tiki_freetagged_objects` o'
                         . ' WHERE t.`tagId` = o.`tagId`'
                         . ' AND (`lang` = ? or `lang` IS null)'
-                        . ' ORDER BY ' . $this->convertSortMode('random')
-                        . ' LIMIT ' . $max;
+                        . ' ORDER BY ' . $this->convertSortMode('random');
 
-        $result = $this->query($query, [ $lang ]);
+        $result = $this->query($query, [ $lang ], $max);
 
         $tags = [];
         $index = [];
