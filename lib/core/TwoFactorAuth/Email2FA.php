@@ -112,8 +112,7 @@ class Email2FA implements TwoFactorAuthInterface
             throw new TwoFactorAuthException($errMsg);
         }
 
-        $hashedTokenFromDb = $tokenInfo['token'];
-        $hashedTokenFromClient = $this->crypt->encryptData($code);
+        $storedToken = $tokenInfo['token'];
         $attempts = $tokenInfo['attempts'];
         $created = intval($tokenInfo['created']);
         $tokenTTL = intval($prefs['twoFactorAuthEmailTokenTTL'] ?? 30) * 60;
@@ -123,7 +122,9 @@ class Email2FA implements TwoFactorAuthInterface
             throw new TwoFactorAuthException($errMsg);
         }
 
-        if ($hashedTokenFromDb !== $hashedTokenFromClient) {
+        $decryptedToken = $this->crypt->decryptData($storedToken);
+
+        if ($decryptedToken === false || ! hash_equals($decryptedToken, $code)) {
             $attempts = $tokenInfo['attempts'] + 1;
             $this->twoFATable->update(['attempts' => $attempts], ['userId' => $userInfo['userId']]);
             return false;
