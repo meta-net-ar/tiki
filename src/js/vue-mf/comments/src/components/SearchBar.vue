@@ -26,7 +26,7 @@ export default {
     <div class="row">
         <div class="col-md-6 mx-auto">
             <div class="search">
-                <i class="fa fa-search" style="color: #8ca5af;"></i>
+                <i class="fa fa-search" style="color: #8ca5af;z-index: 9999;"></i>
                 <input
                     type="text"
                     class="form-control"
