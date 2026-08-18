@@ -329,8 +329,13 @@ class WikiMediawiki extends Wiki
                 $i = $attachments->length - 1;
                 $lastVersion = $attachments->item($i);
 
-                $fileName = $lastVersion->getElementsByTagName('filename')->item(0)->nodeValue;
+                $fileName = basename($lastVersion->getElementsByTagName('filename')->item(0)->nodeValue);
                 $fileUrl = $lastVersion->getElementsByTagName('src')->item(0)->nodeValue;
+
+                if ($fileName === '' || $fileName === '.' || $fileName === '..') {
+                    $this->saveAndDisplayLog(tr('File not imported: invalid attachment filename.') . "\n", true);
+                    continue;
+                }
 
                 if (file_exists($this->attachmentsDestDir . $fileName)) {
                     $this->saveAndDisplayLog(
@@ -344,20 +349,21 @@ class WikiMediawiki extends Wiki
                     continue;
                 }
 
-                // Prevent SSRF: attachment URLs come from the imported XML dump
-                // which may be untrusted. Block private/reserved IP targets.
-                // Only check URLs with a scheme (http/https); relative file paths
-                // are local references and not a network SSRF vector.
-                if (preg_match('#^https?://#i', $fileUrl)) {
-                    $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
-                    if (! $ssrf->isUrlAllowed($fileUrl)) {
-                        $this->saveAndDisplayLog(tr('File %0 not imported: URL targets a private or reserved address.', $fileName) . "\n", true);
-                        continue;
-                    }
+                // Prevent SSRF / local-file disclosure: attachment <src> values come
+                // from the imported XML dump and may be untrusted. Always validate
+                // with SsrfLib (http/https allowlist + reject private/reserved hosts)
+                // so file://, php://, and other stream wrappers cannot bypass the gate.
+                $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+                if (! $ssrf->isUrlAllowed($fileUrl)) {
+                    $this->saveAndDisplayLog(
+                        tr('File %0 not imported: attachment URL must be a public http(s) address.', $fileName) . "\n",
+                        true
+                    );
+                    continue;
                 }
 
-                if (@fopen($fileUrl, 'r')) {
-                    $attachmentContent = @file_get_contents($fileUrl);
+                $attachmentContent = $this->fetchAttachmentContents($fileUrl);
+                if ($attachmentContent !== false) {
                     $newFile = fopen($this->attachmentsDestDir . $fileName, 'w');
                     fwrite($newFile, $attachmentContent);
                     $this->saveAndDisplayLog(tr('File %0 successfully imported!', $fileName) . "\n");
@@ -366,6 +372,18 @@ class WikiMediawiki extends Wiki
                 }
             }
         }
+    }
+
+    /**
+     * Fetch attachment bytes from a validated URL.
+     * Isolated for unit tests so downloads can be mocked without network I/O.
+     *
+     * @param string $fileUrl
+     * @return string|false
+     */
+    protected function fetchAttachmentContents($fileUrl)
+    {
+        return @file_get_contents($fileUrl);
     }
 
     /**
