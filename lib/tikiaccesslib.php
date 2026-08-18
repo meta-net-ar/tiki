@@ -1466,6 +1466,23 @@ class TikiAccessLib extends TikiLib
     }
 
     /**
+     * Instruct the client not to store the current response. Intended for HTML
+     * pages that expose a freshly generated secret (e.g. a new API token) so
+     * that it cannot be recovered from the browser cache or history.
+     *
+     * No-op for serialized (JSON/YAML/feed) API responses, which manage their
+     * own caching, and when headers have already been sent.
+     */
+    public function preventCaching()
+    {
+        if (headers_sent() || self::is_serializable_request()) {
+            return;
+        }
+
+        header('Cache-Control: no-store');
+    }
+
+    /**
      * Will process the output by serializing in the best way possible based on the request's accept headers.
      * To output as an RSS/Atom feed, a descriptor may be provided to map the array data to the feed's properties
      * and to supply additional information. The descriptor must contain the following keys:
