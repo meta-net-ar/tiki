@@ -988,8 +988,10 @@ class Tracker_Query
                 " . ($isSearch == true ? ", search_item_fields.fieldId, search_item_fields.itemId " : "") . "
                 ORDER BY
                 tiki_tracker_items." . $dateUnit . " " . ($this->desc == true ? 'DESC' : 'ASC') . "
-                " . (! empty($this->limit) ? " LIMIT " . $this->limit : "") . "
-                " . (! empty($this->offset) ? " OFFSET " . $this->offset : "");
+                ";
+
+        $numrows = ! empty($this->limit) ? (int)$this->limit : -1;
+        $fetchOffset = ! empty($this->offset) ? (int)$this->offset : -1;
 
         if ($this->debug == true) {
             $result = [$query, $params];
@@ -997,7 +999,7 @@ class Tracker_Query
             print_r($tikilib->fetchAll($query, $params));
             die;
         } else {
-            $result = $tikilib->fetchAll($query, $params);
+            $result = $tikilib->fetchAll($query, $params, $numrows, $fetchOffset);
         }
 
         $newResult = [];
