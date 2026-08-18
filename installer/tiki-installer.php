@@ -623,7 +623,8 @@ if ($install_step == '9') {
     if ($install_type == 'scratch') {
         initialize_prefs(true);
         TikiLib::lib('unifiedsearch')->rebuild();
-        $u = isset($defaultpass) ? 'tiki-change_password.php?user=admin&oldpass=' . $defaultpass . '&newuser=y' : 'tiki-change_password.php?user=admin&newuser=y';
+        // Always pass oldpass so first admin password setup cannot rely on a forgeable flag
+        $u = 'tiki-change_password.php?user=admin&oldpass=' . urlencode($defaultpass ?? 'admin') . '&newuser=y';
         $tikilib = TikiLib::lib('tiki');
         $tikilib->set_preference('tiki_install_version', $TWV->version);
     } else {
