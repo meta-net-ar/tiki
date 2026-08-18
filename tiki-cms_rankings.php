@@ -11,6 +11,14 @@
 // $Id$
 
 $section = 'cms';
+$inputConfiguration = [
+    [
+        'staticKeyFilters'                => [
+            'which'                       => 'word',     //post
+            'limit'                       => 'digits',   //post
+        ],
+    ],
+];
 require_once('tiki-setup.php');
 include_once('lib/rankings/ranklib.php');
 $access->check_feature(['feature_articles', 'feature_cms_rankings']);
@@ -29,8 +37,10 @@ $allrankings = [
 
 $smarty->assign('allrankings', $allrankings);
 
-if (! isset($_REQUEST["which"])) {
-    $which = 'cms_ranking_top_articles';
+$allowedRankings = array_column($allrankings, 'value');
+$defaultWhich = 'cms_ranking_top_articles';
+if (! isset($_REQUEST["which"]) || ! in_array($_REQUEST["which"], $allowedRankings, true)) {
+    $which = $defaultWhich;
 } else {
     $which = $_REQUEST["which"];
 }
@@ -38,10 +48,9 @@ if (! isset($_REQUEST["which"])) {
 $smarty->assign('which', $which);
 
 // Get the page from the request var or default it to HomePage
-if (! isset($_REQUEST["limit"])) {
+$limit = isset($_REQUEST["limit"]) ? (int) $_REQUEST["limit"] : 10;
+if ($limit < 1) {
     $limit = 10;
-} else {
-    $limit = $_REQUEST["limit"];
 }
 
 $smarty->assign_by_ref('limit', $limit);
