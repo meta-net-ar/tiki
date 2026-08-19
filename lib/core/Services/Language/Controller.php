@@ -236,6 +236,11 @@ class Services_Language_Controller
      */
     public function action_download($input)
     {
+        $perms = Perms::get('tiki');
+        if (! $perms->tiki_p_edit_languages) {
+            throw new Services_Exception_Denied(tr('Permission denied'));
+        }
+
         //get input
         $language = $input->language->text();
         $file_type = $input->file_type->text();
