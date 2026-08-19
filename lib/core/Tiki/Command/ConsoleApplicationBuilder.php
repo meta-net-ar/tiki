@@ -118,7 +118,8 @@ class ConsoleApplicationBuilder
                 new PluginRefreshRunCommand(),
                 new PatchCommand(),
                 new UpdateCommand(),
-                new DatabaseEngineConvertCommand()
+                new DatabaseEngineConvertCommand(),
+                new TrackerConvertAttachmentsCommand()
                 ],
             ],[
             'condition' => 'checkTikiSetupComplete',
@@ -188,7 +189,6 @@ class ConsoleApplicationBuilder
                 new TrackerExportCommand(),
                 new TrackerImportCommand(),
                 new TrackerRecalcCommand(),
-                new TrackerConvertAttachmentsCommand(),
                 new SitemapGenerateCommand(),
                 new TikiInfoCommand(),
                 new TrackerClearCommand(),
@@ -201,6 +201,7 @@ class ConsoleApplicationBuilder
                 new UsersPasswordCommand(),
                 new UsersTemporaryCommand(),
                 new TokensClearCommand(),
+                new ApiTokensRevokeAllCommand(),
                 new CookiesClearCommand(),
                 new StatsCommand(),
                 new MLTrainCommand(),
@@ -530,16 +531,12 @@ class ConsoleApplicationBuilder
      * Iterates over all commands in the list, and registers / doesn't register the commands in accordance with the result
      * of the check function and the action configured for the command group
      *
-     * @param int|bool $statusCode
+     * @param int $statusCode
      * @return Application
      */
     public function create($statusCode = 1100): Application
     {
         global $tikipath;
-
-        if (is_bool($statusCode)) {
-            $statusCode = 1100;
-        }
 
         if (self::$lastInstance) {
             return self::$lastInstance;
@@ -559,6 +556,9 @@ class ConsoleApplicationBuilder
         $console->setAutoExit(false);
         $console->setName(tra('Tiki Console Tool'));
         $console->setCatchExceptions(false);
+
+        $commandCalled = $_SERVER['argv'][1] ?? false;
+        $stopAfterRequestedCommand = ! in_array($commandCalled, ['list', 'help'], true);
 
         /**
          * @var  $condition string  The name of the check method to be executed
@@ -621,6 +621,10 @@ class ConsoleApplicationBuilder
                     }
                 }
                 $console->add($command);
+                // If the command exactly matches one that was requested, stop processing further commands as they will not be used anyhow.
+                if ($stopAfterRequestedCommand && $commandCalled === $command->getName()) {
+                    break 2;
+                }
             }
         }
 
