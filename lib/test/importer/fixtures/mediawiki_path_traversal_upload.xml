@@ -1,0 +1,28 @@
+<mediawiki>
+  <page>
+    <upload>
+      <timestamp>2009-07-22T21:43:45Z</timestamp>
+      <contributor>
+        <username>Admin</username>
+        <id>1</id>
+      </contributor>
+      <comment>invalid path</comment>
+      <filename>../outside.jpg</filename>
+      <src>fixtures/sourceTest.jpg</src>
+      <size>100</size>
+    </upload>
+  </page>
+  <page>
+    <upload>
+      <timestamp>2009-07-22T21:50:42Z</timestamp>
+      <contributor>
+        <username>Admin</username>
+        <id>1</id>
+      </contributor>
+      <comment />
+      <filename>..\outside2.jpg</filename>
+      <src>fixtures/sourceTest.jpg</src>
+      <size>100</size>
+    </upload>
+  </page>
+</mediawiki>
