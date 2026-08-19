@@ -175,7 +175,7 @@ class TextArea extends Base
             $headerlib->add_jq_onready("register_id('$as_id','" . addcslashes($auto_save_referrer, "'") . "');");
             $headerlib->add_js("var autoSaveId = '" . addcslashes($auto_save_referrer, "'") . "';");
         }
-        if ($prefs['feature_notify_users_mention'] === 'y' && $prefs['feature_tag_users'] === 'y') {
+        if ($prefs['feature_tag_users'] === 'y') {
             $headerlib->add_jsfile('lib/jquery_tiki/user_mentions.js');
             $headerlib->add_jq_onready("$('#$as_id').userMentions();");
         }
