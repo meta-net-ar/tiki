@@ -866,8 +866,7 @@ class TikiAccessLib extends TikiLib
 
     /**
      * Utility to compose and write the error message from CSRF errors to the server php error log, adding on
-     * certain information regarding the environment. Broken into two pieces since the the GET and POST
-     * parameters have the potential to exceed the character limit.
+     * certain information regarding the environment. Request body content is omitted to avoid logging secrets.
      *
      * @param $msg  string      Description of the specific error which will be placed first ahead of
      *                     the environmental information
@@ -875,7 +874,8 @@ class TikiAccessLib extends TikiLib
     private function csrfPhpErrorLog($msg)
     {
         global $prefs;
-        error_log(PHP_EOL
+        error_log(
+            PHP_EOL
             . '**** ' . tr('Start CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****' . PHP_EOL
             . '  ' . $msg . PHP_EOL
             . '  site_security_timeout' . tr('preference:') . $prefs['site_security_timeout']
@@ -884,7 +884,8 @@ class TikiAccessLib extends TikiLib
             . (isset($_SERVER['REQUEST_URI']) ? '  REQUEST_URI: ' . $_SERVER['REQUEST_URI'] . PHP_EOL : '')
             . (isset($_SERVER['HTTP_ORIGIN']) ? '  HTTP_ORIGIN: ' . $_SERVER['HTTP_ORIGIN'] . PHP_EOL : '')
             . (isset($_SERVER['HTTP_REFERER']) ? '  HTTP_REFERER: ' . $_SERVER['HTTP_REFERER'] . PHP_EOL : '')
-            . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] : '') . PHP_EOL);
+            . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] : '') . PHP_EOL
+        );
         $get = count($_GET) ? json_encode($_GET, JSON_PRETTY_PRINT) : tr('empty');
         $post = count($_POST) ? json_encode($_POST, JSON_PRETTY_PRINT) : tr('empty');
         error_log(PHP_EOL
@@ -1645,25 +1646,11 @@ class TikiAccessLib extends TikiLib
      */
     private function csrfSystemLog($crsfErrorId)
     {
-        global $prefs, $user;
+        global $prefs;
 
-        $tikilib = TikiLib::lib('tiki');
         $logslib = TikiLib::lib('logs');
 
-        $redactPass = function (&$item, $key) {
-            if (strpos($key, 'pass') !== false) {
-                $item = '** ' . tr('redacted') . ' **';
-            }
-        };
-
-        $get = count($_GET) ? $_GET : tr('empty');
-        if (is_array($get)) {
-            array_walk($get, $redactPass);
-        }
-        $post = count($_POST) ? $_POST : tr('empty');
-        if (is_array($post)) {
-            array_walk($post, $redactPass);
-        }
+        $ticket = $this->ticket ?: ($_POST['ticket'] ?? '');
 
         $logCrsf = [
             'serverName' => $_SERVER['SERVER_NAME'],
@@ -1673,12 +1660,10 @@ class TikiAccessLib extends TikiLib
             'siteSecurityTimeout' => tr('preference:') . ' ' . $prefs['site_security_timeout'] . tr('seconds') . ' (' . $prefs['site_security_timeout'] / 60 . ' minutes)',
             'scriptName' => $_SERVER['SCRIPT_NAME'],
             'requestURI' => $_SERVER['REQUEST_URI'],
-            'httpOrigin' => $_SERVER['HTTP_ORIGIN'],
+            'httpOrigin' => isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : null,
             'httpReferer' => $_SERVER['HTTP_REFERER'],
             'requestMethod' => $_SERVER['REQUEST_METHOD'],
-            'queryString' => $_SERVER['QUERY_STRING'] ?? tr('empty'),
-            'get' => $get,
-            'post' => $post
+            'ticket' => $ticket !== '' ? $ticket : tr('empty'),
         ];
         $logslib->add_action('CRSF Error', 'system', 'system', $crsfErrorId, '', '', '', '', '', '', $logCrsf);
     }
