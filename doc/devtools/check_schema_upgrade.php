@@ -584,6 +584,10 @@ class CheckSchemaUpgrade
 
         $dbConnection->exec("DROP TABLE IF EXISTS `index_pref_en`");
 
+        // This signing secret is generated per installation, so normalize it
+        // before comparing upgraded and freshly installed databases.
+        $dbConnection->exec("UPDATE `tiki_preferences` SET `value` = REPEAT('0', 64) WHERE `name` = 'auth_token_secret'");
+
         // set a well defined date for some records
         $dbConnection->exec("UPDATE `tiki_schema` SET `install_date` = '2001-01-01 01:01:01'");
 
