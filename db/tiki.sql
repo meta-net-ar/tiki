@@ -1979,6 +1979,9 @@ CREATE TABLE `tiki_preferences` (
   PRIMARY KEY (`name`(191))
 ) ENGINE=MyISAM;
 
+INSERT INTO `tiki_preferences` (`name`, `value`)
+SELECT 'auth_token_secret', LOWER(SHA2(CONCAT(UUID(), RAND(), CONNECTION_ID()), 256));
+
 DROP TABLE IF EXISTS `tiki_private_messages`;
 CREATE TABLE `tiki_private_messages` (
   `messageId` int(8) NOT NULL auto_increment,
@@ -3547,7 +3550,7 @@ CREATE TABLE `tiki_auth_tokens` (
     `timeout` INT NOT NULL DEFAULT 0,
     `hits` INT NOT NULL DEFAULT 1,
     `maxhits` INT NOT NULL DEFAULT 1,
-    `token` CHAR(32),
+    `token` VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin,
     `entry` VARCHAR(50),
     `email` varchar(255) NOT NULL,
     `parameters` VARCHAR(255),
