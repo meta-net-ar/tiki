@@ -11,6 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tiki\Lib\Auth\Tokens;
 
 #[AsCommand(
     name: 'database:redact',
@@ -172,9 +173,11 @@ class RedactDBCommand extends Command
         $result = $tikilib->query($query);
 
         // Remove auth tokens
-        $output->writeln('<info>' . tra('Removing auth tokens.') . '</info>');
+        $output->writeln('<info>' . tra('Rotating auth token signing secret and removing auth tokens.') . '</info>');
+        $revokedCount = (new Tokens(\TikiDb::get()))->rotateSigningSecret();
         $query = "TRUNCATE TABLE tiki_auth_tokens;";
         $result = $tikilib->query($query);
+        $output->writeln('<comment>' . tr('%0 auth tokens removed.', $revokedCount) . '</comment>');
 
         // Remove web services
         $output->writeln('<info>' . tra('Removing webservices info.') . '</info>');

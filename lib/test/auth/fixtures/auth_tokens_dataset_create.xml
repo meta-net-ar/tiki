@@ -56,7 +56,7 @@
         <field name="timeout">5</field>
         <field name="hits">1</field>
         <field name="maxhits">1</field>
-        <field name="token">0ae3b4b86286ab68f5a66fb8c49da163</field>
+        <field name="token">3e688670095cba622a5390a39c8c23b0ca641faf6bdff0cfccd7b3c35253fe85</field>
         <field name="entry">tiki-index.php</field>
         <field name="user">admin</field>
         <field name="email"></field>
