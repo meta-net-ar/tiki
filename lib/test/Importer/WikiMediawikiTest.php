@@ -314,6 +314,50 @@ XML;
         );
     }
 
+    public function testSanitizeAttachmentFileNameRejectsPathTraversal(): void
+    {
+        $this->assertSame('photo.jpg', $this->obj->sanitizeAttachmentFileName('photo.jpg'));
+        $this->assertSame('photo.jpg', $this->obj->sanitizeAttachmentFileName('  photo.jpg  '));
+
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('../../outside.jpg'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('..\\..\\outside.jpg'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('/etc/passwd'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('subdir/photo.jpg'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('..'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('.'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName(''));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName("evil\0.jpg"));
+    }
+
+    public function testDownloadAttachmentsShouldRejectPathTraversalFilenames(): void
+    {
+        ob_start();
+
+        $this->obj->attachmentsDestDir = __DIR__ . '/fixtures/';
+        $outsidePath = __DIR__ . '/outside.jpg';
+        $outsidePath2 = __DIR__ . '/outside2.jpg';
+
+        if (file_exists($outsidePath)) {
+            unlink($outsidePath);
+        }
+        if (file_exists($outsidePath2)) {
+            unlink($outsidePath2);
+        }
+
+        $this->obj->dom = new DOMDocument();
+        $this->obj->dom->load(__DIR__ . '/fixtures/mediawiki_path_traversal_upload.xml');
+        $this->obj->downloadAttachments();
+
+        $this->assertFileDoesNotExist($outsidePath);
+        $this->assertFileDoesNotExist($outsidePath2);
+        $this->assertFileDoesNotExist($this->obj->attachmentsDestDir . 'outside.jpg');
+        $this->assertFileDoesNotExist($this->obj->attachmentsDestDir . 'outside2.jpg');
+
+        $output = ob_get_clean();
+        $this->assertStringContainsString('filename must not contain directory separators or `..`', $output);
+        $this->assertStringNotContainsString('successfully imported', $output);
+    }
+
     public function testExtractInfo(): void
     {
         ob_start();
