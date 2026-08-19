@@ -6,7 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class AuthTokens
 {
-    private const SCHEME = 'MD5( CONCAT(tokenId, creation, timeout, entry, parameters, `groups`) )';
+    private const LEGACY_TOKEN_LENGTH = 32;
+    private const SIGNED_TOKEN_LENGTH = 64;
     private $db;
     private $table;
     private $dt;
@@ -47,10 +48,28 @@ class AuthTokens
 
     public function getToken($token)
     {
+        $data = $this->table->fetchFullRow(['token' => $token]);
+
+        if (! $this->isTokenValid($data ?: null, $token)) {
+            return null;
+        }
+
+        return $data;
+    }
+
+    public function getActiveToken($token)
+    {
         $data = $this->db->query(
-            'SELECT * FROM tiki_auth_tokens WHERE token = ? AND token = ' . self::SCHEME,
+            'SELECT * FROM tiki_auth_tokens
+                WHERE token = ?
+                AND (timeout = -1 OR UNIX_TIMESTAMP(creation) + timeout >= UNIX_TIMESTAMP())
+                AND (hits = -1 OR hits > 0)',
             [ $token ]
         )->fetchRow();
+
+        if (! $this->isTokenValid($data ?: null, $token)) {
+            return null;
+        }
 
         return $data;
     }
@@ -58,6 +77,43 @@ class AuthTokens
     public function getTokens($conditions = [])
     {
         return $this->table->fetchAll([], $conditions, -1, -1, ['creation' => 'asc']);
+    }
+
+    public function rotateSigningSecret(bool $revokeExistingTokens = true): int
+    {
+        if (! TikiLib::lib('tiki')->set_preference('auth_token_secret', $this->generateSigningSecret())) {
+            throw new \RuntimeException('Unable to rotate token signing secret.');
+        }
+
+        if (! $revokeExistingTokens) {
+            return 0;
+        }
+
+        return $this->revokeAllTokens();
+    }
+
+    public function revokeAllTokens(): int
+    {
+        $tokenCount = (int) $this->db->getOne('SELECT COUNT(*) FROM `tiki_auth_tokens`');
+
+        if ($tokenCount === 0) {
+            return 0;
+        }
+
+        $tokensWithTempUsers = $this->db->fetchAll(
+            'SELECT tokenId, userPrefix FROM `tiki_auth_tokens` WHERE `createUser` = ?',
+            [ 'y' ]
+        );
+
+        foreach ($tokensWithTempUsers as $token) {
+            if (! empty($token['userPrefix'])) {
+                TikiLib::lib('user')->remove_temporary_user($this->buildTemporaryUsername($token['userPrefix'], $token['tokenId']));
+            }
+        }
+
+        $this->db->query('DELETE FROM `tiki_auth_tokens`');
+
+        return $tokenCount;
     }
 
     /**
@@ -70,7 +126,7 @@ class AuthTokens
         return $this->db->query(
             'DELETE FROM tiki_auth_tokens
                 WHERE (timeout != -1 AND UNIX_TIMESTAMP(creation) + timeout < UNIX_TIMESTAMP())
-                OR `hits` = 0',
+                OR (`hits` <= 0 AND `hits` != -1)',
             null,
             $limit,
         );
@@ -82,7 +138,7 @@ class AuthTokens
         $usersToDelete = $this->db->fetchAll(
             'SELECT tokenId, userPrefix FROM tiki_auth_tokens
                 WHERE (timeout != -1 AND UNIX_TIMESTAMP(creation) + timeout < UNIX_TIMESTAMP())
-                OR `hits` = 0',
+                OR (`hits` <= 0 AND `hits` != -1)',
             null,
             2000
         );
@@ -90,16 +146,13 @@ class AuthTokens
         $userlib = TikiLib::lib('user');
         foreach ($usersToDelete as $del) {
             if (! empty($del['userPrefix'])) {
-                $userlib->remove_temporary_user($del['userPrefix'] . $del['tokenId']);
+                $userlib->remove_temporary_user($this->buildTemporaryUsername($del['userPrefix'], $del['tokenId']));
             }
         }
 
         $this->deleteExpired(2000);
 
-        $data = $this->db->query(
-            'SELECT tokenId, entry, parameters, `groups`, email, createUser, userPrefix FROM tiki_auth_tokens WHERE token = ? AND token = ' . self::SCHEME,
-            [ $token ]
-        )->fetchRow();
+        $data = $this->getActiveToken($token);
 
         if (! $data) {
             return null;
@@ -153,14 +206,13 @@ class AuthTokens
             return null;
         }
 
-        $this->db->query(
-            'UPDATE `tiki_auth_tokens` SET `hits` = `hits` - 1 WHERE `tokenId` = ? AND hits != -1',
-            [ $data['tokenId'] ]
-        );
+        if (! $this->consumeHit($data)) {
+            return null;
+        }
 
         // Process autologin of temporary users
         if ($data['createUser'] == 'y') {
-            $tempuser = $data['userPrefix'] . $userlib->autogenerate_login($data['tokenId'], 6);
+            $tempuser = $this->buildTemporaryUsername($data['userPrefix'], $data['tokenId']);
             $groups = json_decode($data['groups'], true);
             if (! $userlib->user_exists($tempuser)) {
                 $randompass = $userlib->genPass();
@@ -266,12 +318,14 @@ class AuthTokens
 
             ]
         );
+        $tokenId = $this->db->lastInsertId();
 
-        $max = $this->db->getOne('SELECT MAX(tokenId) FROM tiki_auth_tokens');
+        $tokenData = $this->table->fetchFullRow(['tokenId' => $tokenId]);
+        $token = $this->generateToken($tokenData);
 
-        $this->db->query('UPDATE tiki_auth_tokens SET token = ' . self::SCHEME . ' WHERE tokenId = ?', [ $max ]);
+        $this->table->update(['token' => $token], ['tokenId' => $tokenId]);
 
-        return $this->db->getOne('SELECT token FROM tiki_auth_tokens WHERE tokenId = ?', [ $max ]);
+        return $token;
     }
 
     /**
@@ -363,8 +417,87 @@ class AuthTokens
             ['tokenId' => $tokenId, 'createUser' => 'y']
         );
         if ($userPrefix) {
-            TikiLib::lib('user')->remove_temporary_user($userPrefix . $tokenId);
+            TikiLib::lib('user')->remove_temporary_user($this->buildTemporaryUsername($userPrefix, $tokenId));
         }
         $this->table->delete(['tokenId' => $tokenId]);
+    }
+
+    private function consumeHit(array $data): bool
+    {
+        if ((int) $data['hits'] === -1) {
+            return true;
+        }
+
+        $result = $this->db->query(
+            'UPDATE `tiki_auth_tokens` SET `hits` = `hits` - 1 WHERE `tokenId` = ? AND `hits` > 0',
+            [ $data['tokenId'] ]
+        );
+
+        return $result && $result->numRows() === 1;
+    }
+
+    private function buildTemporaryUsername(string $userPrefix, int|string $tokenId): string
+    {
+        return $userPrefix . TikiLib::lib('user')->autogenerate_login($tokenId, 6);
+    }
+
+    private function buildTokenPayload(array $data): string
+    {
+        return implode(
+            '',
+            [
+                (string) ($data['tokenId'] ?? ''),
+                (string) ($data['creation'] ?? ''),
+                (string) ($data['timeout'] ?? ''),
+                (string) ($data['entry'] ?? ''),
+                (string) ($data['parameters'] ?? ''),
+                (string) ($data['groups'] ?? ''),
+            ]
+        );
+    }
+
+    private function generateToken(array $data): string
+    {
+        return hash_hmac('sha256', $this->buildTokenPayload($data), $this->getSigningSecret());
+    }
+
+    private function generateSigningSecret(): string
+    {
+        return bin2hex(random_bytes(32));
+    }
+
+    private function getSigningSecret(): string
+    {
+        global $prefs;
+
+        if (! empty($prefs['auth_token_secret'])) {
+            return (string) $prefs['auth_token_secret'];
+        }
+
+        throw new \RuntimeException('No token signing secret is configured.');
+    }
+
+    private function isTokenValid(?array $data, string $token): bool
+    {
+        if (! $data || empty($data['token'])) {
+            return false;
+        }
+
+        $length = strlen($token);
+        if ($length !== strlen((string) $data['token'])) {
+            return false;
+        }
+
+        if ($length === self::LEGACY_TOKEN_LENGTH) {
+            $expected = md5($this->buildTokenPayload($data));
+            return hash_equals($expected, $token);
+        }
+
+        if ($length === self::SIGNED_TOKEN_LENGTH) {
+            $expected = hash_hmac('sha256', $this->buildTokenPayload($data), $this->getSigningSecret());
+            return hash_equals($expected, $token);
+        }
+
+        return false;
     }
 }

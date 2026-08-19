@@ -12,7 +12,10 @@
     {if not empty($info)}
         <div class="rounded bg-dark text-light p-3">{$info|nl2br}</div>
     {else}
-        <form method="post" action="{service controller=manager action=clone}">
+        <div class="alert alert-warning">
+            {tr _0="<code>php console.php tokens:rotate-secret</code>"}After cloning, run %0 in the cloned instance to reset auth token signing and revoke copied auth tokens.{/tr}
+        </div>
+        <form method="post" action="{service controller=manager action=clone}" id="tiki-manager-clone-form">
             {foreach item=option from=$options}
             <div class="tiki-form-group row p-2">
                 <label class="col-form-label col-sm-3">
