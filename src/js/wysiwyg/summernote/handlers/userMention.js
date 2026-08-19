@@ -34,8 +34,8 @@ export default function (textarea) {
                 }
 
                 const dropdown = getSuggestionsDropdown(caretRect);
-                suggestions.forEach(({ username, realname, avatar }) => {
-                    const item = getSuggestionDropdownItem(username, realname, avatar);
+                suggestions.forEach(({ username, realname, avatar }, index) => {
+                    const item = getSuggestionDropdownItem(username, realname, avatar, index === 0);
                     $(item).on("click", (e) => {
                         e.preventDefault();
                         const typedMention = text.match(/@\w*$/)?.[0] ?? "";
