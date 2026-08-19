@@ -19,9 +19,8 @@
             </tr>
             {foreach $tokens as $token}
                 <tr>
-                    <span hidden id="token-{$token.tokenId}">{$token.token|escape}</span>
-                    <td class="copy" data-clipboard-target="#token-{$token.tokenId}">
-                        {$token.token|truncate:20} {icon name='clipboard' title="{tr}Copy{/tr}"}
+                    <td>
+                        <span class="text-muted">{tr}Hidden after creation{/tr}</span>
                     </td>
                     <td>
                         {$token.user|escape}
@@ -61,4 +60,12 @@
             {icon name="create"} {tr}Create Token{/tr}
         </a>
     </p>
+    {if $tokens}
+        <form method="post" action="{service controller=api_token action=revoke_all}" class="d-inline">
+            {ticket}
+            <button type="submit" class="btn btn-danger" onclick="return confirm('{tr}Revoke every API and OAuth token? This cannot be undone.{/tr}')">
+                {icon name="delete"} {tr}Revoke all API and OAuth tokens{/tr}
+            </button>
+        </form>
+    {/if}
 {/block}

@@ -12,8 +12,8 @@
             <label class="col-form-label col-sm-2">
                 {tr}Token{/tr}
             </label>
-            <div class="col-sm-10 js-allow-copy" data-bs-content="{$token.token|escape}">
-                {$token.token|truncate:20} {icon name='clipboard' title="Copy"}
+            <div class="col-sm-10 text-muted">
+                {tr}Hidden after creation. Create a replacement token if the value has been lost.{/tr}
             </div>
         </div>
         <div class="mb-3 row">
