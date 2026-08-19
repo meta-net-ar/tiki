@@ -24,4 +24,5 @@ $host_tiki = 'localhost';
 $user_tiki = 'tiki_tester';
 $pass_tiki = 'tiki_tester_pass';
 $dbs_tiki = 'tiki_unit_test';
+$auth_token_secret = 'test-auth-token-secret';
 $client_charset = 'utf8mb4';
