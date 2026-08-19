@@ -652,9 +652,11 @@ if ($prefs['cookie_consent_feature'] == 'y') {
 // $url_scheme is 'http' or 'https' depending on request type condsidering already a reverse proxy
 // $https_mode is true / false depending on request type condsidering already a reverse proxy
 if ($prefs['feature_jquery_ui'] == 'y') {
-    if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'google') {
-        $headerlib->add_jsfile_cdn("$url_scheme://ajax.googleapis.com/ajax/libs/jqueryui/$headerlib->jqueryui_version/jquery-ui.min.js");
-    } elseif (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
+    // Google's CDN does not carry the jQuery UI version Tiki pins (its newest is
+    // 1.14.1), so 'google' falls through to the local copy below rather than 404ing.
+    // Same approach already used for jquery-migrate, which Google has never hosted,
+    // and for the jQuery UI theme CSS further down.
+    if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
         $headerlib->add_jsfile_cdn("$url_scheme://code.jquery.com/ui/$headerlib->jqueryui_version/jquery-ui.min.js");
     } else {
         if ($prefs['tiki_minify_javascript'] === 'y') {

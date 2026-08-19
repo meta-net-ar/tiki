@@ -148,8 +148,8 @@ class HeaderLib
 
 
     public $jquery_version = '3.7.1';
-    public $jqueryui_version = '1.13.2';
-    public $jquerymigrate_version = '3.4.1';
+    public $jqueryui_version = '1.14.2';
+    public $jquerymigrate_version = '3.6.0';
 
     private ?string $outputHeadersWasStartedBy = null;
     private ?string $outputStaticJSFooterWasStartedBy = null;
