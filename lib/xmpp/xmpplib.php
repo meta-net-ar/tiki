@@ -166,7 +166,7 @@ class XMPPLib extends TikiLib
     {
         global $prefs;
         $tokenlib = Tokens::build($prefs);
-        $data = $tokenlib->getToken($token);
+        $data = $tokenlib->getActiveToken($token);
 
         if (! $data || $data['entry'] !== 'xmppauthtoken') {
             return false;
@@ -329,18 +329,22 @@ class XMPPLib extends TikiLib
         global $prefs;
 
         $tokenlib = Tokens::build($prefs);
-        $token = $tokenlib->getToken($givenToken);
+        $token = $tokenlib->getActiveToken($givenToken);
 
         if (! $token || $token['entry'] !== 'openfireauthtoken') {
             return false;
         }
-        // TODO: figure out how to delete token after n usages
-        $tokenlib->deleteToken($token['tokenId']);
-
         $param = json_decode($token['parameters'], true);
-        return is_array($param)
+        $valid = is_array($param)
             && ! empty($param['user'])
             && $param['user'] === $givenUser;
+
+        if ($valid) {
+            // TODO: figure out how to delete token after n usages
+            $tokenlib->deleteToken($token['tokenId']);
+        }
+
+        return $valid;
     }
 
     public function create_room_from_wikipage($args, $name, $priority)
