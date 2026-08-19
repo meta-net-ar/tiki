@@ -467,62 +467,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
     }
     private function getBaseImage()
     {
-        $iniFile = __DIR__ . '/../db/install.ini';
-
-        $ini = [];
-        if (is_readable($iniFile)) {
-            $ini = parse_ini_file($iniFile);
-        }
-
-        $direct = __DIR__ . '/../db/custom_tiki.sql';
-        $fetch = null;
-        $check = null;
-
-        if (isset($ini['source.type'])) {
-            switch ($ini['source.type']) {
-                case 'local':
-                    $direct = $ini['source.file'];
-                    break;
-                case 'http':
-                    $fetch = $ini['source.file'];
-                    if (isset($ini['source.md5'])) {
-                        $check = $ini['source.md5'];
-                    }
-                    break;
-            }
-        }
-
-        if (is_readable($direct)) {
-            return $direct;
-        }
-
-        if (! $fetch) {
-            return;
-        }
-
-        $cacheFile = __DIR__ . '/../' . TEMP_CACHE_PATH . '/sql' . md5($fetch);
-
-        if (is_readable($cacheFile)) {
-            return $cacheFile;
-        }
-
-        $read = fopen($fetch, 'r');
-        $write = fopen($cacheFile, 'w+');
-
-        if ($read && $write) {
-            while (! feof($read)) {
-                fwrite($write, fread($read, 1024 * 100));
-            }
-
-            fclose($read);
-            fclose($write);
-
-            if (! $check || $check == md5_file($cacheFile)) {
-                return $cacheFile;
-            } else {
-                unlink($cacheFile);
-            }
-        }
+        return (new BaseImageResolver(__DIR__ . '/..'))->resolve();
     }
 
     /**
