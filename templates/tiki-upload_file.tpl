@@ -378,9 +378,11 @@
                     </div>
                 </div>
             {/if}
+            <script>
+                var currentGalInfo = {$gal_info|@json_encode nofilter};
+            </script>
 
             {* Image Compression Controls *}
-            {if isset($gal_info.image_compression_enabled) && $gal_info.image_compression_enabled eq 'y'}
                 <div class="mb-3 row d-none" id="image_compression_controls">
                     <label class="col-md-4 col-form-label">{tr}Image Compression{/tr}</label>
                     <div class="col-md-8">
@@ -510,7 +512,6 @@
                         </div>
                     </div>
                 </div>
-            {/if}
             {if $prefs.elementplus_upload eq 'y'}
                 <div class="mb-3 row">
                     <tiki-el-file-gal-uploader
@@ -770,8 +771,6 @@ $("#current_gallery").on("change", function (e) {
     }
 });
 
-var currentGalInfo = {};
-
 $("#galleryId").on("change", function(){
     var galleryId = $("#galleryId").val();
     var action = $("#galleryId").attr('data-action');
@@ -787,7 +786,6 @@ $("#galleryId").on("change", function(){
             if (data.canUpload && data.gal_info) {
                 // Store complete gal_info object
                 currentGalInfo = data.gal_info;
-                
                 // Update gallery type
                 $("#gallery_type").attr('value', currentGalInfo.type);
 
@@ -808,7 +806,7 @@ $("#galleryId").on("change", function(){
                 // Update compression settings from gallery info
                 if (currentGalInfo.image_compression_enabled === 'y') {
                     $("#image_compression_controls").removeClass('d-none');
-                    
+
                     // Update default summary display
                     if (currentGalInfo.image_max_size_x !== undefined) {
                         const maxWidthText = hasMaxWidth ? currentGalInfo.image_max_size_x + ' px' : tr('No resize');
@@ -846,6 +844,25 @@ $("#galleryId").on("change", function(){
                     }
                     if (currentGalInfo.image_compression_save_original !== undefined) {
                         $("#compression_save_original_main").prop('checked', currentGalInfo.image_compression_save_original === 'y');
+                    }
+
+                     // === UPDATE WEB COMPONENT ===
+                    var uploader = document.getElementById('uploader');
+                    if (uploader) {
+                        uploader.setAttribute('compression_enabled', 
+                        currentGalInfo.image_compression_enabled === 'y' ? 'true' : 'false');
+                        uploader.setAttribute('compression_preset_type', 
+                        currentGalInfo.image_compression_preset_type || '');
+                        uploader.setAttribute('compression_quality', 
+                        currentGalInfo.image_compression_quality || '');
+                        uploader.setAttribute('compression_max_dimension_x', 
+                        currentGalInfo.image_max_size_x || '');
+                        uploader.setAttribute('compression_max_dimension_y', 
+                        currentGalInfo.image_max_size_y || '');
+                        uploader.setAttribute('compression_max_size_mb', 
+                        currentGalInfo.image_compression_max_size_mb || '');
+                        uploader.setAttribute('compression_save_original', 
+                        currentGalInfo.image_compression_save_original || '');
                     }
                 } else {
                     $("#image_compression_controls").addClass('d-none');
