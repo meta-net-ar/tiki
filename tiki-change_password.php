@@ -82,8 +82,21 @@ if (
 }
 $smarty->assign('secure_token', $secure_token);
 
-if (isset($_REQUEST["change"])) {
-    $access->checkCsrf();
+if (isset($_REQUEST["change"]) && $access->checkCsrf()) {
+    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+        if (! $bruteForce->isOperationAllowed('change_password', ['ip' => $tikilib->get_ip_address()])) {
+            $nextAllowedTime = $bruteForce->getNextAllowedTime('change_password', ['ip' => $tikilib->get_ip_address()]);
+            $waitTime = $nextAllowedTime - time();
+            if ($waitTime > 60) {
+                $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+            } else {
+                $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d seconds.'), $waitTime);
+            }
+            $smarty->assign('msg', $waitMessage);
+            $smarty->display('error.tpl');
+            die;
+        }
+    }
 
     // Verify authentication (oldpass, actpass, or token)
     $is_authenticated = false;
