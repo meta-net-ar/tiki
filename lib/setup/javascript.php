@@ -245,6 +245,7 @@ $jqueryTiki['cookie_consent_value'] = json_encode(CookieConsentLib::getConsentPr
 $jqueryTiki['BUILTIN_COOKIE_CATEGORY_ESSENTIAL'] = json_encode(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL);
 $jqueryTiki['wiki_url_scheme'] = $prefs['wiki_url_scheme'];
 $jqueryTiki['calendar_pdf_export_layout'] = $prefs['calendar_pdf_export_layout'];
+$jqueryTiki['user_mention_enabled'] = $prefs['feature_tag_users'] === 'y';
 
 //set at 4 hours if empty
 $jqueryTiki['securityTimeout'] = ! empty($prefs['site_security_timeout']) ? $prefs['site_security_timeout']
