@@ -120,26 +120,9 @@ window.showCriticalIssues = function() {
     }
 };
 
-// Auto-refresh dashboard every 5 minutes
-setInterval(function() {
-    // Only refresh if user is on the page
-    if (!document.hidden) {
-        $.get('tiki-check.php?ajax=dashboard', function(data) {
-            $('.dashboard-summary').html(data);
-            // Reinitialize tooltips after AJAX update
-            if (typeof $ !== 'undefined' && typeof $.fn.tooltip !== 'undefined') {
-                $('[data-toggle="tooltip"]').tooltip({
-                    html: true,
-                    placement: 'top',
-                    trigger: 'hover'
-                });
-            }
-        });
-    }
-}, 300000); // 5 minutes
 </script>
 
-<h2  class="showhide_heading" id="Server_Compatibility">{tr}Server compatibility{/tr} <a href="#Server_compatibility" class="heading-link" aria-label="{tr}Server compatibility{/tr}><span class="icon icon-link fas fa-link "></span></a></h2>
+<h2  class="showhide_heading" id="Server_Compatibility">{tr}Server compatibility{/tr} <a href="#Server_Compatibility" class="heading-link" aria-label="{tr}Server compatibility{/tr}><span class="icon icon-link fas fa-link "></span></a></h2>
 
 {if ! $is_compatible}
     {remarksbox type='error' title="{tr}Server Compatibility Issue{/tr}" close='n'}
@@ -172,7 +155,7 @@ setInterval(function() {
                 <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.value}</td>
                 <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -199,7 +182,7 @@ setInterval(function() {
         </thead>
         <tbody>
         {foreach from=$available_tiki_properties key=key item=item}
-            <tr>
+            <tr id="Server_Compatibility_Available_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text">{$item.name}</th>
                 <td class="text">
                     {$item.php.min}{if $item.php.max && $item.php.max != $item.php.min} - {$item.php.max}{elseif !$item.php.max}+{/if}
@@ -211,7 +194,7 @@ setInterval(function() {
                     {$item.mariadb.min}{if $item.mariadb.max && $item.mariadb.max != $item.mariadb.min} - {$item.mariadb.max}{elseif !$item.mariadb.max}+{/if}
                 </td>
                 <td class="text">
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -247,7 +230,7 @@ setInterval(function() {
                 <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                 <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -289,7 +272,7 @@ setInterval(function() {
 </div>
 
 <a name="dbmismatches"></a>
-<h2 class="showhide_heading" id="Database_mismatches">{tr}Database mismatches{/tr}<a href="#Database mismatches" class="heading-link" aria-label="{tr}Database mismatches{/tr}"><span class="icon icon-link fas fa-link "></span></a></h2>
+<h2 class="showhide_heading" id="Database_mismatches">{tr}Database mismatches{/tr}<a href="#Database_mismatches" class="heading-link" aria-label="{tr}Database mismatches{/tr}"><span class="icon icon-link fas fa-link "></span></a></h2>
 {tr}Check for database tables and columns that are not synced with db/tiki.sql{/tr}.<br>
 <a href="tiki-check.php?dbmismatches=run&ts={$smarty.now}#dbmismatches" class="btn btn-primary btn-sm" style="margin-bottom: 10px;">{tr}Check{/tr}</a>
 {if !empty($diffDatabase)}
@@ -321,8 +304,8 @@ setInterval(function() {
                 {/foreach}
             {else}
                 <td class="text" colspan="2">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -348,8 +331,8 @@ setInterval(function() {
                 {/foreach}
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -368,8 +351,8 @@ setInterval(function() {
                 {/foreach}
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -394,8 +377,8 @@ setInterval(function() {
                 {/foreach}
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -438,8 +421,8 @@ setInterval(function() {
                 </tbody>
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -482,8 +465,8 @@ setInterval(function() {
                 </tbody>
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -547,7 +530,7 @@ setInterval(function() {
                 <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                 <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -576,13 +559,17 @@ setInterval(function() {
         <tbody>
             {foreach from=$dirs item=d key=k}
                 {if $useDatabase[$k] !== 'y'}
-                    <tr>
+                    <tr id="Special_directories_{$d|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                         <th class="text">Directory: {$d|escape}</th>
                         <td data-th="{tr}Fitness:{/tr}" class="text">&nbsp;
                             {if $dirsWritable[$k]}
-                                {icon name='ok' iclass='text-success'}
+                                <span class="tiki-check-status good">
+                                    {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
+                                </span>
                             {else}
-                                {icon name='remove' iclass='text-danger'}
+                                <span class="tiki-check-status bad">
+                                    {icon name="{$fmap['bad']['icon']}"}&nbsp;{tr}Bad{/tr}
+                                </span>
                             {/if}
                         </td>
                         <td data-th="{tr}Explanation:{/tr} " >
@@ -619,7 +606,7 @@ setInterval(function() {
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -655,7 +642,7 @@ setInterval(function() {
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -690,7 +677,7 @@ setInterval(function() {
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -739,7 +726,7 @@ setInterval(function() {
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -772,7 +759,7 @@ setInterval(function() {
             <tr id="Tiki_Security_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text"><span class="only-on-mobile">{tr}Check:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -831,7 +818,7 @@ setInterval(function() {
                 <tr>
                     <th class="text">Mime type: {$key}</th>
                     <td data-th="{tr}Tiki Fitness:{/tr} " lass="text">
-                        <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        <span class="tiki-check-status {$item.fitness_status|escape}">
                             {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                         </span>
                     </td>
@@ -931,7 +918,7 @@ setInterval(function() {
                 <tr>
                     <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -954,7 +941,7 @@ setInterval(function() {
                 <tr>
                     <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -1004,10 +991,10 @@ setInterval(function() {
             <th>{tr}Message{/tr}</th>
         </tr></thead><tbody>
         {foreach from=$composer_checks key=key item=item}
-                <tr>
+                <tr id="Tiki_Packages_Composer_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                     <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -1032,11 +1019,11 @@ setInterval(function() {
         </tr>
 </thead><tbody>
         {foreach from=$packages key=key item=item}
-            <tr>
+            <tr id="Tiki_Packages_Package_{$item.name|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text">{tr}Package name:{/tr} {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"} {$item.status}
                     </span>
                 </td>
@@ -1064,11 +1051,11 @@ setInterval(function() {
         </tr>
 </thead><tbody>
         {foreach from=$ocr key=key item=item}
-            <tr>
+            <tr id="OCR_Status_{$item.name|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text">{tr}Requirement:{/tr} {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr} " data-th="{tr}Version : {/tr}" class="text">
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"} {$item.status}
                     </span>
                 </td>
@@ -1134,14 +1121,14 @@ td > div {
             <th class="text">{tr}{$item.requirement}{/tr}</th>
             <td data-th="{tr}Status:{/tr}" class="text">
                 {if $item.status eq 'js'}
-                    <span class="text-{$fmap['good']['class']} js-good d-none">
-                        {icon name="{$fmap['good']['icon']}"} good
+                    <span class="tiki-check-status good js-good d-none">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
-                    <span class="text-{$fmap['bad']['class']} js-bad d-none">
-                        {icon name="{$fmap['bad']['icon']}"} bad
+                    <span class="tiki-check-status bad js-bad d-none">
+                        {icon name="{$fmap['bad']['icon']}"}&nbsp;{tr}Bad{/tr}
                     </span>
                 {else}
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"} {$item.status}
                     </span>
                 {/if}
@@ -1153,13 +1140,23 @@ td > div {
     </table>
 {jq}
 var ws, ws_status_update = function(req, status) {
-    document.querySelectorAll('#js-' + req + ' .js-good, #js-' + req + ' .js-bad').forEach(function(el) {
-        el.classList.add('d-none');
-    });
-    document.querySelectorAll('#js-' + req + ' .js-' + status).forEach(function(el) {
-        el.classList.remove('d-none');
-    });
-    $('#js-' + req + ' td').last().text($('#js-' + req + ' td').last().data('message-' + status));
+    var row = document.getElementById('js-' + req);
+    if (!row) {
+        return;
+    }
+    var goodEl = row.querySelector('.js-good');
+    var badEl = row.querySelector('.js-bad');
+    if (goodEl) {
+        goodEl.classList.toggle('d-none', status !== 'good');
+    }
+    if (badEl) {
+        badEl.classList.toggle('d-none', status !== 'bad');
+    }
+    var cells = row.querySelectorAll('td');
+    var messageCell = cells[cells.length - 1];
+    if (messageCell) {
+        messageCell.textContent = messageCell.getAttribute('data-message-' + status) || '';
+    }
 }
 ws_status_update('connectivity', 'bad');
 ws_status_update('message_exchange', 'bad');
