@@ -85,8 +85,8 @@ if (
 }
 $smarty->assign('secure_token', $secure_token);
 
-if (isset($_REQUEST["change"])) {
-    $access->checkCsrf();
+if (isset($_REQUEST["change"]) && $access->checkCsrf()) {
+    $changePasswordProperties = $bruteForceProperties();
     if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
         if (! $bruteForce->isOperationAllowed('change_password', ['ip' => $tikilib->get_ip_address()])) {
             $nextAllowedTime = $bruteForce->getNextAllowedTime('change_password', ['ip' => $tikilib->get_ip_address()]);
