@@ -49,7 +49,8 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 
     public function get($token)
     {
-        $token = TikiLib::lib('api_token')->getToken($token);
+        $tokenId = $token;
+        $token = TikiLib::lib('api_token')->getToken($tokenId);
         if (empty($token)) {
             return null;
         }
@@ -64,7 +65,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
         }
 
         $entity = new AccessTokenEntity();
-        $entity->setIdentifier($token['token']);
+        $entity->setIdentifier($tokenId);
         $entity->setExpiryDateTime(new \DateTime($token['expireAfter']));
         $entity->setUserIdentifier($token['user']);
         $entity->setClient($client);
