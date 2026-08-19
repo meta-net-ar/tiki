@@ -147,6 +147,56 @@ class TikiLib extends TikiDb_Bridge
             : $encoded_value;
     }
 
+    /**
+     * Secure, HttpOnly and SameSite flags aligned with the PHP session cookie parameters.
+     * Shared by remember-me handling and auxiliary cookies such as the session validation cookie.
+     *
+     * @return array
+     */
+    public function getSetcookieSecurityAttributesFromSession()
+    {
+        $session_params = session_get_cookie_params();
+        $secure = ! empty($session_params['secure'])
+            || (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] === 'https');
+
+        $samesite = trim((string)($session_params['samesite'] ?? '')) ?: 'Lax';
+        if (strcasecmp($samesite, 'None') === 0) {
+            $samesite = 'None';
+            $secure = true;
+        } elseif (strcasecmp($samesite, 'Strict') === 0) {
+            $samesite = 'Strict';
+        } elseif (strcasecmp($samesite, 'Lax') === 0) {
+            $samesite = 'Lax';
+        }
+
+        $httponly = isset($session_params['httponly']) ? (bool)$session_params['httponly'] : true;
+
+        return [
+            'secure' => $secure,
+            'httponly' => $httponly,
+            'samesite' => $samesite,
+        ];
+    }
+
+    /**
+     * Set a cookie with explicit path and domain plus session-aligned Secure, HttpOnly and SameSite.
+     * Used for the extra session validation cookie in tiki-setup_base.
+     *
+     * @param int $expires Unix timestamp
+     */
+    public function setCookieWithSessionSecurityAttributes($name, $value, $expires, $path, $domain)
+    {
+        setcookie($name, $value, array_merge(
+            [
+                'expires' => $expires,
+                'path' => $path,
+                'domain' => $domain,
+            ],
+            $this->getSetcookieSecurityAttributesFromSession()
+        ));
+    }
+
     // DB param left for interface compatibility, although not considered
     /**
      * @param null $db
