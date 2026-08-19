@@ -101,13 +101,6 @@ $.fn.setupFullCalendar = function (
             viewDidMount: function (data) {
                 $(calendarEl).tikiModal();
             },
-            eventDataTransform: function (event) {
-                if (event.allDay) {
-                    // show all day events as including the end date day
-                    event.end = moment(event.end).add(1, "days").format("YYYY-MM-DD HH:mm:SSZ");
-                }
-                return event;
-            },
             eventDidMount: function (arg) {
                 $(calendarEl).tikiModal();
                 const event = arg.event;
