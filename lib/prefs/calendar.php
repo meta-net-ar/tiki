@@ -224,6 +224,7 @@ function prefs_calendar_list()
             'type' => 'list',
             'options' => [
                 'fit_to_width' => tr('Fit to width'),
+                'landscape_fit_to_width' => tr('Landscape and fit to width'),
                 'fit_on_one_page' => tr('Fit on one page'),
             ],
             'default' => 'fit_on_one_page',
