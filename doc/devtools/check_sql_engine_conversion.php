@@ -429,6 +429,10 @@ class CheckSqlEngineConversion
                 $dbConnection->exec("DROP TABLE IF EXISTS `" . $info['TABLE_NAME'] . "`");
             }
         }
+
+        // This signing secret is generated per installation, so normalize it
+        // before comparing databases built through separate install flows.
+        $dbConnection->exec("UPDATE `tiki_preferences` SET `value` = REPEAT('0', 64) WHERE `name` = 'auth_token_secret'");
     }
 
     /**
