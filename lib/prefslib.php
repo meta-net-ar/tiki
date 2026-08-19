@@ -30,7 +30,7 @@ class PreferencesLib
     // Fake preferences controlled by the system
     private $system_modified = [ 'tiki_release', 'tiki_version_last_check'];
     // prefs with system info etc
-    private $system_info = [ 'fgal_use_dir', 'sender_email' ];
+    private $system_info = [ 'auth_token_secret', 'fgal_use_dir', 'sender_email' ];
 
     /**
      * Returns a list of preferences that can be translated

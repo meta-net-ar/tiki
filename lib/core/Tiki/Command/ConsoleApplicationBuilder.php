@@ -204,6 +204,7 @@ class ConsoleApplicationBuilder
                 new UsersTemporaryCommand(),
                 new TokensClearCommand(),
                 new ApiTokensRevokeAllCommand(),
+                new TokensRotateSecretCommand(),
                 new McpTokenCreateCommand(),
                 new CookiesClearCommand(),
                 new StatsCommand(),
