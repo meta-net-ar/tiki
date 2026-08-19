@@ -73,6 +73,80 @@ function write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_
 }
 
 /**
+ * Validate identifiers used during installer database setup.
+ *
+ * Keep the accepted character set aligned with the installer UI to avoid
+ * surprising users while still rejecting characters that can alter SQL
+ * structure or PHP configuration output.
+ */
+function installer_is_valid_mysql_identifier($value)
+{
+    return is_string($value) && preg_match('/^[A-Za-z0-9$_-]+$/', $value) === 1;
+}
+
+/**
+ * Installer-created database users should only be tied to localhost when the
+ * installation itself comes from localhost. Otherwise keep the existing
+ * wildcard behaviour for remote setup flows.
+ */
+function installer_normalize_mysql_grant_host($host)
+{
+    if (preg_match('/^(127\.0\.\d{1,3}\.\d{1,3}|localhost)(:\d+)?$/', $host)) {
+        return 'localhost';
+    }
+
+    return '%';
+}
+
+/**
+ * Build the CREATE DATABASE statement used during installation.
+ *
+ * Database names are SQL identifiers, so they must be validated separately
+ * before they are interpolated into DDL.
+ */
+function installer_build_create_database_sql($dbname)
+{
+    if (! installer_is_valid_mysql_identifier($dbname)) {
+        throw new InvalidArgumentException('Invalid database name.');
+    }
+
+    return "CREATE DATABASE IF NOT EXISTS `$dbname` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+}
+
+/**
+ * Build the ALTER DATABASE statement used to normalize the default charset.
+ */
+function installer_build_alter_database_charset_sql($dbname)
+{
+    if (! installer_is_valid_mysql_identifier($dbname)) {
+        throw new InvalidArgumentException('Invalid database name.');
+    }
+
+    return "ALTER DATABASE `$dbname` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+}
+
+/**
+ * Build the GRANT statement used when the installer creates a dedicated
+ * database user.
+ *
+ * The database name is an SQL identifier, while the user, host pattern, and
+ * password are SQL string literals that must go through qstr()/PDO::quote().
+ */
+function installer_build_grant_database_privileges_sql($dbTiki, $dbname, $user, $host, $pass)
+{
+    if (! installer_is_valid_mysql_identifier($dbname)) {
+        throw new InvalidArgumentException('Invalid database name.');
+    }
+
+    $quotedUser = $dbTiki->qstr($user);
+    $quotedHost = $dbTiki->qstr(installer_normalize_mysql_grant_host($host));
+    $quotedPass = $dbTiki->qstr($pass);
+
+    return "GRANT ALL PRIVILEGES ON `$dbname`.* TO "
+        . $quotedUser . '@' . $quotedHost . " IDENTIFIED BY " . $quotedPass . ';';
+}
+
+/**
  * @param string $domain
  * @return string
  */
@@ -416,20 +490,19 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
         }
         $dbcon = ! empty($dbTiki);
         // First check that suggested database name will not cause issues
-        $dbname_clean = preg_replace('/[^a-zA-Z0-9$_-]/', "", $dbname);
-        if ($dbname_clean != $dbname) {
-            Feedback::error(tra("Some invalid characters were detected in database name. Please use alphanumeric characters (A-Z a-z 0-9) or underscore (_) or hyphen (-).", '', false, [$dbname_clean]));
+        if (! installer_is_valid_mysql_identifier($dbname)) {
+            Feedback::error(tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
             $dbcon = false;
         } elseif ($dbcon) {
             $error = '';
-            $sql = "CREATE DATABASE IF NOT EXISTS `$dbname_clean` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+            $sql = installer_build_create_database_sql($dbname);
             $dbTiki->queryError($sql, $error);
             if (empty($error)) {
                 // assure the DB has the right default encoding (if the DB already existed)
-                $dbTiki->query("ALTER DATABASE `$dbname_clean` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-                Feedback::success(tra("Database `%0` was created.", '', false, [$dbname_clean]));
+                $dbTiki->query(installer_build_alter_database_charset_sql($dbname));
+                Feedback::success(tra("Database `%0` was created.", '', false, [$dbname]));
             } else {
-                Feedback::error(tra("Database `%0` creation failed. You need to create the database.", '', false, [$dbname_clean]));
+                Feedback::error(tra("Database `%0` creation failed. You need to create the database.", '', false, [$dbname]));
             }
 
             try {
@@ -447,7 +520,7 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
                 Feedback::error($e->getMessage());
             }
         } else {
-            Feedback::error(tra("Database `%0`. Unable to connect to database.", '', false, [$dbname_clean]));
+            Feedback::error(tra("Database `%0`. Unable to connect to database.", '', false, [$dbname]));
         }
     }
 
@@ -471,14 +544,17 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
 function createTikiDBUser(&$dbTiki, $host, $user, $pass, $dbname)
 {
     $error = '';
-    if (preg_match('/^(127\.0\.\d{1,3}\.\d{1,3}|localhost)(:\d+)?$/', $host)) {
-        $host = 'localhost';
-    } else {
-        $host = '%';
+    if (! installer_is_valid_mysql_identifier($dbname)) {
+        Feedback::error(tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+        return false;
     }
 
-    $pass = addslashes($pass);
-    $sql = "GRANT ALL PRIVILEGES ON `$dbname`.* TO `$user`@`$host` IDENTIFIED BY '$pass';";
+    if (! installer_is_valid_mysql_identifier($user)) {
+        Feedback::error(tra("Invalid database user. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+        return false;
+    }
+
+    $sql = installer_build_grant_database_privileges_sql($dbTiki, $dbname, $user, $host, $pass);
     $dbTiki->queryError($sql, $error);
 
     if (empty($error)) {
@@ -496,6 +572,9 @@ function createTikiDBUser(&$dbTiki, $host, $user, $pass, $dbname)
 function convert_database_to_utf8($dbname)
 {
     $db = TikiDb::get();
+    if (! installer_is_valid_mysql_identifier($dbname)) {
+        throw new InvalidArgumentException('Invalid database name.');
+    }
 
     if ($result = $db->fetchAll('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ?', $dbname)) {
         $db->query("ALTER DATABASE `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
