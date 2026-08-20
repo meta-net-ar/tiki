@@ -708,7 +708,7 @@ class WikiLib extends TikiLib
         return $res;
     }
 
-    public function get_parse($page, &$canBeRefreshed = false, $suppress_icons = false)
+    public function get_parse($page, &$canBeRefreshed = false, $suppress_icons = false, $skipCache = false)
     {
         global $prefs, $user;
         $tikilib = TikiLib::lib('tiki');
@@ -746,7 +746,7 @@ class WikiLib extends TikiLib
 
         $wiki_cache = ($prefs['feature_wiki_icache'] == 'y' && ! is_null($info['wiki_cache'])) ? $info['wiki_cache'] : $prefs['wiki_cache'];
 
-        if ($wiki_cache > 0 && empty($_REQUEST['offset']) && empty($_REQUEST['itemId']) && (empty($user) || $prefs['wiki_cache'] == 0)) {
+        if (! $skipCache && $wiki_cache > 0 && empty($_REQUEST['offset']) && empty($_REQUEST['itemId']) && (empty($user) || $prefs['wiki_cache'] == 0)) {
             $cache_info = $this->get_cache_info($page);
             if (! empty($cache_info['cache_timestamp']) && $cache_info['cache_timestamp'] + $wiki_cache >= $this->now) {
                 $content = $cache_info['cache'];
