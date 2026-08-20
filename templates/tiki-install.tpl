@@ -338,7 +338,7 @@
                                     <div class="mb-3 row">
                                         <label class="col-form-label" for="name">{tr}Database name:{/tr}</label>
                                         <div class="mx-3">
-                                            <input type="text" class="form-control" id="name" name="name" size="40" value="{if isset($smarty.request.name)}{$smarty.request.name|escape:"html"}{elseif isset($preconfigname)}{$preconfigname|escape:"html"}{/if}" placeholder="{tr}Database name{/tr}"/>
+                                            <input type="text" class="form-control" id="name" name="name" size="40" value="{if isset($smarty.request.name)}{$smarty.request.name|escape:"html"}{elseif isset($preconfigname)}{$preconfigname|escape:"html"}{/if}" placeholder="{tr}Database name{/tr}" pattern="[A-Za-z0-9_$-]+" title="{tr}Use only letters, numbers, dollar signs, underscores, or hyphens.{/tr}"/>
                                             <a href="javascript:void(0)" onclick="flip('name_help');" title="{tr}Help{/tr}">
                                                 {icon name="help"}
                                             </a>
@@ -356,7 +356,7 @@
                                     <legend>{tr}Database user{/tr}</legend>
                                     <p>{tr}Enter a database user with administrator permission for the Tiki database.{/tr}</p>
                                     <div style="padding:5px;">
-                                        <label class="col-form-label" for="user">{tr}User name:{/tr}</label> <input type="text" class="form-control" id="user" name="user" value="{if (isset($smarty.request.user))}{$smarty.request.user|escape:"html"}{elseif isset($preconfiguser)}{$preconfiguser|escape:"html"}{/if}" maxlength="80" placeholder="{tr}Database username{/tr}">
+                                        <label class="col-form-label" for="user">{tr}User name:{/tr}</label> <input type="text" class="form-control" id="user" name="user" value="{if (isset($smarty.request.user))}{$smarty.request.user|escape:"html"}{elseif isset($preconfiguser)}{$preconfiguser|escape:"html"}{/if}" maxlength="80" placeholder="{tr}Database username{/tr}" pattern="[A-Za-z0-9_$-]+" title="{tr}Use only letters, numbers, dollar signs, underscores, or hyphens.{/tr}">
                                     </div>
 
                                     <div style="padding:5px;">
@@ -367,42 +367,49 @@
                                         {/if}
                                     </div>
 
-                                    <div style="padding:5px;">
-                                        <input type="checkbox" id="create-new-user" name="create_new_user" />
-                                        <label class="col-form-label" for="create-new-user">{tr}Create the above database user just for this Tiki database.{/tr}</label>&nbsp;
-                                    </div>
+                                    {if $allow_create_new_user}
+                                        <div style="padding:5px;">
+                                            <input type="checkbox" id="create-new-user" name="create_new_user" />
+                                            <label class="col-form-label" for="create-new-user">{tr}Create the above database user just for this Tiki database.{/tr}</label>&nbsp;
+                                        </div>
+                                    {else}
+                                        <div style="padding:5px;">
+                                            <em>{tr}Creating a new database user is only available during the initial installation.{/tr}</em>
+                                        </div>
+                                    {/if}
                                 </fieldset>
 
-                                <br/>
-                                <fieldset id="new-user-fieldset" style="display: none;">
-                                    <legend>{tr}Administrative database user{/tr}</legend>
-                                    <p>{tr}Enter database administrator user name and password.{/tr}<br>
-                                        <em>{tr}This is a DB admin user which has permission to create new databases and new users.{/tr}</em></p>
-                                    <div style="padding:5px;">
-                                        <label class="col-form-label" for="user">{tr}DB admin user name:{/tr}</label> <input type="text" class="form-control" id="root_user" name="root_user" value="{if (isset($smarty.request.root_user))}{$smarty.request.root_user|escape:"html"}{elseif isset($preconfiguser)}{$preconfiguser|escape:"html"}{/if}" placeholder="{tr}DB admin user name{/tr}">
-                                    </div>
-                                    <div style="padding:5px;">
-                                        <label class="col-form-label" for="pass">{tr}DB admin password:{/tr}</label> <input type="password" class="form-control" id="root_pass" name="root_pass" value="{if (isset($smarty.request.root_pass))}{$smarty.request.root_pass|escape:"html"}{/if}" autocomplete="new-password">
-                                    </div>
-                                </fieldset>
-                                <script type='text/javascript'><!--//--><![CDATA[//><!--
-                                    ;(function(){
-                                        var user = document.getElementById('user');
-                                        var create_new_user = document.getElementById('create-new-user');
-                                        var new_user_fs = document.getElementById('new-user-fieldset');
+                                {if $allow_create_new_user}
+                                    <br/>
+                                    <fieldset id="new-user-fieldset" style="display: none;">
+                                        <legend>{tr}Administrative database user{/tr}</legend>
+                                        <p>{tr}Enter database administrator user name and password.{/tr}<br>
+                                            <em>{tr}This is a DB admin user which has permission to create new databases and new users.{/tr}</em></p>
+                                        <div style="padding:5px;">
+                                            <label class="col-form-label" for="user">{tr}DB admin user name:{/tr}</label> <input type="text" class="form-control" id="root_user" name="root_user" value="{if (isset($smarty.request.root_user))}{$smarty.request.root_user|escape:"html"}{elseif isset($preconfiguser)}{$preconfiguser|escape:"html"}{/if}" placeholder="{tr}DB admin user name{/tr}">
+                                        </div>
+                                        <div style="padding:5px;">
+                                            <label class="col-form-label" for="pass">{tr}DB admin password:{/tr}</label> <input type="password" class="form-control" id="root_pass" name="root_pass" value="{if (isset($smarty.request.root_pass))}{$smarty.request.root_pass|escape:"html"}{/if}" autocomplete="new-password">
+                                        </div>
+                                    </fieldset>
+                                    <script type='text/javascript'><!--//--><![CDATA[//><!--
+                                        ;(function(){
+                                            var create_new_user = document.getElementById('create-new-user');
+                                            var new_user_fs = document.getElementById('new-user-fieldset');
 
-                                        if(create_new_user.checked) {
-                                            new_user_fs.style.display = 'block';
-                                        }
-
-                                        create_new_user.addEventListener('click', function(){
-                                            if(create_new_user.checked) {
+                                            if (create_new_user.checked) {
                                                 new_user_fs.style.display = 'block';
-                                            } else {
-                                                new_user_fs.style.display = 'none';
                                             }
-                                        });
-                                    })();//--><!]]></script>
+
+                                            create_new_user.addEventListener('click', function(){
+                                                if (create_new_user.checked) {
+                                                    new_user_fs.style.display = 'block';
+                                                } else {
+                                                    new_user_fs.style.display = 'none';
+                                                }
+                                            });
+                                        })();//--><!]]></script>
+                                {/if}
 
                                 <br/>
                                 <input type="hidden" name="resetdb" value="y">
