@@ -44,13 +44,6 @@
                                 <label class="form-check-label" for="source-custom">Custom URL</label>
                             </div>
 
-                            <input
-                                v-if="editingDraft.source_mode === 'existing'"
-                                v-model="sourceSearch"
-                                type="text"
-                                class="form-control form-control-sm mt-2"
-                                placeholder="Search pages..."
-                            >
                             <select
                                 v-if="editingDraft.source_mode === 'existing'"
                                 v-model="editingDraft.source_itemId"
@@ -58,7 +51,7 @@
                                 @change="selectExistingPage('source', editingDraft.source_itemId)"
                             >
                                 <option value="">Select page...</option>
-                                <option v-for="page in filteredPageOptions(sourceSearch)" :key="page.itemId" :value="page.itemId">
+                                <option v-for="page in pageOptions" :key="page.itemId" :value="page.itemId">
                                     {{ page.href }} · {{ page.type }}
                                 </option>
                             </select>
@@ -107,14 +100,6 @@
                                 >
                                 <label class="form-check-label" for="target-custom">Custom URL</label>
                             </div>
-
-                            <input
-                                v-if="editingDraft.target_mode === 'existing'"
-                                v-model="targetSearch"
-                                type="text"
-                                class="form-control form-control-sm mt-2"
-                                placeholder="Search pages..."
-                            >
                             <select
                                 v-if="editingDraft.target_mode === 'existing'"
                                 v-model="editingDraft.target_itemId"
@@ -122,7 +107,7 @@
                                 @change="selectExistingPage('target', editingDraft.target_itemId)"
                             >
                                 <option value="">Select page...</option>
-                                <option v-for="page in filteredPageOptions(targetSearch)" :key="page.itemId" :value="page.itemId">
+                                <option v-for="page in pageOptions" :key="page.itemId" :value="page.itemId">
                                     {{ page.href }} · {{ page.type }}
                                 </option>
                             </select>
@@ -319,19 +304,7 @@ const redirectsData = ref(parsedRedirects.value.map((redirect) => normalizeRedir
 const editingRowIndex = ref(null);
 const editingDraft = ref(createEmptyRedirect());
 const pendingNewRowIndex = ref(null);
-const sourceSearch = ref('');
-const targetSearch = ref('');
 const saveError = ref('');
-
-const filteredPageOptions = (searchValue) => {
-    const term = (searchValue || '').toLowerCase().trim();
-
-    if (!term) {
-        return pageOptions.value;
-    }
-
-    return pageOptions.value.filter((page) => `${page.href} ${page.type}`.toLowerCase().includes(term));
-};
 
 const getDisplayUrl = (redirect, side) => {
     if (side === 'source') {
@@ -396,6 +369,7 @@ const emitUpdatedRedirects = () => {
 
     const event = new CustomEvent('redirect-builder:update', {
         detail: normalizedRedirects,
+        bubbles: true,
     });
     document.dispatchEvent(event);
 };
@@ -406,8 +380,6 @@ const startEdit = (index) => {
     saveError.value = '';
     editingRowIndex.value = index;
     editingDraft.value = { ...normalizeRedirect(redirectsData.value[index]) };
-    sourceSearch.value = '';
-    targetSearch.value = '';
 };
 
 const saveEdit = (index) => {
@@ -453,8 +425,6 @@ const cancelEdit = (index) => {
     editingRowIndex.value = null;
     editingDraft.value = createEmptyRedirect();
     saveError.value = '';
-    sourceSearch.value = '';
-    targetSearch.value = '';
 };
 
 const deleteRedirect = (index) => {
@@ -489,8 +459,6 @@ watch(
             pendingNewRowIndex.value = null;
             editingDraft.value = createEmptyRedirect();
             saveError.value = '';
-            sourceSearch.value = '';
-            targetSearch.value = '';
         }
     }
 );

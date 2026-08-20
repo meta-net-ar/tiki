@@ -10,12 +10,13 @@
     <fieldset>
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_redirects visible="always"}
-        <div class="col-md-8">
+        <div class="col-md-12">
             <input type="hidden" name="redirects" id="redirects" value="{$redirects|escape}">
             <div id="single-spa-application:@vue-mf/redirect-builder" class="redirect-builder"></div>
         </div>
         {jq}
             document.addEventListener('redirect-builder:update', function(e){
+                console.log('redirect-builder:update', e.detail);
                 $('#redirects').val(JSON.stringify(e.detail));
             });
         {/jq}
