@@ -3129,7 +3129,11 @@ CREATE TABLE `tiki_object_scores` (
   `pointsAssigned` INT NOT NULL,
   `pointsBalance` INT NOT NULL,
   `date` INT NOT NULL,
-  `reversalOf` INT UNSIGNED
+  `reversalOf` INT UNSIGNED,
+  KEY `recipient_latest` (`recipientObjectType`(32), `recipientObjectId`(191), `id`),
+  KEY `recipient_rule` (`recipientObjectType`(32), `recipientObjectId`(128), `ruleId`(80)),
+  KEY `trigger_event` (`triggerObjectType`(32), `triggerObjectId`(64), `triggerUser`(64), `triggerEvent`(64), `id`),
+  KEY `trigger_rule` (`triggerObjectType`(24), `triggerObjectId`(64), `ruleId`(48), `recipientObjectType`(24), `recipientObjectId`(64), `reversalOf`, `id`)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `tiki_file_handlers`;
