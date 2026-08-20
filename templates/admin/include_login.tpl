@@ -201,7 +201,7 @@
                     {preference name=cookie_consent_feature}
                     <div class="adminoptionboxchild" id="cookie_consent_feature_childcontainer">
                         {preference name=cookie_consent_expires}
-                        {preference name=cookie_consent_description}
+                        {preference name=cookie_consent_description syntax=''}
                         {preference name=cookie_consent_mode}
                         {preference name=cookie_consent_dom_id}
                         {preference name=cookie_consent_disable_builtin_categories}
