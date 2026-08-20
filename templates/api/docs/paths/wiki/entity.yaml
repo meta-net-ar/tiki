@@ -8,6 +8,15 @@ get:
       required: true
       schema:
         type: string
+    - name: nocache
+      in: query
+      description: Set to 1 to bypass the cached parsed wiki page content and render the page fresh.
+      required: false
+      schema:
+        type: integer
+        enum:
+          - 0
+          - 1
   responses:
     '200':
       description: page content response
