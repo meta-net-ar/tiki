@@ -21,6 +21,7 @@ class PreferencesLib
         'scheduler_shell_command',
         'smarty_enable_string_eval',
         'wikiplugin_fileaccess_allowed_paths',
+        'php_cli_path',
     ];
 
     private $data = [];
