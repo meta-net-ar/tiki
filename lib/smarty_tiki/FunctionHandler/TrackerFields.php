@@ -73,6 +73,11 @@ class TrackerFields extends Base
         $auto = ['input' => [], 'output' => [], 'inline' => []];
 
         $datepicker = false;
+        // Item preview re-renders the (unsaved) submitted values through the view
+        // template. Fields that fetch their value on demand (e.g. Secret) must know
+        // they are in a preview so they can disable that fetch, since there is no
+        // saved row yet to read and the masked value would be misleading.
+        $preview = ! empty($params['preview']);
         foreach ($params['fields'] as $field) {
             if ($field['type'] == 'h') {
                 $title = tr($field['name']);
@@ -100,12 +105,13 @@ class TrackerFields extends Base
 
 
             // the item-list field needs the itemId here - passed via the template - otherwise it does not show a value in the template
-            $auto['output'][$permName] = new Tiki_Render_Lazy(function () use ($field, $smarty, $itemId) {
+            $auto['output'][$permName] = new Tiki_Render_Lazy(function () use ($field, $smarty, $itemId, $preview) {
                 return smarty_function_trackeroutput([
                     'field' => $field,
                     'showlinks' => 'n',
                     'list_mode' => 'n',
                     'itemId' => $itemId,
+                    'preview' => $preview,
                 ], $smarty->getEmptyInternalTemplate());
             });
 
@@ -174,6 +180,9 @@ class TrackerFields extends Base
         $smarty->assign('sections', array_values($out));
         $smarty->assign('fields', $params['fields']);
         $smarty->assign('auto', $auto);
+        // Standard flat/tab layouts render fields via a direct {trackeroutput} call
+        // (not the $auto closures), so expose the preview flag for them to forward.
+        $smarty->assign('preview', $preview);
 
         try {
             $result = $smarty->fetch($template);

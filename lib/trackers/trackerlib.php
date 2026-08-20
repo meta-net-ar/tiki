@@ -2231,6 +2231,29 @@ class TrackerLib extends TikiLib
         $this->itemFields()->insertOrUpdate(['value' => $value], $conditions);
     }
 
+    /**
+     * Copy the raw stored value of one field from a source item to a target item,
+     * bypassing any per-field transformation (notably the encryption-on-save in
+     * modify_field). Used to duplicate Secret (SEC) field values: the raw blob —
+     * plaintext, or ciphertext bound to the field's encryption key — is valid
+     * verbatim on another item of the same tracker, so duplication needs neither
+     * the encryption key in session nor re-encryption.
+     */
+    public function copyItemFieldValueRaw($sourceItemId, $targetItemId, $fieldId)
+    {
+        $value = $this->itemFields()->fetchOne('value', [
+            'itemId' => (int) $sourceItemId,
+            'fieldId' => (int) $fieldId,
+        ]);
+        if ($value === false || $value === null) {
+            return;
+        }
+        $this->itemFields()->insertOrUpdate(
+            ['value' => $value],
+            ['itemId' => (int) $targetItemId, 'fieldId' => (int) $fieldId]
+        );
+    }
+
     public function groupName($tracker_info, $itemId)
     {
         if (empty($tracker_info['autoCreateGroupInc'])) {
@@ -2841,6 +2864,25 @@ class TrackerLib extends TikiLib
                         $mandatory_fields[] = $f;
                     } elseif ($f['type'] == 'r' && empty(array_filter((array) $f['value']))) {  // ItemLink - '0' counts as empty
                         $mandatory_fields[] = $f;
+                    } elseif ($f['type'] == 'SEC') {
+                        // Secret: an empty submission may be backed by the source item's value
+                        // (duplication copies it at database level after insert) or by this item's
+                        // own stored value (keep-on-blank). View permissions are re-checked because
+                        // the cloneSource marker arrives from the POST body.
+                        $secretIsMissing = Tracker_Field_Secret::isMandatorySubmissionEmpty($f, (int) $itemId, function ($backingItemId) use ($trackerId, $f) {
+                            try {
+                                $backingItem = Tracker_Item::fromId($backingItemId);
+                            } catch (Exception $e) {
+                                return '';
+                            }
+                            if (! $backingItem || ! $backingItem->canView() || ! $backingItem->canViewField($f['fieldId'])) {
+                                return '';
+                            }
+                            return $this->get_item_value($trackerId, $backingItemId, $f['fieldId']);
+                        });
+                        if ($secretIsMissing) {
+                            $mandatory_fields[] = $f;
+                        }
                     } elseif (! isset($f['value']) || ! is_array($f['value']) && strlen($f['value']) == 0 || is_array($f['value']) && empty($f['value'])) {
                         $mandatory_fields[] = $f;
                     }
