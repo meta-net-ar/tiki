@@ -110,6 +110,10 @@ class Preference extends Base
                 }
             }
 
+            if ($info['type'] === 'textarea' && $params['syntax'] !== 'tiki' && $params['syntax'] !== 'markdown') {
+                $info['value'] = \TikiLib::lib('tiki')->removeInlineSyntaxTags($info['value']);
+            }
+
             $smarty->assign('p', $info);
 
             /* Allows having preference Lisa show only if its parent preference Homer is *un*checked (rather than checked), by setting mode=invert on Homer.
