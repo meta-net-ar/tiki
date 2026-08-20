@@ -172,9 +172,12 @@ class RedactDBCommand extends Command
         $result = $tikilib->query($query);
 
         // Remove auth tokens
-        $output->writeln('<info>Removing auth tokens.</info>');
+        $output->writeln('<info>' . tra('Rotating auth token signing secret and removing auth tokens.') . '</info>');
+        require_once 'lib/auth/tokens.php';
+        $revokedCount = (new \AuthTokens(\TikiDb::get()))->rotateSigningSecret();
         $query = "TRUNCATE TABLE tiki_auth_tokens;";
         $result = $tikilib->query($query);
+        $output->writeln('<comment>' . tr('%0 auth tokens removed.', $revokedCount) . '</comment>');
 
         // Remove web services
         $output->writeln('<info>Removing webservices info.</info>');
