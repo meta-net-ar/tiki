@@ -30,14 +30,19 @@ $.fn.addEventCalendarPrint = function (buttonId, calendar) {
                     .text()
                     .trim();
                 var imgData = canvas.toDataURL("image/jpeg", 1.0);
-                var imgWidth = 180;
+                const isLandscapeFitToWidth = jqueryTiki.calendar_pdf_export_layout === "landscape_fit_to_width";
+                const pageWidthMm = isLandscapeFitToWidth ? 297 : 210;
+                const pageHeightMm = isLandscapeFitToWidth ? 210 : 297;
+
+                var imgWidth = isLandscapeFitToWidth ? 267 : 180;
+                var marginLeft = (pageWidthMm - imgWidth) / 2;
+                var marginTop = isLandscapeFitToWidth ? 25 : 30;
+                var marginRight = isLandscapeFitToWidth ? 25 : 20;
+                var marginBottom = 10;
+
                 var pageHeight = 250;
                 var imgHeight = (canvas.height * imgWidth) / canvas.width;
                 var heightLeft = imgHeight;
-                const isLandscapeFitToWidth = jqueryTiki.calendar_pdf_export_layout === "landscape_fit_to_width";
-
-                const pageWidthMm = isLandscapeFitToWidth ? 297 : 210;
-                const pageHeightMm = isLandscapeFitToWidth ? 210 : 297;
 
                 var doc = new jsPDF(isLandscapeFitToWidth ? "l" : "p", "mm");
                 doc.setFontSize(14);
@@ -45,9 +50,6 @@ $.fn.addEventCalendarPrint = function (buttonId, calendar) {
 
                 // Fit calendar to width (multi-pages)
                 if (jqueryTiki.calendar_pdf_export_layout === "fit_to_width" || jqueryTiki.calendar_pdf_export_layout === "landscape_fit_to_width") {
-                    var marginTop = 30;
-                    var marginRight = 20;
-                    var marginBottom = 10;
                     const printableHeight = pageHeightMm - marginTop - marginBottom;
                     const pxPerMm = canvas.width / imgWidth; // Scale factor to convert canvas coordinates (px) into PDF units (mm)
                     const pageHeightPx = printableHeight * pxPerMm;
