@@ -43,7 +43,7 @@
                 $('#redirect').val('0');
             }
         });
-        $('#string_in_db_search').keypress(function (e) {
+        $('#string_in_db_search').on('keypress', function (e) {
             var key = e.which;
             if(key == 13)  // the enter key code
             {

@@ -79,7 +79,7 @@
         });
 
         var urlField = $('input[type=url]', container), add = $('.add-more', container);
-        urlField.keypress(function (e) {
+        urlField.on('keypress', function (e) {
             if (e.which == 13) {
                 e.preventDefault();
                 add.trigger("click");

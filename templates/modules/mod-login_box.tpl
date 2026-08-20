@@ -41,7 +41,7 @@ $(document).ready(function () {
             data: { username: username },
             success: async function (res) {
                 if (!res) {
-                    $(event.currentTarget).off('submit').submit();
+                    $(event.currentTarget).off('submit').trigger('submit');
                 } else {
                     if (twoFAType === '{{$TOTP_2FA}}') {
                         show2FactorInputElement(btn, event);
@@ -161,7 +161,7 @@ $(document).ready(function () {
             let btnStep = parseInt(btn.attr('step'));
 
             if (isNormalLogin === 'y') {
-                $(this).off('submit').submit();
+                $(this).off('submit').trigger('submit');
                 return false;
             }
 
@@ -180,14 +180,14 @@ $(document).ready(function () {
 
                     // If step > 1, or no user screen, or 2FA is effectively "n", just submit
                     if (btnStep > 1 || isLoginScreen === 0 || (twoFASecret == 'n' && twoFAType === '{{$TOTP_2FA}}')) {
-                        $(this).off('submit').submit();
+                        $(this).off('submit').trigger('submit');
                         return false;
                     }
                     await handleEmail2FA(username, btn, event);
 
                 } else {
                     // No 2FA => submit directly
-                    $(this).off('submit').submit();
+                    $(this).off('submit').trigger('submit');
                 }
             } else {
                 // Missing user/pass
@@ -534,7 +534,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" id="login-2fa_{$module_logo_instance}">
             {if $prefs.twoFactorAuthType eq $EMAIL_2FA}
                 <small class="text-muted">{tr}Please type the 6 digit security code sent to your email address{/tr}</small>
-                <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').submit()" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>
+                <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').trigger('submit')" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>
             {else}
                 <small class="text-muted">{tr}Please type the 6 digit security code (TOTP) provided by your authenticator application{/tr}</small>
             {/if}

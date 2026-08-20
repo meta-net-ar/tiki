@@ -261,7 +261,7 @@
             }
 
             function attachFileCheckingOnElement(el) {
-                $("input[type=file]", el).change(function () {
+                $("input[type=file]", el).on('change', function () {
                     return checkFile($(this).val(), $(this).closest("form"));
                 });
                 $(el).on('drop', '.file-uploader', function (e) {
@@ -295,7 +295,7 @@
 
             attachFileCheckingOnElement($self.find('.upload-files-inline-form'));
 
-            $("a.upload-files").click(function () {
+            $("a.upload-files").on('click', function () {
                 $(document).one('tiki.modal.redraw', '.modal.fade', function () {
                     attachFileCheckingOnElement(this);
                 });
@@ -403,7 +403,7 @@
                 });
             });
 
-            $url.keypress(function (e) {
+            $url.on('keypress', function (e) {
                 if (e.which === 13) {
                     var $this = $(this);
                     var url = $this.val();

@@ -50,7 +50,7 @@ class BarcodeScanner {
 
             // Set initial camera selection
             this.selectedCameraId = cameras[0].deviceId;
-            $(`#camera-select-${this.fieldId}`).change(() => {
+            $(`#camera-select-${this.fieldId}`).on("change", () => {
                 this.selectedCameraId = $(`#camera-select-${this.fieldId}`).find(":selected").val();
             });
         } catch (err) {
