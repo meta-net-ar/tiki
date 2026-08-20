@@ -192,18 +192,18 @@
                 <legend class="h3">{tr}Shadow layer{/tr}</legend>
                 {preference name=feature_layoutshadows}
                 <div class="adminoptionboxchild" id="feature_layoutshadows_childcontainer">
-                    {preference name=main_shadow_start}
-                    {preference name=main_shadow_end}
-                    {preference name=header_shadow_start}
-                    {preference name=header_shadow_end}
-                    {preference name=middle_shadow_start}
-                    {preference name=middle_shadow_end}
-                    {preference name=center_shadow_start}
-                    {preference name=center_shadow_end}
-                    {preference name=footer_shadow_start}
-                    {preference name=footer_shadow_end}
-                    {preference name=box_shadow_start}
-                    {preference name=box_shadow_end}
+                    {preference name='main_shadow_start' syntax='htmlmixed'}
+                    {preference name='main_shadow_end' syntax='htmlmixed'}
+                    {preference name='header_shadow_start' syntax='htmlmixed'}
+                    {preference name='header_shadow_end' syntax='htmlmixed'}
+                    {preference name='middle_shadow_start' syntax='htmlmixed'}
+                    {preference name='middle_shadow_end' syntax='htmlmixed'}
+                    {preference name='center_shadow_start' syntax='htmlmixed'}
+                    {preference name='center_shadow_end' syntax='htmlmixed'}
+                    {preference name='footer_shadow_start' syntax='htmlmixed'}
+                    {preference name='footer_shadow_end' syntax='htmlmixed'}
+                    {preference name='box_shadow_start' syntax='htmlmixed'}
+                    {preference name='box_shadow_end' syntax='htmlmixed'}
                 </div>
                 <hr>
             {/tab}
@@ -497,13 +497,13 @@
             <hr>
             <fieldset>
                 <legend class="h3">{tr}Custom code{/tr}</legend>
-                {preference name="header_custom_css" syntax="css"}
-                {preference name=feature_custom_html_head_content syntax="htmlmixed"}
-                {preference name=feature_endbody_code syntax="tiki"}
-                {preference name=site_google_analytics_account}
-                {preference name="header_custom_js" syntax="javascript"}
-                {preference name="layout_add_body_group_class"}
-                {preference name=categories_add_class_to_body_tag}
+                {preference name='header_custom_css' syntax='css'}
+                {preference name='feature_custom_html_head_content' syntax='htmlmixed'}
+                {preference name='feature_endbody_code' syntax='tiki'}
+                {preference name='header_custom_js' syntax='javascript'}
+                {preference name='layout_add_body_group_class'}
+                {preference name='categories_add_class_to_body_tag'}
+                {preference name='site_google_analytics_account'}
             </fieldset>
             <hr>
             <fieldset>
