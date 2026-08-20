@@ -119,6 +119,13 @@ if ($prefs['scheduler_shell_command'] == 'y') {
         'message' => tra('The "Scheduler shell command" is activated. It can be used by Tiki administrators to execute shell commands which can lead to security risks.')
     ];
 }
+if (! empty($prefs['php_cli_path'])) {
+    $tikisettings['php_cli_path'] = [
+        'risk' => tra('risky') ,
+        'setting' => $prefs['php_cli_path'],
+        'message' => tra('A custom PHP CLI path is configured. This preference is risky and should only be set by server administrators via system configuration.')
+    ];
+}
 
 $risky_message = tra('Enabling this preference is potentially dangerous! Only Tiki administrators should be allowed to enable and use this feature.');
 
