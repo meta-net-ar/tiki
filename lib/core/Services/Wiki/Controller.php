@@ -68,7 +68,8 @@ class Services_Wiki_Controller
     public function action_get_page($input)
     {
         $page = $input->page->text();
-        $info = TikiLib::lib('wiki')->get_page_info($page);
+        $skipCache = (bool) $input->nocache->int();
+        $info = TikiLib::lib('wiki')->get_page_info($page, true, $skipCache);
         if (! $info) {
             throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
         }
@@ -79,7 +80,7 @@ class Services_Wiki_Controller
         }
 
         $canBeRefreshed = false;
-        $data = TikiLib::lib('wiki')->get_parse($page, $canBeRefreshed);
+        $data = TikiLib::lib('wiki')->get_parse($page, $canBeRefreshed, false, $skipCache);
         return ['data' => $data];
     }
 
