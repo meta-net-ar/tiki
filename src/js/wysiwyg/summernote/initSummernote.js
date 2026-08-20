@@ -22,16 +22,11 @@ export default function (areaId, toolbar, options) {
             }
         },
 
-        onKeydown: function (event) {
-            if (event.key === "@") {
-                event.preventDefault();
-                renderUserMentionModal(areaId);
-            }
-        },
-
         onCodeviewToggled: function () {
             Handlers.customCodeview(target);
         },
+
+        onKeydown: Handlers.userMention(target),
     };
 
     // Add onDialogShown ONLY when ElementPlus is active
