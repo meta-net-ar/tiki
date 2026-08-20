@@ -8,7 +8,6 @@
 
 abstract class Tiki_Connect_Abstract
 {
-
     // preferences that we should not collect
     // TODO these should be done as a property (or tag) per preference
 
@@ -69,6 +68,7 @@ abstract class Tiki_Connect_Abstract
         'auth_phpbb_dbname',
         'bigbluebutton_server_location',
         'bigbluebutton_server_salt',
+        'auth_token_secret',
         'internal_site_hash',
         'lang_bing_api_client_id',
         'lang_bing_api_client_secret',

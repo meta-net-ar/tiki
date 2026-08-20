@@ -190,6 +190,7 @@ class ConsoleApplicationBuilder
                 new UsersPasswordCommand(),
                 new UsersTemporaryCommand(),
                 new TokensClearCommand(),
+                new TokensRotateSecretCommand(),
                 new CookiesClearCommand(),
                 new StatsCommand(),
                 new MLTrainCommand(),
