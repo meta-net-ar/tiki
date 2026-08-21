@@ -110,7 +110,8 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
             }
         } else {
             // This condition addresses the scenario where data is received from the API, and the timestamp value is provided in its raw form.
-            $value = (isset($requestData[$ins_id]) && ! empty($requestData[$ins_id]))
+            $hasRawRequestValue = array_key_exists($ins_id, $requestData);
+            $value = $hasRawRequestValue
                 ? $requestData[$ins_id]
                 : $this->getValue();
 
@@ -130,7 +131,10 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
                 }
             }
 
-            $data['value'] = $value;
+            // Keep default current date initialized above on initial render (no submitted value and no stored value).
+            if ($hasRawRequestValue || ! empty($value)) {
+                $data['value'] = $value;
+            }
         }
 
         return $data;
