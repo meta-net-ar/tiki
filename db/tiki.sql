@@ -4329,8 +4329,8 @@ CREATE TABLE `tiki_markdown_imports` (
   `error_note` TEXT NULL,
   `is_journal` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_source_relpath` (`source_key`(120), `relpath`(120)),
+  UNIQUE KEY `uq_source_relpath` (`source_key`(75), `relpath`(165)),
   KEY `idx_page` (`page_name`(190)),
-  KEY `idx_status` (`last_status`),
-  KEY `idx_orphaned` (`orphaned_at`)
+  KEY `idx_orphaned` (`orphaned_at`),
+  KEY `idx_source_status` (`source_key`, `last_status`)
 ) ENGINE=MyISAM;
