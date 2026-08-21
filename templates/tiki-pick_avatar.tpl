@@ -56,7 +56,7 @@
                         {if $prefs.user_store_file_gallery_picture neq 'y'}{tr}GIF, JPG, or PNG images approximately 45px × 45px{/tr}{else}{tr}GIF, JPG, or PNG images{/tr}{/if}
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" name="upload">{icon name="upload"} {tr}Upload{/tr}</button>
+                <button type="submit" class="btn btn-primary" id="upload" name="upload" disabled>{icon name="upload"} {tr}Upload{/tr}</button>
             </form>
         </section>
     </div>
@@ -133,4 +133,10 @@
         </section>
     {/if}
 {/if}
+
+{jq}
+    $("#userfile1").on("change", function() {
+        $("#upload").prop("disabled", !this.files.length);
+    });
+{/jq}
 </div>
