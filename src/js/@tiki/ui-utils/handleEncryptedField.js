@@ -41,10 +41,12 @@ export default function handleEncryptedField() {
         if (modal) modal.removeAttribute("hidden");
     });
 
-    // The tiki:unlocked event carries decrypted cleartext, so EnterKeyModal dispatches
-    // it on each field's host element (non-bubbling) instead of document — page-level
-    // listeners never see it. Attach the view-span handler per host. Fields are
-    // server-rendered, so they all exist by the time this module runs.
+    // Only the host-scoped tiki:unlocked event carries decrypted cleartext:
+    // EnterKeyModal dispatches it on each field's host element (non-bubbling), so no
+    // page-level listener ever sees a value. It also sends a value-free notification
+    // on document for field-type JS that just needs to know the field was unlocked.
+    // Attach the view-span handler per host. Fields are server-rendered, so they all
+    // exist by the time this module runs.
     document.querySelectorAll("tiki-encrypted-field").forEach((fieldEl) => {
         fieldEl.addEventListener("tiki:unlocked", handleUnlocked);
     });

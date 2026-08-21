@@ -126,6 +126,10 @@ function applyUnlock(value: string) {
     // Dispatch on the field's host element (not document, no bubbling) so the
     // decrypted cleartext is only observable by listeners scoped to that field.
     fieldEl?.dispatchEvent(new CustomEvent("tiki:unlocked", { detail: { fieldId: props.fieldId, itemId: props.itemId ?? 0, value } }));
+    // Field-type JS that only needs to know the field was unlocked (the Secret
+    // field re-enables its show/hide toggle) listens on document. Notify without
+    // the cleartext, so page-level listeners never see a decrypted value.
+    document.dispatchEvent(new CustomEvent("tiki:unlocked", { detail: { fieldId: props.fieldId, itemId: props.itemId ?? 0 } }));
 }
 
 async function submit() {

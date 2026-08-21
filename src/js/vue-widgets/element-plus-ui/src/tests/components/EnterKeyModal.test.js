@@ -147,8 +147,42 @@ describe("EnterKeyModal", () => {
 
         await waitFor(() => expect(events.length).toBe(1));
         expect(events[0]).toMatchObject({ fieldId: BASE_PROPS.fieldId });
-        // The cleartext-carrying event must never reach document-level listeners
-        expect(documentEvents.length).toBe(0);
+        // A document-level notification is also sent so field-type JS can react
+        // (see the value-free assertion below), but it must never carry cleartext.
+        expect(documentEvents.length).toBe(1);
+        expect(documentEvents[0]).not.toHaveProperty("value");
+    });
+
+    test("notifies document listeners without the cleartext value", async () => {
+        // The Secret (SEC) field's show/hide toggle is rendered disabled while the
+        // field is locked and is only re-enabled by a document-level tiki:unlocked
+        // listener, so the notification has to reach document. It must stay
+        // value-free: the host-scoped event is the only carrier of cleartext.
+        const { host } = makeModal({ itemId: 99 });
+        const fieldHost = makeFieldHost(99);
+
+        showModal(host);
+        await waitFor(() => screen.getByRole("dialog"));
+
+        const input = screen.getByLabelText(/Enter shared secret/i);
+        await fireEvent.update(input, "valid-share");
+
+        fetchSpy
+            .mockResolvedValueOnce({ ok: true }) // enter_key
+            .mockResolvedValueOnce({ ok: true, json: async () => ({ value: "decrypted!" }) }); // get_decrypted_value
+
+        const hostEvents = [];
+        const documentEvents = [];
+        fieldHost.addEventListener("tiki:unlocked", (e) => hostEvents.push(e.detail));
+        document.addEventListener("tiki:unlocked", (e) => documentEvents.push(e.detail));
+
+        await fireEvent.click(screen.getByText("Submit"));
+
+        await waitFor(() => expect(documentEvents.length).toBe(1));
+        expect(documentEvents[0]).toEqual({ fieldId: BASE_PROPS.fieldId, itemId: 99 });
+        expect(documentEvents[0]).not.toHaveProperty("value");
+        // The host event still carries the decrypted value for field-scoped listeners
+        expect(hostEvents[0]).toMatchObject({ value: "decrypted!" });
     });
 
     test("dispatches tiki:unlocked with decrypted value on successful unlock (existing item)", async () => {
