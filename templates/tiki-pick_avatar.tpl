@@ -27,7 +27,7 @@
             {if isset($user_picture_id)}
                 <details class="text-start mb-3" id="full-size-picture">
                     <summary class="small">{tr}View full size{/tr}</summary>
-                    <img src="tiki-download_file.php?fileId={$user_picture_id|escape}&amp;display=y" class="img-fluid rounded-1 mt-2" alt="{tr}Full size profile picture{/tr}" style="max-height: 300px;object-fit:cover">
+                    <img src="tiki-download_file.php?fileId={$user_picture_id|escape}&amp;display=y" class="img-fluid rounded-1 mt-2" alt="{tr}Full size profile picture{/tr}" style="object-fit:cover">
                 </details>
             {/if}
             <div class="profile-picture-page__actions">
