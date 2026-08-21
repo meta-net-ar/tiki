@@ -9146,6 +9146,12 @@ class UsersLib extends TikiLib
             }
         }
     }
+
+    public function updateLastMFADate($username)
+    {
+        $query = "update `users_users` set `last_mfa_date` = ? WHERE `login` = ?";
+        $this->query($query, [time(), $username]);
+    }
 }
 
 
