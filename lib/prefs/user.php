@@ -377,6 +377,7 @@ function prefs_user_list($partial = false)
             'help' => 'http://gravatar.com',
             'type' => 'flag',
             'default' => 'n',
+            'conflicts' => ['user_dicebear_avatar']
         ],
         'user_multilike_config' => [
             'name' => tr('Configuration for multilike'),
@@ -410,6 +411,7 @@ function prefs_user_list($partial = false)
             'type' => 'flag',
             'tags' => ['advanced'],
             'default' => 'y',
+            'conflicts' => ['user_use_gravatar'],
         ],
         'user_default_avatar_style' => [
             'name' => tr('Default avatar style'),
