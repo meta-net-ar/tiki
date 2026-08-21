@@ -16,7 +16,7 @@ class ToolbarInline extends ToolbarItem
                 $iconname = 'bold';
                 $wysiwyg = 'bold';
                 $syntax = '__text__';
-                $markdown = '__text__';
+                $markdown = '**text**';
                 $markdown_wysiwyg = 'bold';
                 break;
             case 'italic':
@@ -59,6 +59,7 @@ class ToolbarInline extends ToolbarItem
                 $iconname = 'ban';
                 $wysiwyg = '';
                 $syntax = '~np~text~/np~';
+                $markdown = '~np~text~/np~';
                 break;
             default:
                 return null;
