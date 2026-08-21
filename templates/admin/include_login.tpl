@@ -10,7 +10,7 @@
         warning_ept = $('#empty_pretty_tracker_warning');
     warning_ept.hide();
     //prevent space, backslash and bad chars in template name, see lib/wiki/wikilib.php:188
-    pretty_tracker_tpl.keypress(function(e){
+    pretty_tracker_tpl.on('keypress', function(e){
     return /[^ //?#\[\]@$&+;=<>\\]/i.test(e.key);
     });
     frm.on("submit", function(){

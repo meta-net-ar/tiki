@@ -6,7 +6,7 @@
         warning_empty_period.hide();
 
     // allow to type in only digits
-    days_before_lock.keypress(function(e){
+    days_before_lock.on('keypress', function(e){
         return /^\d*$/i.test(e.key);
     });
     frm.on("submit", function(){

@@ -761,7 +761,7 @@
                                                 </div>
                                             </div>
                                             {jq}
-                                                $("#lang").change(function() {
+                                                $("#lang").on('change', function() {
                                                     $("#lang_request").val($(this).val());
                                                 });
                                             {/jq}
