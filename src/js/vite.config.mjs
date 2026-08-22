@@ -849,8 +849,16 @@ export default defineConfig(({ command, mode }) => {
             },
             server: {
                 deps: {
-                    inline: [/element-plus/],
+                    inline: [/element-plus/, /@dicebear/],
                 },
+            },
+            alias: {
+                ...Object.fromEntries(
+                    diceBearStyles.map(({ name }) => [
+                        `@dicebear/${name}`,
+                        resolve(import.meta.dirname, `../../public/generated/js/@dicebear/${name}.js`),
+                    ])
+                ),
             },
         },
     };

@@ -17,9 +17,9 @@ describe("showPickerModal helper functions", () => {
         window.$ = $;
     });
 
-    test("getRandomAvatars should return an array of 24 well-formed avatars", () => {
+    test("getRandomAvatars should return an array of 24 well-formed avatars", async () => {
         const activeStyle = stylesConstant[0].name;
-        const avatars = getRandomAvatars(activeStyle);
+        const avatars = await getRandomAvatars(activeStyle);
 
         expect(avatars).toHaveLength(24);
         avatars.forEach((avatar) => {

@@ -35,13 +35,13 @@ describe("showPickerModal", () => {
         vi.clearAllMocks();
     });
 
-    test("renders correctly the avatar picker modal", () => {
+    test("renders correctly the avatar picker modal", async () => {
         getRandomAvatars.mockReturnValue([
             { seed: "seed1", svg: "avatar1" },
             { seed: "seed2", svg: "avatar2" },
         ]);
 
-        showPickerModal();
+        await showPickerModal();
 
         expect($.openModal).toHaveBeenCalledWith({
             title: "Choose an avatar translated",
@@ -66,8 +66,8 @@ describe("showPickerModal", () => {
         expect(handleAvatarClick).toHaveBeenCalledWith(content[0]);
     });
 
-    test("correctly handles the randomize button click", () => {
-        showPickerModal();
+    test("correctly handles the randomize button click", async () => {
+        await showPickerModal();
 
         const openModalCall = $.openModal.mock.calls[0][0];
         const content = $(openModalCall.content);
@@ -81,7 +81,7 @@ describe("showPickerModal", () => {
         getAvatarElement.mockImplementation((avatar) => `<div>${avatar.seed}</div>`);
 
         const randomizeButton = content.find("#randomize-avatars");
-        randomizeButton.trigger("click");
+        await randomizeButton.trigger("click");
 
         expect(handleAvatarClick).toHaveBeenCalledTimes(2);
         expect(handleAvatarClick).toHaveBeenCalledWith(content[0]);
@@ -90,8 +90,8 @@ describe("showPickerModal", () => {
         expect(avatarPickerAvatars.html()).toBe(`<div>${expectedRandomAvatars[0].seed}</div><div>${expectedRandomAvatars[1].seed}</div>`);
     });
 
-    test("correctly handles the style change event", () => {
-        showPickerModal();
+    test("correctly handles the style change event", async () => {
+        await showPickerModal();
 
         const openModalCall = $.openModal.mock.calls[0][0];
         const content = $(openModalCall.content);
@@ -106,7 +106,7 @@ describe("showPickerModal", () => {
         const styleSelect = content.find("#avatar-style");
         const newStyle = stylesConstant.find((style) => style.name === "funEmoji");
         styleSelect.val(newStyle.name);
-        styleSelect.trigger("change");
+        await styleSelect.trigger("change");
 
         const activeStyleSource = content.find("#active-style-source");
         expect(activeStyleSource.attr("href")).toBe(newStyle.source);
@@ -126,7 +126,7 @@ describe("showPickerModal", () => {
         );
     });
 
-    test("correctly submits the selected avatar", () => {
+    test("correctly submits the selected avatar", async () => {
         // Mock
         $.BUTTON_LOADER_MARKUP = "loading...";
         window.jqueryTiki = { username: "testUser" };
@@ -136,7 +136,7 @@ describe("showPickerModal", () => {
             .append('<div id="user-picture"></div>')
             .append('<div class="mod-login-avatar"><img src="" alt="Avatar"></div>');
 
-        showPickerModal();
+        await showPickerModal();
 
         const openModalCall = $.openModal.mock.calls[0][0];
         const content = $(openModalCall.content);
@@ -170,7 +170,7 @@ describe("showPickerModal", () => {
         );
 
         // on success
-        ajaxPostSpy.mock.calls[0][2]();
+        await ajaxPostSpy.mock.calls[0][2]();
 
         expect(showMessage).toHaveBeenCalledWith("Avatar updated translated", "success");
         expect($("#user-picture").html()).toBe(avatarItem.html());
@@ -190,8 +190,8 @@ describe("showPickerModal", () => {
         expect(submitButtonMock.attr("disabled")).toBeUndefined();
     });
 
-    test("should not submit if no avatar is selected", () => {
-        showPickerModal();
+    test("should not submit if no avatar is selected", async () => {
+        await showPickerModal();
 
         const openModalCall = $.openModal.mock.calls[0][0];
         const content = $(openModalCall.content);
