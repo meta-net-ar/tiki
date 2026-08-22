@@ -216,6 +216,8 @@ const SWAGGER_UI_DIST_PATH = 'public/generated/js/vendor_dist/swagger-ui-dist';
 const SWIPER_DIST_PATH = 'public/generated/js/vendor_dist/swiper';
 const ZXING_DIST_PATH = 'public/generated/js/vendor_dist/@zxing/library';
 
+const DICEBEAR_COLLECTIONS_PATH = 'public/generated/js/@dicebear';
+
 /* END - VENDOR ASSETS SECTION */
 
 /* PRIVATE GENERATED PATHS (must never be servable over HTTP) */
