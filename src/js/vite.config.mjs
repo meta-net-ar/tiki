@@ -856,7 +856,10 @@ export default defineConfig(({ command, mode }) => {
                 ...Object.fromEntries(
                     diceBearStyles.map(({ name }) => [
                         `@dicebear/${name}`,
-                        resolve(import.meta.dirname, `../../public/generated/js/@dicebear/${name}.js`),
+                        resolve(
+                            import.meta.dirname,
+                            `../../node_modules/@dicebear/${name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`
+                        ),
                     ])
                 ),
             },
