@@ -320,6 +320,12 @@ $PHP_CONFIG_FILE_PATH/php.ini or $httpd_conf.
 
 
 
+function set_system_administrator_password($randompass)
+{
+    global $installer;
+    $installer->query("UPDATE users_users SET hash=? WHERE userId=1", [ password_hash($randompass, PASSWORD_DEFAULT) ]);
+}
+
 // Try to see if we have an admin account
 /**
  * @param $api_tiki
