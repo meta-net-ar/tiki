@@ -51,7 +51,26 @@
                 <input type="hidden" name="MAX_FILE_SIZE" value="10000000">
                 <div class="tiki-form-group">
                     <label for="userfile1" class="form-label">{tr}Image file{/tr}</label>
-                    <input id="userfile1" name="userfile1" type="file" accept="image/*" class="form-control">
+                    {if $prefs.elementplus_upload eq 'y'}
+                        <el-file-input accept="image/*" id="el-userfile1"></el-file-input>
+                        <input id="userfile1" name="userfile1" type="file" class="d-none">
+                        {jq}
+                            $("#el-userfile1").on("change", function(event) {
+                                const file = event.detail[0];
+                                const dataTransfer = new DataTransfer();
+
+                                dataTransfer.items.add(file.raw);
+
+                                $("#userfile1")[0].files = dataTransfer.files;
+                                $("#upload").prop("disabled", !dataTransfer.files.length);
+                            }).on("remove", function(event) {
+                                $("#userfile1")[0].value = "";
+                                $("#upload").prop("disabled", true);
+                            });
+                        {/jq}
+                    {else}
+                        <input id="userfile1" name="userfile1" type="file" accept="image/*" class="form-control">
+                    {/if}
                     <div class="form-text mt-2">
                         {if $prefs.user_store_file_gallery_picture neq 'y'}{tr}GIF, JPG, or PNG images approximately 45px × 45px{/tr}{else}{tr}GIF, JPG, or PNG images{/tr}{/if}
                     </div>
