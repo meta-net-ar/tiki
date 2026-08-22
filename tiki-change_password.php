@@ -38,6 +38,9 @@ if (! isset($_REQUEST["oldpass"])) {
 
 $user = $_REQUEST["user"];
 $secure_token = $_REQUEST["token"] ?? '';
+$bruteForceProperties = function () use ($tikilib) {
+    return ['ip' => $tikilib->get_ip_address()];
+};
 
 $pass_confirm = $userlib->getOne('select `pass_confirm` from `users_users` where binary `login`=?', [$user]);
 $must_change_password = ($pass_confirm === 0 || $pass_confirm === null);
@@ -84,14 +87,14 @@ $smarty->assign('secure_token', $secure_token);
 
 if (isset($_REQUEST["change"]) && $access->checkCsrf()) {
     if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
-        if (! $bruteForce->isOperationAllowed('change_password', ['ip' => $tikilib->get_ip_address()])) {
-            $nextAllowedTime = $bruteForce->getNextAllowedTime('change_password', ['ip' => $tikilib->get_ip_address()]);
-            $waitTime = $nextAllowedTime - time();
+        if (! $bruteForce->isOperationAllowed('change_password', $changePasswordProperties)) {
+            $waitTime = $bruteForce->getWaitTime('change_password', $changePasswordProperties);
             if ($waitTime > 60) {
                 $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
             } else {
                 $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d seconds.'), $waitTime);
             }
+            http_response_code(429);
             $smarty->assign('msg', $waitMessage);
             $smarty->display('error.tpl');
             die;
@@ -192,6 +195,9 @@ if (isset($_REQUEST["change"]) && $access->checkCsrf()) {
             $res = $userlib->change_user_password($user, $_REQUEST["pass"]);
             if ($res && $prefs['pass_history_management'] === 'y') {
                 $userlib->addPasswordHistory($user, $_REQUEST["pass"]);
+            }
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                $bruteForce->success('change_password', $changePasswordProperties);
             }
 
             // One-time marker: do not allow reuse of the validation session for another change
