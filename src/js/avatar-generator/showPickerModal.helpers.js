@@ -1,12 +1,14 @@
 import { createAvatar } from "@dicebear/core";
-import * as collections from "@dicebear/collection";
 import { AVATAR_RADIUS, AVATAR_SIZE } from "./avatarOptions.constant";
 
-export function getRandomAvatars(activeStyle) {
+export async function getRandomAvatars(activeStyle) {
     const avatars = [];
     for (let i = 0; i < 24; i++) {
         const seed = Math.random().toString(36).substring(2, 15);
-        const avatar = createAvatar(collections[activeStyle], { seed, size: AVATAR_SIZE.large, radius: AVATAR_RADIUS });
+
+        const collection = await import(`@dicebear/${activeStyle}`);
+
+        const avatar = createAvatar(collection, { seed, size: AVATAR_SIZE.large, radius: AVATAR_RADIUS });
         avatars.push({ seed, svg: avatar.toString() });
     }
     return avatars;
