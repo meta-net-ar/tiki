@@ -77,6 +77,7 @@ class ConverseJS
         global $user;
         global $prefs;
         $authMethod = TikiLib::lib('tiki')->get_preference('xmpp_auth_method');
+        $prebindAvailable = class_exists('XmppPrebind');
 
         // Anonymous login
         if (empty($user) && isset($params['anonymous']) && $params['anonymous'] === 'y') {
@@ -114,14 +115,22 @@ class ConverseJS
 
         // Prebind (tikitoken)
         } elseif ($authMethod === 'tikitoken') {
-            $this->set_options([
-                'auto_login' => true,
-                'authentication'   => 'prebind',
-                'prebind_url'      => TikiLib::lib('service')->getUrl([
-                    'action' => 'prebind',
-                    'controller' => 'xmpp',
-                ]),
-            ]);
+            if (isset($_GET['page']) && $_GET['page'] === 'rtc' && ! $prebindAvailable) {
+                Feedback::warning(
+                    'The <a href="https://packagist.org/packages/candy-chat/xmpp-prebind-php" target="_blank">XMPP Prebind library</a> is not installed. '
+                    . 'It is needed only if you choose the <strong>Openfire TikiToken</strong> authentication method. '
+                    . 'See the <a href="https://doc.tiki.org/XMPP#Installing_the_XMPP_Prebind_library_for_TikiToken" target="_blank">Tiki documentation</a> for installation instructions.'
+                );
+            } else {
+                $this->set_options([
+                    'auto_login' => true,
+                    'authentication'   => 'prebind',
+                    'prebind_url'      => TikiLib::lib('service')->getUrl([
+                        'action' => 'prebind',
+                        'controller' => 'xmpp',
+                    ]),
+                ]);
+            }
         } elseif ($authMethod === 'oauth') {
             $this->set_options([
                 'authentication'   => 'login',
