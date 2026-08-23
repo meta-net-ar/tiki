@@ -15,6 +15,8 @@ use SplObjectStorage;
 use SplObserver;
 use TWVersion;
 use Exception;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @see Patch
@@ -26,6 +28,9 @@ class Installer extends TikiDb_Bridge implements SplSubject
 
     public $scripts = [];
     public $executed = [];
+
+    public InputInterface $commandLineInput;
+    public OutputInterface $commandLineOutput;
 
     private string $currentPatchName = '';
 

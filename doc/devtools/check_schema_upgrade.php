@@ -512,6 +512,7 @@ class CheckSchemaUpgrade
                 $phpFinder->find(),
                 'console.php',
                 'database:update',
+                '--no-interaction',
             ]
         );
         $process->setWorkingDirectory($this->tikiRoot);

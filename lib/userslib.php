@@ -3100,7 +3100,7 @@ class UsersLib extends TikiLib
      *
      * @param string $from The current login name.
      * @param string $to The new login name.
-     * @param bool $scratching Exceptionally allow changing the admin login when installing Tiki.
+     * @param bool $scratching Exceptionally allow changing the admin login when installing or upgrading Tiki.
      * @return bool True on success, false on failure.
      */
     public function change_login($from, $to, $scratching = false)
