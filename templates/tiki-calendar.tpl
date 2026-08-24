@@ -111,7 +111,10 @@
         {assign var="timeFormat" value=false}
     {/if}
     {if $viewlist eq 'list'}
-        {include file='tiki-calendar_listmode.tpl'}
+        <div class="calendar-list-compact">
+            {include file='tiki-calendar_nav.tpl' module='y' ajax='n'}
+            {include file='tiki-calendar_listmode.tpl'}
+        </div>
     {else}
         {jq}
             let today = new Date();
