@@ -80,11 +80,11 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
 
                 "@kurkle/color" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@kurkle/color/dist/color.esm.js",
                 "@lottiefiles/dotlottie-wc" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@lottiefiles/dotlottie-wc/dist/index.js",
-                "@popperjs/core" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/@popperjs/core/dist/esm/index.js",
+
                 "@shoelace/color-picker" => $tikiUrl . JS_ASSETS_PATH . "/color-picker.js",
                 "altcha" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/altcha/dist/altcha.js",
                 "animejs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/anime/dist/anime.es.js",
-                "bootstrap" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/bootstrap/dist/js/bootstrap.esm.min.js",
+                "bootstrap" => $tikiUrl . JS_ASSETS_PATH . "/common-reexported/bootstrap.js",
                 "chartjs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/chart.js/dist/chart.js",
                 "clipboard" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/clipboard/dist/clipboard.min.js",
                 "dompurify" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/dompurify/dist/purify.es.mjs",
