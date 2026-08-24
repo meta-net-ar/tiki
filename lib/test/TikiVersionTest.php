@@ -229,7 +229,7 @@ class TikiVersionTest extends PHPUnit\Framework\TestCase
      *
      * @dataProvider upgradeMessages
      */
-    public function testUpgradeCastsToItsMessage(string $expectedMessage, Tiki_Version_Upgrade $upgrade, array $ltsMockData = [])
+    public function testUpgradeCastsToItsMessage(string $expectedMessage, Tiki_Version_Upgrade $upgrade, array $ltsMockData = []): void
     {
         $this->setupMockTWV($ltsMockData);
 

@@ -22,12 +22,7 @@ class Scheduler_Task_TikiCheckerCommandTask extends Scheduler_Task_CommandTask
 
             $tikiVersion = $TWV->version;
             $versionUtils = new Tiki_Version_Utils();
-            $needupdate = array_map(
-                function ($upgrade) {
-                    return $upgrade->getMessage();
-                },
-                $versionUtils->checkUpdatesForVersion($tikiVersion)
-            );
+            $needupdate = $versionUtils->getUpgradeMessages($tikiVersion);
             $lastRebuild = $tikilib->get_preference('notified_tiki_version');
 
             if (! empty($needupdate) && $lastRebuild != $tikiVersion) {
