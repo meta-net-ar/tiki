@@ -12,8 +12,8 @@ This is how we implement the Tiki Social Contract.
 http://tiki.org/Social+Contract
 
 List of members of the Community
-As of 2026-07-26, the community has:
-  * 754 members on SourceForge.net,
+As of 2026-08-24, the community has:
+  * 752 members on SourceForge.net,
   * Array of those people who made at least one code commit
 
 This list is automatically generated and alphabetically sorted
@@ -54,8 +54,8 @@ Number of Commits: 2
 
 Nickname: Alfred Syatsukwa
 First Commit: Thu Jul 24 01:20:38 2025 +0000
-Last Commit: Thu Jul 24 01:20:38 2025 +0000
-Number of Commits: 1
+Last Commit: Thu Aug 20 11:05:21 2026 +0000
+Number of Commits: 7
 
 Nickname: Alvin Bauma
 First Commit: Fri Oct 8 14:05:39 2021 +0100
@@ -169,8 +169,8 @@ Number of Commits: 2
 
 Nickname: Espoir Baraka
 First Commit: Thu Dec 12 10:17:11 2024 +0000
-Last Commit: Sun Jun 21 12:51:14 2026 +0200
-Number of Commits: 10
+Last Commit: Mon Aug 24 11:18:21 2026 +0200
+Number of Commits: 17
 
 Nickname: Eutyche odimba
 First Commit: Fri Oct 29 12:30:52 2021 +0200
@@ -305,7 +305,7 @@ Number of Commits: 2
 Nickname: Jyhem
 First Commit: Sun Apr 21 14:41:36 2013 +0000
 Last Commit: Wed Nov 20 23:21:35 2024 +0100
-Number of Commits: 460
+Number of Commits: 458
 
 Nickname: Katy Kleinert
 First Commit: Thu Sep 24 19:09:34 2020 +0000
@@ -314,8 +314,8 @@ Number of Commits: 3
 
 Nickname: King KAMBALE DAVID
 First Commit: Fri Oct 11 15:26:34 2024 +0000
-Last Commit: Fri Jul 17 18:07:58 2026 +0000
-Number of Commits: 8
+Last Commit: Fri Aug 7 15:10:47 2026 +0000
+Number of Commits: 9
 
 Nickname: Kishiko
 First Commit: Fri Apr 20 11:50:25 2018 +0000
@@ -354,8 +354,8 @@ Number of Commits: 10
 
 Nickname: MAGENE Sem Joel
 First Commit: Thu Jul 3 16:05:56 2025 +0000
-Last Commit: Fri Mar 27 07:07:24 2026 +0000
-Number of Commits: 3
+Last Commit: Thu Aug 20 18:49:25 2026 +0000
+Number of Commits: 4
 
 Nickname: MIKE KOTA
 First Commit: Fri Dec 6 16:19:40 2019 +0200
@@ -485,7 +485,7 @@ Number of Commits: 17
 Nickname: RobertPlummer
 First Commit: Wed May 1 13:02:45 2013 +0000
 Last Commit: Tue Jan 26 14:52:38 2016 +0000
-Number of Commits: 112
+Number of Commits: 109
 
 Nickname: Roberto Kirschbaum
 First Commit: Mon Feb 26 17:57:13 2018 +0000
@@ -661,8 +661,6 @@ SF Role: Developer
 Nickname: alain_desilets
 Name: Alain DÃ©silets
 First Commit: 2008-03-11
-Last Commit: Thu Dec 12 19:36:35 2013 +0000
-Number of Commits: 37
 SF Role: Developer
 
 Nickname: albrown
@@ -723,7 +721,7 @@ Nickname: amette
 Name: Alexander Mette
 First Commit: 2005-05-19
 Last Commit: Thu Jul 29 12:03:00 2021 +0200
-Number of Commits: 57
+Number of Commits: 44
 SF Role: Developer
 
 Nickname: amnabilal
@@ -798,7 +796,7 @@ SF Role: Developer
 Nickname: arildb
 First Commit: 2011-09-04
 Last Commit: Sun Oct 29 08:33:55 2017 +0000
-Number of Commits: 141
+Number of Commits: 135
 SF Role: Developer
 
 Nickname: arion92fr
@@ -1044,15 +1042,10 @@ Nickname: chandi
 Name: Chandi Bernier
 SF Role: Developer
 
-Nickname: changi67
-First Commit: Sun Nov 24 18:54:24 2013 +0000
-Last Commit: Sun Nov 24 18:54:24 2013 +0000
-Number of Commits: 1
-
 Nickname: chealer
 First Commit: 2003-09-27
 Last Commit: Fri Jan 26 16:00:49 2018 +0000
-Number of Commits: 614
+Number of Commits: 613
 
 Nickname: chessy
 Name: Juanan Pereira
@@ -1062,7 +1055,7 @@ Nickname: chibaguy
 Name: Gary Cunningham-Lee
 First Commit: 2006-02-04
 Last Commit: Mon Mar 2 09:16:38 2020 +0000
-Number of Commits: 1924
+Number of Commits: 1715
 SF Role: Admin
 
 Nickname: chris_holman
@@ -1087,8 +1080,6 @@ SF Role: Developer
 Nickname: citadelrock
 Name: Citadel Rock Online Communities
 First Commit: 2012-04-24
-Last Commit: Wed Oct 23 16:35:18 2013 +0000
-Number of Commits: 7
 SF Role: Developer
 
 Nickname: claborne
@@ -1278,8 +1269,6 @@ SF Role: Developer
 
 Nickname: egma
 First Commit: 2013-10-02
-Last Commit: Wed Oct 2 11:53:28 2013 +0000
-Number of Commits: 1
 SF Role: Developer
 
 Nickname: einstine
@@ -1385,8 +1374,6 @@ SF Role: Developer
 Nickname: fareh1abdelhak
 Name: FAREH Abdelhak
 First Commit: 2013-12-05
-Last Commit: Fri Dec 6 13:39:13 2013 +0000
-Number of Commits: 3
 SF Role: Developer
 
 Nickname: fbergeron
@@ -1430,7 +1417,7 @@ Nickname: fmg-sf
 Name: Frank Guthausen
 First Commit: 2012-10-12
 Last Commit: Sun Feb 11 12:26:17 2018 +0000
-Number of Commits: 53
+Number of Commits: 52
 SF Role: Developer
 
 Nickname: fmjrey
@@ -1535,7 +1522,7 @@ Nickname: gezzzan
 Name: gezza
 First Commit: 2009-05-02
 Last Commit: Sun Apr 2 07:55:23 2017 +0000
-Number of Commits: 412
+Number of Commits: 377
 SF Role: Developer
 
 Nickname: ggd
@@ -1855,8 +1842,6 @@ Number of Commits: 1
 
 Nickname: jobicarter
 First Commit: 2013-11-14
-Last Commit: Thu Dec 5 22:19:58 2013 +0000
-Number of Commits: 5
 SF Role: Developer
 
 Nickname: joeldeocm88
@@ -1891,7 +1876,7 @@ Nickname: jonnybradley
 Name: jonny Bradley
 First Commit: 2007-08-15
 Last Commit: Thu Aug 1 18:20:37 2019 +0000
-Number of Commits: 3902
+Number of Commits: 3799
 SF Role: Admin
 
 Nickname: josefgc
@@ -1946,8 +1931,6 @@ SF Role: Developer
 Nickname: juxtagonale
 Name: Marie-Michelle Ouellet
 First Commit: 2013-11-18
-Last Commit: Mon Nov 18 00:51:05 2013 +0000
-Number of Commits: 2
 SF Role: Developer
 
 Nickname: jwigdahl
@@ -2150,7 +2133,7 @@ Nickname: lindonb
 Name: lindon
 First Commit: 2009-05-10
 Last Commit: Sun Sep 6 21:58:09 2020 -0400
-Number of Commits: 1744
+Number of Commits: 1715
 SF Role: Admin, Developer
 
 Nickname: llunax
@@ -2182,7 +2165,7 @@ Nickname: lphuberdeau
 Name: Louis-Philippe Huberdeau
 First Commit: 2004-04-10
 Last Commit: Wed Feb 18 17:41:34 2015 +0000
-Number of Commits: 692
+Number of Commits: 606
 SF Role: Developer
 
 Nickname: lrrcenter
@@ -2222,7 +2205,7 @@ Nickname: luciash
 Name: luciash d&#39; being
 First Commit: 2003-08-05
 Last Commit: Wed Oct 9 19:03:31 2019 +0000
-Number of Commits: 537
+Number of Commits: 511
 SF Role: Admin
 
 Nickname: luciash d' being
@@ -2279,7 +2262,7 @@ SF Role: Developer
 Nickname: manivannans
 First Commit: 2013-10-24
 Last Commit: Tue May 19 13:21:35 2015 +0000
-Number of Commits: 56
+Number of Commits: 34
 SF Role: Developer
 
 Nickname: marc-etienne
@@ -2295,7 +2278,7 @@ Nickname: marclaporte
 Name: Marc Laporte
 First Commit: 2003-11-28
 Last Commit: Thu Nov 14 04:34:48 2019 +0000
-Number of Commits: 71
+Number of Commits: 64
 SF Role: Admin
 
 Nickname: marcmont
@@ -2647,7 +2630,7 @@ Nickname: nkoth
 Name: Nelson
 First Commit: 2007-05-17
 Last Commit: Tue Nov 26 21:26:14 2019 +0000
-Number of Commits: 497
+Number of Commits: 496
 SF Role: Developer
 
 Nickname: normandaoust
@@ -2707,8 +2690,6 @@ SF Role: Developer
 Nickname: omstefanov
 Name: Olaf-Michael Stefanov
 First Commit: 2009-07-04
-Last Commit: Sun Nov 10 21:11:30 2013 +0000
-Number of Commits: 2
 SF Role: Developer
 
 Nickname: onewatt
@@ -2758,7 +2739,7 @@ Nickname: patrick-proulx
 Name: Patrick Proulx
 First Commit: 2013-07-14
 Last Commit: Thu May 18 17:08:16 2017 +0000
-Number of Commits: 217
+Number of Commits: 214
 SF Role: Developer
 
 Nickname: patrickallard
@@ -2881,8 +2862,6 @@ SF Role: Developer
 Nickname: ppttrr
 Name: Pete Jalajas
 First Commit: 2012-06-30
-Last Commit: Sat Dec 14 20:07:44 2013 +0000
-Number of Commits: 3
 SF Role: Developer
 
 Nickname: pratesi
@@ -3150,8 +3129,6 @@ SF Role: Developer
 Nickname: sept_7
 Name: StÃ©phane Casset
 First Commit: 2007-07-03
-Last Commit: Tue Dec 17 16:16:03 2013 +0000
-Number of Commits: 10
 SF Role: Developer
 
 Nickname: sewilco
@@ -3204,7 +3181,7 @@ Nickname: skinut
 Name: Steve C
 First Commit: 2012-11-20
 Last Commit: Sat Feb 14 14:52:23 2015 +0000
-Number of Commits: 4
+Number of Commits: 3
 SF Role: Developer
 
 Nickname: slordjette
@@ -3290,11 +3267,6 @@ First Commit: 2014-05-22
 Last Commit: 2014-05-22
 Number of Commits: 1
 SF Role: Developer
-
-Nickname: sylvieg
-First Commit: Sun Nov 3 21:12:48 2013 +0000
-Last Commit: Sun Nov 3 21:12:48 2013 +0000
-Number of Commits: 1
 
 Nickname: syracine
 Name: S Racine
@@ -3435,8 +3407,8 @@ SF Role: Admin
 
 Nickname: ushindi bienvenu
 First Commit: Tue Jul 1 22:42:12 2025 +0000
-Last Commit: Mon Jul 27 01:52:50 2026 +0200
-Number of Commits: 29
+Last Commit: Tue Aug 25 00:55:29 2026 +0200
+Number of Commits: 38
 
 Nickname: uxeric
 First Commit: 2015-08-17
@@ -3513,7 +3485,7 @@ Nickname: xavidp
 Name: Xavier de Pedro
 First Commit: 2005-07-08
 Last Commit: Wed Dec 8 01:05:35 2021 +0100
-Number of Commits: 644
+Number of Commits: 622
 SF Role: Admin
 
 Nickname: xbtheria
