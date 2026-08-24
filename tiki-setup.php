@@ -285,6 +285,7 @@ if (! TIKI_API) {
             $prefs['site_closed'] === 'y'
         ) {
             // js disabled, so we need to set the cookies server-side
+            // DRY, this appears to be the default value of initializeConsentPreferences why do we have another copy here?  benoitg - 2026-03-25
             $consent = [
                 'consentGiven' => true,
                 'categories' => [
@@ -295,11 +296,16 @@ if (! TIKI_API) {
                 ],
             ];
             CookieConsentLib::setConsentPreferences($consent);
-            $feature_no_cookie = false;
+            $feature_no_cookie = false;  //This isn't a global here, so this set will have no effect! - benoitg - 2026-03-25
         }
-        // Retrieve the full consent object (This check first the browser and then user cookie consent prefs)
+        // Retrieve the full consent object
         $consent_preferences = CookieConsentLib::initializeConsentPreferences();
 
+        /*
+        I don't understand why CookieConsentLib doesn't deal with this at init.
+        Especially since it's not clearing the cookies for a category if one withdraws consent from
+        tiki-user_preferences.php, so tiki essentially lies in that situation -  benoitg - 2026-03-25
+        */
         if (! $consent_preferences['consentGiven'] || $jitRequest->offsetExists('cookie_consent')) {
             if (! $jitRequest->offsetExists('cookie_consent')) {
                 foreach ($_COOKIE as $k => $v) {
@@ -309,8 +315,7 @@ if (! TIKI_API) {
                 }
             }
             // Get cookie categories
-            $cookie_categories = CookieConsentLib::getCookieCategories();
-            $smarty->assign('cookie_categories', $cookie_categories);
+            $smarty->assign('cookie_categories', CookieConsentLib::getRequestedCookieCategories());
             $cookie_consent_html = $smarty->fetch('cookie_consent.tpl');
         }
     }

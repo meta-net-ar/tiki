@@ -55,7 +55,7 @@ function wikiplugin_googleanalytics($data, $params)
     if (empty($params['account'])) {
         return tra('Missing parameter');
     }
-    if (! CookieConsentLib::checkAllowedCookieCategory(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ANALYTICS)) {
+    if (! CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ANALYTICS)) {
         return;
     }
     $account = htmlspecialchars($params['account'], ENT_QUOTES);

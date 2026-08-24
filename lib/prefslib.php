@@ -108,6 +108,22 @@ class PreferencesLib
         return '';
     }
 
+    /**
+     * Clearly this was meant as the main accessor for preferences information (would be more adequately called getPreferenceInfo).
+     * It is the only place I could find that lists all the possible values
+     * for the keys contained in the preference definition (although it doesn't document them)
+     *
+     * I do not know why (historically) a true refactoring from the global $pref variable was
+     * never started.
+     *
+     * There is a TikiLib::get_preference() to directly return the value, but it has questionable fallbacks, and is independent of this code:
+     * It does not read the type, so can't be relied upon unless you know in advance it returns an array.
+     * @param [type] $name
+     * @param boolean $deps Process dependencies (does not currently enforce them, just returns information)
+     * @param ?array $source Is set, will look for the preference value in this variable instead of the global $pref array.
+     * @param boolean $get_pages If true, will return the result of $this->getPreferenceLocations($name) in the 'pages' key.
+     * @return false on failure or an array of information on the preference.  That actual value is in the 'value' key.
+     */
     public function getPreference($name, $deps = true, $source = null, $get_pages = false)
     {
         global $prefs, $systemConfiguration;
@@ -118,7 +134,7 @@ class PreferencesLib
             return false;
         }
         $defaults = [
-            'type' => '',
+            'type' => '', //Possible values appear to be 'flag', 'list' as in selection from a list as opposed to array, 'multilist' (as in array), 'text', 'textarea', 'password', 'multicheckbox', 'group'
             'helpurl' => '',
             'help' => '',
             'adminurl' => 'tiki-admin.php?lm_criteria=' . urlencode($name) . '&amp;exact',
@@ -155,14 +171,26 @@ class PreferencesLib
             $source = $prefs;
         }
 
-        $value = $source[$name] ?? null;
-        if (
-            ! empty($value) &&
-            is_string($value) &&
-            (strlen($value) > 1 && $value[1] == ':' && str_contains($value, '{')) &&
-            false !== $unserialized = @unserialize($value)
-        ) {
-            $value = $unserialized;
+        //Determine the effective value
+        if (array_key_exists($name, $source)) { //Cannot use isset here, null can be a valid value for a pref
+            $value = $source[$name];
+            if (
+                ! empty($value) &&
+                is_string($value) &&
+                (strlen($value) > 1 && $value[1] == ':' && str_contains($value, '{')) &&
+                false !== $unserialized = @unserialize($value)
+            ) {
+                $value = $unserialized;
+            }
+        } elseif (array_key_exists('default', $data[$name])) { //Here again, null may be a valid default value
+            $value = $data[$name]['default'];
+        } else {
+            /*  Note:  This is still incomplete, 'default' isn't mandatory.
+                'multilist' and 'multicheckbox' should return arrays.
+                The different string types should return an empty string (because that seems to be the current semantics of the pref system)
+                Once again, in a stable branch, so I don't want to do such a large change of behaviour right now - benoitg - 2026-03-26
+                */
+            $value = null;
         }
 
         $info['preference'] = $name;
@@ -245,6 +273,10 @@ class PreferencesLib
             if (is_string($info['default'])) {
                 $info['modified'] = str_replace("\r\n", "\n", $info['value'] ?? '') != $info['default'];
             } else {
+                /* This is from https://gitlab.com/tikiwiki/tiki/-/merge_requests/2666
+                   It is wrong.  Now any preference with non-string values will not be compared at all.
+                   But I'm currently working on a branch, so I cannot fix this immediately - benoitg - 2026-03-26
+                   */
                 $info['modified'] = false;
             }
         }
@@ -1339,6 +1371,7 @@ class PreferencesLib
                 if (isset($info['default'])) {
                     $defaults[$name] = $info['default'];
                 } else {
+                    //This isn't checking types and will be wildly incorrect for array types. And currently other functions are defaulting to null - benoitg - 2026-03-26
                     $defaults[$name] = '';
                 }
             }
