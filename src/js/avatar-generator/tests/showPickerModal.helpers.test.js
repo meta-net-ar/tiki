@@ -9,6 +9,7 @@ import { AVATAR_RADIUS, AVATAR_SIZE } from "../avatarOptions.constant";
 vi.mock("@dicebear/core", () => ({
     createAvatar: vi.fn(() => ({
         toString: () => "avatarString",
+        toDataUri: () => "data:image/svg+xml,avatar",
     })),
 }));
 
@@ -24,6 +25,7 @@ describe("showPickerModal helper functions", () => {
         expect(avatars).toHaveLength(24);
         avatars.forEach((avatar) => {
             expect(avatar.svg).toBe("avatarString");
+            expect(avatar.dataUri).toBe("data:image/svg+xml,avatar");
             expect(avatar.seed).toBeTypeOf("string");
             expect(avatar.seed).toBeTruthy();
 
@@ -36,12 +38,15 @@ describe("showPickerModal helper functions", () => {
     });
 
     test("getAvatarElement should return a correct HTML markup for displaying an avatar", () => {
-        const givenAvatar = { seed: "seed1", svg: "<svg>avatar</svg>" };
+        const givenAvatar = { seed: "seed1", dataUri: "data:image/svg+xml,avatar" };
 
         const actualElement = $(getAvatarElement(givenAvatar));
+        const image = actualElement.find("img");
 
         expect(actualElement.data("seed")).toBe(givenAvatar.seed);
-        expect(actualElement.html().trim()).toBe(givenAvatar.svg);
+        expect(image.attr("src")).toBe(givenAvatar.dataUri);
+        expect(image.attr("alt")).toBe(`Avatar ${givenAvatar.seed}`);
+        expect(image.hasClass("avatar-picker__avatars__item__image")).toBe(true);
         expect(actualElement.hasClass("avatar-picker__avatars__item bg-secondary-subtle border rounded border-3 border-white")).toBe(true);
     });
 

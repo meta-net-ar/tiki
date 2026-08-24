@@ -9,7 +9,7 @@ export async function getRandomAvatars(activeStyle) {
         const collection = await import(`@dicebear/${activeStyle}`);
 
         const avatar = createAvatar(collection, { seed, size: AVATAR_SIZE.large, radius: AVATAR_RADIUS });
-        avatars.push({ seed, svg: avatar.toString() });
+        avatars.push({ seed, svg: avatar.toString(), dataUri: avatar.toDataUri() });
     }
     return avatars;
 }
@@ -17,7 +17,7 @@ export async function getRandomAvatars(activeStyle) {
 export function getAvatarElement(avatar) {
     return `
         <div class="avatar-picker__avatars__item bg-secondary-subtle border rounded border-3 border-white" data-seed="${avatar.seed}" role="button">
-            ${avatar.svg}
+            <img src="${avatar.dataUri}" alt="Avatar ${avatar.seed}" class="avatar-picker__avatars__item__image" />
         </div>
     `;
 }
