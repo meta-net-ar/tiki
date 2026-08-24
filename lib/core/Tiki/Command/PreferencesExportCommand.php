@@ -165,18 +165,96 @@ class PreferencesExportCommand extends Command
      */
     public function export_wiki($export_file, $fields, $data)
     {
-        $header_fields = implode("|", $fields);
-        $header = "{FANCYTABLE(head=\"" . $header_fields . "\")}";
-        $body = "";
-        $footer = "{FANCYTABLE}";
+        // The system name and the human readable name are shown in a single "Name" column to keep the table compact
+        $merge_names = in_array('preference', $fields) && in_array('name', $fields);
 
-        foreach ($data as $values) {
-            $values = array_values($values);
-            $body .= implode("|", $values) . "\n";
+        if ($merge_names) {
+            $fields = array_values(array_diff($fields, ['name']));
+            $fields[array_search('preference', $fields)] = 'Name';
         }
 
-        $content = $header . "\n" . $body . "\n" . $footer;
+        $header_fields = implode("|", $fields);
+        $header = "{FANCYTABLE(head=\"" . $header_fields . "\")}";
+        $footer = "{FANCYTABLE}";
+
+        $content = "";
+
+        // One table per administration page, a single table being too large to be rendered
+        foreach ($this->groupByLocation($data) as $group => $rows) {
+            $body = "";
+
+            foreach ($rows as $values) {
+                $values = array_map([$this, 'escapeWikiCell'], $values);
+
+                if ($merge_names) {
+                    $values['preference'] = "''" . $values['preference'] . "''";
+                    if ($values['name'] !== '') {
+                        $values['preference'] .= '%%%' . $values['name'];
+                    }
+                    unset($values['name']);
+                }
+
+                $values = array_values($values);
+                $body .= implode("|", $values) . "\n";
+            }
+
+            if ($group !== '') {
+                $content .= "!! " . $group . "\n";
+            }
+            $content .= $header . "\n" . $body . "\n" . $footer . "\n\n";
+        }
+
         file_put_contents($export_file, $content);
+    }
+
+    /**
+     * The table plugin separates the rows on line breaks and the cells on pipes, so a value
+     * containing either of them has to be kept out of its way. Pipes are wrapped in a no-parse tag,
+     * which the plugin sets aside before splitting the cells, an HTML entity being decoded too early
+     * to protect anything.
+     *
+     * @param $value
+     * @return string
+     */
+    public function escapeWikiCell($value)
+    {
+        $value = preg_replace('/\s*\R\s*/', ' ', (string) $value);
+
+        return str_replace('|', '~np~|~/np~', $value);
+    }
+
+    /**
+     * Groups the preferences by the administration page they are shown on, so that each group can be
+     * exported as its own table. Preferences shown on several pages are grouped under the first one.
+     *
+     * @param $data
+     * @return array group name => rows, ungrouped preferences last. A single unnamed group is
+     *               returned when the locations are not part of the export.
+     */
+    public function groupByLocation($data)
+    {
+        if (empty($data) || ! isset(reset($data)['locations'])) {
+            return ['' => $data];
+        }
+
+        $ungrouped = tra('Other');
+        $groups = [];
+
+        foreach ($data as $values) {
+            $location = trim(explode(',', $values['locations'])[0]);
+            $group = $location !== '' ? ucfirst(explode('/', $location)[0]) : $ungrouped;
+            $groups[$group][] = $values;
+        }
+
+        ksort($groups);
+
+        if (isset($groups[$ungrouped])) {
+            $rows = $groups[$ungrouped];
+            unset($groups[$ungrouped]);
+            $groups[$ungrouped] = $rows;
+        }
+
+        return $groups;
     }
 
     /**
