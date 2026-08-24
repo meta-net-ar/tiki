@@ -4627,6 +4627,10 @@ class TikiLib extends TikiDb_Bridge
             return false;
         }
 
+        if ($definition && $definition['in_conflict']) {
+            return false;
+        }
+
         $preferences = $this->table('tiki_preferences');
         $preferences->insertOrUpdate(['value' => is_array($value) ? serialize($value) : $value], ['name' => $name]);
 
