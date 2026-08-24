@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, esmExternalRequirePlugin } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -217,7 +217,6 @@ export default defineConfig(({ command, mode }) => {
                     "jquery-ui",
                     "jquery-validation",
                     "mermaid",
-                    "moment",
                     /^moment\/.+/, //Moment submodules
                     "pivottablejs",
                     "plyr",
@@ -271,6 +270,11 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         plugins: [
+            // Own this external here to rewrite moment-timezone's require("moment") for browsers.
+            // https://rolldown.rs/builtin-plugins/esm-external-require
+            esmExternalRequirePlugin({
+                external: ["moment"],
+            }),
             vue({
                 template: {
                     transformAssetUrls: {
