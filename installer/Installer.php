@@ -117,6 +117,18 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $this->assureDefaultCharSetIsAlignedWithTikiSchema();
         $this->assureInnoDdTableRowFormatIsDynamicOrBetter();
 
+        foreach (Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch) {
+            try {
+                $this->installPatch($patchName);
+            } catch (Exception $e) {
+                if ($e->getCode() != 2) {
+                    throw $e;
+                } else {
+                    return false;
+                }
+            }
+        }
+
         $TWV = new TWVersion();
 
         // If a Mysql data file exists, use that. Very fast
@@ -137,17 +149,6 @@ class Installer extends TikiDb_Bridge implements SplSubject
         } elseif (file_exists($secdb)) {
             // Run single inserts
             $this->runFile($secdb, false);
-        }
-        foreach (Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch) {
-            try {
-                $this->installPatch($patchName);
-            } catch (Exception $e) {
-                if ($e->getCode() != 2) {
-                    throw $e;
-                } else {
-                    return false;
-                }
-            }
         }
 
         foreach ($this->scripts as $script) {
