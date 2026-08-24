@@ -162,6 +162,17 @@ $(document).ready(() => {
         return false;
     });
 
+    $("#cookieConsentPreferences")
+        .on("show.bs.collapse", () => {
+            $("#cookieConsentInitialActions").addClass("d-none");
+        })
+        .on("shown.bs.collapse", function () {
+            $(this).find("input:not(:disabled), button").first().trigger("focus");
+        })
+        .on("hidden.bs.collapse", () => {
+            $("#cookieConsentInitialActions").removeClass("d-none");
+        });
+
     if (jqueryTiki.cookie_consent_mode === "banner") {
         setTimeout(() => {
             $(`#${jqueryTiki.cookie_consent_dom_id}`).slideDown("slow");

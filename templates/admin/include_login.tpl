@@ -203,6 +203,7 @@
                         {preference name=cookie_consent_expires}
                         {preference name=cookie_consent_description}
                         {preference name=cookie_consent_mode}
+                        {preference name=cookie_consent_simplified_ui}
                         {preference name=cookie_consent_dom_id}
                         {preference name=cookie_consent_disable_builtin_categories}
                         {preference name=cookie_consent_disable}
