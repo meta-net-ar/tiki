@@ -216,11 +216,22 @@ class Services_File_Controller
         $cat_name = $name;
         $cat_href = "tiki-download_file.php?fileId=$fileId";
 
-        if ($categories) {
-            $_REQUEST['cat_categories'] = $categories;
-            $_REQUEST["cat_categorize"] = 'on';
+        // Categories are either posted by the form or, on a replace, already on the file.
+        $postedCategories = [];
+        if (isset($_REQUEST['cat_categorize']) && $_REQUEST['cat_categorize'] === 'on' && ! empty($_REQUEST['cat_categories'])) {
+            $postedCategories = array_filter(array_map('intval', (array) $_REQUEST['cat_categories']));
         }
-        include('categorize.php');
+
+        if ($postedCategories) {
+            $_REQUEST['cat_categories'] = $postedCategories;
+            include('categorize.php');
+        } elseif ($categories) {
+            // Replacing a file with nothing posted: keep what it already had.
+            $_REQUEST['cat_categories'] = $categories;
+            $_REQUEST['cat_categorize'] = 'on';
+            include('categorize.php');
+        }
+        // Otherwise skip: categorize.php has no no-op path and would clear the file's categories.
 
         $filegallib = TikiLib::lib('filegal');
         $info = $filegallib->get_file_info($fileId);
