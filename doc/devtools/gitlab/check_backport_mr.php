@@ -7,7 +7,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 /**
- * Warns when a merge request targeting a release branch has an unfilled Backport template.
+ * Fails when a merge request targeting a release branch has an unfilled Backport template.
  *
  * Runs from gitlab-ci on merge request pipelines, reading the predefined
  * CI_MERGE_REQUEST_DESCRIPTION, so it also works for merge requests from forks.
@@ -38,7 +38,7 @@ if (! preg_match('/^\d+\.x$/', $target)) {
 
 // Only merge requests that actually used the Backport template get the full check.
 if (! str_contains($description, 'dev.tiki.org/Backport-Policy')) {
-    echo color('This merge request targets release branch "' . $target . '" but does not use the Backport template.', 'yellow') . PHP_EOL;
+    echo color('This merge request targets release branch "' . $target . '" but does not use the Backport template.', 'red') . PHP_EOL;
     echo 'If this is a backport, pick the "Backport" description template and fill it in.' . PHP_EOL;
     echo 'Run php doc/devtools/gitlab/backport_mr.php ' . $target . ' to fill section 1 automatically.' . PHP_EOL;
     exit(1);
@@ -98,6 +98,6 @@ foreach ($problems as $problem) {
 }
 
 echo PHP_EOL;
-echo color(count($problems) . ' problem(s) found. See ' . POLICY_URL, 'yellow') . PHP_EOL;
+echo color(count($problems) . ' problem(s) found. See ' . POLICY_URL, 'red') . PHP_EOL;
 
 exit(1);

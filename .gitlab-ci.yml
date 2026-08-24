@@ -255,7 +255,7 @@ shlint:
     - shellcheck ./*.sh
     - shellcheck ./doc/devtools/*.sh
 
-#Warns when a merge request into a release branch has an unfilled Backport template.
+#Fails when a merge request into a release branch has an unfilled Backport template.
 #Uses CI_MERGE_REQUEST_DESCRIPTION, it works for forks.
 #See https://dev.tiki.org/Backport-Policy
 backport-template:
@@ -264,7 +264,6 @@ backport-template:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php doc/devtools/gitlab/check_backport_mr.php
-  allow_failure: true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^\d+\.x$/'
 
