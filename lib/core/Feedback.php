@@ -99,6 +99,15 @@ class Feedback
             die;
         }
 
+        if (
+            ($httpCode == 401 || $httpCode == 403)
+            && \Tiki\Sections::getCurrentSection() === \Tiki\Sections::SECTION_ADMIN_LAYOUT
+        ) {
+            // Don't leak admin UI (UAB layout, admin theme) to unauthorized visitors (WYSIWYCA).
+            // SECTION_ADMIN still counts as "admin" for theme purposes, so go further.
+            \Tiki\Sections::setCurrentSection(\Tiki\Sections::SECTION_GLOBAL);
+        }
+
         $errorPage = $errorPage ?? "error.tpl";
         $smarty = TikiLib::lib('smarty');
         $smarty->assign('errortype', $httpCode);
