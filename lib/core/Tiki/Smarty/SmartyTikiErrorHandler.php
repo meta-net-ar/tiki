@@ -80,7 +80,7 @@ class SmartyTikiErrorHandler
                 $suppressedAnError = true;
             } elseif (
                 preg_match(
-                    '/^(Undefined index|Undefined array key|Trying to access array offset on value of type)/',
+                    '/^(Undefined index|Undefined array key|Trying to access array offset on (value of type|null))/',
                     $errstr
                 )
             ) {
