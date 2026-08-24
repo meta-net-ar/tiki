@@ -27,7 +27,10 @@ export default async function (file, maxWidth, maxHeight) {
         .serializeArray()
         .forEach((item) => {
             if (item.name.endsWith("[]")) {
-                (result[item.name] ||= []).push(item.value);
+                if (!Array.isArray(result[item.name])) {
+                    result[item.name] = [];
+                }
+                result[item.name].push(item.value);
             } else {
                 result[item.name] = item.value;
             }
