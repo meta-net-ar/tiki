@@ -304,12 +304,8 @@ function updateSecdb($version)
         sort($queries);
         fwrite($fp, "start transaction;\n");
         fwrite($fp, "DELETE FROM `tiki_secdb`;\n");
-        // This index was originally created with a size limit that would raise an error on some versions,
-        // notably on 18.0. Since this file is executed before any patch in installer/schema, the fix had to
-        // be done here. It's a quick operation because table is empty, so no harm in leaving this here forever.
-        fwrite($fp, "ALTER TABLE `tiki_secdb` DROP PRIMARY KEY, ADD PRIMARY KEY (`filename`(171),`tiki_version`(20));\n\n");
-
-        $insertString = 'INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES ';
+        fwrite($fp, "\n");
+        $insertString = 'INSERT INTO `tiki_secdb` (`filename`, `filename_hash`, `md5_value`, `tiki_version`) VALUES ';
 
         $extendedInsertSize = 0;
         $extendedInsertMaxSize = 1 * 1024 * 1024 - 100; // 1MB with 100 bytes safety limit, some old versions of Mysql had max_allowed_packet=1MB
@@ -422,7 +418,8 @@ function build_secdb_queries($dir, $version, &$queries, $excludes = [])
 
                 if (is_readable($entry)) {
                     $hash = md5_file($entry);
-                    $queries[] = "('$file', '$hash', '$version')";
+                    $filenameHash = md5($file);
+                    $queries[] = "('$file', '$filenameHash', '$hash', '$version')";
                 }
             }
         }
