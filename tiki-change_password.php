@@ -75,8 +75,7 @@ if ($server_new_user_validation) {
 
 $smarty->assign('userlogin', $_REQUEST["user"]);
 if (
-    empty($_REQUEST['oldpass'])
-    && $server_new_user_validation
+    $server_new_user_validation
     && ! empty($_SESSION['last_validation']['pass'])
 ) {
     $smarty->assign('oldpass', $_SESSION['last_validation']['pass']);

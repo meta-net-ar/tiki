@@ -27,6 +27,7 @@ $inputConfiguration = [
             'convert_to_utf8' => 'xss',
             'db' => 'alpha',
             'dbinfo' => 'alpha',
+            'defaultpass' => 'raw',
             'email_test_cc' => 'digits',
             'email_test_to' => 'email',
             'use_proxy' => 'alpha',
@@ -172,6 +173,15 @@ $prefs['lang_use_db'] = 'n';
 // Which step of the installer
 if (empty($_POST['install_step'])) {
     $install_step = '0';
+
+    if (isset($_REQUEST['setdbversion'])) {
+        // Sets dbversion_tiki when installing the WebDeploy package
+        $db = fopen('db/' . $tikidomainslash . 'local.php', 'a');
+        require_once 'lib/setup/twversion.class.php';
+        $TWV = new TWVersion();
+        fwrite($db, "\n\$dbversion_tiki='" . $TWV->getBaseVersion() . "';\n");
+        fclose($db);
+    }
 } else {
     $install_step = $_POST['install_step'];
 
@@ -308,6 +318,20 @@ if ($errors) {
 // if local then build dsn and try to connect
 //   then get con or nocon
 
+//adodb settings
+
+if (! defined('ADODB_FORCE_NULLS')) {
+    define('ADODB_FORCE_NULLS', 1);
+}
+
+if (! defined('ADODB_ASSOC_CASE')) {
+    define('ADODB_ASSOC_CASE', 2);
+}
+
+if (! defined('ADODB_CASE_ASSOC')) { // typo in adodb's driver for sybase? // so do we even need this without sybase? What's this?
+    define('ADODB_CASE_ASSOC', 2);
+}
+
 require_once('lib/tikilib.php');
 
 // Get list of available languages
@@ -325,21 +349,38 @@ $dbconn = (TikiDb::isAvailable()) ? TikiDb::get() : false;
 $installer = null;
 if (file_exists($local)) {
     // include the file to get the variables
+    $default_api_tiki = $api_tiki;
+    $api_tiki = '';
     include $local;
     if (! $client_charset_forced = isset($client_charset)) {
         $client_charset = '';
     }
+    $previousDbApi = $api_tiki;
+    if (empty($api_tiki)) {
+        $api_tiki_forced = false;
+        $api_tiki = $default_api_tiki;
+        if (! empty($dbversion_tiki) && $dbversion_tiki[0] < 4) {
+            $previousDbApi = 'adodb'; // AdoDB was the default DB abstraction layer before 4.0
+        }
+    } else {
+        $api_tiki_forced = true;
+    }
+
+    unset($default_api_tiki);
 
     // In case of replication, ignore it during installer.
     unset($shadow_dbs, $shadow_user, $shadow_pass, $shadow_host);
+    if ($dbversion_tiki == '1.10') {
+        $dbversion_tiki = '2.0';
+    }
 
     $dbconn = false;
     $smarty->assign('resetdb', 'n');
-    if ($dbconn = initTikiDB($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, $dbTiki)) {
+    if ($dbconn = initTikiDB($api_tiki, $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, $dbTiki)) {
         $smarty->assign('resetdb', isset($_POST['reset']) ? 'y' : 'n');
         $installer = Installer::getInstance();
         if (! $client_charset_forced) {
-            write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, '');
+            write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_charset, ($api_tiki_forced ? $api_tiki : ''), $dbversion_tiki);
             $logslib->add_log('install', 'database credentials written to file with hostname=' . $host_tiki
                 . '; dbname=' . $dbs_tiki . '; dbuser=' . $user_tiki);
         }
@@ -367,7 +408,7 @@ if (file_exists($local)) {
 }
 
 if ($dbconn && has_tiki_db()) {
-    $admin_acc = has_admin();
+    $admin_acc = has_admin($api_tiki);
 }
 
 if ($admin_acc == 'n') {
@@ -425,6 +466,7 @@ if (
             && ! empty($_POST['root_pass'])
         ) {
             $dbconn = initTikiDB(
+                $api_tiki,
                 $_POST['host'],
                 $_POST['root_user'],
                 $_POST['root_pass'],
@@ -434,6 +476,7 @@ if (
             );
         } else {
             $dbconn = initTikiDB(
+                $api_tiki,
                 $_POST['host'],
                 $_POST['user'],
                 $_POST['pass'],
@@ -485,10 +528,13 @@ if ($dbconn) {
 // Some initializations to avoid PHP error messages
 $smarty->assign('tikidb_created', false);
 $smarty->assign('tikidb_is20', false);
+$smarty->assign('tikidb_oldPerms', 0);
 
 if ($dbconn) {
     $has_tiki_db = has_tiki_db();
     $smarty->assign('tikidb_created', $has_tiki_db);
+    $oldPerms = $installer->getOne('SELECT COUNT(*) FROM `users_permissions` WHERE `permDesc` = \'Can view categorized items\'');
+    $smarty->assign('tikidb_oldPerms', $oldPerms);
 
     if ($install_step == '6' && $has_tiki_db) {
         if (isset($_POST['install_type']) && $_POST['install_type'] === 'scratch') {
@@ -499,7 +545,7 @@ if ($dbconn) {
         }
         update_preferences($prefs);
         $smarty->assign('admin_email', get_admin_email());
-        $smarty->assign('upgradefix', 'y');
+        $smarty->assign('upgradefix', (empty($dbversion_tiki) || $dbversion_tiki[0] < 4) ? 'y' : 'n');
     }
     $smarty->assign('tikidb_is20', has_tiki_db_20());
 }
@@ -533,6 +579,8 @@ if (
         // Set Administrator password
         $randompass = TikiLib::lib('user')->genPass();
         set_system_administrator_password($randompass);
+        $_SESSION['install_admin_defaultpass'] = $randompass;
+        $_SESSION['install_type'] = 'scratch';
         $smarty->assign('defaultpass', $randompass);
         $default_password_field = '<input type="hidden" name="defaultpass" value="' . $randompass . '">';
         $smarty->assign('default_password_field', $default_password_field);
@@ -626,6 +674,11 @@ if ($install_step == '9') {
         touch('db/' . $tikidomainslash . 'lock');
     }
 
+    $install_admin_defaultpass = $_POST['defaultpass'] ?? $_SESSION['install_admin_defaultpass'] ?? null;
+    if (empty($install_type) && ! empty($_SESSION['install_type'])) {
+        $install_type = $_SESSION['install_type'];
+    }
+
     $userlib = TikiLib::lib('user');
     $cachelib = TikiLib::lib('cache');
     if (session_id()) {
@@ -636,6 +689,11 @@ if ($install_step == '9') {
     if ($install_type == 'scratch') {
         initialize_prefs(true);
         TikiLib::lib('unifiedsearch')->rebuild();
+        if (! empty($install_admin_defaultpass)) {
+            $_SESSION['pending_new_user_password'] = ['user' => 'admin'];
+            $_SESSION['last_validation'] = ['user' => 'admin', 'pass' => $install_admin_defaultpass];
+            $defaultpass = $install_admin_defaultpass;
+        }
         // Always pass oldpass so first admin password setup cannot rely on a forgeable flag
         $u = 'tiki-change_password.php?user=admin&oldpass=' . urlencode($defaultpass ?? 'admin') . '&newuser=y';
         $tikilib = TikiLib::lib('tiki');
