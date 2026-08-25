@@ -24,7 +24,7 @@ function wikiplugin_fade_info()
                 'filter' => 'wikicontent',
                 'description' => tra('Optional visible summary that stays shown above the collapsible details (Wiki syntax). It is displayed under the label as a subtitle; if no label is set, it becomes the heading of the block.'),
                 'default' => '',
-                'since' => '30.1',
+                'since' => '30.2',
             ],
             'expanded' => [
                 'required' => false,
@@ -32,7 +32,7 @@ function wikiplugin_fade_info()
                 'filter' => 'alpha',
                 'description' => tra('Start with details shown (y) or hidden (n). If not set, the site preference for the Fade plugin applies.'),
                 'default' => '',
-                'since' => '30.1',
+                'since' => '30.2',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
@@ -50,7 +50,7 @@ function wikiplugin_fade_info()
                     '</code>'
                 ),
                 'default' => '',
-                'since' => '30.1',
+                'since' => '30.2',
             ],
             'label' => [
                 'required' => true,
@@ -131,7 +131,6 @@ function wikiplugin_fade_info()
 function wikiplugin_fade($body, $params)
 {
     static $id = 0;
-    static $fadeAssetsAdded = false;
 
     $params['show_speed'] = validate_speed($params['show_speed']);
     $params['hide_speed'] = validate_speed($params['hide_speed']);
@@ -140,10 +139,7 @@ function wikiplugin_fade($body, $params)
     $unique_link = $unique . '-link';
 
     $headerlib = TikiLib::lib('header');
-    if (! $fadeAssetsAdded) {
-        $fadeAssetsAdded = true;
-        $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-fade.js', true);
-    }
+    $headerlib->add_js_module('import "@tiki/plugins/fade";');
 
     $body = trim($body);
     $body = TikiLib::lib('parser')->parse_data($body);

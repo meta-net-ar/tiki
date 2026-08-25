@@ -213,7 +213,7 @@ function wikiplugin_button_info()
                 'required' => false,
                 'name' => tra('Fade Action'),
                 'description' => tra('Structured FADE action for grouped collapsibles.'),
-                'since' => '30.1',
+                'since' => '30.2',
                 'filter' => 'alpha',
                 'default' => '',
                 'advanced' => true,
@@ -233,7 +233,7 @@ function wikiplugin_button_info()
                     '<code>',
                     '</code>'
                 ),
-                'since' => '30.1',
+                'since' => '30.2',
                 'filter' => 'text',
                 'default' => '',
                 'advanced' => true,
@@ -255,8 +255,6 @@ function wikiplugin_button_info()
 
 function wikiplugin_button($data, $params)
 {
-    static $fadeAssetsAdded = false;
-
     $parserlib = TikiLib::lib('parser');
     $smarty = TikiLib::lib('smarty');
     $headerlib = TikiLib::lib('header');
@@ -316,10 +314,7 @@ function wikiplugin_button($data, $params)
         $existingData['fade-group'] = $fadeGroup;
         $params['data'] = http_build_query($existingData, '', '&', PHP_QUERY_RFC3986);
 
-        if (! $fadeAssetsAdded) {
-            $fadeAssetsAdded = true;
-            $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-fade.js', true);
-        }
+        $headerlib->add_js_module('import "@tiki/plugins/fade";');
     }
 
     $content = \SmartyTiki\FunctionHandler\Button::render($params, $smarty->getEmptyInternalTemplate());
