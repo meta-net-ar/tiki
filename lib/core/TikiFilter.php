@@ -55,8 +55,8 @@ class TikiFilter
                 // Transforms a scalar phrase into an integer. eg. '-4 is less than 0' returns -4, while '' returns 0
                 return new ToInt();
 
-	    /** Float return types **/
-	    case 'float':
+            /** Float return types **/
+            case 'float':
                 return new ToFloat();
 
             /** Boolean return types **/
