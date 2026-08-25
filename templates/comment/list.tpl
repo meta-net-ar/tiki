@@ -32,6 +32,107 @@
         <script type="text/javascript">
             $(function() {
                 $('#comment-container').applyColorbox();
+
+                {if $prefs.comments_resolved_threads eq 'y'}
+                    function initResolvedThreads() {
+                        var hash = window.location.hash;
+                        $('.comment-thread-wrapper[data-resolved="true"]').each(function() {
+                            var $wrapper = $(this);
+                            var $collapse = $wrapper.find('.collapse').first();
+                            if ($collapse.length) {
+                                var shouldExpand = false;
+                                if (hash && hash.match(/^#threadId=?\d+/)) {
+                                    var targetSelector = hash.replace('=', '');
+                                    if ($wrapper.is(targetSelector) || $wrapper.find(targetSelector).length > 0) {
+                                        shouldExpand = true;
+                                    }
+                                }
+                                
+                                try {
+                                    if (shouldExpand) {
+                                        $collapse.addClass('show');
+                                        $wrapper.find('.comment-resolved-header').attr('aria-expanded', 'true');
+                                        $wrapper.find('.comment-collapse-icon').addClass('comment-collapse-icon-open');
+                                        setTimeout(function() {
+                                            var targetId = hash.replace('=', '');
+                                            var $target = $(targetId);
+                                            if ($target.length) {
+                                                $('html, body').stop().animate({
+                                                    scrollTop: $target.offset().top - 150
+                                                }, 800);
+                                                $target.addClass('comment-highlight');
+                                                setTimeout(function() { $target.removeClass('comment-highlight'); }, 3000);
+                                            }
+                                        }, 700);
+                                    } else {
+                                        $collapse.removeClass('show');
+                                        $wrapper.find('.comment-resolved-header').attr('aria-expanded', 'false');
+                                        $wrapper.find('.comment-collapse-icon').removeClass('comment-collapse-icon-open');
+                                    }
+                                } catch (e) {
+                                    // Ignore errors during scroll/expand initialization
+                                }
+                            }
+                        });
+                    }
+                    initResolvedThreads();
+                    $(window).on('hashchange', function() {
+                        initResolvedThreads();
+                    });
+                    $(document).off('click.resolved').on('click.resolved', '.comment-resolved-header', function() {
+                        // Toggle handled by Bootstrap collapse
+                    });
+                    $(document).on('shown.bs.collapse', '.comment-thread-wrapper .collapse', function() {
+                        var $wrapper = $(this).closest('.comment-thread-wrapper');
+                        $wrapper.find('.comment-collapse-icon').addClass('comment-collapse-icon-open');
+                        $wrapper.find('.comment-resolved-header').attr('aria-expanded', 'true');
+                    });
+                    $(document).on('hidden.bs.collapse', '.comment-thread-wrapper .collapse', function() {
+                        var $wrapper = $(this).closest('.comment-thread-wrapper');
+                        $wrapper.find('.comment-collapse-icon').removeClass('comment-collapse-icon-open');
+                        $wrapper.find('.comment-resolved-header').attr('aria-expanded', 'false');
+                    });
+                    $(document).on('tiki.ajax.redraw', function() {
+                        initResolvedThreads();
+                    });
+
+                    $(document).on('click', '.resolve-direct', function(e) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        var $btn = $(this);
+                        var url = $btn.data('url');
+                        
+                        $btn.prop('disabled', true).find('i, .tikiicon').addClass('fa-spin-fast');
+                        
+                        $.post(url, function(data) {
+                            if (data.status === 'DONE') {
+                                var $container = $('#comments, #comment-container, .comment-container').filter(function() {
+                                    return typeof $(this).comment_load === 'function';
+                                }).first();
+
+                                if ($container.length) {
+                                    $container.comment_load($.service('comment', 'list', {
+                                        objectId: objectId,
+                                        type: objectType,
+                                        modal: 1
+                                    }));
+                                } else {
+                                    window.location.reload();
+                                }
+                            } else if (data.errors) {
+                                alert(data.errors.join("\n"));
+                                $btn.prop('disabled', false).find('i, .tikiicon').removeClass('fa-spin-fast');
+                                if (typeof $.tikiModal === 'function') $.tikiModal();
+                            }
+                        }, 'json').fail(function() {
+                            // Ensure the spinner is removed on error
+                            $btn.prop('disabled', false).find('i, .tikiicon').removeClass('fa-spin-fast');
+                            if (typeof $.tikiModal === 'function') $.tikiModal();
+                            // Optionally show a brief error
+                            if (typeof showMessage === 'function') showMessage(tr('An error occurred while processing the request'), 'error');
+                        });
+                    });
+                {/if}
             })
         </script>
     {else}
@@ -86,5 +187,50 @@
     <script type="text/javascript">
         var ajax_url = '{$base_url}';
         var objectId = '{$objectId|escape:'javascript'}';
+        var objectType = '{$type|escape:'javascript'}';
     </script>
+    
+    {if $prefs.comments_resolved_threads eq 'y'}
+    <style>
+        {* Hide modal chrome when loaded inside the comment container *}
+        #comments .modal-header, 
+        #comments .modal-footer, 
+        #comments .btn-close, 
+        #comments .modal-content > .btn.btn-link,
+        .comment-container .modal-header,
+        .comment-container .modal-footer,
+        .comment-container .btn-close,
+        .comment-container .modal-content > .btn.btn-link {
+            display: none !important;
+        }
+        
+        .comment-resolved-header {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border-left: 4px solid var(--bs-success) !important;
+        }
+        .comment-resolved-header:hover {
+            background-color: rgba(var(--bs-success-rgb), 0.05) !important;
+        }
+        .comment-collapse-icon {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--bs-success);
+        }
+        .comment-collapse-icon-open {
+            transform: rotate(90deg);
+        }
+        .comment-resolved {
+            border-left: 2px solid var(--bs-success-bg-subtle);
+            padding-left: 1rem;
+            opacity: 0.85;
+        }
+        .comment-highlight {
+            animation: commentHighlightPulse 2s ease-in-out infinite;
+        }
+        @keyframes commentHighlightPulse {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(var(--bs-warning-rgb), 0.15); }
+        }
+    </style>
+    {/if}
 {/block}

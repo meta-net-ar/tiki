@@ -726,6 +726,7 @@ CREATE TABLE `tiki_comments` (
   `archived` char(1) default NULL,
   `approved` char(1) NOT NULL default 'y',
   `locked` char(1) NOT NULL default 'n',
+  `is_resolved` char(1) NOT NULL default 'n',
   PRIMARY KEY (`threadId`),
   KEY `title` (`title`(191)),
   KEY `data` (`data`(191)),
