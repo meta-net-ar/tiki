@@ -43,10 +43,10 @@ class TWVersion
 
     public function __construct()
     {
-        $this->branch   = 'stable';
+        $this->branch   = 'end-of-life';
 
         // Set everything else, including defaults.
-        $this->version  = '29.4';
+        $this->version  = '29.5vcs';
         $this->star     = 'Bellatrix';
         $this->releases = [];
 
