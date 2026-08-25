@@ -816,6 +816,7 @@ function postForum($forumId, $subject)
     }
 
     $smarty->assign('feedbacks', $feedbacks);
+    $smarty->assign('forumName', $forum_info['name']);
     return $threadId;
 }
 

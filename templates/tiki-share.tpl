@@ -2,7 +2,7 @@
     {if $report != 'y'}{tr}Share this page{/tr}{else}{tr}Report this page{/tr}{/if}
 {/title}
 
-{if isset($sent) && empty($errors)}
+{if isset($sent) && (isset($share_generated_link) || (isset($emailSent) && $emailSent) || isset($tweetId) || (isset($facebookId) && $facebookId) || isset($messageSent) || (isset($threadId) && $threadId > 0))}
     <div id="success" class="alert alert-success">
         {icon name='ok' alt="{tr}OK{/tr}" style="vertical-align:middle" align="left"}
         {if $report ne 'y'}
@@ -51,7 +51,7 @@
         {/if}
         {if isset($threadId) and $threadId>0}
             <div>
-                {tr}The link was published in a{/tr} <a href="tiki-view_forum_thread.php?comments_parentId={$threadId}>{tr}forum{/tr}</a>
+                {tr}The link was published in{/tr} <a href="tiki-view_forum_thread.php?comments_parentId={$threadId}">{$forumName|escape}</a>
                 <br>
                 {foreach from=$feedbacks item=feedback}
                     {$feedback}
@@ -468,14 +468,14 @@
                             <div class="col-sm-9">
                                 <select name="forumId" id="forumId" class="form-control">
                                     {foreach from=$forums item="forum"}
-                                        <option value="{$forum.forumId}"{if $forum.forumId==$forumId} selected="selected"{/if}>
+                                        <option value="{$forum.forumId}" data-forum-use-password="{$forum.forum_use_password}"{if $forum.forumId==$forumId} selected="selected"{/if}>
                                             {$forum.name}{if $forum.forum_use_password!='n'} ({tr}password-protected{/tr}){/if}
                                         </option>
                                     {/foreach}
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="mb-3 row" id="forum-password-row">
                             <label class="col-form-label col-sm-3">
                                 {tr}Password{/tr}
                             </label>

@@ -93,13 +93,21 @@ $(function () {
             type: "POST",
             data: postData,
             success: function (data) {
-                var shrsuccess = $($.parseHTML(data)).find("#success").html();
-                var shrerror = $($.parseHTML(data)).find("#shareerror").html();
+                var parsed = $($.parseHTML(data));
+                var shrsuccess = parsed.find("#success").html();
+                var shrerror = parsed.find("#shareerror").html();
+                var out = "";
                 if (shrsuccess) {
-                    $("#ajaxmsg").html("<div class='alert alert-success'>" + shrsuccess + "</div>");
-                    $("#addresses").val("");
-                } else if (shrerror && $.trim(shrerror)) {
-                    $("#ajaxmsg").html("<div class='alert alert-warning'>" + shrerror + "</div>");
+                    out += "<div class='alert alert-success'>" + shrsuccess + "</div>";
+                }
+                if (shrerror && $.trim(shrerror)) {
+                    out += "<div class='alert alert-warning'>" + shrerror + "</div>";
+                }
+                if (out) {
+                    $("#ajaxmsg").html(out);
+                    if (shrsuccess) {
+                        $("#addresses").val("");
+                    }
                 } else {
                     $("#ajaxmsg").html(
                         "<div class='alert alert-warning'>" +
@@ -126,22 +134,33 @@ $(function () {
         return false;
     });
 
-    $(".share-email-hide").on("click", function () {
-        $(".share-email-details").addClass("d-none");
-    });
-    $(".share-email-show").on("click", function () {
-        $(".share-email-details").removeClass("d-none");
-    });
-    $(".share-message-hide").on("click", function () {
-        $(".share-message-details").addClass("d-none");
-    });
-    $(".share-message-show").on("click", function () {
-        $(".share-message-details").removeClass("d-none");
-    });
-    $(".share-forum-hide").on("click", function () {
-        $(".share-forum-details").addClass("d-none");
-    });
-    $(".share-forum-show").on("click", function () {
-        $(".share-forum-details").removeClass("d-none");
-    });
+    function shareBindSection(showSel, hideSel, detailsSel) {
+        var $show = $(showSel);
+        if (!$show.length) {
+            return; // report mode: do_email is a hidden input, no radios to sync
+        }
+        function sync() {
+            if ($show.is(":checked")) {
+                $(detailsSel).removeClass("d-none");
+            } else {
+                $(detailsSel).addClass("d-none");
+            }
+        }
+        $(showSel + ", " + hideSel).on("change", sync);
+        sync();
+    }
+    shareBindSection(".share-email-show", ".share-email-hide", ".share-email-details");
+    shareBindSection(".share-message-show", ".share-message-hide", ".share-message-details");
+    shareBindSection(".share-forum-show", ".share-forum-hide", ".share-forum-details");
+
+    function shareToggleForumPassword() {
+        var use = $("#forumId option:selected").attr("data-forum-use-password");
+        if (use && use !== "n") {
+            $("#forum-password-row").removeClass("d-none");
+        } else {
+            $("#forum-password-row").addClass("d-none");
+        }
+    }
+    $("#forumId").on("change", shareToggleForumPassword);
+    shareToggleForumPassword();
 });
