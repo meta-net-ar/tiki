@@ -33,7 +33,10 @@ function transformContainerSelects(containerElement) {
             elementPlusUi.attr("collapse-tags", selectPreferences.collapseTags);
             elementPlusUi.attr("max-collapse-tags", selectPreferences.maxCollapseTags);
             elementPlusUi.attr("filterable", selectPreferences.filterable);
-            elementPlusUi.attr("allow-create", selectPreferences.allowCreate);
+            // A field can opt into free-text entry via data-allow-create, overriding
+            // the global preference for that select only.
+            const allowCreate = $(this).data("allow-create") ?? selectPreferences.allowCreate;
+            elementPlusUi.attr("allow-create", allowCreate);
             elementPlusUi.attr("ordering", selectPreferences.ordering);
 
             if ($(this).data("remote-source-url")) {
