@@ -87,6 +87,11 @@ lang = {
     "September" : "septembre",
     "October" : "octobre",
     "November" : "novembre",
-    "December" : "décembre"
+    "December" : "décembre",
+    "From URL" : "Depuis l'URL",
+    "To URL" : "Vers l'URL",
+    "Add Redirect" : "Ajouter une redirection",
+    "Existing page" : "Page existante",
+    "Custom URL" : "URL personnalisée",
     // remember the IE does not support ending comma on last item
 };

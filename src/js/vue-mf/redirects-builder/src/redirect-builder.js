@@ -25,6 +25,8 @@ const vueLifecycles = singleSpaVue({
         },
     },
     handleInstance: (app) => {
+        const translateFn = typeof window.tr === "function" ? window.tr : (key) => key;
+        app.config.globalProperties.$t = translateFn;
         if (import.meta.env.MODE === "development") {
             console.log(import.meta.env);
         }

@@ -2,22 +2,22 @@
     <div class="table-responsive">
         <div class="d-flex justify-content-end mb-3">
             <button type="button" class="btn btn-primary btn-sm" @click="addRedirect">
-                Add Redirect
+                {{ $t('Add Redirect') }}
             </button>
         </div>
 
         <table class="table table-striped table-hover table-bordered align-middle mb-0 redirects-table">
             <thead class="table-light">
                 <tr>
-                    <th scope="col">From URL</th>
-                    <th scope="col">To URL</th>
-                    <th scope="col">Code</th>
-                    <th scope="col" class="text-end">Actions</th>
+                    <th scope="col">{{ $t('From URL') }}</th>
+                    <th scope="col">{{ $t('To URL') }}</th>
+                    <th scope="col">{{ $t('Code') }}</th>
+                    <th scope="col" class="text-end">{{ $t('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr v-if="!redirectsData.length">
-                    <td colspan="4" class="text-muted text-center py-4">No redirects found.</td>
+                    <td colspan="4" class="text-muted text-center py-4">{{ $t('No redirects found.') }}</td>
                 </tr>
 
                 <tr v-for="(redirect, index) in redirectsData" :key="redirect.relationId ?? index">
@@ -31,7 +31,7 @@
                                     type="radio"
                                     value="existing"
                                 >
-                                <label class="form-check-label" for="source-existing">Existing page</label>
+                                <label class="form-check-label" for="source-existing">{{ $t('Existing page') }}</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input
@@ -41,7 +41,7 @@
                                     type="radio"
                                     value="custom"
                                 >
-                                <label class="form-check-label" for="source-custom">Custom URL</label>
+                                <label class="form-check-label" for="source-custom">{{ $t('Custom URL') }}</label>
                             </div>
 
                             <select
@@ -88,7 +88,7 @@
                                     type="radio"
                                     value="existing"
                                 >
-                                <label class="form-check-label" for="target-existing">Existing page</label>
+                                <label class="form-check-label" for="target-existing">{{ $t('Existing page') }}</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input
@@ -98,7 +98,7 @@
                                     type="radio"
                                     value="custom"
                                 >
-                                <label class="form-check-label" for="target-custom">Custom URL</label>
+                                <label class="form-check-label" for="target-custom">{{ $t('Custom URL') }}</label>
                             </div>
                             <select
                                 v-if="editingDraft.target_mode === 'existing'"
@@ -151,13 +151,13 @@
                         <div v-if="isEditingRow(index)" class="d-flex flex-column align-items-end gap-2">
                             <div v-if="saveError" class="text-danger small">{{ saveError }}</div>
                             <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn-success" :disabled="!canSaveRedirect" @click="saveEdit(index)">Save</button>
-                                <button type="button" class="btn btn-outline-secondary" @click="cancelEdit(index)">Cancel</button>
+                                <button type="button" class="btn btn-success" :disabled="!canSaveRedirect" @click="saveEdit(index)">{{ $t('Save') }}</button>
+                                <button type="button" class="btn btn-outline-secondary" @click="cancelEdit(index)">{{ $t('Cancel') }}</button>
                             </div>
                         </div>
                         <div v-else class="btn-group btn-group-sm" role="group">
-                            <button type="button" class="btn btn-outline-primary" @click="startEdit(index)">Edit</button>
-                            <button type="button" class="btn btn-outline-danger" @click="deleteRedirect(index)">Delete</button>
+                            <button type="button" class="btn btn-outline-primary" @click="startEdit(index)">{{ $t('Edit') }}</button>
+                            <button type="button" class="btn btn-outline-danger" @click="deleteRedirect(index)">{{ $t('Delete') }}</button>
                         </div>
                     </td>
                 </tr>
