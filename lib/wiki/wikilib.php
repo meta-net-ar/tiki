@@ -1435,6 +1435,16 @@ class WikiLib extends TikiLib
         $result = $this->query($query, [$page]);
         $ret = [];
 
+        $backlinkIcons = [
+            'wiki page' => 'notepad',
+            'trackeritemfield' => 'database',
+            'article' => 'articles',
+            'post' => 'blog',
+            'forum post' => 'comments',
+            'calendar event' => 'calendar',
+        ];
+        $seenTrackerItems = [];
+
         while ($res = $result->fetchRow()) {
             $is_wiki_page = substr($res['fromPage'], 0, 11) != 'objectlink:';
             if ($is_wiki_page) {
@@ -1461,6 +1471,10 @@ class WikiLib extends TikiLib
                 if (! $itemObject->canView() || ! $itemObject->canViewField($fieldId)) {
                     continue;
                 }
+                if (isset($seenTrackerItems[$itemId])) {
+                    continue;
+                }
+                $seenTrackerItems[$itemId] = true;
             } else {
                 $objectperms = Perms::get(['type' => $type, 'object' => $objectId]);
                 if (! $objectperms->view) {
@@ -1469,6 +1483,7 @@ class WikiLib extends TikiLib
             }
             $aux["type"] = $type;
             $aux["objectId"] = $objectId;
+            $aux["icon"] = $backlinkIcons[$type] ?? (str_ends_with($type, 'comment') ? 'comment' : 'link');
             $ret[] = $aux;
         }
 
