@@ -9,7 +9,7 @@ export default defineStore("commentsUiStore", {
         // TODO: replace with the actual logged-in user once auth is wired into this module
         currentUser: "Angelo",
         searchQuery: "",
-        manuallyExpandedThreads: [], // messageIds of resolved root threads whose replies were manually expanded via the "Show replies" button.
+        manuallyToggledThreads: [],
     }),
     getters: {
         // Whether a single item (not its descendants) matches the current search query.
@@ -22,8 +22,8 @@ export default defineStore("commentsUiStore", {
                 item.title.toLowerCase().includes(query) || item.message.toLowerCase().includes(query) || item.author.toLowerCase().includes(query)
             );
         },
-        // Whether a resolved thread's replies were manually expanded despite the collapse.
-        isManuallyExpanded: (state) => (messageId) => state.manuallyExpandedThreads.includes(messageId),
+        // Whether a root thread's reply visibility was manually toggled away from its default.
+        isManuallyToggled: (state) => (messageId) => state.manuallyToggledThreads.includes(messageId),
         // Whether an item, or any of its descendants, matches the current search query.
         subtreeMatchesSearch(state) {
             return (messageId) => {
@@ -50,23 +50,31 @@ export default defineStore("commentsUiStore", {
 
             return parents.filter((root) => this.subtreeMatchesSearch(root.messageId));
         },
-        // Whether a resolved thread's replies should be shown despite the collapse: either the user expanded them manually, or the current search matches inside.
-        isThreadForciblyVisible(state) {
-            return (messageId) => this.isManuallyExpanded(messageId) || this.subtreeMatchesSearch(messageId);
+        // Whether a root thread's replies should currently be shown: resolved threads default to hidden and
+        // others to visible, a manual toggle flips that default either way, and a search match always wins.
+        // messageId must be a root thread's own id (parentId === 0) — every call site already only ever
+        // passes one, so this intentionally does not walk up the parentId chain to find it.
+        areRepliesVisible(state) {
+            return (messageId) => {
+                const rootThread = useCommentsStore().threads.find((element) => element.messageId === messageId);
+                const defaultVisible = !rootThread || rootThread.resoved !== 1;
+                const visible = this.isManuallyToggled(messageId) ? !defaultVisible : defaultVisible;
+                return visible || this.subtreeMatchesSearch(messageId);
+            };
         },
     },
     actions: {
         setSearchQuery(query) {
             this.searchQuery = query;
         },
-        // Toggles messageId in/out of manuallyExpandedThreads; never touches resoved,
+        // Toggles messageId in/out of manuallyToggledThreads; never touches resoved,
         // so this only affects display, not the actual resolved status.
-        toggleManualExpand(messageId) {
-            const index = this.manuallyExpandedThreads.indexOf(messageId);
+        toggleRepliesVisibility(messageId) {
+            const index = this.manuallyToggledThreads.indexOf(messageId);
             if (index !== -1) {
-                this.manuallyExpandedThreads.splice(index, 1);
+                this.manuallyToggledThreads.splice(index, 1);
             } else {
-                this.manuallyExpandedThreads.push(messageId);
+                this.manuallyToggledThreads.push(messageId);
             }
         },
         drawMessagesTree() {
@@ -76,14 +84,11 @@ export default defineStore("commentsUiStore", {
                 let totalHeight = 0;
                 let lastChildHeight = 0;
                 let targetClass = "";
-                let resolved = false;
+                let repliesHidden = false;
                 if (item.parentId === 0) {
                     targetClass = "replies-" + item.messageId;
                     margins = 16;
-                    // Treat the thread as "not resolved" for tree-line purposes when its replies
-                    // are actually being shown (manual expand or search match), so the connecting
-                    // line still gets drawn instead of being zeroed out below.
-                    resolved = item.resoved === 1 && !this.isThreadForciblyVisible(item.messageId);
+                    repliesHidden = !this.areRepliesVisible(item.messageId);
                 }
                 let parentBody = $("#body-" + item.messageId).parent(".thread-block");
                 totalHeight = parentBody.outerHeight();
@@ -92,7 +97,7 @@ export default defineStore("commentsUiStore", {
                 });
                 totalHeight -= lastChildHeight + margins;
 
-                if (resolved && targetClass !== "" && (parentBody.hasClass(targetClass) || parentBody.find("." + targetClass).length > 0)) {
+                if (repliesHidden && targetClass !== "" && (parentBody.hasClass(targetClass) || parentBody.find("." + targetClass).length > 0)) {
                     totalHeight = 0;
                 }
 

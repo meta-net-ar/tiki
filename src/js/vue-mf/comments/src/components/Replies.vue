@@ -36,7 +36,7 @@ export default {
 </script>
 
 <template>
-    <Messages :key="identifier" :messages=getDescendants(item.messageId) :resolved="item.resoved === 1" />
+    <Messages :key="identifier" :messages=getDescendants(item.messageId) />
 </template>
 
 <style scoped lang="scss">

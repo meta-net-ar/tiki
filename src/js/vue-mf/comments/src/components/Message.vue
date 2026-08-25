@@ -37,7 +37,7 @@ export default {
             return useCommentsUiStore().itemMatchesSearch(this.item);
         },
         repliesVisible() {
-            return useCommentsUiStore().isThreadForciblyVisible(this.item.messageId);
+            return useCommentsUiStore().areRepliesVisible(this.item.messageId);
         },
     },
     methods: {
@@ -69,7 +69,7 @@ export default {
             }, timeout);//TODO: find a better way to do this
         },
         toggleThreadVisibility: function(messageId) {
-            useCommentsUiStore().toggleManualExpand(messageId);
+            useCommentsUiStore().toggleRepliesVisibility(messageId);
             setTimeout(() => {
                 useCommentsUiStore().drawMessagesTree();
             }, 20);//TODO: find a better way to do this
@@ -81,8 +81,8 @@ export default {
             while (root && root.parentId !== 0) {
                 root = store.getThreads.find((thread) => thread.messageId === root.parentId);
             }
-            if (root && root.resoved === 1 && !uiStore.isManuallyExpanded(root.messageId)) {
-                uiStore.toggleManualExpand(root.messageId);
+            if (root && !uiStore.areRepliesVisible(root.messageId)) {
+                uiStore.toggleRepliesVisibility(root.messageId);
             }
             document.getElementById("tab-recent").click();
             setTimeout(() => {
@@ -122,7 +122,7 @@ export default {
                     <i v-if="!pinnedTab" class="icon fa-solid fa-thumbs-down fa-xs mt-3" :class="{ 'text-danger': item.dislikedBy.includes(uiStore.currentUser) }" @click="store.dislike(item.messageId, uiStore.currentUser)"></i><span v-if="!pinnedTab" class="dislike small text-muted mx-1">{{ item.dislike }}</span>
                     <div :class="[{'d-thread-button-block' : item.parentId != 0 || pinnedTab}, 'thread-button-block float-end']">
                         <a href="#" data-bs-toggle="collapse" :data-bs-target="`.replies-${item.messageId}`" class="btn resolved-btn m-1 btn-sm" :class="item.resoved === 1 ? 'bg-success border-success text-white' : 'btn-outline-primary'" :aria-expanded="item.resoved !== 1" @click="toggleResolved(item.messageId)" v-if="item.parentId == 0 && !pinnedTab">{{ item.resoved === 1 ? tr('Resolved') : tr('Mark as resolved') }}</a>
-                        <a href="#" class="btn btn-outline-secondary m-1 btn-sm" :class="{ active: repliesVisible }" :aria-expanded="repliesVisible" @click.prevent="toggleThreadVisibility(item.messageId)" v-if="item.parentId == 0 && item.resoved === 1 && !pinnedTab">{{ repliesVisible ? tr('Hide replies') : tr('Show replies') }}</a>
+                        <a href="#" class="btn btn-outline-secondary m-1 btn-sm" :class="{ active: repliesVisible }" :aria-expanded="repliesVisible" @click.prevent="toggleThreadVisibility(item.messageId)" v-if="item.parentId == 0 && !pinnedTab">{{ repliesVisible ? tr('Hide replies') : tr('Show replies') }}</a>
                         <a class="btn pinned-btn m-1 btn-sm" :class="item.pinned === 1 ? 'bg-warning border-warning text-white' : 'btn-outline-primary'" @click="store.togglePinned(item.messageId)">{{ item.pinned === 1 ? tr('Unpin') : tr('Pin') }}</a>
                         <a v-if="pinnedTab" :href="'#body-'+item.messageId" class="btn btn-outline-primary m-1 btn-sm" @click.prevent="goToThread(item.messageId)">{{ tr('View in thread') }}</a>
                         <a v-if="!pinnedTab" :href="'#message-'+item.messageId" class="btn btn-outline-primary m-1 btn-sm" @click="update(item.messageId)">{{ tr('Edit') }}</a>
