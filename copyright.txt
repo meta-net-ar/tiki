@@ -12,7 +12,7 @@ This is how we implement the Tiki Social Contract.
 http://tiki.org/Social+Contract
 
 List of members of the Community
-As of 2026-08-24, the community has:
+As of 2026-08-25, the community has:
   * 752 members on SourceForge.net,
   * Array of those people who made at least one code commit
 
@@ -569,8 +569,8 @@ Number of Commits: 23
 
 Nickname: Ushindi Gedeon
 First Commit: Mon Apr 8 13:13:01 2024 +0000
-Last Commit: Thu Oct 17 14:59:55 2024 +0000
-Number of Commits: 4
+Last Commit: Thu Apr 4 12:30:46 2024 +0000
+Number of Commits: 5
 
 Nickname: VianneyR4
 First Commit: Wed Nov 17 15:19:00 2021 +0200
@@ -1055,7 +1055,7 @@ Nickname: chibaguy
 Name: Gary Cunningham-Lee
 First Commit: 2006-02-04
 Last Commit: Mon Mar 2 09:16:38 2020 +0000
-Number of Commits: 1715
+Number of Commits: 1713
 SF Role: Admin
 
 Nickname: chris_holman
@@ -1522,7 +1522,7 @@ Nickname: gezzzan
 Name: gezza
 First Commit: 2009-05-02
 Last Commit: Sun Apr 2 07:55:23 2017 +0000
-Number of Commits: 377
+Number of Commits: 376
 SF Role: Developer
 
 Nickname: ggd
@@ -2165,7 +2165,7 @@ Nickname: lphuberdeau
 Name: Louis-Philippe Huberdeau
 First Commit: 2004-04-10
 Last Commit: Wed Feb 18 17:41:34 2015 +0000
-Number of Commits: 606
+Number of Commits: 603
 SF Role: Developer
 
 Nickname: lrrcenter
@@ -3407,8 +3407,8 @@ SF Role: Admin
 
 Nickname: ushindi bienvenu
 First Commit: Tue Jul 1 22:42:12 2025 +0000
-Last Commit: Tue Aug 25 00:55:29 2026 +0200
-Number of Commits: 38
+Last Commit: Tue Aug 25 14:08:25 2026 +0200
+Number of Commits: 43
 
 Nickname: uxeric
 First Commit: 2015-08-17
