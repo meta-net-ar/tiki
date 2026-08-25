@@ -10,21 +10,22 @@ global $prefs, $smarty, $base_url, $tikiroot;
 
 $tikilib = TikiLib::lib('tiki');
 
-function get_item_id_from_custom_url(string $url) {
+function get_item_id_from_custom_url(string $url)
+{
     // parse url, if has page=? then use it as itemID
     // if no page then we take everythin after $tikiroot or $base_url as itemID (user can have included scheme then base_url become usefull or just path then tikiroot is enough)
     global $base_url, $tikiroot;
     $parsedUrl = parse_url($url);
-    if (isset($parsedUrl['query'])){
+    if (isset($parsedUrl['query'])) {
         parse_str($parsedUrl['query'], $queryParams);
         if (isset($queryParams['page'])) {
             return $queryParams['page'];
         }
     }
-    if(str_starts_with($url, $base_url)) {
+    if (str_starts_with($url, $base_url)) {
         return substr($url, strlen($base_url));
     }
-    if(str_starts_with($url, $tikiroot)) {
+    if (str_starts_with($url, $tikiroot)) {
         return substr($url, strlen($tikiroot));
     }
     return $url;

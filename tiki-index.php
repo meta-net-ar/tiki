@@ -78,8 +78,8 @@ function tiki_route_attempt_relation_redirect()
     global $tikiroot, $prefs;
 
     $fullpath = $_SERVER['REQUEST_URI']; // get the full path from the request URI, remember we are doing redirections, we need to have exact match
-    $path = preg_match('/^'.preg_quote($tikiroot, '/').'/', $fullpath) ? preg_replace('/^'.preg_quote($tikiroot, '/').'/', '', $fullpath, 1) : $fullpath;
-    $page =  $_REQUEST['page'] ?? '';
+    $path = preg_match('/^' . preg_quote($tikiroot, '/') . '/', $fullpath) ? preg_replace('/^' . preg_quote($tikiroot, '/') . '/', '', $fullpath, 1) : $fullpath;
+    $page = $_REQUEST['page'] ?? '';
     $path = $page ? $page : $path;
 
     tiki_route_bootstrap_minimal();
