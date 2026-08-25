@@ -5,10 +5,32 @@
 {/block}
 
 {block name="content"}
-    {include 
-        file='calendar_header.tpl'
-        viewlist='listEventView'
-    }
+    {if not $modal and not $preview}
+        {include
+            file='calendar_header.tpl'
+            viewlist='listEventView'
+        }
+    {/if}
+
+    {if not $preview}
+        {include file='calendar_header.tpl' viewlist='listEventView'}
+
+        <div class="float-end">
+            {permission name='change_events' type='calendaritem' object=$calitem.calitemId}
+                <a href="{service controller='calendar' action='edit_item' calitemId=$calitem.calitemId|escape}" class="btn btn-primary edit-calendar-item-btn">
+                    {tr}Edit{/tr}
+                </a>
+            {/permission}
+            {if $tiki_p_add_events eq 'y'}
+                <a 
+                    href="{service controller='calendar' action='edit_item' calitemId=0 copy_from=$calitem.calitemId|escape modal=1 return_url='tiki-calendar.php'}"
+                    class="btn btn-light edit-calendar-item-btn cleanable-false"
+                    title="{tr}Create a new event based on this one{/tr}">
+                    {icon name='copy'} {tr}Duplicate{/tr}
+                </a>
+            {/if}
+        </div>
+    {/if}
   
     <h5 class="mt-3 mb-3">{tr}Title{/tr} : {$calitem.parsedName}</h5>
     <div class="summary mb-4">
