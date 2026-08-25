@@ -2,7 +2,7 @@
     {if $report != 'y'}{tr}Share this page{/tr}{else}{tr}Report this page{/tr}{/if}
 {/title}
 
-{if isset($sent) && empty($errors)}
+{if isset($sent) && (isset($share_generated_link) || (isset($emailSent) && $emailSent) || isset($tweetId) || (isset($facebookId) && $facebookId) || isset($messageSent) || (isset($threadId) && $threadId > 0))}
     <div id="success" class="alert alert-success">
         {icon name='ok' alt="{tr}OK{/tr}" style="vertical-align:middle" align="left"}
         {if $report ne 'y'}
@@ -11,7 +11,26 @@
         {else}
             {tr}Your report was sent to the Webmaster{/tr}
         {/if}
-        {if isset($emailSent) and $report ne 'y'}
+        {if isset($share_generated_link) and $report ne 'y'}
+            <div class="share-generated-link mb-2">
+                <strong>{tr}Shareable link{/tr}</strong>
+                <div class="input-group mt-1 mb-1">
+                    <input
+                        type="text"
+                        id="share-generated-link-input"
+                        class="form-control"
+                        value="{$share_generated_link|escape}"
+                        readonly
+                    >
+                    <button type="button" class="btn btn-outline-secondary" id="copy-share-link-btn">
+                        {icon name='copy'} {tr}Copy{/tr}
+                    </button>
+                </div>
+                <div id="copy-share-link-status" class="form-text"></div>
+                <span class="form-text d-block">{tr}Copy this link to share access without sending email.{/tr}</span>
+            </div>
+        {/if}
+        {if isset($emailSent) and $emailSent and $report ne 'y'}
             <div>
                 {tr}The link was sent via email to the following addresses:{/tr} {$addresses|escape}
             </div>
@@ -32,7 +51,7 @@
         {/if}
         {if isset($threadId) and $threadId>0}
             <div>
-                {tr}The link was published in a{/tr} <a href="tiki-view_forum_thread.php?comments_parentId={$threadId}>{tr}forum{/tr}</a>
+                {tr}The link was published in{/tr} <a href="tiki-view_forum_thread.php?comments_parentId={$threadId}">{$forumName|escape}</a>
                 <br>
                 {foreach from=$feedbacks item=feedback}
                     {$feedback}
@@ -58,7 +77,7 @@
 
 {if !isset($sent) && empty($errors)}
     <div id="ajaxmsg"></div>
-    <form method="post" action="tiki-share.php?url={$url|escape:url}" id="share-form">
+    <form method="post" action="tiki-share.php?url={$url|escape:url}" id="share-form" data-auth-token-access="{if $auth_token_access_enabled}1{else}0{/if}">
         {ticket}
         <div class="mb-3 row">
             <label class="col-form-label col-sm-3">
@@ -128,14 +147,19 @@
                         </label>
                         <div class="col-sm-9">
                             {if $prefs.elementplus_select == 'y'}
-                                {user_selector contact='true' lazy=true user = '' multiple='true' editable='y' mustmatch='false' group='all' name='addresses' id='addresses' class='form-control' user_selector_threshold=0 style='width:99%'}
+                                {user_selector realnames='n' allowcreate='y' lazy=true user = '' multiple='true' editable='y' mustmatch='false' group='all' name='addresses' id='addresses' class='form-control' user_selector_threshold=0 style='width:99%'}
                                 <span class="form-text">
                                     {tr}Separate multiple email addresses with a comma and a space{/tr}
                                 </span>
                             {else}
-                                <input class="form-control" type="text" size="60" name="addresses" value="{$addresses|escape}">
+                                <input class="form-control" type="text" size="60" name="addresses" id="addresses" value="{$addresses|escape}">
                                 <span class="form-text">
                                     {tr}Separate multiple email addresses with a comma.{/tr}
+                                </span>
+                            {/if}
+                            {if $report != 'y' && $auth_token_access_enabled}
+                                <span class="form-text d-block mt-1 text-info">
+                                    {tr}Leave empty to generate a shareable access link only (no email).{/tr}
                                 </span>
                             {/if}
                         </div>
@@ -330,7 +354,7 @@
                         {/remarksbox}
                     {/if}
                 </div>
-                <div class="card-body share-message-details hidden">
+                <div class="card-body share-message-details d-none">
                 {if $send_msg}
                     <div class="mb-3 row clearfix">
                         <label for="messageto" class="col-form-label col-sm-3">
@@ -435,7 +459,7 @@
                         {/remarksbox}
                     {/if}
                 </div>
-                <div class="card-body share-forum-details hidden">
+                <div class="card-body share-forum-details d-none">
                     {if count($forums)>0}
                         <div class="mb-3 row">
                             <label class="col-form-label col-sm-3">
@@ -444,14 +468,14 @@
                             <div class="col-sm-9">
                                 <select name="forumId" id="forumId" class="form-control">
                                     {foreach from=$forums item="forum"}
-                                        <option value="{$forum.forumId}"{if $forum.forumId==$forumId} selected="selected"{/if}>
+                                        <option value="{$forum.forumId}" data-forum-use-password="{$forum.forum_use_password}"{if $forum.forumId==$forumId} selected="selected"{/if}>
                                             {$forum.name}{if $forum.forum_use_password!='n'} ({tr}password-protected{/tr}){/if}
                                         </option>
                                     {/foreach}
                                 </select>
                             </div>
                         </div>
-                        <div class="mb-3 row">
+                        <div class="mb-3 row" id="forum-password-row">
                             <label class="col-form-label col-sm-3">
                                 {tr}Password{/tr}
                             </label>
@@ -481,53 +505,3 @@
 {else}
     <p><a href="javascript:window.history.go(-2);">{tr}Return to previous page{/tr}</a></p>
 {/if}
-{jq}
-    $('#share-form').on("submit", function(e){
-            if($('#addresses').val() !='' || ! $('#emailtable:visible').length) {
-                    $(this).tikiModal("Please wait....");
-                    var postData = $(this).serializeArray();
-                    var formURL = 'tiki-share.php?send=share';
-                    $.ajax({
-                            url : formURL,
-                            type: "POST",
-                            data : postData,
-                            success:function(data, textStatus, jqXHR) {
-                                    var shrsuccess = $($.parseHTML(data)).find("#success").html();
-                                    var shrerror = $($.parseHTML(data)).find("#shareerror").html();
-                                    if(shrsuccess) {
-                                            $('#ajaxmsg').html("<div class='alert alert-success'>"+shrsuccess+"</div>");
-                                    } else {
-                                            $('#ajaxmsg').html("<div class='alert alert-warning'>"+shrerror+"</div>");
-                                    }
-                                    $('#share-form').tikiModal("");
-                                    $('#addresses').val('');
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                    $('#share-form').tikiModal("");
-                            }
-                    });
-            } else {
-                    alert("You must provide at least one recipient email address");
-            }
-            e.preventDefault();
-            return false;
-    });
-    $(".share-email-hide").on("click", function(){
-        $(".share-email-details").addClass('hidden');
-    });
-    $(".share-email-show").on("click", function(){
-        $(".share-email-details").removeClass('hidden');
-    });
-    $(".share-message-hide").on("click", function(){
-        $(".share-message-details").addClass('hidden');
-    });
-    $(".share-message-show").on("click", function(){
-        $(".share-message-details").removeClass('hidden');
-    });
-    $(".share-forum-hide").on("click", function(){
-        $(".share-forum-details").addClass('hidden');
-    });
-    $(".share-forum-show").on("click", function(){
-        $(".share-forum-details").removeClass('hidden');
-    });
-{/jq}

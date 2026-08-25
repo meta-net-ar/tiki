@@ -46,6 +46,7 @@ class UserSelector extends Base
             'group' => 'all',
             'groupIds' => '',
             'contact' => 'false',
+            'allowcreate' => 'n',
             'name' => 'user',
             'id' => 'user_selector_' . $iUserSelector,
             'multiple' => 'false',
@@ -125,8 +126,11 @@ class UserSelector extends Base
             foreach ($selectedValues as $selected) {
                 $options .= "<option value=\"$selected\" selected>$selected</option>";
             }
+            // Let a field opt into free-text entry (Element Plus allow-create) without
+            // changing the global elementplus_select_allow_create preference.
+            $allowCreateAttr = $params['allowcreate'] === 'y' ? ' data-allow-create="true"' : '';
             return <<<HTML
-                <select name="{$params['name']}" id="{$params['id']}" class="form-control" data-remote-source-url="{$remoteUrl}" $mt>{$options}</select>
+                <select name="{$params['name']}" id="{$params['id']}" class="form-control" data-remote-source-url="{$remoteUrl}"$allowCreateAttr $mt>{$options}</select>
             HTML;
         }
 

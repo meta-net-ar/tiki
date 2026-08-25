@@ -133,7 +133,13 @@ class ContactLib extends TikiLib
                 $query = 'insert into `tiki_webmail_contacts` set `firstName`=?, `lastName`=?, `email`=?, `nickname`=?, `user`=?';
                 $res = $this->query(
                     $query,
-                    [$contact['firstName'], $contact['lastName'], $contact['email'], $contact['nickname'], $user]
+                    [
+                        $contact['firstName'] ?? null,
+                        $contact['lastName'] ?? null,
+                        $contact['email'] ?? null,
+                        $contact['nickname'] ?? null,
+                        $user,
+                    ]
                 );
 
                 if ($res->numRows()) {
