@@ -2206,7 +2206,7 @@ INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES
 ('./lib/core/TikiDb/Table.php', 'fcaf5c265b651afdebe308e51faa2b53', '24.15'),
 ('./lib/core/TikiDb/Transaction.php', '2ca673fed40350dc68c4e2ef3387b5b3', '24.15'),
 ('./lib/core/TikiDb/index.php', 'b4e1712c18d01578ce3e314d5ded8447', '24.15'),
-('./lib/core/TikiFilter.php', '8a35553115c83e59c4383558a6046163', '24.15'),
+('./lib/core/TikiFilter.php', 'd6f5439c578464907de96affd567eb3a', '24.15'),
 ('./lib/core/TikiFilter/Alnum.php', 'e067c0a73b6029a0a27140bd7a1df268', '24.15'),
 ('./lib/core/TikiFilter/Alpha.php', '5583738f70497befa7004d0651b5eccb', '24.15'),
 ('./lib/core/TikiFilter/AttributeType.php', 'a6a2a7a722ed6ed14dea2b51c4090688', '24.15'),
@@ -2218,6 +2218,7 @@ INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES
 ('./lib/core/TikiFilter/PregFilter.php', '9b84f2603075e4ff2152699a040ece64', '24.15'),
 ('./lib/core/TikiFilter/PrepareInput.php', '962f82625cac034af6ea9ac1c7d5377b', '24.15'),
 ('./lib/core/TikiFilter/PreventXss.php', 'e1b2050eba54eae52e120b4b99d3571a', '24.15'),
+('./lib/core/TikiFilter/Raw.php', '9dacb67e47c3edc34892d6b17c326ed1', '24.15'),
 ('./lib/core/TikiFilter/RawUnsafe.php', '887c5b259202057f28ae9cfbf3ea743d', '24.15'),
 ('./lib/core/TikiFilter/RelativeURL.php', '8e774a592343e555c77396036b294d9b', '24.15'),
 ('./lib/core/TikiFilter/WikiContent.php', '0dc6b892af4242d55ef7aae8acbaad3f', '24.15'),
@@ -9908,9 +9909,9 @@ INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES
 ('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/el.js', '58cc476ff65e2e241d3b1ee4ca7d23ba', '24.15'),
 ('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/en-au.js', '46be253582560bfcdfa767ebe232de95', '24.15'),
 ('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/en.js', 'c49c66238c41217d95e67b2690e93749', '24.15'),
-('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/eo.js', '206105a2afca3bbc24558a087db57f49', '24.15'),
-('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/es-mx.js', '2e723e219367f6a5b8a43ca7070cfa39', '24.15');
+('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/eo.js', '206105a2afca3bbc24558a087db57f49', '24.15');
 INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES 
+('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/es-mx.js', '2e723e219367f6a5b8a43ca7070cfa39', '24.15'),
 ('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/es.js', '719aa7b3869686c27c847ec9b0039dcf', '24.15'),
 ('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/et.js', 'd51211181d47b681e748eec2a072fc24', '24.15'),
 ('./vendor_bundled/vendor/ckeditor/ckeditor/plugins/embedbase/lang/eu.js', 'b921229deb479fcacb7d13e55c2ed29c', '24.15'),
@@ -17520,9 +17521,9 @@ INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES
 ('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Entry/Atom/Deleted.php', '4c0d81b15e03eecd45ca3843e094b1d6', '24.15'),
 ('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Entry/Atom/index.php', 'd41d8cd98f00b204e9800998ecf8427e', '24.15'),
 ('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Entry/AtomDeleted.php', 'ae464e5bc033500f4b9b5f86eaa71d53', '24.15'),
-('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Entry/Rss.php', 'a03164e26e0e204641b4066b1005ae75', '24.15'),
-('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Entry/index.php', 'd41d8cd98f00b204e9800998ecf8427e', '24.15');
+('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Entry/Rss.php', 'a03164e26e0e204641b4066b1005ae75', '24.15');
 INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES 
+('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Entry/index.php', 'd41d8cd98f00b204e9800998ecf8427e', '24.15'),
 ('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Feed/AbstractAtom.php', '3b13345bab872543e9a21eecec35768d', '24.15'),
 ('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Feed/Atom.php', '0543b11448291fc82365d17450809e50', '24.15'),
 ('./vendor_bundled/vendor/laminas/laminas-feed/src/Writer/Renderer/Feed/Atom/AbstractAtom.php', '75e0389fd4ee37d748a73b7b2939040a', '24.15'),
@@ -25493,9 +25494,9 @@ INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES
 ('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Smiley.php', '95c75a6162229eb0de0b4de33bb15b44', '24.15'),
 ('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Strong.php', '1a872f45630b9afd35134641b69117c8', '24.15'),
 ('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Subscript.php', 'd65c8999c3e63a1525b867c59928a449', '24.15'),
-('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Superscript.php', '87548bc734b08b67da4c9751192ff656', '24.15'),
-('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Table.php', '1fb6d3368e608f3b477b21c2b78cf9f3', '24.15');
+('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Superscript.php', '87548bc734b08b67da4c9751192ff656', '24.15');
 INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES 
+('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Table.php', '1fb6d3368e608f3b477b21c2b78cf9f3', '24.15'),
 ('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Tighten.php', '6c519500baa283fe2be361605a260574', '24.15'),
 ('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Toc.php', '24be5eeac6267e1f24179652821e6c99', '24.15'),
 ('./vendor_bundled/vendor/pear/text_wiki_mediawiki/Text/Wiki/Parse/Default/Tt.php', 'e9c72fcd2dd77645809a8cf906bb8fe7', '24.15'),
