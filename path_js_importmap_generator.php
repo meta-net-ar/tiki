@@ -136,11 +136,11 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/timeago" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/timeago.js",
                 "@jquery-tiki/validate-alt-image" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/validate-alt-image.js",
 
-                /* src/js/tiki-annotator */
-                "@tiki-annotator/annotator" => $tikiUrl . JS_ASSETS_PATH . "/tiki-annotator.js",
-
                 /* src/js/tiki-3d-model-viewer */
                 "@tiki-3d-model-viewer/model3dviewer" => $tikiUrl . JS_ASSETS_PATH . "/tiki-3d-model-viewer.js",
+
+                /* src/js/tiki-annotator */
+                "@tiki-annotator/annotator" => $tikiUrl . JS_ASSETS_PATH . "/tiki-annotator.js",
 
                 /* src/js/tiki-figlet */
                 "@tiki-figlet" => $tikiUrl . JS_ASSETS_PATH . "/tiki-figlet.js",
