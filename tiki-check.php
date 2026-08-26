@@ -1219,6 +1219,94 @@ if (function_exists('exec')) {
     }
 }
 
+$isGitCheckout = file_exists(__DIR__ . '/.git');
+$engineRanges = getPackageEngineRanges();
+
+foreach (array('node' => 'Node.js', 'npm' => 'npm') as $command => $displayName) {
+    $propertyName = $displayName . ' CLI version';
+    $requiredRange = isset($engineRanges[$command]) ? $engineRanges[$command] : null;
+    $isRequired = $isGitCheckout && ! empty($requiredRange);
+    $rangeNote = $requiredRange ? tr('Expected: %0', $requiredRange) : tr('No version constraint in package.json');
+    $context = $isGitCheckout ? tr('Used by setup.sh.') : tr('Only needed for setup.sh on a Git checkout.');
+
+    if (! function_exists('exec')) {
+        $php_properties[$propertyName] = array(
+            'fitness' => tra('unsure'),
+            'fitness_status' => FITNESS_STATUS_UNSURE,
+            'setting' => tra('Unable to detect'),
+            'message' => tr('Cannot check %0: exec() is disabled. %1. %2', $displayName, $rangeNote, $context),
+        );
+        continue;
+    }
+
+    $candidates = resolveNodeNpmCandidates($command);
+    if (empty($candidates)) {
+        $php_properties[$propertyName] = array(
+            'fitness' => $isRequired ? tra('bad') : tra('info'),
+            'fitness_status' => $isRequired ? FITNESS_STATUS_BAD : FITNESS_STATUS_INFO,
+            'setting' => tra('Not found'),
+            'message' => tr('%0 not found in PATH. %1. %2', $displayName, $rangeNote, $context),
+        );
+        continue;
+    }
+
+    // Walk candidates (PATH-resolved first, then nvm versions desc) and pick first in range.
+    $detectedVersion = null;
+    $source = null;
+    foreach ($candidates as $candidatePath) {
+        $ver = detectCommandVersion($candidatePath);
+        if (! $ver) {
+            continue;
+        }
+        if (empty($requiredRange) || isVersionInRangeString($ver, $requiredRange)) {
+            $detectedVersion = $ver;
+            $source = preg_match('/\/versions\/node\/(v[0-9]+[^\/]*)\//', $candidatePath, $m) ? $m[1] : 'PATH';
+            break;
+        }
+        if (! $detectedVersion) {
+            $detectedVersion = $ver;
+            $source = preg_match('/\/versions\/node\/(v[0-9]+[^\/]*)\//', $candidatePath, $m) ? $m[1] : 'PATH';
+        }
+    }
+
+    if (! $detectedVersion) {
+        $php_properties[$propertyName] = array(
+            'fitness' => tra('unsure'),
+            'fitness_status' => FITNESS_STATUS_UNSURE,
+            'setting' => tra('Unable to detect'),
+            'message' => tr('%0 found but version unreadable. %1. %2', $displayName, $rangeNote, $context),
+        );
+        continue;
+    }
+
+    if (empty($requiredRange)) {
+        $php_properties[$propertyName] = array(
+            'fitness' => tra('info'),
+            'fitness_status' => FITNESS_STATUS_INFO,
+            'setting' => $detectedVersion,
+            'message' => tr('%0 %1 detected (%2). %3', $displayName, $detectedVersion, $source, $context),
+        );
+        continue;
+    }
+
+    if (! isVersionInRangeString($detectedVersion, $requiredRange)) {
+        $php_properties[$propertyName] = array(
+            'fitness' => $isRequired ? tra('bad') : tra('info'),
+            'fitness_status' => $isRequired ? FITNESS_STATUS_BAD : FITNESS_STATUS_INFO,
+            'setting' => $detectedVersion,
+            'message' => tr('%0 %1 is outside %2 (%3). %4', $displayName, $detectedVersion, $requiredRange, $source, $context),
+        );
+        continue;
+    }
+
+    $php_properties[$propertyName] = array(
+        'fitness' => tra('good'),
+        'fitness_status' => FITNESS_STATUS_GOOD,
+        'setting' => $detectedVersion,
+        'message' => tr('%0 %1 matches %2 (%3). %4', $displayName, $detectedVersion, $requiredRange, $source, $context),
+    );
+}
+
 // PHP Server API (SAPI)
 if (str_starts_with(PHP_SAPI, 'cgi')) {
     $php_properties['PHP Server API'] = array(
@@ -5347,6 +5435,230 @@ function commandIsAvailable($command)
     }
 
     return $returnCode === 0;
+}
+
+/**
+ * Return all candidate paths for node/npm: PATH-resolved first, then nvm versions sorted desc.
+ *
+ * @param string $command
+ * @return array
+ */
+function resolveNodeNpmCandidates($command)
+{
+    if (! function_exists('exec')) {
+        return array();
+    }
+
+    $isWindows = str_starts_with(strtoupper(PHP_OS), 'WIN');
+    $output = array();
+    $returnCode = 1;
+    exec(sprintf($isWindows ? 'where %s' : 'command -v %s 2>/dev/null', escapeshellarg($command)), $output, $returnCode);
+    $candidates = ($returnCode === 0 && ! empty(trim($output[0] ?? ''))) ? array(trim($output[0])) : array();
+
+    if (! $isWindows) {
+        $home = getenv('HOME') ?: ((function_exists('posix_getpwuid') && function_exists('posix_getuid')) ? (posix_getpwuid(posix_getuid())['dir'] ?? '') : '');
+        $nvmDir = getenv('NVM_DIR') ?: ($home ? $home . '/.nvm' : '');
+        if ($nvmDir) {
+            $nvmPaths = array_filter((array) glob($nvmDir . '/versions/node/*/bin/' . $command), 'is_executable');
+            usort($nvmPaths, function ($a, $b) {
+                preg_match('/\/v([0-9.]+)\//', $a, $am);
+                preg_match('/\/v([0-9.]+)\//', $b, $bm);
+                return version_compare(normalizeVersionForCompare($bm[1] ?? '0'), normalizeVersionForCompare($am[1] ?? '0'));
+            });
+            $candidates = array_values(array_unique(array_merge($candidates, array_values($nvmPaths))));
+        }
+    }
+
+    return $candidates;
+}
+
+/**
+ * Read node and npm ranges from package.json.
+ *
+ * @return array<string,string>
+ */
+function getPackageEngineRanges()
+{
+    $packageJsonPath = __DIR__ . '/package.json';
+    if (! file_exists($packageJsonPath) || ! is_readable($packageJsonPath)) {
+        return array();
+    }
+
+    $packageJson = @file_get_contents($packageJsonPath);
+    if ($packageJson === false) {
+        return array();
+    }
+
+    $packageConfig = json_decode($packageJson, true);
+    if (! is_array($packageConfig) || empty($packageConfig['engines']) || ! is_array($packageConfig['engines'])) {
+        return array();
+    }
+
+    $ranges = array();
+    if (! empty($packageConfig['engines']['node']) && is_string($packageConfig['engines']['node'])) {
+        $ranges['node'] = trim($packageConfig['engines']['node']);
+    }
+    if (! empty($packageConfig['engines']['npm']) && is_string($packageConfig['engines']['npm'])) {
+        $ranges['npm'] = trim($packageConfig['engines']['npm']);
+    }
+
+    return $ranges;
+}
+
+/**
+ * Detect version of a command at the given path, trying --version then -v.
+ * Prepends the binary's own directory to PATH so npm can resolve node.
+ *
+ * @param string $commandPath
+ * @return false|string
+ */
+function detectCommandVersion($commandPath)
+{
+    if (! function_exists('exec')) {
+        return false;
+    }
+
+    $prefix = '';
+    if (! str_starts_with(strtoupper(PHP_OS), 'WIN')) {
+        // Keep npm and node from the same bin directory.
+        $prefix = 'env PATH=' . escapeshellarg(dirname($commandPath) . ':' . (getenv('PATH') ?: '')) . ' ';
+    }
+
+    $bin = escapeshellarg($commandPath);
+    foreach (array('--version', '-v') as $flag) {
+        $output = array();
+        $returnCode = 1;
+        exec("{$prefix}{$bin} {$flag} 2>&1", $output, $returnCode);
+        if ($returnCode !== 0) {
+            continue;
+        }
+        $version = extractSemverFromOutput($output);
+        if ($version) {
+            return $version;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Extract semantic version from command output.
+ *
+ * @param array $output
+ * @return false|string
+ */
+function extractSemverFromOutput($output)
+{
+    if (empty($output) || ! is_array($output)) {
+        return false;
+    }
+
+    foreach ($output as $line) {
+        $line = trim($line);
+        if (preg_match('/v?([0-9]+\.[0-9]+(?:\.[0-9]+)?)/', $line, $matches)) {
+            return $matches[1];
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Check whether a version satisfies a supported npm-style range.
+ *
+ * @param string $version
+ * @param string $range
+ * @return bool
+ */
+function isVersionInRangeString($version, $range)
+{
+    $normalizedVersion = normalizeVersionForCompare($version);
+    $clauses = preg_split('/\s*\|\|\s*/', trim($range));
+    if (empty($clauses)) {
+        return false;
+    }
+
+    foreach ($clauses as $clause) {
+        $clause = trim($clause);
+        if ($clause === '') {
+            continue;
+        }
+
+        if (preg_match('/^\^(\d+(?:\.\d+){0,2})$/', $clause, $matches)) {
+            $base = normalizeVersionForCompare($matches[1]);
+            $parts = array_map('intval', explode('.', $base));
+
+            if ($parts[0] > 0) {
+                $upper = ($parts[0] + 1) . '.0.0';
+            } elseif ($parts[1] > 0) {
+                $upper = '0.' . ($parts[1] + 1) . '.0';
+            } else {
+                $upper = '0.0.' . ($parts[2] + 1);
+            }
+
+            if (version_compare($normalizedVersion, $base, '>=') && version_compare($normalizedVersion, $upper, '<')) {
+                return true;
+            }
+
+            continue;
+        }
+
+        if (preg_match('/^~(\d+(?:\.\d+){0,2})$/', $clause, $matches)) {
+            $base = normalizeVersionForCompare($matches[1]);
+            $parts = array_map('intval', explode('.', $base));
+            $upper = $parts[0] . '.' . ($parts[1] + 1) . '.0';
+
+            if (version_compare($normalizedVersion, $base, '>=') && version_compare($normalizedVersion, $upper, '<')) {
+                return true;
+            }
+
+            continue;
+        }
+
+        $comparators = preg_split('/\s+/', $clause);
+        $allComparatorsSatisfied = true;
+
+        foreach ($comparators as $comparator) {
+            $comparator = trim($comparator);
+            if ($comparator === '') {
+                continue;
+            }
+
+            if (! preg_match('/^(>=|<=|>|<|=)?\s*(\d+(?:\.\d+){0,2})$/', $comparator, $matches)) {
+                $allComparatorsSatisfied = false;
+                break;
+            }
+
+            $operator = ! empty($matches[1]) ? $matches[1] : '=';
+            $targetVersion = normalizeVersionForCompare($matches[2]);
+            if (! version_compare($normalizedVersion, $targetVersion, $operator)) {
+                $allComparatorsSatisfied = false;
+                break;
+            }
+        }
+
+        if ($allComparatorsSatisfied) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Normalize version to three numeric parts.
+ *
+ * @param string $version
+ * @return string
+ */
+function normalizeVersionForCompare($version)
+{
+    $parts = explode('.', $version);
+    while (count($parts) < 3) {
+        $parts[] = '0';
+    }
+
+    return implode('.', array_slice($parts, 0, 3));
 }
 
 /**
