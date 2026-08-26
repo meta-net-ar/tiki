@@ -1,10 +1,10 @@
 {if $prefs.feature_canonical_url eq 'y' and isset($mid)}
     {if $mid eq 'tiki-show_page.tpl' or $mid eq 'tiki-index_p.tpl' or $mid eq 'tiki-show_page_raw.tpl' or $mid eq 'tiki-all_languages.tpl' or $mid eq 'tiki-show_content.tpl'}
-        <link rel="canonical" href="{$base_url_canonical}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}">
-        <meta content="{$base_url_canonical}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}" property="og:url">
+        <link rel="canonical" href="{$base_url_canonical_root}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}">
+        <meta content="{$base_url_canonical_root}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}" property="og:url">
     {elseif $mid eq 'extends:layouts/internal/layout_view.tpl|tiki-show_page.tpl'}
-        <link rel="canonical" href="{$base_url_canonical}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}">
-        <meta content="{$base_url_canonical}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}" property="og:url">
+        <link rel="canonical" href="{$base_url_canonical_root}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}">
+        <meta content="{$base_url_canonical_root}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}" property="og:url">
     {elseif $mid eq 'tiki-view_tracker_item.tpl'}
         <link rel="canonical" href="{$base_url_canonical}{$itemId|sefurl:trackeritem}">
         <meta content="{$base_url_canonical}{$itemId|sefurl:trackeritem}" property="og:url">

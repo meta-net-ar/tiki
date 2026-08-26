@@ -266,6 +266,33 @@ if (! $info || isset($_REQUEST['date']) || isset($_REQUEST['version'])) {
     }
 }
 
+// Enforce the language-prefixed URL (/en/, /fr/) as the one true canonical address for
+// multilingual wiki pages, so bare or mismatched-language URLs consolidate onto it in search
+// engines instead of competing with it. Redirect target and language come from the page's own
+// stored `lang`, not from a request parameter, so it can't drift out of sync with what's served.
+if (
+    ! empty($info)
+        && $prefs['feature_multilingual'] == 'y'
+        && $prefs['feature_sefurl'] == 'y'
+        && $_SERVER['REQUEST_METHOD'] === 'GET'
+        && $page !== $prefs['wikiHomePage']
+) {
+    $langPrefix = $wikilib->getLanguageUrlPrefix($info['lang'] ?? '');
+    if ($langPrefix !== '') {
+        $requestPath = (string) parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $expectedPrefix = '/' . $langPrefix . '/';
+        if (strncasecmp($requestPath, $expectedPrefix, strlen($expectedPrefix)) !== 0) {
+            $extraParams = $_GET;
+            unset($extraParams['page'], $extraParams['curr_lang']);
+            $canonicalUrl = $wikilib->sefurl($page);
+            if ($extraParams) {
+                $canonicalUrl .= (strpos($canonicalUrl, '?') === false ? '?' : '&') . http_build_query($extraParams);
+            }
+            $access->redirect($canonicalUrl, '', 301);
+        }
+    }
+}
+
 if (empty($info)) {
     // If not found maybe was because of old wiki url encode strategy, and the slugs not being regenerated after. The
     // right page to display in this case is one where applying a different slug degeneration to the requested page

@@ -92,7 +92,8 @@ abstract class AbstractType
         $titleField = 'title',
         $updateField = 'created',
         $priority = '0.6',
-        $changeFreq = 'weekly'
+        $changeFreq = 'weekly',
+        $langField = null
     ) {
 
         global $prefs;
@@ -108,14 +109,22 @@ abstract class AbstractType
         //
         if (($this->sitemap instanceof Sitemap) === false) {
             foreach ($entries['data'] as $entry) {
-                $url = $this->getEntryUrl($urlTemplate, $entry[$idField], $entryType, $entry[$titleField] ?? '');
+                $isHome = $entry['is_home'] ?? ($langField && (($entry['pageName'] ?? $entry[$idField]) === $prefs['wikiHomePage']));
+                $entryLang = $langField ? ($entry[$langField] ?? '') : '';
+                $url = $this->getEntryUrl($urlTemplate, $entry[$idField], $entryType, $entry[$titleField] ?? '', $entryLang, $isHome);
                 $pri = $this->getEntryPriority($entry, $idField, $priority);
 
                 $this->sitemap->loc($url)->priority($pri)->changeFreq($changeFreq)->lastMod(date('Y/m/d H:i:s', $entry[$updateField]) ?? time());
 
+                // Self-referencing alternate, then every other language version — each URL lists
+                // itself plus all alternates, per Google's recommended sitemap hreflang pattern.
+                if ($entryLang !== '') {
+                    $this->sitemap->alternate($url, $entryLang);
+                }
                 if ($entry['has_translations'] ?? false) {
                     foreach ($entry['translations'] as $t) {
-                        $this->sitemap->alternate($this->getEntryUrl($urlTemplate, $t['objName'], $entryType), $t['lang']);
+                        $tUrl = $this->getEntryUrl($urlTemplate, $t['objName'], $entryType, '', $langField ? ($t['lang'] ?? '') : '', $isHome);
+                        $this->sitemap->alternate($tUrl, $t['lang']);
                     }
                 }
             }
@@ -135,18 +144,26 @@ abstract class AbstractType
             $titleField,
             $updateField,
             $priority,
-            $changeFreq
+            $changeFreq,
+            $langField,
+            $prefs
         ) {
 
             foreach ($entries['data'] as $entry) {
-                $url = $this->getEntryUrl($urlTemplate, $entry[$idField], $entryType, $entry[$titleField] ?? '');
+                $isHome = $entry['is_home'] ?? ($langField && (($entry['pageName'] ?? $entry[$idField]) === $prefs['wikiHomePage']));
+                $entryLang = $langField ? ($entry[$langField] ?? '') : '';
+                $url = $this->getEntryUrl($urlTemplate, $entry[$idField], $entryType, $entry[$titleField] ?? '', $entryLang, $isHome);
                 $pri = $this->getEntryPriority($entry, $idField, $priority);
 
                 $map->loc($url)->priority($pri)->changeFreq($changeFreq)->lastMod(date('Y/m/d H:i:s', $entry[$updateField]) ?? time());
 
+                if ($entryLang !== '') {
+                    $map->alternate($url, $entryLang);
+                }
                 if ($entry['has_translations'] ?? false) {
                     foreach ($entry['translations'] as $t) {
-                        $map->alternate($this->getEntryUrl($urlTemplate, $t['objName'], $entryType), $t['lang']);
+                        $tUrl = $this->getEntryUrl($urlTemplate, $t['objName'], $entryType, '', $langField ? ($t['lang'] ?? '') : '', $isHome);
+                        $map->alternate($tUrl, $t['lang']);
                     }
                 }
             }
@@ -155,13 +172,38 @@ abstract class AbstractType
 
     /**
      * Build URL for sitemap entry
+     *
+     * @param string $lang   When set, and a URL prefix is registered for it (see WikiLib::getLanguageUrlPrefix),
+     *                       the entry URL is prefixed with it (e.g. /en/, /fr/) to match the site's multilingual routing.
+     * @param bool   $isHome Whether this entry (or, for an alternate, its primary page) is the site's wiki home
+     *                       page. Home pages are served, and .htaccess-redirect down to, the bare root of their
+     *                       language (/ or /fr/) rather than /HomePage or /fr/Accueil — listing the pre-redirect
+     *                       form in the sitemap would send crawlers through an avoidable 301.
      */
-    protected function getEntryUrl($urlTemplate, $idValue, $entryType, $title = '')
+    protected function getEntryUrl($urlTemplate, $idValue, $entryType, $title = '', $lang = '', $isHome = false)
     {
+        global $prefs;
+
+        if ($isHome && $lang !== '' && class_exists('WikiLib')) {
+            if ($lang === $prefs['site_language']) {
+                return '/';
+            }
+            $langPrefix = \WikiLib::getLanguageUrlPrefix($lang);
+            return $langPrefix !== '' ? '/' . $langPrefix . '/' : '/';
+        }
+
         $url = sprintf($urlTemplate, urlencode($idValue));
         if (function_exists('filter_out_sefurl')) {
             $url = filter_out_sefurl($url, $entryType, $title);
         }
+
+        if ($lang !== '' && class_exists('WikiLib')) {
+            $langPrefix = \WikiLib::getLanguageUrlPrefix($lang);
+            if ($langPrefix !== '' && $idValue !== $prefs['wikiHomePage']) {
+                $url = '/' . $langPrefix . '/' . ltrim($url, '/');
+            }
+        }
+
         return $url;
     }
 

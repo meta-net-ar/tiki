@@ -461,6 +461,9 @@ $smarty->assign('base_url_http', $base_url_http);
 $smarty->assign('base_url_https', $base_url_https);
 $smarty->assign('base_url_canonical', $base_url_canonical);
 $smarty->assign('base_url_canonical_default', $base_url_canonical_default);
+// wiki page sefurl()s are root-absolute (leading slash); pair them with a base that has no
+// trailing slash so canonical.tpl doesn't have to strip one or the other.
+$smarty->assign('base_url_canonical_root', rtrim($base_url_canonical, '/'));
 $smarty->assign('show_stay_in_ssl_mode', $show_stay_in_ssl_mode);
 $smarty->assign('stay_in_ssl_mode', $stay_in_ssl_mode);
 $smarty->assign('tiki_version', $TWV->version);

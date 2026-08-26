@@ -32,23 +32,45 @@ class Pages extends AbstractType
         $isMultilingual  = $prefs['feature_multilingual'] === 'y';
 
         // In case of multilingual websites.
-        // find pages that are in primary site lang then attach the translations to it.
+        // Each language version gets its own top-level sitemap entry, listing every version
+        // (including itself) as an hreflang alternate, per Google's recommended sitemap pattern
+        // — rather than only the primary-language page appearing in <loc>, with the others
+        // reachable solely as alternates nested inside it.
         if ($isMultilingual) {
             $pagesFilter = ['lang' => $prefs['site_language']];
 
              /** @var \TikiLib $tikilib */
             $listPages = $tikilib->list_pages(filter: $pagesFilter);
 
-            foreach ($listPages['data'] as &$page) {
+            $flatEntries = [];
+            foreach ($listPages['data'] as $page) {
                 try {
-                    $translations = $multilinguallib->getTranslations('wiki page', $page['page_id']);
-                    $page['has_translations'] = count($translations) > 1;
-                    $page['translations'] = array_slice($translations, 1);
+                    // getTranslations() without $objName/$objLang returns an empty placeholder
+                    // at index 0 for "self" — the real alternates start at index 1.
+                    $others = array_slice($multilinguallib->getTranslations('wiki page', $page['page_id']), 1);
                 } catch (Exception $e) {
-                    $page['has_translations'] = false;
-                    $page['translations'] = [];
+                    $others = [];
+                }
+
+                $self = ['objId' => $page['page_id'], 'objName' => $page['pageName'], 'lang' => $page['lang']];
+                $versions = array_merge([$self], $others);
+                $isHomeGroup = in_array($prefs['wikiHomePage'], array_column($versions, 'objName'), true);
+
+                foreach ($versions as $version) {
+                    $entry = $version['objName'] === $page['pageName'] ? $page : $tikilib->get_page_info($version['objName']);
+                    if (! $entry) {
+                        continue;
+                    }
+                    $entry['has_translations'] = count($versions) > 1;
+                    $entry['translations'] = array_values(array_filter(
+                        $versions,
+                        fn($v) => $v['objName'] !== $version['objName']
+                    ));
+                    $entry['is_home'] = $isHomeGroup;
+                    $flatEntries[] = $entry;
                 }
             }
+            $listPages['data'] = $flatEntries;
         } else {
             // fallback to default behavior
             $listPages = $tikilib->list_pages();
@@ -66,6 +88,6 @@ class Pages extends AbstractType
             $priority[$key] = '0.8';
         }
         $priority[$prefs['wikiHomePage']] = '1.0';
-        $this->addEntriesToSitemap($listPages, '/tiki-index.php?page=%s', 'pageSlug', null, 'pages.xml', '', 'lastModif', $priority);
+        $this->addEntriesToSitemap($listPages, '/tiki-index.php?page=%s', 'pageSlug', null, 'pages.xml', '', 'lastModif', $priority, 'weekly', 'lang');
     }
 }

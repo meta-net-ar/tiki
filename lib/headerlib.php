@@ -701,7 +701,7 @@ class HeaderLib
     public function add_rawhtml($tags)
     {
         $this->throwIfHeadersAlreadyOutput();
-        $this->rawhtml = $tags;
+        $this->rawhtml .= $tags;
         return $this;
     }
 

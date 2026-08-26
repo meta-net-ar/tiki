@@ -1680,10 +1680,59 @@ class WikiLib extends TikiLib
             $href = str_replace(':', '%3A', $href);
 
             include_once(__DIR__ . '/../../tiki-sefurl.php');
-            return filter_out_sefurl($href, 'wiki');
+            $href = filter_out_sefurl($href, 'wiki');
+
+            if ($finalPageName) {
+                if ($finalPageName !== $prefs['wikiHomePage']) {
+                    $langPrefix = self::getLanguageUrlPrefix($this->get_page_language($finalPageName));
+                    if ($langPrefix !== '') {
+                        $href = $langPrefix . '/' . ltrim($href, '/');
+                    }
+                }
+                // Always root-absolute: once some pages carry a language segment, a bare relative
+                // reference (e.g. "fr/About") would resolve against the current directory-like path
+                // (e.g. "/en/Elsewhere" -> "/en/fr/About") instead of the site root. Making every
+                // resolved wiki link absolute-path avoids that ambiguity consistently.
+                $href = '/' . ltrim($href, '/');
+            }
+
+            return $href;
         } else {
             return $href;
         }
+    }
+
+    /**
+     * Returns the language stored for a wiki page, using the request-level page info cache
+     * so repeated sefurl() calls for the same page don't trigger extra queries.
+     */
+    protected function get_page_language($pageName)
+    {
+        $info = TikiLib::lib('tiki')->get_page_info($pageName, false);
+
+        return $info['lang'] ?? '';
+    }
+
+    /**
+     * Maps a page's stored language to the URL prefix used to serve it (/en/, /fr/, ...),
+     * as defined by the site's .htaccess rewrite rules. The prefix is the language code
+     * itself, restricted to the site's active languages (available_languages, or every
+     * installed Tiki language if that pref isn't set). Returns '' for languages outside
+     * that set, so callers fall back to the un-prefixed URL.
+     */
+    public static function getLanguageUrlPrefix($lang)
+    {
+        global $prefs;
+
+        if ($prefs['feature_multilingual'] != 'y') {
+            return '';
+        }
+
+        $activeLanguages = ! empty($prefs['available_languages'])
+            ? $prefs['available_languages']
+            : Language::getLanguages();
+
+        return in_array($lang, $activeLanguages, true) ? $lang : '';
     }
 
     public function url_for_operation_on_a_page($script_name, $page, $with_next)
