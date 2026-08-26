@@ -38,7 +38,8 @@
                         var hash = window.location.hash;
                         $('.comment-thread-wrapper[data-resolved="true"]').each(function() {
                             var $wrapper = $(this);
-                            var $collapse = $wrapper.find('.collapse').first();
+                            var threadId = $wrapper.data('comment-thread-id');
+                            var $collapse = $wrapper.find('#comment-thread-body-' + threadId);
                             if ($collapse.length) {
                                 var shouldExpand = false;
                                 if (hash && hash.match(/^#threadId=?\d+/)) {
@@ -82,12 +83,12 @@
                     $(document).off('click.resolved').on('click.resolved', '.comment-resolved-header', function() {
                         // Toggle handled by Bootstrap collapse
                     });
-                    $(document).on('shown.bs.collapse', '.comment-thread-wrapper .collapse', function() {
+                    $(document).on('shown.bs.collapse', '.comment-thread-wrapper .collapse[id^="comment-thread-body-"]', function () {
                         var $wrapper = $(this).closest('.comment-thread-wrapper');
                         $wrapper.find('.comment-collapse-icon').addClass('comment-collapse-icon-open');
                         $wrapper.find('.comment-resolved-header').attr('aria-expanded', 'true');
                     });
-                    $(document).on('hidden.bs.collapse', '.comment-thread-wrapper .collapse', function() {
+                    $(document).on('hidden.bs.collapse', '.comment-thread-wrapper .collapse[id^="comment-thread-body-"]', function () {
                         var $wrapper = $(this).closest('.comment-thread-wrapper');
                         $wrapper.find('.comment-collapse-icon').removeClass('comment-collapse-icon-open');
                         $wrapper.find('.comment-resolved-header').attr('aria-expanded', 'false');
