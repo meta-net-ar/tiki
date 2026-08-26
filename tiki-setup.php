@@ -229,8 +229,8 @@ Sections::onSectionChange(function ($section) use ($prefs) {
     $freetaglib->assignCurrentObjectTagsToSmarty();
 });
 
-Sections::onSectionChange(function ($section) use ($prefs) {
-    global $headerlib, $jitRequest, $user, $jqueryTiki;
+Sections::onSectionChange(function ($section) {
+    global $headerlib, $prefs, $user, $jqueryTiki;
 
     if ($prefs['feature_inline_comments'] !== 'y' || $prefs['comments_inline_annotator'] !== 'y') {
         return;
@@ -251,22 +251,28 @@ Sections::onSectionChange(function ($section) use ($prefs) {
         return;
     }
 
-    $canPost = $commentController->canPost($object['type'], $object['object']);
-    $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
+    $accesslib = TikiLib::lib('access');
+    $accesslib->setTicket();
 
-    $headerlib->add_js_module('
-        import { initRecogito } from "@tiki-annotator/annotator";
+    $annotatorConfig = [
+        'containerId'  => 'top',
+        'objectUri'    => urlencode($object['type']) . ':' . urlencode($object['object']),
+        'userId'       => (string) $user,
+        'userName'     => (string) ($jqueryTiki['userRealName'] ?? $user),
+        'canPost'      => $commentController->canPost($object['type'], $object['object']),
+        'showUserInfo' => $prefs['comments_inline_annotator_with_info'] === 'y',
+        'ticket'       => $accesslib->getTicket(),
+    ];
 
-        initRecogito({
-            containerId: "top",
-            objectUri: "' . $objectIdentifier . '",
-            userId: "' . $user . '",
-            userName: "' . $jqueryTiki["userRealName"] . '",
-            canPost: ' . ($canPost ? 'true' : 'false') . ',
-            showUserInfo: ' . ($prefs['comments_inline_annotator_with_info'] === 'y' ? 'true' : 'false') . ',
-            csrfToken: "' . $jitRequest->csrfToken() . '"
-        });
-    ');
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/tiki-annotator.css');
+
+    $headerlib->add_js_module(
+        'import { initRecogito } from "@tiki-annotator/annotator";' . "\n"
+        . 'initRecogito(' . json_encode(
+            $annotatorConfig,
+            JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+        ) . ');'
+    );
 });
 
 require_once('lib/setup/wiki.php');
