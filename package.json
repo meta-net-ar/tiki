@@ -66,7 +66,6 @@
         "node" : "We track supported vite node version, which is 18 as of vite 5"
     },
     "dependencies" : {
-        "@recogito/text-annotator": "^4.1.1",
         "single-spa-css" : "^4.0.1",
         "single-spa-vue" : "^3.0.1",
         "ui-predicate-vue3" : "1.1.0"
@@ -165,6 +164,7 @@
     "src/js/common-externals*",
     "src/js/common-reexported",
     "src/js/jquery-tiki",
+    "src/js/tiki-annotator",
     "src/js/tiki-figlet",
     "src/js/tiki-iot",
     "src/js/tiki-glightbox",

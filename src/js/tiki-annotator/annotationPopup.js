@@ -25,6 +25,7 @@ function positionPopup(popup, anchorRect) {
     let left;
     let top;
 
+    // Position near selection if create, otherwise center-ish
     if (anchorRect) {
         left = anchorRect.left + anchorRect.width / 2 - width / 2;
         top = anchorRect.bottom + gap;

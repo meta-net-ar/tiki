@@ -107,6 +107,9 @@ export async function initRecogito(config) {
         }
     };
 
+    /**
+     * Load existing annotations
+     */
     try {
         const annotationsList = await loadAnnotations(objectUri, transformBackendResponse);
 
@@ -165,6 +168,9 @@ export async function initRecogito(config) {
         }
     };
 
+    /**
+     * Create annotation
+     */
     anno.on("createAnnotation", (annotation) => {
         if (suppressStoreEvents) return;
 
@@ -187,6 +193,9 @@ export async function initRecogito(config) {
         });
     });
 
+    /**
+     * Click an annotation
+     */
     anno.on("clickAnnotation", async (clicked) => {
         hideAnnotationTrigger();
 
@@ -222,12 +231,18 @@ export async function initRecogito(config) {
         anno.cancelSelected();
     });
 
+    /**
+     * Update annotation
+     */
     anno.on("updateAnnotation", async (annotation) => {
         if (suppressStoreEvents) return;
 
         await persistUpdate(annotation);
     });
 
+    /**
+     * Delete annotation
+     */
     anno.on("deleteAnnotation", async (annotation) => {
         if (suppressStoreEvents) return;
 

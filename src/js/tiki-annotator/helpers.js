@@ -58,6 +58,10 @@ export function isAllowed(permissions, action) {
     return value === undefined || value === null ? true : Boolean(value);
 }
 
+/**
+ * Transform backend response to Recogito-compatible format
+ * Recogito expects: [{id, bodies, target}, ...]
+ */
 export function transformBackendResponse(data) {
     if (!data?.rows || !Array.isArray(data.rows)) return [];
 
@@ -79,6 +83,9 @@ export function transformBackendResponse(data) {
         .filter(isRecogitoAnnotation);
 }
 
+/**
+ * Convert W3C annotation back to legacy backend format
+ */
 export function convertToLegacyPayload(w3cAnnotation, objectUri, threadId = null) {
     return {
         threadId,
