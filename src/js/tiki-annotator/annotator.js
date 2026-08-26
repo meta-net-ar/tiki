@@ -1,18 +1,34 @@
 import { createTextAnnotator } from "@recogito/text-annotator";
 import { openAnnotationPopup } from "./annotationPopup.js";
-import { convertToLegacyPayload, transformBackendResponse } from "./helpers.js";
-import { saveAnnotationBackend, updateAnnotationBackend, deleteAnnotationBackend, loadAnnotations } from "./api.js";
+import {
+    convertToLegacyPayload,
+    getSelectionRects,
+    isAllowed,
+    notify,
+    rectFromPoint,
+    setCommentBody,
+    tr,
+    transformBackendResponse,
+} from "./helpers.js";
+import { hideAnnotationTrigger, showAnnotationTrigger } from "./annotationTrigger.js";
+import { deleteAnnotationBackend, loadAnnotations, saveAnnotationBackend, setTicket, updateAnnotationBackend } from "./api.js";
+import "@recogito/text-annotator/text-annotator.css";
+import "./tikiOverrides.css";
 
-import { injectRecogitoCSS } from "./annotatorStyles.js";
+const HIGHLIGHT_FILL = "#fd7e14";
 
-let isCreating = false;
+const highlightStyle = (annotation, state) => ({
+    fill: HIGHLIGHT_FILL,
+    fillOpacity: state?.selected ? 0.4 : 0.21,
+    underlineColor: HIGHLIGHT_FILL,
+    underlineThickness: state?.selected || state?.hovered ? 2 : 1,
+});
 
 export async function initRecogito(config) {
     const objectUri = String(config.objectUri || "").trim();
-    const csrfToken = config.csrfToken || "";
     const showUserInfo = config.showUserInfo || false;
 
-    if (!objectUri) {
+    if (!objectUri.includes(":")) {
         return null;
     }
 
@@ -22,7 +38,7 @@ export async function initRecogito(config) {
         return null;
     }
 
-    injectRecogitoCSS();
+    setTicket(config.ticket);
 
     const anno = createTextAnnotator(container, {
         annotatingEnabled: config.canPost,
@@ -31,131 +47,191 @@ export async function initRecogito(config) {
             name: config.userName,
         },
         selectionMode: "all",
+        style: highlightStyle,
     });
 
     if (!anno) {
         return null;
     }
 
-    /**
-     * Load existing annotations
-     */
-    const annotationsList = await loadAnnotations(objectUri, transformBackendResponse);
-    anno.setAnnotations(annotationsList);
+    const threadIds = new Map();
 
-    /**
-     * Click an annotation
-     */
-    anno.on("selectionChanged", async (annotations) => {
-        if (isCreating) return;
+    const rememberThreadId = (annotation, threadId) => {
+        if (annotation?.id && threadId) {
+            threadIds.set(annotation.id, threadId);
+        }
+    };
 
-        if (!annotations || annotations.length === 0) return;
+    const threadIdOf = (annotation) => (annotation?.id ? (threadIds.get(annotation.id) ?? null) : null);
 
-        const annotation = annotations[0];
+    let suppressStoreEvents = false;
 
-        const res = await openAnnotationPopup({
-            annotation,
-            mode: "edit",
-            showAuthor: showUserInfo,
-        });
+    const withSuppressedEvents = (fn) => {
+        suppressStoreEvents = true;
+        try {
+            fn();
+        } finally {
+            suppressStoreEvents = false;
+        }
+    };
 
-        if (res.action === "cancel") {
-            anno.setSelected(undefined);
+    const persistUpdate = async (annotation) => {
+        const threadId = threadIdOf(annotation);
+
+        if (!threadId) {
+            notify(tr("This comment has not been saved yet."));
             return;
         }
 
-        if (res.action === "delete") {
-            anno.removeAnnotation(annotation);
-            return;
+        try {
+            await updateAnnotationBackend(convertToLegacyPayload(annotation, objectUri, threadId));
+        } catch (error) {
+            notify(tr("Could not save the comment.") + " " + error.message);
+        }
+    };
+
+    const persistDelete = async (annotation) => {
+        const threadId = threadIdOf(annotation);
+
+        if (!threadId) {
+            return false;
         }
 
-        if (res.action === "update") {
-            let body = annotation.bodies.find((b) => b.purpose === "commenting");
-
-            if (!body) {
-                body = {
-                    purpose: "commenting",
-                    value: res.comment,
-                };
-                annotation.bodies.push(body);
-            } else {
-                body.value = res.comment;
-            }
-
-            const payload = convertToLegacyPayload(annotation, objectUri, annotation.threadId);
-            anno.updateAnnotation(annotation);
+        try {
+            await deleteAnnotationBackend(threadId);
+            threadIds.delete(annotation.id);
+            return true;
+        } catch (error) {
+            notify(tr("Could not delete the comment.") + " " + error.message);
+            return false;
         }
-    });
+    };
 
-    /**
-     * Create annotation
-     */
-    anno.on("createAnnotation", async (annotation) => {
-        isCreating = true;
-        if (!objectUri?.trim()) {
-            return;
-        }
+    try {
+        const annotationsList = await loadAnnotations(objectUri, transformBackendResponse);
 
+        annotationsList.forEach((annotation) => rememberThreadId(annotation, annotation.threadId));
+        anno.setAnnotations(annotationsList);
+    } catch (error) {
+        notify(tr("Could not load the inline comments.") + " " + error.message);
+    }
+
+    let lastPointer = null;
+
+    container.addEventListener(
+        "pointerdown",
+        (event) => {
+            lastPointer = { x: event.clientX, y: event.clientY };
+        },
+        true
+    );
+
+    let pendingAnnotation = null;
+
+    const discardPending = () => {
+        if (!pendingAnnotation) return;
+
+        const annotation = pendingAnnotation;
+        pendingAnnotation = null;
+
+        withSuppressedEvents(() => anno.removeAnnotation(annotation));
+    };
+
+    const createWithPopup = async (annotation, anchorRect) => {
         try {
             const result = await openAnnotationPopup({
                 annotation,
                 mode: "create",
                 showAuthor: false,
+                anchorRect,
             });
 
-            if (!result.action || result?.action === "cancel") {
-                anno.removeAnnotation(annotation.id);
-                anno.setSelected(undefined);
-                isCreating = false;
+            if (result.action !== "create") {
+                withSuppressedEvents(() => anno.removeAnnotation(annotation));
                 return;
             }
 
-            annotation.bodies.push({
-                purpose: "commenting",
-                value: result?.comment || "",
-            });
+            setCommentBody(annotation, result.comment || "");
 
-            let payload = convertToLegacyPayload(annotation, objectUri);
-            payload = { ...payload, text: result?.comment || "" };
+            const saved = await saveAnnotationBackend(convertToLegacyPayload(annotation, objectUri));
 
-            if (!payload.uri || !payload.uri.includes(":")) {
-                return;
-            }
-
-            if (csrfToken) {
-                payload.ticket = csrfToken;
-            }
-
-            isCreating = false;
-            anno.setSelected(undefined);
-            await saveAnnotationBackend(payload);
+            rememberThreadId(annotation, saved?.id ?? saved?.threadId);
+            withSuppressedEvents(() => anno.updateAnnotation(annotation));
+        } catch (error) {
+            withSuppressedEvents(() => anno.removeAnnotation(annotation));
+            notify(tr("Could not save the comment.") + " " + error.message);
         } finally {
-            isCreating = false;
-            anno.setSelected(undefined);
+            anno.cancelSelected();
         }
+    };
+
+    anno.on("createAnnotation", (annotation) => {
+        if (suppressStoreEvents) return;
+
+        hideAnnotationTrigger();
+        discardPending();
+
+        pendingAnnotation = annotation;
+
+        showAnnotationTrigger({
+            getAnchorRect: () => getSelectionRects()?.bounds ?? null,
+            label: tr("Add comment"),
+            onActivate: (anchorRect) => {
+                pendingAnnotation = null;
+                createWithPopup(annotation, anchorRect);
+            },
+            onDismiss: () => {
+                discardPending();
+                anno.cancelSelected();
+            },
+        });
     });
 
-    /**
-     * Update annotation
-     */
-    anno.on("updateAnnotation", (annotation) => {
-        const payload = convertToLegacyPayload(annotation, objectUri, annotation.threadId);
+    anno.on("clickAnnotation", async (clicked) => {
+        hideAnnotationTrigger();
 
-        if (csrfToken) {
-            payload.ticket = csrfToken;
-        }
-        updateAnnotationBackend(payload);
-    });
+        const annotation = Array.isArray(clicked) ? clicked[0] : clicked;
 
-    /**
-     * Delete annotation
-     */
-    anno.on("deleteAnnotation", (annotation) => {
-        if (!annotation?.threadId) {
+        if (!annotation) return;
+
+        const permissions = annotation.permissions;
+
+        const res = await openAnnotationPopup({
+            annotation,
+            mode: "edit",
+            showAuthor: showUserInfo,
+            canUpdate: isAllowed(permissions, "update"),
+            canDelete: isAllowed(permissions, "delete"),
+            anchorRect: lastPointer ? rectFromPoint(lastPointer.x, lastPointer.y) : null,
+        });
+
+        if (res.action === "delete") {
+            if (await persistDelete(annotation)) {
+                withSuppressedEvents(() => anno.removeAnnotation(annotation));
+            }
+            anno.cancelSelected();
             return;
         }
 
-        deleteAnnotationBackend(annotation.threadId);
+        if (res.action === "update") {
+            setCommentBody(annotation, res.comment);
+            withSuppressedEvents(() => anno.updateAnnotation(annotation));
+            await persistUpdate(annotation);
+        }
+
+        anno.cancelSelected();
+    });
+
+    anno.on("updateAnnotation", async (annotation) => {
+        if (suppressStoreEvents) return;
+
+        await persistUpdate(annotation);
+    });
+
+    anno.on("deleteAnnotation", async (annotation) => {
+        if (suppressStoreEvents) return;
+
+        await persistDelete(annotation);
     });
 
     return anno;
