@@ -130,8 +130,9 @@ input[type="checkbox"] {
  //       --bs-pagination-active-bg: #{$secondary};
  //       --bs-pagination-active-border-color: #{$secondary};
  //   }
-    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-        --bs-nav-pills-link-active-bg: #{$dark};
+    .nav-pills {
+        --bs-nav-pills-link-active-bg: var(--bs-dark-bg-subtle);
+        --bs-nav-pills-link-active-color: var(--bs-dark-text-emphasis);
     }
 }
 

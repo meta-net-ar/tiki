@@ -262,8 +262,8 @@ li.archivedate {
 }
 
 .fb-post {
-    background: #fff;
-    border: 1px solid #dddfe2;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 12px;
@@ -273,13 +273,13 @@ li.archivedate {
 .fb-author {
     font-weight: 600;
     font-size: 15px;
-    color: #050505;
+    color: var(--bs-emphasis-color);
     margin-bottom: 8px;
 }
 
 .fb-text {
     font-size: 14px;
-    color: #050505;
+    color: var(--bs-body-color);
     line-height: 1.5;
     margin-bottom: 10px;
     word-wrap: break-word;

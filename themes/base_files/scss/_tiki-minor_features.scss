@@ -106,7 +106,7 @@
     content: '';
     height: 50%;
     width: 50%;
-    background-color: #0d6efd;
+    background-color: var(--bs-primary);
     border-radius: 50%;
     position: absolute;
     top: 25%;
@@ -118,7 +118,7 @@
     height: 30px;
     position: absolute;
     top: 20px;
-    background: #0d6efd;
+    background: var(--bs-primary);
 //    border-radius: center;
     text-align: center;
     line-height: 35px;
@@ -129,7 +129,7 @@
   
   .range_selectValue::after {
     content: '';
-    border-top: 17px solid #0d6efd;
+    border-top: 17px solid var(--bs-primary);
     border-left: 19px solid #fff;
     border-right: 19px solid #fff;
     position: absolute;
@@ -140,7 +140,7 @@
   .range_progressBar {
     width: 50%;
     height: 8px;
-    background-color: #0d6efd;
+    background-color: var(--bs-primary);
     border-radius: 3px;
     position: absolute;
     top: 10px;
@@ -151,7 +151,7 @@
     position: absolute;
     bottom: -20px;
     transform: translateX(-50%);
-    color: black;
+    color: var(--bs-body-color);
     font-size: 16px;
     font-weight: bolder;
     margin-left: 5px;

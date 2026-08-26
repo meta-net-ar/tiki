@@ -1,21 +1,22 @@
 .since-last-visit-wrapper {
     padding: 15px;
-    background: #fff;
+    background: var(--bs-body-bg);
+    color: var(--bs-body-color);
     border-radius: 8px;
 
     .welcome-message {
         font-size: 1.2em;
-        color: #2c3e50;
+        color: var(--bs-emphasis-color);
         margin-bottom: 20px;
         text-align: center;
 
         .last-visit-date {
             font-size: 0.9em;
-            color: #7f8c8d;
+            color: var(--bs-secondary-color);
             margin-top: 5px;
 
             .date {
-                color: #3498db;
+                color: var(--bs-primary);
                 font-weight: bold;
             }
         }
@@ -32,7 +33,7 @@
             flex-direction: column;
             align-items: center;
             padding: 15px;
-            background: #f8f9fa;
+            background: var(--bs-tertiary-bg);
             border-radius: 6px;
             transition: transform 0.2s, box-shadow 0.2s;
 
@@ -43,18 +44,18 @@
 
             .icon-wrapper {
                 margin-bottom: 8px;
-                color: #3498db;
+                color: var(--bs-primary);
             }
 
             .count {
                 font-size: 1.2em;
                 font-weight: bold;
-                color: #2c3e50;
+                color: var(--bs-emphasis-color);
             }
 
             .label {
                 font-size: 0.9em;
-                color: #7f8c8d;
+                color: var(--bs-secondary-color);
                 text-align: center;
                 margin-top: 5px;
             }

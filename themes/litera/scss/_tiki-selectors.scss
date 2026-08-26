@@ -1,0 +1,12 @@
+// Theme-specific Tiki selectors
+
+// Avoid nav item overflow in dense topbars
+.navbar-expand .navbar-nav {
+    flex-wrap: wrap;
+}
+
+@include media-breakpoint-up(lg) {
+    .navbar-expand-lg .navbar-nav {
+        flex-wrap: wrap;
+    }
+}
