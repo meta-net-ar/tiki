@@ -8,7 +8,6 @@ namespace Tiki\MailIn\Action;
 
 use Tiki\MailIn\Account;
 use Tiki\MailIn\Source\Message;
-use Tiki\MailIn\Exception\MailInException;
 
 class RecipientPlaceholderFactory implements FactoryInterface
 {
