@@ -1,130 +1,188 @@
-export function openAnnotationPopup({ annotation, showAuthor = false, mode = "create" }) {
+import { getCommentBody, tr } from "./helpers.js";
+
+const POPUP_ID = "tiki-annotator-popup";
+
+const POPUP_Z_INDEX = "1070";
+
+function makeButton(label, className) {
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className = className;
+    button.textContent = label;
+
+    return button;
+}
+
+function positionPopup(popup, anchorRect) {
+    popup.style.left = "0px";
+    popup.style.top = "0px";
+
+    const { width, height } = popup.getBoundingClientRect();
+    const margin = 8;
+    const gap = 8;
+
+    let left;
+    let top;
+
+    if (anchorRect) {
+        left = anchorRect.left + anchorRect.width / 2 - width / 2;
+        top = anchorRect.bottom + gap;
+
+        if (top + height + margin > window.innerHeight && anchorRect.top - gap - height > margin) {
+            top = anchorRect.top - gap - height;
+        }
+    } else {
+        left = window.innerWidth / 2 - width / 2;
+        top = window.innerHeight * 0.2;
+    }
+
+    left = Math.min(Math.max(left, margin), Math.max(margin, window.innerWidth - width - margin));
+    top = Math.min(Math.max(top, margin), Math.max(margin, window.innerHeight - height - margin));
+
+    popup.style.left = `${left}px`;
+    popup.style.top = `${top}px`;
+}
+
+export function openAnnotationPopup({ annotation, showAuthor = false, mode = "create", canUpdate = true, canDelete = true, anchorRect = null }) {
     return new Promise((resolve) => {
-        document.getElementById("recogito-comment-popup")?.remove();
+        document.getElementById(POPUP_ID)?.remove();
+
+        const readOnly = mode === "edit" && !canUpdate;
 
         const popup = document.createElement("div");
-        popup.id = "recogito-comment-popup";
 
+        popup.id = POPUP_ID;
+        popup.className = "card shadow";
         popup.style.position = "fixed";
-        popup.style.background = "#fff";
-        popup.style.border = "1px solid #ccc";
-        popup.style.borderRadius = "6px";
-        popup.style.boxShadow = "0 4px 12px rgba(0,0,0,.15)";
-        popup.style.padding = "10px";
-        popup.style.minWidth = "280px";
-        popup.style.zIndex = "999999";
+        popup.style.zIndex = POPUP_Z_INDEX;
+        popup.style.minWidth = "18rem";
+        popup.style.maxWidth = "min(24rem, 90vw)";
 
-        // Position near selection if create, otherwise center-ish
+        const body = document.createElement("div");
+        body.className = "card-body p-3";
+        popup.appendChild(body);
+
+        const heading = document.createElement("h6");
+        heading.className = "card-title mb-2";
+
         if (mode === "create") {
-            const selection = window.getSelection();
-            if (selection.rangeCount) {
-                const rect = selection.getRangeAt(0).getBoundingClientRect();
-                popup.style.left = `${rect.left + rect.width / 2}px`;
-                popup.style.top = `${rect.top - 10}px`;
-                popup.style.transform = "translate(-50%, -100%)";
-            }
+            heading.textContent = tr("Add comment");
         } else {
-            popup.style.left = "50%";
-            popup.style.top = "20%";
-            popup.style.transform = "translate(-50%, 0)";
+            heading.textContent = readOnly ? tr("Comment") : tr("Edit comment");
         }
 
-        const existingComment = annotation?.bodies?.find((b) => b.purpose === "commenting")?.value || "";
+        body.appendChild(heading);
 
-        const realName = annotation?.realName || "";
-        const commentDate = annotation?.commentDate || "";
+        if (showAuthor && (annotation?.realName || annotation?.commentDate)) {
+            const meta = document.createElement("p");
+            const parts = [];
 
-        popup.innerHTML = `
-      <div style="margin-bottom:8px;font-weight:bold">
-        ${mode === "create" ? "Add comment" : "Edit annotation"}
-      </div>
-    
-      <div style="font-size:12px;color:#555;margin-bottom:8px">
-          ${showAuthor && realName ? `<div><b>Author:</b> ${realName}</div>` : ""}
-          ${showAuthor && commentDate ? `<div><b>Date:</b> ${commentDate}</div>` : ""}
-      </div>
+            if (annotation.realName) parts.push(annotation.realName);
+            if (annotation.commentDate) parts.push(annotation.commentDate);
 
-      <textarea
-        rows="4"
-        style="width:100%;box-sizing:border-box;resize:vertical"
-      >${existingComment}</textarea>
+            meta.className = "small text-body-secondary mb-2";
+            meta.textContent = parts.join(" — ");
+            body.appendChild(meta);
+        }
 
-      <div style="display:flex;justify-content:space-between;gap:8px;margin-top:10px">
+        const existingComment = getCommentBody(annotation);
 
-        <div>
-          ${
-              mode === "edit"
-                  ? `
-            <button class="delete-btn" style="color:red">Delete</button>
-          `
-                  : ""
-          }
-        </div>
+        let textarea = null;
 
-        <div style="display:flex;gap:8px">
-          <button class="cancel-btn">Cancel</button>
-          <button class="save-btn">
-            ${mode === "create" ? "Create" : "Update"}
-          </button>
-        </div>
-      </div>
-    `;
+        if (readOnly) {
+            const text = document.createElement("p");
 
-        document.body.appendChild(popup);
+            text.className = "mb-0 text-break";
+            text.style.whiteSpace = "pre-wrap";
+            text.textContent = existingComment;
+            body.appendChild(text);
+        } else {
+            textarea = document.createElement("textarea");
 
-        const textarea = popup.querySelector("textarea");
-        const saveBtn = popup.querySelector(".save-btn");
-        const cancelBtn = popup.querySelector(".cancel-btn");
-        const deleteBtn = popup.querySelector(".delete-btn");
+            textarea.className = "form-control";
+            textarea.rows = 4;
+            textarea.value = existingComment;
+            body.appendChild(textarea);
+        }
+
+        const footer = document.createElement("div");
+        footer.className = "d-flex justify-content-between align-items-center gap-2 mt-3";
+        body.appendChild(footer);
+
+        const leftActions = document.createElement("div");
+        const rightActions = document.createElement("div");
+
+        rightActions.className = "d-flex gap-2 ms-auto";
+        footer.appendChild(leftActions);
+        footer.appendChild(rightActions);
 
         function cleanup() {
             document.removeEventListener("mousedown", outsideClick);
+            document.removeEventListener("keydown", onKeyDown);
             popup.remove();
         }
 
-        saveBtn.onclick = () => {
-            const value = textarea.value.trim();
-
+        function finish(action, comment) {
             cleanup();
-
-            resolve({
-                action: mode === "create" ? "create" : "update",
-                comment: value,
-            });
-        };
-
-        cancelBtn.onclick = () => {
-            cleanup();
-            resolve({ action: "cancel" });
-        };
-
-        if (deleteBtn) {
-            deleteBtn.onclick = () => {
-                cleanup();
-                resolve({ action: "delete" });
-            };
+            resolve(comment === undefined ? { action } : { action, comment });
         }
 
-        function outsideClick(e) {
-            if (!popup.contains(e.target)) {
-                cleanup();
-                resolve({ action: "cancel" });
+        function outsideClick(event) {
+            if (!popup.contains(event.target)) {
+                finish("cancel");
             }
+        }
+
+        function onKeyDown(event) {
+            if (event.key === "Escape") {
+                finish("cancel");
+                return;
+            }
+
+            if (event.key === "Enter" && (event.ctrlKey || event.metaKey) && popup.contains(event.target)) {
+                save();
+            }
+        }
+
+        function save() {
+            if (!textarea) {
+                finish("cancel");
+                return;
+            }
+
+            finish(mode === "create" ? "create" : "update", textarea.value.trim());
+        }
+
+        if (mode === "edit" && canDelete) {
+            const deleteBtn = makeButton(tr("Delete"), "btn btn-sm btn-outline-danger");
+
+            deleteBtn.onclick = () => finish("delete");
+            leftActions.appendChild(deleteBtn);
+        }
+
+        const cancelBtn = makeButton(readOnly ? tr("Close") : tr("Cancel"), "btn btn-sm btn-secondary");
+
+        cancelBtn.onclick = () => finish("cancel");
+        rightActions.appendChild(cancelBtn);
+
+        if (!readOnly) {
+            const saveBtn = makeButton(mode === "create" ? tr("Create") : tr("Update"), "btn btn-sm btn-primary");
+
+            saveBtn.onclick = save;
+            rightActions.appendChild(saveBtn);
+        }
+
+        document.body.appendChild(popup);
+        positionPopup(popup, anchorRect);
+
+        if (textarea) {
+            textarea.focus();
         }
 
         setTimeout(() => {
             document.addEventListener("mousedown", outsideClick);
+            document.addEventListener("keydown", onKeyDown);
         }, 0);
-
-        textarea.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-                cleanup();
-                resolve({ action: "cancel" });
-            }
-
-            if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-                saveBtn.click();
-            }
-        });
     });
 }
