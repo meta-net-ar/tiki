@@ -3491,4 +3491,48 @@ class Services_Tracker_Controller
             'useFolders' => $trackerField->getOption('useFolders')
         ];
     }
+
+    public function actionPreviewItemEmail($input)
+    {
+        $itemId = $input->itemId->int();
+        $fieldId = $input->fieldId->int();
+        $fileId = $input->fileId->int();
+
+        $trk = TikiLib::lib('trk');
+
+        $item = Tracker_Item::fromId($itemId);
+        $field = $trk->get_field_info($fieldId);
+
+        if (! $item || ! $field) {
+            throw new Services_Exception_NotFound();
+        }
+
+        $trackerId = $item->getDefinition()->getId();
+        $perms = Perms::get('tracker', $trackerId);
+        if (! $perms->view_trackers) {
+            throw new Services_Exception_Denied(tr("You don't have permission to view the tracker"));
+        }
+
+        /** @var Tracker_Field_EmailFolder $fieldHandler */
+        $fieldHandler = $item->getDefinition()->getFieldFactory()->getHandler($field, $item->getData());
+
+        if (! method_exists($fieldHandler, 'getEmailFromFile')) {
+            throw new ServicesExceptionBadRequest(tr('Incorrect field type'));
+        }
+
+        $email = $fieldHandler->getEmailFromFile($fileId);
+
+        if (! $email) {
+            throw new Services_Exception_NotFound();
+        }
+
+        // TODO: Fetch proper output from Cypht and return it here instead of raw data.
+        return [
+            'subject' => $email['subject'],
+            'from' => $email['from'],
+            'date' => $email['date'] ? TikiLib::lib('tiki')->get_long_datetime($email['date']) : '',
+            'html' => $email['html'],
+            'plaintext' => $email['plaintext'],
+        ];
+    }
 }
