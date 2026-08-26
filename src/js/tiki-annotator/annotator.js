@@ -111,7 +111,7 @@ export async function initRecogito(config) {
      * Load existing annotations
      */
     try {
-        const annotationsList = await loadAnnotations(objectUri, transformBackendResponse);
+        const annotationsList = await loadAnnotations(objectUri, (data) => transformBackendResponse(data, container));
 
         annotationsList.forEach((annotation) => rememberThreadId(annotation, annotation.threadId));
         anno.setAnnotations(annotationsList);
