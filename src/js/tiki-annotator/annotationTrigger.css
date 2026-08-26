@@ -1,0 +1,43 @@
+.btn.tiki-annotator-trigger {
+    position: fixed;
+    z-index: 1070;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    line-height: 1;
+}
+
+.tiki-annotator-trigger::after {
+    content: "";
+    position: absolute;
+    left: var(--tiki-annotator-arrow-left, 50%);
+    width: 0;
+    height: 0;
+    border: 0.375rem solid transparent;
+    transform: translateX(-50%);
+}
+
+.tiki-annotator-trigger--above::after {
+    top: 100%;
+    border-bottom-width: 0;
+    border-top-color: var(--bs-btn-bg);
+}
+
+.tiki-annotator-trigger--above:hover::after,
+.tiki-annotator-trigger--above:focus-visible::after {
+    border-top-color: var(--bs-btn-hover-bg);
+}
+
+.tiki-annotator-trigger--below::after {
+    bottom: 100%;
+    border-top-width: 0;
+    border-bottom-color: var(--bs-btn-bg);
+}
+
+.tiki-annotator-trigger--below:hover::after,
+.tiki-annotator-trigger--below:focus-visible::after {
+    border-bottom-color: var(--bs-btn-hover-bg);
+}
