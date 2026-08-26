@@ -83,7 +83,7 @@ export function openAnnotationPopup({ annotation, showAuthor = false, mode = "cr
             if (annotation.commentDate) parts.push(annotation.commentDate);
 
             meta.className = "small text-body-secondary mb-2";
-            meta.textContent = parts.join(" — ");
+            meta.textContent = parts.join(" | ");
             body.appendChild(meta);
         }
 

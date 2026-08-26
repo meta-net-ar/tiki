@@ -135,7 +135,7 @@
         },
         "postcss" : "8.5.25"
     },
-    "overridesComment": {
+    "overridesComment" : {
         "dompurify": [
             "This override forces all packages to use DOMPurify v3.4.12 to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
             "Upgrading from v2 to v3 is safe for our project because we do not support Internet Explorer (IE).",
