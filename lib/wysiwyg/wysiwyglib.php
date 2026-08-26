@@ -10,6 +10,74 @@
 
 class WYSIWYGLib
 {
+    /**
+     * Editorial disambiguation map from Tiki language codes to editor locale codes.
+     * Used by resolveLocaleCode() (Summernote) and languageMapISO() (Toast UI).
+     *
+     * TikiLib::get_language() returns bare codes (e.g. 'es', 'fr'), which can match
+     * more than one locale file on disk. This map makes the explicit editorial choice
+     * (e.g. 'de' → 'de-DE' rather than 'de-CH'). Languages absent from the map fall
+     * back to disk-based discovery in resolveSummernoteLocale().
+     *
+     * Special cases:
+     *   - Empty string (''): English — Summernote has no locale file; Toast uses its default.
+     *   - 'ar': bare code kept because Toast UI ships ar.js; Summernote resolves ar-AR from disk.
+     */
+    private const TIKI_EDITOR_LOCALE_MAP = [
+        'ar'      => 'ar',           // Toast UI: ar.js exists; Summernote: disk resolves ar-AR regardless
+        //'bg'    => 'bg',           // Bulgarian — no editor file yet
+        //'ca'    => 'ca',           // Catalan — no editor file yet
+        'cn'      => 'zh-CN',        // Simplified Chinese: Tiki='cn', editors='zh-CN'
+        'cs'      => 'cs-CZ',        // Czech
+        //'cy'    => 'cy',           // Welsh — no editor file yet
+        //'da'    => 'da',           // Danish — no editor file yet
+        'de'      => 'de-DE',        // German
+        'en'      => '',             // English — Toast default (no file); Summernote uses 'en-US' (built-in, no locale file loaded)
+        'en-uk'   => 'en-US',        // British English → en-US for both editors
+        'es'      => 'es-ES',        // Spanish
+        //'el'    => 'el',           // Greek — no editor file yet
+        //'fa'    => 'fa',           // Farsi — no editor file yet
+        'fi'      => 'fi-FI',        // Finnish
+        //'fj'    => 'fj',           // Fijian — no editor file yet
+        'fr'      => 'fr-FR',        // French
+        'fy-NL'   => 'nl-NL',        // West Frisian → Dutch (no dedicated file in either editor)
+        'gl'      => 'gl-ES',        // Galician
+        //'he'    => 'he',           // Hebrew — no editor file yet
+        'hr'      => 'hr-HR',        // Croatian
+        //'id'    => 'id',           // Indonesian — no editor file yet
+        //'is'    => 'is',           // Icelandic — no editor file yet
+        'it'      => 'it-IT',        // Italian
+        //'iu'    => 'iu',           // Inuktitut — no editor file yet
+        //'iu-ro' => 'iu-ro',        // Inuktitut (Roman) — no editor file yet
+        //'iu-iq' => 'iu-iq',        // Iniunnaqtun — no editor file yet
+        'ja'      => 'ja-JP',        // Japanese
+        'ko'      => 'ko-KR',        // Korean
+        //'hu'    => 'hu',           // Hungarian — no editor file yet
+        //'lt'    => 'lt',           // Lithuanian — no editor file yet
+        'nds'     => 'de-DE',        // Low German → German locale
+        'nl'      => 'nl-NL',        // Dutch
+        'no'      => 'nb-NO',        // Norwegian: Tiki='no', editors use Bokmål 'nb'
+        'pl'      => 'pl-PL',        // Polish
+        // 'pt' is intentionally absent: Toast UI has no pt.js (only pt-br.js, covered below),
+        // and Summernote resolves pt-PT from disk without a map entry.
+        'pt-br'   => 'pt-BR',        // Brazilian Portuguese
+        //'ro'    => 'ro',           // Romanian — no editor file yet
+        //'rm'    => 'rm',           // Romansh — no editor file yet
+        'ru'      => 'ru-RU',        // Russian
+        //'sb'    => 'sb',           // Pijin Solomon — no editor file yet
+        //'si'    => 'si',           // Sinhala — no editor file yet
+        //'sk'    => 'sk',           // Slovak — no editor file yet
+        //'sl'    => 'sl',           // Slovene — no editor file yet
+        //'sq'    => 'sq',           // Albanian — no editor file yet
+        'sr-latn' => 'sr-RS-Latin',  // Latin Serbian: suffix naming mismatch across editors
+        'sv'      => 'sv-SE',        // Swedish
+        //'tv'    => 'tv',           // Tuvaluan — no editor file yet
+        'tr'      => 'tr-TR',        // Turkish
+        'tw'      => 'zh-TW',        // Traditional Chinese: Tiki='tw', editors='zh-TW'
+        'uk'      => 'uk-UA',        // Ukrainian
+        //'vi'    => 'vi',           // Vietnamese — no editor file yet
+    ];
+
     public function setupInlineEditor($pageName)
     {
         global $prefs, $user;
@@ -64,17 +132,98 @@ class WYSIWYGLib
 
     public function getEditorLang()
     {
-        $lang = TikiLib::lib('tiki')->get_language();
-        if ($lang === 'en' || $lang === 'en-uk') { // Summernote only has en-US
-            $lang = 'en-US';
+        $tikLang = TikiLib::lib('tiki')->get_language();
+        $locale = $this->resolveLocaleCode($tikLang);
+        $langFilePath = NODE_PUBLIC_DIST_PATH . '/summernote/dist/lang/summernote-' . $locale . '.min.js';
+
+        return ['lang' => $locale, 'filePath' => $langFilePath];
+    }
+
+    /**
+     * Resolve the Summernote locale code for a given Tiki language code.
+     *
+     * TikiLib::get_language() returns bare codes (e.g. 'es', 'fr'). TIKI_EDITOR_LOCALE_MAP
+     * makes the editorial choice when a bare code would match multiple files on disk
+     * (e.g. 'de' → 'de-DE' rather than 'de-CH'). Languages absent from the map fall back
+     * to disk-based discovery in resolveSummernoteLocale().
+     *
+     * @see TikiLib::get_language()
+     */
+    protected function resolveLocaleCode(string $tikLang): string
+    {
+        $mapped = self::TIKI_EDITOR_LOCALE_MAP[$tikLang] ?? null;
+
+        if ($mapped === null) {
+            // Language not in map: auto-discover locale from disk.
+            return $this->resolveSummernoteLocale($tikLang);
+        } elseif ($mapped === '') {
+            // English: Summernote renders in English by default; no locale file is loaded.
+            return 'en-US';
+        } elseif (strpos($mapped, '-') !== false) {
+            // Full hyphenated locale (e.g. 'fr-FR', 'zh-CN'): use directly.
+            return $mapped;
         } else {
-            $parts = explode('-', $lang);
-            $lang = $parts[0] . '-' . strtoupper($parts[1] ?? $parts[0]);
+            // Bare language hint (e.g. 'ar'): let disk resolution find the best variant.
+            return $this->resolveSummernoteLocale($mapped);
+        }
+    }
+
+    /**
+     * Auto-discover and resolve the correct Summernote locale code from disk.
+     * Matches exact case-insensitive code, then falls back to prefix matching
+     * (with country-code tiebreaker), and finally defaults to 'en-US'.
+     */
+    protected function resolveSummernoteLocale(string $tikLang): string
+    {
+        $langDir = NODE_PUBLIC_DIST_PATH . '/summernote/dist/lang/';
+        $files = glob($langDir . 'summernote-*.min.js');
+
+        if (empty($files)) {
+            return 'en-US';
         }
 
-        $langFilePath = NODE_PUBLIC_DIST_PATH . '/summernote/dist/lang/summernote-' . $lang . '.min.js';
+        // Extract locale codes from file names (e.g. 'sv-SE', 'de-DE', 'de-CH')
+        $availableLocales = [];
+        foreach ($files as $file) {
+            if (preg_match('/summernote-(.+)\.min\.js$/', basename($file), $matches)) {
+                $availableLocales[] = $matches[1];
+            }
+        }
 
-        return ['lang' => $lang, 'filePath' => $langFilePath];
+        // 1. Exact match (case-insensitive) — e.g. Tiki 'pt-br' → Summernote 'pt-BR'
+        foreach ($availableLocales as $locale) {
+            if (strcasecmp($locale, $tikLang) === 0) {
+                return $locale;
+            }
+        }
+
+        // 2. Prefix match — e.g. Tiki 'sv' matches Summernote 'sv-SE'
+        $langPrefix = strtolower(explode('-', $tikLang)[0]);
+        $candidates = array_values(array_filter($availableLocales, function ($locale) use ($langPrefix) {
+            return strtolower(explode('-', $locale)[0]) === $langPrefix;
+        }));
+
+        if (count($candidates) === 1) {
+            return $candidates[0];
+        }
+
+        if (count($candidates) > 1) {
+            // Tiebreak: prefer the locale whose country suffix (uppercased)
+            // mirrors the language prefix — e.g. 'de' prefers 'de-DE' over 'de-CH'.
+            $preferredCountry = strtoupper($langPrefix);
+            foreach ($candidates as $locale) {
+                $parts = explode('-', $locale);
+                if (isset($parts[1]) && $parts[1] === $preferredCountry) {
+                    return $locale;
+                }
+            }
+            // No preferred match: return the first one alphabetically
+            sort($candidates);
+            return $candidates[0];
+        }
+
+        // 3. Fallback
+        return 'en-US';
     }
 
     public function setUpEditor($dom_id, $params = [])
@@ -284,71 +433,17 @@ class WYSIWYGLib
         return [];
     }
 
-    /** Map between tiki lang codes and Toast (uses ISO codes)
+    /**
+     * Map a Tiki language code to the locale code used by Toast UI editor.
+     * Reads from the shared TIKI_EDITOR_LOCALE_MAP constant so both editors
+     * are always in sync — update the constant, not this method.
      *
      * @param string $lang  Tiki language code
-     *
-     * @return string       mapped language code
-     *                      defaults empty if not found so not supported
+     * @return string       Toast UI locale code, or '' if Toast has no translation
      */
     private function languageMapISO($lang)
     {
-
-        $langMap = [
-            'ar' => 'ar',           // Arabic = United Arab Emirates
-            //'bg' => 'bg',         // Bulgarian
-            //'ca' => 'ca',         // Catalan
-            'cn' => 'zh-CN',        // China - Simplified Chinese
-            'cs' => 'cs-CZ',        // Czech
-            //'cy' => 'cy',         // Welsh
-            //'da' => 'da',         // Danish
-            'de' => 'de-DE',        // Germany - German
-            //'en-uk' => 'en-GB',   // United Kingdom - English
-            'en' => '',        // United States - English
-            'es' => 'es-ES',        // Spain - Spanish
-            //'el' => 'el',         // Greek
-            //'fa' => 'fa',         // Farsi
-            'fi' => 'fi-FI',         // Finnish
-            //'fj' => 'fj',         // Fijian
-            'fr' => 'fr-FR',        // France - French
-            'fy-NL' => 'nl',        // Netherlands - Dutch
-            'gl' => 'gl-ES',        // Galician
-            //'he' => 'he',         // Israel - Hebrew
-            'hr' => 'hr-HR',        // Croatian
-            //'id' => 'id',         // Indonesian
-            //'is' => 'is',         // Icelandic
-            'it' => 'it-IT',        // Italy - Italian
-            //'iu' => 'iu',         // Inuktitut
-            //'iu-ro' => 'iu-ro',   // Inuktitut (Roman)
-            //'iu-iq' => 'iu-iq',   // Iniunnaqtun
-            'ja' => 'ja-JP',        // Japan - Japanese
-            'ko' => 'ko-KR',        // Korean
-            //'hu' => 'hu',         // Hungarian
-            //'lt' => 'lt',         // Lithuanian
-            'nds' => 'de-DE',       // Low German
-            'nl' => 'nl-NL',        // Netherlands - Dutch
-            'no' => 'nb-NO',        // Norway - Norwegian
-            'pl' => 'pl-PL',        // Poland - Polish
-            'pt' => 'pt',           // Portuguese
-            'pt-br' => 'pt-BR',     // Brazil - Portuguese
-            //'ro' => 'ro',         // Romanian
-            //'rm' => 'rm',         // Romansh
-            'ru' => 'ru-RU',        // Russia - Russian
-            //'sb' => 'sb',           // Pijin Solomon
-            //'si' => 'si',         // Sinhala
-            //'sk' => 'sk',         // Slovak
-            //'sl' => 'sl',         // Slovene
-            //'sq' => 'sq',         // Albanian
-            //'sr-latn' => 'sr-latn',   // Serbian Latin
-            'sv' => 'sv-SE',        // Sweden - Swedish
-            //'tv' => 'tv',           // Tuvaluansr-latn
-            'tr' => 'tr-TR',        // Turkey - Turkish
-            'tw' => 'zh-TW',        // Taiwan - Traditional Chinese
-            'uk' => 'uk-UA',        // Ukrainian
-            //'vi' => 'vi',         // Vietnamese
-        ];
-
-        return $langMap[$lang] ?? '';
+        return self::TIKI_EDITOR_LOCALE_MAP[$lang] ?? '';
     }
 
     private function processSpecialHeadings($content)
