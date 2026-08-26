@@ -1,3 +1,5 @@
+import { isLegacyAnnotation, legacyToRecogito } from "./legacy.js";
+
 const COMMENTING_PURPOSE = "commenting";
 
 export function tr(key) {
@@ -62,12 +64,14 @@ export function isAllowed(permissions, action) {
  * Transform backend response to Recogito-compatible format
  * Recogito expects: [{id, bodies, target}, ...]
  */
-export function transformBackendResponse(data) {
+export function transformBackendResponse(data, container) {
     if (!data?.rows || !Array.isArray(data.rows)) return [];
 
     return data.rows
         .map((row) => {
-            const annotation = { ...row?.annotation };
+            const annotation = isLegacyAnnotation(row?.annotation) ? legacyToRecogito(row, container) : { ...row.annotation };
+
+            if (!annotation) return null;
 
             if (typeof row?.text === "string" && row.text !== "") {
                 setCommentBody(annotation, row.text);
@@ -83,6 +87,17 @@ export function transformBackendResponse(data) {
         .filter(isRecogitoAnnotation);
 }
 
+function withoutRanges(target) {
+    if (!target) return {};
+
+    const selector = Array.isArray(target.selector) ? target.selector : target.selector ? [target.selector] : [];
+
+    return {
+        ...target,
+        selector: selector.map((s) => ({ id: s.id, quote: s.quote, start: s.start, end: s.end })),
+    };
+}
+
 /**
  * Convert W3C annotation back to legacy backend format
  */
@@ -94,7 +109,7 @@ export function convertToLegacyPayload(w3cAnnotation, objectUri, threadId = null
         params: {
             id: w3cAnnotation?.id,
             bodies: w3cAnnotation?.bodies ?? [],
-            target: w3cAnnotation?.target ?? {},
+            target: withoutRanges(w3cAnnotation?.target),
             annotationlib: "recogito",
         },
         uri: String(objectUri || "").trim(),
