@@ -7,7 +7,7 @@
 /**
  * Class Services_Annotator_Controller
  *
- * Linking annotatorjs to inline comments
+ * Linking the recogito text annotator to inline comments
  */
 
 const RANGE_ATTRIBUTE = 'tiki.comment.ranges';
@@ -36,31 +36,34 @@ class Services_Comment_AnnotationController
      * Create an inline comment
      *
      * @param jitFilter $input
-     *        string    json encoded comment info from annotatorjs
-     * containing:
      *        string    text    comment text
      *        string    quote   quoted text on page
-     *        array     data    annotation info for quoted text
+     *        string    params  json encoded W3C annotation describing the quoted text
      *        string    uri     actually object-type:object-id identifier for the tiki object to be commented
+     *        string    ticket  csrf ticket
      *
-     * @return array    unused probably
+     * @return array    the new comment threadId plus a fresh csrf ticket
      *
      * @throws Exception
+     * @throws Services_Exception
      * @throws Services_Exception_Denied
      */
 
     public function action_create($input)
     {
-        global $user, $headerlib;
+        global $user;
 
-        $rawJson = file_get_contents('php://input');
-        $params = new JitFilter(json_decode((string) $rawJson, true) ?? []);
+        $util = new Services_Utilities();
 
-        $text = $params->text->wikicontent();
-        $quote = $params->quote->text();
-        $data = $params->data->none();
-        $identifier = urldecode($params->uri->url()); // not really the uri but object-type:object-id identifier
-        list($objectType, $objectId) = explode(':', $identifier, 2);
+        if (! $util->checkCsrf()) {
+            throw new Services_Exception(tr('Invalid security ticket.'), 401);
+        }
+
+        $text = $input->text->wikicontent();
+        $quote = $input->quote->text();
+        $annotation = $this->decodeAnnotation($input);
+
+        list($objectType, $objectId) = $this->splitIdentifier($input);
 
         if (! $this->commentController->canPost($objectType, $objectId)) {
             throw new Services_Exception_Denied();
@@ -84,7 +87,7 @@ class Services_Comment_AnnotationController
             'comment',
             $threadId,
             RANGE_ATTRIBUTE,
-            json_encode($data)
+            json_encode($annotation)
         );
 
         require_once(__DIR__ . '/../../../notifications/notificationemaillib.php');
@@ -92,6 +95,8 @@ class Services_Comment_AnnotationController
 
         return [
             'id' => $threadId,
+            'threadId' => $threadId,
+            'ticket' => $this->refreshTicket($util),
         ];
     }
 
@@ -99,63 +104,67 @@ class Services_Comment_AnnotationController
      * Update an inline comment
      *
      * @param jitFilter $input
-     *        string    json encoded comment info from annotatorjs
-     * containing:
-     *        int       id      comment threadId
-     *        string    text    comment text
-     *        string    quote   quoted text on page
-     *        array     data    annotation info for quoted text
-     *        string    uri     actually object-type:object-id identifier for the tiki object to be commented
-     *        string    created datetime updated (?)
-     *        string    updated datetime updated
+     *        int       threadId    comment threadId
+     *        string    text        comment text
+     *        string    quote       quoted text on page
+     *        string    params      json encoded W3C annotation describing the quoted text
+     *        string    ticket      csrf ticket
      *
-     * @return array    unused probably
+     * @return array    the edited comment plus a fresh csrf ticket
      *
      * @throws Exception
+     * @throws Services_Exception
      * @throws Services_Exception_Denied
      * @throws Services_Exception_NotFound
      */
 
     public function action_update($input)
     {
+        $util = new Services_Utilities();
+
+        if (! $util->checkCsrf()) {
+            throw new Services_Exception(tr('Invalid security ticket.'), 401);
+        }
+
         $threadId = $input->threadId->int();
 
-        $rawJson = file_get_contents('php://input');
-        $params = new JitFilter(json_decode((string) $rawJson, true) ?? []);
+        if (! $threadId) {
+            throw new Services_Exception(tr('Thread not specified.'), 400);
+        }
 
-        // If threadId is not provided in the input, use the one from the JSON payload
-        $threadId = $threadId ?? $params->threadId->int();
-
-        $data = $params->data->none();
-        $text = $params->text->wikicontent();
-        $quote = $params->quote->text();
+        $annotation = $this->decodeAnnotation($input);
+        $text = $input->text->wikicontent();
+        $quote = $input->quote->text();
 
         $input->offsetSet('data', $this->formatComment($quote, $text));
         $input->offsetSet('title', $this->createTitle($text));
         $input->offsetSet('edit', 1);
-
-        // ensure threadId is set in the input for the commentController
         $input->offsetSet('threadId', $threadId);
 
         $ret = $this->commentController->action_edit($input);
 
-        if ($ret) {
-            TikiLib::lib('attribute')->set_attribute(
-                'comment',
-                $threadId,
-                RANGE_ATTRIBUTE,
-                json_encode($data)
-            );
+        if (! empty($ret['errors'])) {
+            throw new Services_Exception(implode(' ', $ret['errors']), 400);
         }
+
+        TikiLib::lib('attribute')->set_attribute(
+            'comment',
+            $threadId,
+            RANGE_ATTRIBUTE,
+            json_encode($annotation)
+        );
+
+        $ret['ticket'] = $this->refreshTicket($util);
 
         return $ret;
     }
 
     /**
-     * Remove an inline comment - warning, no confirmation yet
+     * Remove an inline comment
      *
      * @param jitFilter $input
      *        int       threadId  comment id to delete
+     *        string    ticket    csrf ticket
      *
      * @return array
      * @throws Services_Exception
@@ -163,14 +172,16 @@ class Services_Comment_AnnotationController
 
     public function action_destroy($input)
     {
+        $util = new Services_Utilities();
 
-        $rawJson = file_get_contents('php://input');
-        $params = new JitFilter(json_decode((string) $rawJson, true) ?? []);
+        if (! $util->checkCsrf()) {
+            throw new Services_Exception(tr('Invalid security ticket.'), 401);
+        }
 
-        $threadId = $params->threadId->int();
+        $threadId = $input->threadId->int();
 
         if (! $threadId) {
-            throw new Services_Exception("Thread not specified.");
+            throw new Services_Exception(tr('Thread not specified.'), 400);
         }
 
         $input->offsetSet('threadId', $threadId);
@@ -179,6 +190,7 @@ class Services_Comment_AnnotationController
         $ret = $this->commentController->action_remove($input);
 
         $ret['id'] = $ret['threadId'];
+        $ret['ticket'] = $this->refreshTicket($util);
 
         return $ret;
     }
@@ -203,12 +215,11 @@ class Services_Comment_AnnotationController
         $tikilib = TikiLib::lib('tiki');
         $userlib = TikiLib::lib('user');
 
-        $identifier = urldecode($input->uri->url());
-        $object = explode(':', $identifier);
+        list($objectType, $objectId) = $this->splitIdentifier($input);
 
         $list = $this->commentController->action_list(new JitFilter([
-            'type' => $object[0],
-            'objectId' => $object[1],
+            'type' => $objectType,
+            'objectId' => $objectId,
         ]));
 
         $comments = [];
@@ -217,7 +228,7 @@ class Services_Comment_AnnotationController
             if (str_starts_with($comment['data'], ';note:')) {         // only the "inline" ones starting ;note: so far
                 $data = explode("\n", $comment['data'], 2);
                 $quote = trim(substr($data[0], 6));
-                $text = trim($data[1]);
+                $text = isset($data[1]) ? trim($data[1]) : '';
 
                 $annotation_data = json_decode(
                     TikiLib::lib('attribute')->get_attribute(
@@ -240,7 +251,7 @@ class Services_Comment_AnnotationController
                     'quote'       => $quote,
                     'created'     => $tikilib->get_iso8601_datetime($comment['commentDate']),
                     'updated'     => $tikilib->get_iso8601_datetime($comment['commentDate']),   // we don't have a commentUpdated column?
-                    'annotation'      => $annotation_data ? $annotation_data : [],
+                    'annotation'  => $annotation_data ? $annotation_data : [],
                     'permissions' => $permissions,
                     'threadId'    => $comment['threadId'],
                 ];
@@ -259,6 +270,58 @@ class Services_Comment_AnnotationController
             'total' => count($comments),    // TODO pagination
             'rows' => $comments,
         ];
+    }
+
+    /**
+     * Split the "uri" input into object type and id
+     *
+     * @param jitFilter $input
+     * @return array    [objectType, objectId]
+     * @throws Services_Exception
+     */
+    private function splitIdentifier($input)
+    {
+        $identifier = urldecode($input->uri->url());
+        $parts = explode(':', $identifier, 2);
+
+        if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '') {
+            throw new Services_Exception(tr('Object not specified.'), 400);
+        }
+
+        return $parts;
+    }
+
+    /**
+     * Decode the W3C annotation sent as a json string in the "params" field
+     *
+     * @param jitFilter $input
+     * @return array
+     */
+    private function decodeAnnotation($input)
+    {
+        $raw = $input->params->none();
+
+        if (is_array($raw)) {
+            return $raw;
+        }
+
+        $decoded = json_decode((string) $raw, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Issue a fresh csrf ticket for the next call
+     *
+     * @param Services_Utilities $util
+     * @return mixed
+     * @throws Exception
+     */
+    private function refreshTicket(Services_Utilities $util)
+    {
+        $util->setTicket();
+
+        return $util->getTicket();
     }
 
     /**
