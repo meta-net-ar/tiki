@@ -198,7 +198,7 @@ function wikiplugin_map($data, $params)
     }
 
 
-    $popupStyle = smarty_modifier_escape($params['popupstyle']);
+    $popupStyle = \SmartyTiki\Modifier\Escape::apply($params['popupstyle']);
 
     if ($params['tooltips'] === 'y') {
         $tooltips = ' data-tooltips="1"';
@@ -249,7 +249,7 @@ function wikiplugin_map($data, $params)
     $geolib = TikiLib::lib('geo');
     if (isset($params['center'])) {
         if ($coords = $geolib->parse_coordinates($params['center'])) {
-            $center = ' data-geo-center="' . smarty_modifier_escape($geolib->build_location_string($coords)) . '" ';
+            $center = ' data-geo-center="' . \SmartyTiki\Modifier\Escape::apply($geolib->build_location_string($coords)) . '" ';
         }
     } else {
         $center = $geolib->get_default_center();
@@ -257,7 +257,7 @@ function wikiplugin_map($data, $params)
 
     TikiLib::lib('header')->add_map();
 
-    $scope = smarty_modifier_escape(wp_map_getscope($params));
+    $scope = \SmartyTiki\Modifier\Escape::apply(wp_map_getscope($params));
 
     $output = "<div class=\"map-container\" data-marker-filter=\"$scope\" data-map-controls=\"$controls\" data-popup-style=\"$popupStyle\"" .
         " style=\"width: $width; height: $height;\" $center $tooltips $cluster $clusterFillColor $clusterTextColor $tilesets $clusterHover $clusterExcludeField $clusterIncludeField>";
@@ -345,7 +345,7 @@ function wp_map_plugin_searchlayer($body, $args)
 
     $filters = '';
     foreach ($args as $key => $arg) {
-        $filters .= '<input type="hidden" name="filter~' . $key . '" value="' . smarty_modifier_escape($arg) . '"/>';
+        $filters .= '<input type="hidden" name="filter~' . $key . '" value="' . \SmartyTiki\Modifier\Escape::apply($arg) . '"/>';
     }
 
     if ($maxRecords) {
@@ -361,7 +361,7 @@ function wp_map_plugin_searchlayer($body, $args)
         $fields = array_map(function ($field) {
             return str_replace('tracker_field_', '', $field);
         }, $fields);
-        $fieldList = '<input type="hidden" name="fields" value="' . smarty_modifier_escape(implode(',', $fields)) . '"/>';
+        $fieldList = '<input type="hidden" name="fields" value="' . \SmartyTiki\Modifier\Escape::apply(implode(',', $fields)) . '"/>';
     }
 
     $popup_config = [];
@@ -378,8 +378,8 @@ function wp_map_plugin_searchlayer($body, $args)
     }
     $popup_fields = implode(',', $fields);
 
-    $escapedLayer = smarty_modifier_escape($layer);
-    $escapedSuffix = smarty_modifier_escape($suffix);
+    $escapedLayer = \SmartyTiki\Modifier\Escape::apply($layer);
+    $escapedSuffix = \SmartyTiki\Modifier\Escape::apply($suffix);
     return <<<OUT
 <form method="post" action="tiki-searchindex.php" class="search-box onload" style="display: none" data-result-refresh="$refresh" data-result-layer="$escapedLayer" data-result-suffix="$escapedSuffix" data-load-delay="$load_delay" data-popup-fields="$popup_fields" data-popup-tpl="$popup_tpl"{$popup_config}>
     <p>$maxRecords$sort_mode$fieldList$filters<input type="submit" class="btn btn-primary btn-sm" /></p>

@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty {translation lang=XX}{/translation} block plugin
@@ -25,8 +26,13 @@ use Smarty\Template;
  * @param Smarty clever simulation of a method
  * @return string string $content re-formatted
  */
-class Translation extends Base
+class Translation extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'translation';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if (! $repeat && ! empty($content)) {

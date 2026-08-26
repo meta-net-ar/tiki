@@ -10,9 +10,15 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\Exception;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Article extends Base
+class Article extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'article';
+    }
+
     public function handle($params, Template $template)
     {
         $tikilib = \TikiLib::lib('tiki');

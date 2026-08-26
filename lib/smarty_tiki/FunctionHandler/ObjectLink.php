@@ -11,9 +11,18 @@ use Perms;
 use Tracker_Definition;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
-class ObjectLink extends Base
+class ObjectLink extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'object_link';
+    }
+
     public function handle($params, Template $template)
     {
         if (! isset($params['type'], $params['id']) &&  ! isset($params['type'], $params['objectId']) && ! isset($params['identifier'])) {
@@ -125,14 +134,14 @@ class ObjectLink extends Base
         $text = $title;
         $titleAttribute = '';
         if ($type == 'wiki page') {
-            $titleAttribute .= ' title="' . smarty_modifier_escape($title) . '"';
+            $titleAttribute .= ' title="' . \SmartyTiki\Modifier\Escape::apply($title) . '"';
             $text = \TikiLib::lib('wiki')->get_without_namespace($title);
         }
 
-        $escapedText = smarty_modifier_escape($text ? $text : tra('No title specified'), 'html', 'UTF-8', false);
+        $escapedText = \SmartyTiki\Modifier\Escape::apply($text ? $text : tra('No title specified'), 'html', 'UTF-8', false);
 
         if ($url) {
-            $escapedHref = smarty_modifier_escape(\TikiLib::tikiUrlOpt($url));
+            $escapedHref = \SmartyTiki\Modifier\Escape::apply(\TikiLib::tikiUrlOpt($url));
         } else {
             if ($type == 'tracker') {
                 $definition = Tracker_Definition::get($object);
@@ -140,7 +149,7 @@ class ObjectLink extends Base
                     return $escapedText;
                 }
             }
-            $escapedHref = smarty_modifier_escape(smarty_modifier_sefurl($object, $type));
+            $escapedHref = \SmartyTiki\Modifier\Escape::apply(\SmartyTiki\Modifier\Sefurl::apply($object, $type));
         }
 
         $classList = [];
@@ -162,7 +171,7 @@ class ObjectLink extends Base
         // Add target attribute if specified
         $targetAttribute = '';
         if (! empty($params['target'])) {
-            $targetAttribute = ' target="' . smarty_modifier_escape($params['target']) . '"';
+            $targetAttribute = ' target="' . \SmartyTiki\Modifier\Escape::apply($params['target']) . '"';
         }
 
         if (! str_contains($escapedHref, '://')) {
@@ -183,7 +192,7 @@ class ObjectLink extends Base
         global $prefs;
         if (isset($attributes['tiki.content.source']) && $prefs['fgal_source_show_refresh'] == 'y') {
             $html .= '<a class="file-refresh" href="' .
-            smarty_function_service(
+            \SmartyTiki\FunctionHandler\Service::render(
                 [
                     'controller' => 'file',
                     'action' => 'refresh',
@@ -191,7 +200,7 @@ class ObjectLink extends Base
                 ],
                 $template
             ) . '">' .
-            smarty_function_icon(
+            \SmartyTiki\FunctionHandler\Icon::render(
                 ['_id' => 'arrow_refresh',],
                 $template
             ) . '</a>';
@@ -207,10 +216,10 @@ class ObjectLink extends Base
         }
 
         if (! empty($params['metaItemId'])) {
-            $html .= smarty_function_icon([
+            $html .= \SmartyTiki\FunctionHandler\Icon::render([
                 'name' => 'clipboard-list',
                 'title' => tr('show metadata'),
-                'href' => smarty_modifier_escape(smarty_modifier_sefurl($params['metaItemId'], 'trackeritem')),
+                'href' => \SmartyTiki\Modifier\Escape::apply(\SmartyTiki\Modifier\Sefurl::apply($params['metaItemId'], 'trackeritem')),
             ], $template) . '</a>';
         }
 
@@ -221,7 +230,7 @@ class ObjectLink extends Base
     {
         $comments_lib = \TikiLib::lib('comments');
         $comment = $comments_lib->get_comment($object);
-        $url = is_array($comment) ? smarty_modifier_sefurl($object, $comment['objectType'] . '_comment') : smarty_modifier_sefurl($object, 'comment' . '_comment');
+        $url = is_array($comment) ? \SmartyTiki\Modifier\Sefurl::apply($object, $comment['objectType'] . '_comment') : \SmartyTiki\Modifier\Sefurl::apply($object, 'comment' . '_comment');
 
         if (empty($title)) {
             $title = \TikiLib::lib('object')->get_title($type, $object, empty($params['format']) ? null : $params['format']);
@@ -234,7 +243,7 @@ class ObjectLink extends Base
     {
         $item = \Tracker_Item::fromId($object);
 
-        $pre = smarty_function_tracker_item_status_icon(['item' => $item], $template);
+        $pre = \SmartyTiki\FunctionHandler\TrackerItemStatusIcon::render(['item' => $item], $template);
         if (! empty($pre)) {
             $pre .= " ";
         }
@@ -253,13 +262,13 @@ class ObjectLink extends Base
                 $title = \TikiLib::lib('object')->get_title($type, $object, empty($params['format']) ? null : $params['format'], $params['metaItemId'] ?? null);
             }
 
-            return $pre . smarty_modifier_escape($title);
+            return $pre . \SmartyTiki\Modifier\Escape::apply($title);
         }
     }
 
     public function smartyFunctionObjectLinkUser($template, $user, $title = null)
     {
-        return smarty_modifier_userlink($user, 'link', 'not_set', $title ? $title : '');
+        return \SmartyTiki\Modifier\UserLink::apply($user, 'link', 'not_set', $title ? $title : '');
     }
 
     public function smartyFunctionObjectLinkExternal($template, $link_orig, $title = null, $type = null)
@@ -286,9 +295,9 @@ class ObjectLink extends Base
             }
         }
 
-        $escapedHref = smarty_modifier_escape($link);
-        $escapedLink = smarty_modifier_escape($link_orig);
-        $escapedTitle = smarty_modifier_escape($title);
+        $escapedHref = \SmartyTiki\Modifier\Escape::apply($link);
+        $escapedLink = \SmartyTiki\Modifier\Escape::apply($link_orig);
+        $escapedTitle = \SmartyTiki\Modifier\Escape::apply($title);
 
         if ($type == 'external_extended' && "$link_orig" != "$title") {
             $data = '<a rel="external" href="' . $escapedHref . '">' . $escapedLink . '</a>'
@@ -387,7 +396,7 @@ class ObjectLink extends Base
             }
         }
         // Check if 'threadId' key exists in $comment array before accessing it
-        return array_key_exists('threadId', $comment) && isset($comment['threadId']) ? "<a href='tiki-view_forum_thread.php?threadId=" . $comment['threadId'] . "'>" . smarty_modifier_escape($comment['title']) . "</a>" : "<span>" . smarty_modifier_escape($comment['title']) . "</span>";
+        return array_key_exists('threadId', $comment) && isset($comment['threadId']) ? "<a href='tiki-view_forum_thread.php?threadId=" . $comment['threadId'] . "'>" . \SmartyTiki\Modifier\Escape::apply($comment['title']) . "</a>" : "<span>" . \SmartyTiki\Modifier\Escape::apply($comment['title']) . "</span>";
     }
 
     public function smartyFunctionObjectLinkEmail($template, $object)

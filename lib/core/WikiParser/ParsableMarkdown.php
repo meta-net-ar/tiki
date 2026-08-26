@@ -147,7 +147,7 @@ class WikiParser_ParsableMarkdown extends ParserLib
     private function addHeadingLinks($data)
     {
         $smarty = TikiLib::lib('smarty');
-        $icon = smarty_function_icon(['name' => 'link'], $smarty->getEmptyInternalTemplate());
+        $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'link'], $smarty->getEmptyInternalTemplate());
         $all_anchors = [];
 
         $data = preg_replace_callback('#<h([1-6])>(.+?)</h\1>#is', function ($matches) use ($icon, $all_anchors) {

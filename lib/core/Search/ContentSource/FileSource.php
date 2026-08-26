@@ -98,7 +98,10 @@ class Search_ContentSource_FileSource implements Search_ContentSource_Interface,
                         if (! empty($parsed_fields['source_id'])) {
                             $page_info = TikiLib::lib('tiki')->get_page_info_from_id($parsed_fields['source_id']);
                             if ($page_info && stristr($page_info['data'], "cypht")) {
-                                $view_path = smarty_modifier_sefurl($page_info['pageName']);
+                                $view_path = \SmartyTiki\Modifier\Sefurl::apply($page_info['pageName']);
+                                if (preg_match("/tiki-index\.php\?page=.*/", $view_path)) {
+                                    $view_path = "tiki-index.php?page_id=" . $parsed_fields['source_id'];
+                                }
                             }
                         }
                         if (str_contains($view_path, '?')) {

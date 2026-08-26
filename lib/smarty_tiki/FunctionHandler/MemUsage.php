@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class MemUsage extends Base
+class MemUsage extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'memusage';
+    }
+
     public function handle($params, Template $template)
     {
         if (function_exists('memory_get_peak_usage')) {

@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * \brief Smarty modifier to replace strings
  *
@@ -24,8 +26,13 @@ namespace SmartyTiki\Modifier;
  *
  * Example: {$country|stringfix:"_":" "}
  */
-class StringFix
+class StringFix implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'stringfix';
+    }
+
     public function handle($string, $what = '_', $by = ' ')
     {
         // Convert $string to string if null

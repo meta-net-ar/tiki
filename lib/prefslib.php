@@ -334,23 +334,23 @@ class PreferencesLib
             $info['popup_html'] = '<ul class="list-unstyled">';
 
             if (! empty($info['admin'])) {
-                $icon = smarty_function_icon([ 'name' => 'settings'], $smarty->getEmptyInternalTemplate());
+                $icon = \SmartyTiki\FunctionHandler\Icon::render([ 'name' => 'settings'], $smarty->getEmptyInternalTemplate());
                 $info['popup_html'] .= '<li><a class="icon" href="' . $info['admin'] . '">' . $icon . ' ' . tra('Settings') . '</a></li>';
             }
             if (! empty($info['permission'])) {
-                $icon = smarty_function_icon([ 'name' => 'permission'], $smarty->getEmptyInternalTemplate());
+                $icon = \SmartyTiki\FunctionHandler\Icon::render([ 'name' => 'permission'], $smarty->getEmptyInternalTemplate());
                 $info['popup_html'] .= '<li><a class="icon" href="' . $info['permission'] . '">' . $icon . ' ' . tra('Permissions') . '</a></li>';
             }
             if (! empty($info['view'])) {
-                $icon = smarty_function_icon([ 'name' => 'view'], $smarty->getEmptyInternalTemplate());
+                $icon = \SmartyTiki\FunctionHandler\Icon::render([ 'name' => 'view'], $smarty->getEmptyInternalTemplate());
                 $info['popup_html'] .= '<li><a class="icon" href="' . $info['view'] . '">' . $icon . ' ' . tra('View') . '</a></li>';
             }
             if (! empty($info['module'])) {
-                $icon = smarty_function_icon([ 'name' => 'module'], $smarty->getEmptyInternalTemplate());
+                $icon = \SmartyTiki\FunctionHandler\Icon::render([ 'name' => 'module'], $smarty->getEmptyInternalTemplate());
                 $info['popup_html'] .= '<li><a class="icon" href="' . $info['module'] . '">' . $icon . ' ' . tra('Modules') . '</a></li>';
             }
             if (! empty($info['plugin'])) {
-                $icon = smarty_function_icon([ 'name' => 'plugin'], $smarty->getEmptyInternalTemplate());
+                $icon = \SmartyTiki\FunctionHandler\Icon::render([ 'name' => 'plugin'], $smarty->getEmptyInternalTemplate());
                 $info['popup_html'] .= '<li><a class="icon" href="' . $info['plugin'] . '">' . $icon . ' ' . tra('Plugins') . '</a></li>';
             }
             $info['popup_html'] .= '</ul>';
@@ -363,19 +363,19 @@ class PreferencesLib
             $info['voting_html'] = '';
 
             if (! in_array('like', $currentVote)) {
-                $info['voting_html'] .= smarty_function_icon($this->getVoteIconParams($info['preference'], 'like', tra('Like')), $smarty->getEmptyInternalTemplate());
+                $info['voting_html'] .= \SmartyTiki\FunctionHandler\Icon::render($this->getVoteIconParams($info['preference'], 'like', tra('Like')), $smarty->getEmptyInternalTemplate());
             } else {
-                $info['voting_html'] .= smarty_function_icon($this->getVoteIconParams($info['preference'], 'unlike', tra("Don't like")), $smarty->getEmptyInternalTemplate());
+                $info['voting_html'] .= \SmartyTiki\FunctionHandler\Icon::render($this->getVoteIconParams($info['preference'], 'unlike', tra("Don't like")), $smarty->getEmptyInternalTemplate());
             }
 //              if (!in_array('fix', $currentVote)) {
-//                  $info['voting_html'] .= smarty_function_icon($this->getVoteIconParams($info['preference'], 'fix', tra('Fix me')), $smarty);
+//                  $info['voting_html'] .= \SmartyTiki\FunctionHandler\Icon::render($this->getVoteIconParams($info['preference'], 'fix', tra('Fix me')), $smarty);
 //              } else {
-//                  $info['voting_html'] .= smarty_function_icon($this->getVoteIconParams($info['preference'], 'unfix', tra("Don't fix me")), $smarty);
+//                  $info['voting_html'] .= \SmartyTiki\FunctionHandler\Icon::render($this->getVoteIconParams($info['preference'], 'unfix', tra("Don't fix me")), $smarty);
 //              }
 //              if (!in_array('wtf', $currentVote)) {
-//                  $info['voting_html'] .= smarty_function_icon($this->getVoteIconParams($info['preference'], 'wtf', tra("What's this for?")), $smarty);
+//                  $info['voting_html'] .= \SmartyTiki\FunctionHandler\Icon::render($this->getVoteIconParams($info['preference'], 'wtf', tra("What's this for?")), $smarty);
 //              } else {
-//                  $info['voting_html'] .= smarty_function_icon($this->getVoteIconParams($info['preference'], 'unwtf', tra("What's this for?")), $smarty);
+//                  $info['voting_html'] .= \SmartyTiki\FunctionHandler\Icon::render($this->getVoteIconParams($info['preference'], 'unwtf', tra("What's this for?")), $smarty);
 //              }
         }
 

@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty plugin Accordion
@@ -26,8 +27,13 @@ use Smarty\Template;
  *  {/accordion}
  * \endcode
  */
-class Accordion extends Base
+class Accordion extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'accordion';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $accordion_current_group;

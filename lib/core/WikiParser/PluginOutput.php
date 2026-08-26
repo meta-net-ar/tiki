@@ -57,7 +57,7 @@ class WikiParser_PluginOutput
 
         return new self(
             'html',
-            smarty_block_remarksbox(
+            \SmartyTiki\BlockHandler\Remarksbox::render(
                 [
                             'type' => 'error',
                             'title' => $label,
@@ -81,11 +81,11 @@ class WikiParser_PluginOutput
             $smarty = TikiLib::lib('smarty');
             $content .= '<form method="post" action="tiki-admin.php">';
             foreach ($preferences as $pref) {
-                $content .= smarty_function_preference(['name' => $pref, 'visible' => 'always'], $smarty->getEmptyInternalTemplate());
+                $content .= \SmartyTiki\FunctionHandler\Preference::render(['name' => $pref, 'visible' => 'always'], $smarty->getEmptyInternalTemplate());
             }
-            $content .= smarty_function_ticket([], $smarty->getEmptyInternalTemplate());
+            $content .= \SmartyTiki\FunctionHandler\Ticket::render([], $smarty->getEmptyInternalTemplate());
             $content .= '<input type="submit" class="btn btn-primary btn-sm" value="'
-                . smarty_modifier_escape(tra('Set')) . '">';
+                . \SmartyTiki\Modifier\Escape::apply(tra('Set')) . '">';
             if (! empty($gobackto)) {
                 $content .= '<input type="hidden" name="gobackto" value="' . $gobackto . '" >';
             }

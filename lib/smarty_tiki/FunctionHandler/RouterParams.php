@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Render the inputs that will allow to customize a custom route
@@ -16,8 +17,13 @@ use Smarty\Template;
  * @param $params
  * @param $smarty
  */
-class RouterParams extends Base
+class RouterParams extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'router_params';
+    }
+
     public function handle($params, Template $template)
     {
         if (empty($params['name'])) {
@@ -38,7 +44,7 @@ class RouterParams extends Base
         $html = '';
 
         foreach ($inputParams as $key => $param) {
-            $escapedParam = smarty_modifier_escape($routerParams[$key]);
+            $escapedParam = \SmartyTiki\Modifier\Escape::apply($routerParams[$key]);
             $inputKey = $routerName . '_' . $key;
 
             switch ($param['type']) {
@@ -52,7 +58,7 @@ class RouterParams extends Base
                         $args = [];
                         if ($param['args']) {
                             foreach ($param['args'] as $value) {
-                                $args[] = smarty_modifier_escape($routerParams[$value]);
+                                $args[] = \SmartyTiki\Modifier\Escape::apply($routerParams[$value]);
                             }
                         }
 
@@ -75,8 +81,8 @@ class RouterParams extends Base
 
             $infoHtml = '';
             if (! empty($param['description'])) {
-                $description = smarty_modifier_escape($param['description']);
-                $icon = smarty_function_icon(['name' => 'information'], $template);
+                $description = \SmartyTiki\Modifier\Escape::apply($param['description']);
+                $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'information'], $template);
 
                 $infoHtml = <<<HTML
     <a class="tikihelp text-info" title="{$param['name']}: {$description}">

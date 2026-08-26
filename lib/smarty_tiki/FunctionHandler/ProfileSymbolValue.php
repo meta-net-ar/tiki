@@ -10,6 +10,8 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * Smarty plugin
@@ -40,8 +42,15 @@ use TikiLib;
  *    {profilesymbolvalue ref="profile_reference" profile="profile_name" domain="https://profiles.tiki.org" cache="n"}
  *
  */
-class ProfileSymbolValue extends Base
+class ProfileSymbolValue extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'profilesymbolvalue';
+    }
+
     public function handle($params, Template $template)
     {
         extract($params, EXTR_SKIP);

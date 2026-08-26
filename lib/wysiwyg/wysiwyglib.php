@@ -48,7 +48,7 @@ class WYSIWYGLib
         $headerlib = TikiLib::lib('header');
         $smarty = TikiLib::lib('smarty');
 
-        $tools = json_encode(smarty_function_toolbars($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
+        $tools = json_encode(\SmartyTiki\FunctionHandler\Toolbars::render($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
         $tools = addslashes($tools); // Escape special characters for JavaScript
 
         ['lang' => $lang, 'filePath' => $langFilePath] = $this->getEditorLang();
@@ -84,7 +84,7 @@ class WYSIWYGLib
         $smarty = TikiLib::lib('smarty');
 
         if ($params['_toolbars'] !== 'n') {
-            $tools = json_encode(smarty_function_toolbars($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
+            $tools = json_encode(\SmartyTiki\FunctionHandler\Toolbars::render($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
             $tools = addslashes($tools); // Escape special characters for JavaScript
         } else {
             $tools = json_encode([]);
@@ -264,7 +264,7 @@ class WYSIWYGLib
                 '_wysiwyg' => 'y',
                 'is_html' => false,
             ];
-            $tuitools = smarty_function_toolbars($toolbarParams, $smarty->getEmptyInternalTemplate());
+            $tuitools = \SmartyTiki\FunctionHandler\Toolbars::render($toolbarParams, $smarty->getEmptyInternalTemplate());
         } else {
             $tuitools = [];
         }

@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /*
  * smarty_function_reindex_file_pixel: Display a 1x1 transparent gif image that will start a background reindexation process of a file
@@ -16,8 +17,13 @@ use Smarty\Template;
  * params:
  *  - id: id of the file to reindex
  */
-class ReindexFilePixel extends Base
+class ReindexFilePixel extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'reindex_file_pixel';
+    }
+
     public function handle($params, Template $template)
     {
         if (! is_array($params) || ! isset($params['id']) || ( $id = (int) $params['id'] ) <= 0) {

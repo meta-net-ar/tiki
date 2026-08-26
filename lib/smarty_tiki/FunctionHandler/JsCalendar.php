@@ -9,6 +9,8 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * @param $params
@@ -28,8 +30,15 @@ use Smarty\Template;
  * @return string
  * @throws Exception
  */
-class JsCalendar extends Base
+class JsCalendar extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'jscalendar';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;

@@ -262,7 +262,7 @@ function wikiplugin_tour($data, $params)
         // Show the restart button
         if (! empty($first_step['show_restart_button'])) {
             $smarty = TikiLib::lib('smarty');
-            $html .= smarty_function_button([
+            $html .= \SmartyTiki\FunctionHandler\Button::render([
                     '_text' => tra($first_step['show_restart_button']),
                     '_id' => $startButtonId,
                     'href' => '#',

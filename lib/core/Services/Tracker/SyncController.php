@@ -239,10 +239,9 @@ class Services_Tracker_SyncController
         }
 
         $manualList = $this->getItemList($manual);
-        require_once 'lib/smarty_tiki/modifier.sefurl.php';
         foreach ($manualList as & $item) {
             $itemId = $item['itemId'];
-            $item['remoteUrl'] = $syncInfo['provider'] . '/' . smarty_modifier_sefurl($itemMap[$itemId], 'trackeritem', '', '', 'n');
+            $item['remoteUrl'] = $syncInfo['provider'] . '/' . \SmartyTiki\Modifier\Sefurl::apply($itemMap[$itemId], 'trackeritem', '', '', 'n');
         }
 
         return [
@@ -422,14 +421,13 @@ class Services_Tracker_SyncController
     private function getItemList($itemIds)
     {
         $trklib = TikiLib::lib('trk');
-        require_once 'lib/smarty_tiki/modifier.sefurl.php';
 
         $out = [];
         foreach ($itemIds as $itemId) {
             $out[] = [
                 'itemId' => $itemId,
                 'title' => $trklib->get_isMain_value(null, $itemId),
-                'localUrl' => smarty_modifier_sefurl($itemId, 'trackeritem'),
+                'localUrl' => \SmartyTiki\Modifier\Sefurl::apply($itemId, 'trackeritem'),
             ];
         }
 

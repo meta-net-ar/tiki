@@ -10,6 +10,7 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use Tiki\Lib\TikiDate;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty {html_select_time} function handler
@@ -24,8 +25,13 @@ use Tiki\Lib\TikiDate;
  * @return string
  * @uses smarty_make_timestamp()
  */
-class HtmlSelectTime extends Base
+class HtmlSelectTime extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'html_select_time';
+    }
+
     public function handle($params, Template $template)
     {
         global $tikilib;
@@ -137,7 +143,7 @@ class HtmlSelectTime extends Base
                 $hours = array_merge([$hour_empty == ' ' ? '' : $hour_empty], $hours);
             }
 
-            $html_result .= smarty_function_html_options(
+            $html_result .= (new \Smarty\FunctionHandler\HtmlOptions())->handle(
                 [
                     'output'        => $hours,
                     'values'        => $hours,
@@ -218,7 +224,7 @@ class HtmlSelectTime extends Base
                 $minutes = array_merge([$minute_empty == ' ' ? '' : $minute_empty], $minutes);
             }
 
-            $html_result .= smarty_function_html_options(
+            $html_result .= (new \Smarty\FunctionHandler\HtmlOptions())->handle(
                 [
                     'output'        => $minutes,
                     'values'        => $minutes,
@@ -270,7 +276,7 @@ class HtmlSelectTime extends Base
                 $secondes = array_merge([$seconde_empty == ' ' ? '' : $seconde_empty], $secondes);
             }
 
-            $html_result .= smarty_function_html_options(
+            $html_result .= (new \Smarty\FunctionHandler\HtmlOptions())->handle(
                 [
                     'output'        => $seconds,
                     'values'        => $seconds,
@@ -298,7 +304,7 @@ class HtmlSelectTime extends Base
             }
             $html_result .= '>' . "\n";
 
-            $html_result .= smarty_function_html_options(
+            $html_result .= (new \Smarty\FunctionHandler\HtmlOptions())->handle(
                 [
                     'output'        => ['AM', 'PM'],
                     'values'        => ['am', 'pm'],

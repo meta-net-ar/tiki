@@ -522,7 +522,7 @@ window.customsearch_$id = customsearch$id;
     //get iconset icon if daterange is one of the fields
     if ($dr) {
         $smarty = TikiLib::lib('smarty');
-        $iconinsert = smarty_function_js_insert_icon(['type' => 'jscalendar', 'return' => 'y'], $smarty->getEmptyInternalTemplate());
+        $iconinsert = \SmartyTiki\FunctionHandler\JsInsertIcon::render(['type' => 'jscalendar', 'return' => 'y'], $smarty->getEmptyInternalTemplate());
     } else {
         $iconinsert = '';
     }
@@ -1174,7 +1174,7 @@ function cs_design_daterange($id, $fieldname, $fieldid, $arguments, $default, &$
         $params['enddate'] = $startEmpty ? '' : TikiLib::lib('tiki')->now + 365 * 24 * 3600;
     }
 
-    $picker = '<div class="row col-sm-6">' . smarty_function_jscalendar($params, $smarty->getEmptyInternalTemplate()) . '</div>';
+    $picker = '<div class="row col-sm-6">' . \SmartyTiki\FunctionHandler\JsCalendar::render($params, $smarty->getEmptyInternalTemplate()) . '</div>';
 
     $script .= "
     $(document).on('change', 'input[name=\"$from_fieldname\"],input[name=\"$to_fieldname\"]', function() {

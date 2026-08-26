@@ -35,7 +35,7 @@ class Math_Formula_Function_Currency extends Math_Formula_Function
         }
 
         $smarty = TikiLib::lib('smarty');
-        return smarty_function_currency(
+        return \SmartyTiki\FunctionHandler\Currency::render(
             [
                 'amount' => $amount,
                 'sourceCurrency' => $currency,

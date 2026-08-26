@@ -140,13 +140,10 @@ function wikiplugin_trackerstat($data, $params)
     }
     if (! empty($show_lastmodif)) {
         $date = $trklib->lastModif($trackerId);
-        if (! function_exists('smarty_modifier_tiki_date_format')) {
-            include('lib/smarty_tiki/modifier.tiki_date_format.php');
-        }
         if ($show_lastmodif == 'y') {
             $show_lastmodif = $prefs['short_date_format'];
         }
-        return smarty_modifier_tiki_date_format($date, tra($show_lastmodif));
+        return \SmartyTiki\Modifier\TikiDateFormat::apply($date, tra($show_lastmodif));
     }
 
     if (! $trklib->valid_status($status)) {

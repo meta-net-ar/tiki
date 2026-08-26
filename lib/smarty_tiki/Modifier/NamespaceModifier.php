@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class NamespaceModifier
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class NamespaceModifier implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'namespace';
+    }
+
     public function handle($pageName)
     {
         return \TikiLib::lib('wiki')->get_namespace($pageName);

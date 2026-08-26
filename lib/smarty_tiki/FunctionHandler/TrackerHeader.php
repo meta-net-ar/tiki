@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /* params
    level: level of tag <h>
@@ -17,8 +18,13 @@ use Smarty\Template;
    inTable: table class in a table otherwise will insert div
 */
 
-class TrackerHeader extends Base
+class TrackerHeader extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'trackerheader';
+    }
+
     public function handle($params, Template $template)
     {
         $headerlib = \TikiLib::lib('header');

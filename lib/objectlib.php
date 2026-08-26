@@ -1342,8 +1342,8 @@ class ObjectLib extends TikiLib
 
     public function get_metadata($type, $object, &$classList)
     {
-        $escapedType = smarty_modifier_escape($type);
-        $escapedObject = smarty_modifier_escape($object);
+        $escapedType = \SmartyTiki\Modifier\Escape::apply($type);
+        $escapedObject = \SmartyTiki\Modifier\Escape::apply($object);
         $metadata = ' data-type="' . $escapedType . '" data-object="' . $escapedObject . '"';
 
         if ($coordinates = TikiLib::lib('geo')->get_coordinates($type, $object)) {
@@ -1359,7 +1359,7 @@ class ObjectLib extends TikiLib
         $attributes = $attributelib->get_attributes($type, $object);
 
         if (isset($attributes['tiki.icon.src'])) {
-            $escapedIcon = smarty_modifier_escape($attributes['tiki.icon.src']);
+            $escapedIcon = \SmartyTiki\Modifier\Escape::apply($attributes['tiki.icon.src']);
             $metadata .= " data-icon-src=\"$escapedIcon\"";
         }
 

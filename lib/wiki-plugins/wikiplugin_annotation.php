@@ -108,7 +108,7 @@ function wikiplugin_annotation($data, $params)
     global $page, $tiki_p_edit;
     $headerlib = TikiLib::lib('header');
     $smarty = TikiLib::lib('smarty');
-    $ticketHtml = smarty_function_ticket([], $smarty->getEmptyInternalTemplate());
+    $ticketHtml = \SmartyTiki\FunctionHandler\Ticket::render([], $smarty->getEmptyInternalTemplate());
 
     $annotations = [];
     foreach (explode("\n", $data) as $line) {
@@ -174,8 +174,8 @@ FORM;
 
     $headerlib->add_jq_onready('$("#' . $cid . '").imageAnnotation(' . $annotations . ', ' . $showlink . ');');
 
-    $close = smarty_function_icon(['name' => 'close'], $smarty->getEmptyInternalTemplate());
-    $delete = smarty_function_icon(['name' => 'trash'], $smarty->getEmptyInternalTemplate());
+    $close = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'close'], $smarty->getEmptyInternalTemplate());
+    $delete = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'trash'], $smarty->getEmptyInternalTemplate());
 
     $labelStr = tra('Label');
     $linkStr = tra('Link');

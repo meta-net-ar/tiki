@@ -9,6 +9,8 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * Smarty {preference} special parameters
@@ -20,8 +22,15 @@ use Smarty\Template;
  *                            As of Tiki 31+ by default the syntax passed to `\SmartyTiki\BlockHandler\TextArea` is `none`, i.e. plain text.
  *                            To get the textarea to use a markup language (tiki or markdown) pass an empty string, e.g. `syntax=''`
  */
-class Preference extends Base
+class Preference extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'preference';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs, $user_overrider_prefs;

@@ -503,7 +503,7 @@ class H5PLib
         */
 
         $smarty = TikiLib::lib('smarty');
-        $embedUrl = smarty_function_service([
+        $embedUrl = \SmartyTiki\FunctionHandler\Service::render([
             'controller' => 'h5p',
             'action' => 'embed',
             'fileId' => $content['file_id'],

@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Favorite extends Base
+class Favorite extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'favorite';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs, $user;
@@ -30,8 +36,8 @@ class Favorite extends Base
             'object' => $params['object'],
         ]);
 
-        $url = smarty_modifier_escape($url);
-        $e_user = smarty_modifier_escape($user);
+        $url = \SmartyTiki\Modifier\Escape::apply($url);
+        $e_user = \SmartyTiki\Modifier\Escape::apply($user);
 
         if (isset($params['label'])) {
             $label = $params['label'];

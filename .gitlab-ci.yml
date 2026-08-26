@@ -237,7 +237,17 @@ smarty-syntax-check:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
+    - php console.php smarty:generate-mapping
     - php doc/devtools/check_smarty_syntax.php
+
+smarty-mapping-check:
+  stage: code-quality
+  needs:
+    - composer
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php console.php smarty:generate-mapping
+    - php console.php smarty:generate-mapping --check
 
 eslint:
   stage: code-quality
@@ -575,6 +585,7 @@ console-php-works:
     - 'echo -n "ElasticSearch Version: " && curl -sS -XGET http://${ELASTICSEARCH_SERVICE_ALIAS}:9200 | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
     - 'echo -n "Manticore Version: " && mysql -h ${MANTICORE_SERVICE_ALIAS} -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
     - echo '<?php $host_tiki = "'${MYSQL_SERVICE_ALIAS}'"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
+    - php console.php smarty:generate-mapping
     - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit $PHPUNIT_EXTRA_PARAMS --log-junit temp/ci/phpunit-report.xml --display-deprecations --display-notices --display-warnings
 
 unit-tests-php-latest-with-coverage:

@@ -257,10 +257,10 @@ class Services_Search_Controller
                             return '';
                         }
                     }, $format),
-                    'link' => smarty_function_object_link(['type' => $item['object_type'], 'id' => $item['object_id']], $smarty->getEmptyInternalTemplate())
+                    'link' => \SmartyTiki\FunctionHandler\ObjectLink::render(['type' => $item['object_type'], 'id' => $item['object_id']], $smarty->getEmptyInternalTemplate())
                 ];
                 if ($item['object_type'] == 'trackeritem') {
-                    $transformed['status_icon'] = smarty_function_tracker_item_status_icon(['item' => $item['object_id']], $smarty->getEmptyInternalTemplate());
+                    $transformed['status_icon'] = \SmartyTiki\FunctionHandler\TrackerItemStatusIcon::render(['item' => $item['object_id']], $smarty->getEmptyInternalTemplate());
 
                     try {
                         $popupContent = Services_Object_Controller::getTrackerItemPopupContent((int) $item['object_id']);
@@ -289,7 +289,7 @@ class Services_Search_Controller
     {
         global $smarty;
         return [
-            'selector' => smarty_function_object_selector($input->params->array(), $smarty->getEmptyInternalTemplate())
+            'selector' => \SmartyTiki\FunctionHandler\ObjectSelector::render($input->params->array(), $smarty->getEmptyInternalTemplate())
         ];
     }
 }

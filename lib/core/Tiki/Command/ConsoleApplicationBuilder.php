@@ -85,6 +85,7 @@ class ConsoleApplicationBuilder
                 new FixBOMandUnixCommand(),
                 new GetStringsCommand(),
                 new BuildIconsListCommand(),
+                new SmartyGenerateMappingCommand(),
                 ],
             ],[
             'condition' => 'checkIsDevMode',

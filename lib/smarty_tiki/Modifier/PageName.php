@@ -7,8 +7,18 @@
 
 namespace SmartyTiki\Modifier;
 
-class PageName
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
+class PageName implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'pagename';
+    }
+
     public function handle($source)
     {
         global $prefs;

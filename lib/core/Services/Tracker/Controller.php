@@ -235,7 +235,7 @@ class Services_Tracker_Controller
                 if ($dupeFields) {
                     foreach ($dupeFields as & $df) {
                         $df['message'] = tr('Warning: There is a conflict in permanent names, which can cause indexing errors.') .
-                            '<br><a href="' . smarty_modifier_sefurl($df['trackerId'], 'trackerfields') . '">' .
+                            '<br><a href="' . \SmartyTiki\Modifier\Sefurl::apply($df['trackerId'], 'trackerfields') . '">' .
                             tr(
                                 'Field #%0 "%1" of type "%2" also found in tracker #%3 with perm name %4',
                                 $df['fieldId'],
@@ -1178,7 +1178,7 @@ class Services_Tracker_Controller
                 $item['nextTicket'] = $util->getTicket();
 
                 if (! $redirect && ! $access->is_xml_http_request() && ! TIKI_API) {
-                    $redirect = smarty_modifier_sefurl($trackerId, 'tracker');
+                    $redirect = \SmartyTiki\Modifier\Sefurl::apply($trackerId, 'tracker');
                 }
 
                 if ($redirect) {
@@ -1311,7 +1311,7 @@ class Services_Tracker_Controller
             } catch (Services_Exception_EditConflict $e) {
                 if ($input->modal->int() && $access->is_xml_http_request()) {
                     $smarty = TikiLib::lib('smarty');
-                    $href = smarty_function_service([
+                    $href = \SmartyTiki\FunctionHandler\Service::render([
                         'controller' => 'tracker',
                         'action' => 'update_item',
                         'trackerId' => $trackerId,
@@ -1460,7 +1460,7 @@ class Services_Tracker_Controller
 
                 // also $prefs['tracker_legacy_insert'] === 'y'
                 if (! $redirect && ! $access->is_xml_http_request() && ! TIKI_API) {
-                    $redirect = smarty_modifier_sefurl($itemId, 'trackeritem');
+                    $redirect = \SmartyTiki\Modifier\Sefurl::apply($itemId, 'trackeritem');
                 }
 
                 if ($input->addComment->bool()) {
@@ -1809,7 +1809,7 @@ class Services_Tracker_Controller
             $message = tr('The requested element cannot be displayed. One of the view/edit templates is missing or has errors: %0', $e->getMessage());
             trigger_error($e->getMessage(), E_USER_WARNING);
             $access = TikiLib::lib('access');
-            $access->redirect(smarty_modifier_sefurl($trackerId, 'tracker'), $message, 302, 'error');
+            $access->redirect(\SmartyTiki\Modifier\Sefurl::apply($trackerId, 'tracker'), $message, 302, 'error');
         }
     }
 
@@ -1893,10 +1893,9 @@ class Services_Tracker_Controller
         }
 
         if ($trackerlistParams = $input->asArray('trackerlistParams')) {
-            include_once 'lib/smarty_tiki/block.wikiplugin.php';
             $trackerlistParams['_name'] = 'trackerlist';
             $trackerlistParams['checkbox'] = preg_replace('#/[\d,]*$#', '/' . implode(',', $linkedItemIds), $trackerlistParams['checkbox']);
-            return smarty_block_wikiplugin($trackerlistParams, '', TikiLib::lib('smarty')) . TikiLib::lib('header')->output_js();
+            return \SmartyTiki\BlockHandler\Wikiplugin::render($trackerlistParams, '', TikiLib::lib('smarty')) . TikiLib::lib('header')->output_js();
         } else {
             return [
                 'status' => 'ok'
@@ -2482,7 +2481,7 @@ class Services_Tracker_Controller
                         $emptyTemplate = TikiLib::lib('smarty')->getEmptyInternalTemplate();
                         if (empty($diff_style)) {
                             $field_value['value'] = $hist['value'];
-                            $hist['rendered_value'] = smarty_function_trackeroutput([
+                            $hist['rendered_value'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                 'field' => $field_value,
                                 'list_mode' => 'csv',
                                 'history' => 'y',
@@ -2490,7 +2489,7 @@ class Services_Tracker_Controller
                                 'process' => 'y',
                             ], $emptyTemplate);
                             $field_value['value'] = $hist['new'];
-                            $hist['rendered_new'] = smarty_function_trackeroutput([
+                            $hist['rendered_new'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                 'field' => $field_value,
                                 'list_mode' => 'csv',
                                 'history' => 'y',
@@ -2502,7 +2501,7 @@ class Services_Tracker_Controller
                                 $hist['value'] = $hist['rendered_value'];
                                 $hist['new'] = $hist['rendered_new'];
                                 $field_value['value'] = $hist['value'];
-                                $hist['rendered_value'] = smarty_function_trackeroutput([
+                                $hist['rendered_value'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                     'field' => $field_value,
                                     'list_mode' => 'y',
                                     'history' => 'y',
@@ -2510,7 +2509,7 @@ class Services_Tracker_Controller
                                     'process' => 'y',
                                 ], $emptyTemplate);
                                 $field_value['value'] = $hist['new'];
-                                $hist['rendered_new'] = smarty_function_trackeroutput([
+                                $hist['rendered_new'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                     'field' => $field_value,
                                     'list_mode' => 'y',
                                     'history' => 'y',
@@ -2520,7 +2519,7 @@ class Services_Tracker_Controller
                             }
                         } else {
                             $field_value['value'] = $hist['new'];
-                            $hist['rendered_diff'] = smarty_function_trackeroutput([
+                            $hist['rendered_diff'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                 'field' => $field_value,
                                 'list_mode' => 'y',
                                 'history' => 'y',
@@ -2741,14 +2740,14 @@ class Services_Tracker_Controller
                         if ($dateFormatUnixTimestamp) {
                             $toDisplay[] = $row['created'];
                         } else {
-                            $toDisplay[] = smarty_modifier_tiki_short_datetime($row['created'], '', 'n');
+                            $toDisplay[] = \SmartyTiki\Modifier\TikiShortDateTime::apply($row['created'], '', 'n');
                         }
                     }
                     if ($showLastModif) {
                         if ($dateFormatUnixTimestamp) {
                             $toDisplay[] = $row['lastModif'];
                         } else {
-                            $toDisplay[] = smarty_modifier_tiki_short_datetime($row['lastModif'], '', 'n');
+                            $toDisplay[] = \SmartyTiki\Modifier\TikiShortDateTime::apply($row['lastModif'], '', 'n');
                         }
                     }
                     foreach ($row['field_values'] as $val) {

@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class Percent
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class Percent implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'percent';
+    }
+
     /**
      *
      * returns a percentage instead of a fraction

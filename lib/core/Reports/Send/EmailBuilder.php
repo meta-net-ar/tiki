@@ -51,7 +51,7 @@ class Reports_Send_EmailBuilder
         $smarty = TikiLib::lib('smarty');
 
         $smarty->assign('report_preferences', $report_preferences);
-        $smarty->assign('report_user', ucfirst(smarty_modifier_username($user_data['login'])));
+        $smarty->assign('report_user', ucfirst(\SmartyTiki\Modifier\Username::apply($user_data['login'])));
         $smarty->assign('report_interval', ucfirst($report_preferences['interval']));
         $smarty->assign('report_date', date("l d.m.Y"));
         $smarty->assign('report_site', $this->tikilib->get_preference('browsertitle'));
@@ -146,18 +146,15 @@ class Reports_Send_EmailBuilder
                     $body .= $this->tikilib->get_short_datetime(strtotime($change['time'])) . ": ";
 
                     if (isset($change['data']['user'])) {
-                        include_once(__DIR__ . '/../../../smarty_tiki/modifier.username.php');
-                        $change['data']['user'] = smarty_modifier_username($change['data']['user']);
+                        $change['data']['user'] = \SmartyTiki\Modifier\Username::apply($change['data']['user']);
                     }
 
                     if (isset($change['data']['editUser'])) {
-                        include_once(__DIR__ . '/../../../smarty_tiki/modifier.username.php');
-                        $change['data']['editUser'] = smarty_modifier_username($change['data']['editUser']);
+                        $change['data']['editUser'] = \SmartyTiki\Modifier\Username::apply($change['data']['editUser']);
                     }
 
                     if (isset($change['user'])) {
-                        include_once(__DIR__ . '/../../../smarty_tiki/modifier.username.php');
-                        $change['user'] = smarty_modifier_username($change['user']);
+                        $change['user'] = \SmartyTiki\Modifier\Username::apply($change['user']);
                     }
 
                                         $body .= $eventObject->getOutput($change);

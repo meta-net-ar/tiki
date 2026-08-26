@@ -275,7 +275,7 @@ if (isset($_POST['save']) && ! $contribution_needed && $access->checkCsrf()) {
     include_once("categorize.php");
 
     require_once('tiki-sefurl.php');
-    $url = smarty_modifier_sefurl($postId, 'blogpost');
+    $url = \SmartyTiki\Modifier\Sefurl::apply($postId, 'blogpost');
     header("location: $url");
     exit;
 }

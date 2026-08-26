@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class DatetimeRange extends Base
+class DatetimeRange extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'datetime_range';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;
@@ -35,15 +41,15 @@ class DatetimeRange extends Base
         }
 
         if ($params['type'] == 'long') {
-            $fromDate = smarty_modifier_tiki_date_format($params['from'], $prefs['long_date_format']);
-            $fromTime = smarty_modifier_tiki_date_format($params['from'], $prefs['long_time_format']);
-            $toDate = smarty_modifier_tiki_date_format($params['to'], $prefs['long_date_format']);
-            $toTime = smarty_modifier_tiki_date_format($params['to'], $prefs['long_time_format']);
+            $fromDate = \SmartyTiki\Modifier\TikiDateFormat::apply($params['from'], $prefs['long_date_format']);
+            $fromTime = \SmartyTiki\Modifier\TikiDateFormat::apply($params['from'], $prefs['long_time_format']);
+            $toDate = \SmartyTiki\Modifier\TikiDateFormat::apply($params['to'], $prefs['long_date_format']);
+            $toTime = \SmartyTiki\Modifier\TikiDateFormat::apply($params['to'], $prefs['long_time_format']);
         } else {
-            $fromDate = smarty_modifier_tiki_date_format($params['from'], $prefs['short_date_format']);
-            $fromTime = smarty_modifier_tiki_date_format($params['from'], $prefs['short_time_format']);
-            $toDate = smarty_modifier_tiki_date_format($params['to'], $prefs['short_date_format']);
-            $toTime = smarty_modifier_tiki_date_format($params['to'], $prefs['short_time_format']);
+            $fromDate = \SmartyTiki\Modifier\TikiDateFormat::apply($params['from'], $prefs['short_date_format']);
+            $fromTime = \SmartyTiki\Modifier\TikiDateFormat::apply($params['from'], $prefs['short_time_format']);
+            $toDate = \SmartyTiki\Modifier\TikiDateFormat::apply($params['to'], $prefs['short_date_format']);
+            $toTime = \SmartyTiki\Modifier\TikiDateFormat::apply($params['to'], $prefs['short_time_format']);
         }
 
         if ($fromDate == $toDate && $prefs['tiki_same_day_time_only'] == 'y') {

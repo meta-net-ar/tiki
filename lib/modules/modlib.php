@@ -1167,7 +1167,7 @@ class ModLib extends TikiLib
             foreach ((array) $info['prefs'] as $preference) {
                 if ($prefs[$preference] != 'y') {
                     $this->add_pref_error($mod_reference['name'], $preference);
-                    return smarty_block_remarksbox(
+                    return \SmartyTiki\BlockHandler\Remarksbox::render(
                         [
                             'type' => 'warning',
                             'title' => tr('Failed to execute "%0" module', $mod_reference['name']),
@@ -1268,7 +1268,7 @@ class ModLib extends TikiLib
                 $message = tr('Contact the system administrator');
             }
             $repeat = false;
-            return smarty_block_remarksbox(
+            return \SmartyTiki\BlockHandler\Remarksbox::render(
                 [
                     'type' => 'warning',
                     'title' => tr('Failed to execute "%0" module', $mod_reference['name']),

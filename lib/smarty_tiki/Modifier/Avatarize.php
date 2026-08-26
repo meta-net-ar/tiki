@@ -8,6 +8,7 @@
 namespace SmartyTiki\Modifier;
 
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty modifier avatarize
@@ -15,8 +16,13 @@ use TikiLib;
  * Purpose:  show avatar for a given user name
  * -------------------------------------------------------------
  */
-class Avatarize
+class Avatarize implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'avatarize';
+    }
+
     public function handle($user, $float = '', $default = '', $show_tag = 'y')
     {
         if (! $user) {
@@ -28,7 +34,7 @@ class Avatarize
         if (! $avatar && $default) {
             $smarty = TikiLib::lib('smarty');
             $name = TikiLib::lib('user')->clean_user($user);
-            $avatar = smarty_function_icon(['_id' => $default, 'title' => $name], $smarty->getEmptyInternalTemplate());
+            $avatar = \SmartyTiki\FunctionHandler\Icon::render(['_id' => $default, 'title' => $name], $smarty->getEmptyInternalTemplate());
         }
 
         if ($avatar != '' && $show_tag == 'y') {

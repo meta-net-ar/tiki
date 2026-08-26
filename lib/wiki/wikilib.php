@@ -1283,7 +1283,7 @@ class WikiLib extends TikiLib
                 $newQueryStr = http_build_query($queryArray, '', '&');
                 $with_next = (empty($newQueryStr) ? '' : $newQueryStr);
 
-                $new_url = smarty_modifier_sefurl($newPage, '', $with_next);
+                $new_url = \SmartyTiki\Modifier\Sefurl::apply($newPage, '', $with_next);
             }
             // redirect to the new url
             $access->redirect($new_url);

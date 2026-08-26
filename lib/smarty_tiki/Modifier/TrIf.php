@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class TrIf
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class TrIf implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tr_if';
+    }
+
     public function handle($source)
     {
         global $prefs;

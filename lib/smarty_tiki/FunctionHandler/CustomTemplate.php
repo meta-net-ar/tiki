@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class CustomTemplate extends Base
+class CustomTemplate extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'custom_template';
+    }
+
     public function handle($params, Template $template)
     {
         return \TikiLib::custom_template($params['basetpl'], $params['modifiers']);

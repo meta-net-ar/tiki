@@ -10,6 +10,8 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * @param $params
@@ -29,8 +31,15 @@ use TikiLib;
  * @return string
  * @throws Exception
  */
-class JsTransferList extends Base
+class JsTransferList extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'jstransfer_list';
+    }
+
     public function handle($params, Template $template)
     {
         $defaultParams = [

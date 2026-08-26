@@ -8,9 +8,18 @@
 namespace SmartyTiki\FunctionHandler;
 
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
-class InlineAudioPlayer extends \Smarty\FunctionHandler\Base
+class InlineAudioPlayer extends \Smarty\FunctionHandler\Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'inline_audio_player';
+    }
+
     public function handle($params, \Smarty\Template $template)
     {
         $fileId = $params['fileId'];

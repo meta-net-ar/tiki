@@ -102,10 +102,10 @@ class Search_Formatter_ValueFormatter_Currency extends Search_Formatter_ValueFor
         }
 
         if ($this->amount_only) {
-            return '~np~' . smarty_modifier_number_format($amount, 2, '.', '') . '~/np~';
+            return '~np~' . \SmartyTiki\Modifier\NumberFormat::apply($amount, 2, '.', '') . '~/np~';
             ;
         } else {
-            return smarty_function_currency(
+            return \SmartyTiki\FunctionHandler\Currency::render(
                 [
                 'amount' => $amount,
                 'sourceCurrency' => $currency,

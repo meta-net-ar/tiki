@@ -10,6 +10,7 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /** params
  * - link_on_section
@@ -26,8 +27,13 @@ use TikiLib;
  * - setSelected=y|n (default=y) processes all menu items to show currently selected item, also sets open states, sectionLevel, toLevel etc
  *                                 so menu_cookie, sectionLevel and toLevel will be ignored if this is set to n
  */
-class Menu extends Base
+class Menu extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'menu';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;

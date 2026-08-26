@@ -7,8 +7,18 @@
 
 namespace SmartyTiki\Modifier;
 
-class NumberFormat
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
+class NumberFormat implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'number_format';
+    }
+
     /**
      * Smarty substring modifier plugin
      *

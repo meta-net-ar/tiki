@@ -152,8 +152,7 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
             $classList = ['tablename'];
             $metadata = \TikiLib::lib('object')->get_metadata('trackeritem', $itemId, $classList);
 
-            require_once('lib/smarty_tiki/modifier.sefurl.php');
-            $href = smarty_modifier_sefurl($itemId, 'trackeritem');
+            $href = \SmartyTiki\Modifier\Sefurl::apply($itemId, 'trackeritem');
             $href .= (strpos($href, '?') === false) ? '?' : '&';
             $href .= http_build_query($query, '', '&');
             $href = rtrim($href, '?&');

@@ -9,10 +9,16 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 // Do NOT change this plugin under any circunstances!
-class SameUrl extends Base
+class SameUrl extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'sameurl';
+    }
+
     public function handle($params, Template $template)
     {
         global $sameurl_elements;

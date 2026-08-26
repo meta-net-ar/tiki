@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * \brief Smarty {tikimodule}{/tikimodule} block handler
@@ -35,8 +36,13 @@ use Smarty\Template;
  * error was used only in case the name was not there.
  * I fixed that error case. -- mose
  */
-class TikiModule extends Base
+class TikiModule extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tikimodule';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {

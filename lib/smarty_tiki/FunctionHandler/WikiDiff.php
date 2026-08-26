@@ -11,13 +11,22 @@ use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
 use Tiki\Lib\Diff\DiffUtils;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * To display with difference between two blocks of text, often wiki syntax or html
  *
  *  */
-class WikiDiff extends Base
+class WikiDiff extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'wikidiff';
+    }
+
     public function handle($params, Template $template)
     {
         $defaults = [

@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * smarty_function_form_item handler: Display a basic form item in proper Bootstrap syntax
@@ -18,8 +19,13 @@ use Smarty\Template;
  *  - _field: the form input field should be passed to this parameter.
  *  Usage of this function should be something like {formitem _field={$f_title} _label="Title"}
   */
-class FormItem extends Base
+class FormItem extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'formitem';
+    }
+
     public function handle($params, Template $template)
     {
         if (! is_array($params) || ! isset($params['_field']) || ! isset($params['_label'])) {

@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -15,8 +17,13 @@ namespace SmartyTiki\Modifier;
  * @param caps, if set will cause "A " or "An "
  * -------------------------------------------------------------
  */
-class AorAn
+class AorAn implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'a_or_an';
+    }
+
     public function handle($string, $caps = false)
     {
         global $prefs;

@@ -47,10 +47,6 @@ function check_smarty_syntax(): int
 
     define('TIKI_PATH', getcwd());
 
-    require_once ROOT . '/lib/smarty_tiki/prefilter.tr.php';
-    require_once ROOT . '/lib/smarty_tiki/prefilter.jq.php';
-    require_once ROOT . '/lib/smarty_tiki/prefilter.log_tpl.php';
-
     $smarty = new SmartyTiki();
 
     set_error_handler('check_smarty_syntax_error_handler');

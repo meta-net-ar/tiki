@@ -10,11 +10,17 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /* inserts the content of an rss feed into a module */
 
-class Rss extends Base
+class Rss extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'rss';
+    }
+
     public function handle($params, Template $template)
     {
         extract($params, EXTR_SKIP);

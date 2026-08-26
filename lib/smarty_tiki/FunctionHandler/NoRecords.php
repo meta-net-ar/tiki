@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  *    function norecords
@@ -17,8 +18,13 @@ use Smarty\Template;
  *        _colspan : How much column need to be covered
  *        _text : text to display, bu default => No records found.
  */
-class NoRecords extends Base
+class NoRecords extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'norecords';
+    }
+
     public function handle($params, Template $template)
     {
         $html = '<tr class="even">';

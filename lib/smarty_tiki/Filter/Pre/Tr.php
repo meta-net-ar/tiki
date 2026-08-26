@@ -7,12 +7,19 @@
 
 namespace SmartyTiki\Filter\Pre;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /** Smarty translation prefilter. This prefilter tries to offload the tr block from as much work as possible to keep
 * the performance penalty of translation limited to compilation. It does not intervene if an argument is given (lang)
 * and in some cases when translation may only be possible at runtime.
 */
-class Tr implements \Smarty\Filter\FilterInterface
+class Tr implements \Smarty\Filter\FilterInterface, TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tr';
+    }
+
     public function filter($source, \Smarty\Template $template)
     {
         // The preg_replace() takes away the Smarty comments ({* *}) in case they have tr tags

@@ -9,6 +9,8 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\BlockHandlerStaticFacadeTrait;
 
 /**
  *
@@ -37,8 +39,15 @@ use Smarty\Template;
  *   _script : specify another script than the current one (this disable AJAX for this link when the current script is different).
  *   _on* : specify values of on* (e.g. onclick) HTML attributes used for javascript events
  */
-class SelfLink extends Base
+class SelfLink extends Base implements TikiSmartyExtensionInterface
 {
+    use BlockHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'self_link';
+    }
+
     public function handle($params, $content, Template $template, &$repeat = false)
     {
         $default_type = 'absolute_path';
@@ -106,7 +115,7 @@ class SelfLink extends Base
                 if (! empty($params['_tag']) && $params['_tag'] === 'y') {
                     $params['_urlencode'] = 'n';
                 }
-                $ret = smarty_function_query($params, $template);
+                $ret = \SmartyTiki\FunctionHandler\Query::render($params, $template);
             }
 
             if ($params['_tag'] == 'y') {
@@ -128,7 +137,8 @@ class SelfLink extends Base
                             $params['_htmlelement'] = '';
                             $params['_template'] = '';
                         }
-                        $ret = smarty_block_ajax_href(
+                        $repeat = false;
+                        $ret = \SmartyTiki\BlockHandler\AjaxHref::render(
                             [
                                 'template' => $params['_template'],
                                 'htmlelement' => $params['_htmlelement'],
@@ -137,7 +147,7 @@ class SelfLink extends Base
                             ],
                             $ret,
                             $template,
-                            $tmp = false
+                            $repeat
                         );
                         unset($params['_onclick']); // Prevent addition to $link later
                     } else {
@@ -189,7 +199,7 @@ class SelfLink extends Base
                         $icon_params['height'] = $params['_height'];
                     }
 
-                    $content = smarty_function_icon($icon_params, $template);
+                    $content = \SmartyTiki\FunctionHandler\Icon::render($icon_params, $template);
 
                     if (isset($params['_text'])) {
                         $content .= ' ' . $params['_text'];
@@ -223,14 +233,14 @@ class SelfLink extends Base
                 }
 
                 if (isset($params['_confirm'])) {
-                    $link .= ' data-confirm="' . smarty_modifier_escape($params['_confirm']) . '"';
+                    $link .= ' data-confirm="' . \SmartyTiki\Modifier\Escape::apply($params['_confirm']) . '"';
                 }
 
                 $ret = "<a $link>" . $content . '</a>';
 
                 if (! empty($params['_sort_field'])) {
                     $ret = "<a $link style='text-decoration:none;'>" . $content .
-                    smarty_function_show_sort(
+                    \SmartyTiki\FunctionHandler\ShowSort::render(
                         ['sort' => $params['_sort_arg'], 'var' => $params['_sort_field']],
                         $template
                     ) . '</a>';
@@ -238,7 +248,7 @@ class SelfLink extends Base
             }
         } else {
             $params = ['_type' => $default_type];
-            $ret = smarty_function_query($params, $template);
+            $ret = \SmartyTiki\FunctionHandler\Query::render($params, $template);
         }
 
         return $ret;

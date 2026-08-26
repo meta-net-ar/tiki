@@ -1021,13 +1021,11 @@ class Services_File_Controller
 
     private function buildFailedUploadErrorMessage()
     {
-        require_once __DIR__ . '/../../../smarty_tiki/modifier.kbsize.php';
-
         $tikilib = TikiLib::lib('tiki');
         $maxPostSize = $tikilib->return_bytes(ini_get('post_max_size'));
 
         if (isset($_SERVER['CONTENT_LENGTH']) && (int) $_SERVER['CONTENT_LENGTH'] > $maxPostSize) {
-            $message = tr('Uploaded data is larger than the max post size, uploaded data should not exceed %0', smarty_modifier_kbsize($maxPostSize, true, 0));
+            $message = tr('Uploaded data is larger than the max post size, uploaded data should not exceed %0', \SmartyTiki\Modifier\KbSize::apply($maxPostSize, true, 0));
         } else {
             $message = tr('File could not be uploaded.');
         }

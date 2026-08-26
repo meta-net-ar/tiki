@@ -53,7 +53,7 @@ class Services_H5P_Controller
                 );
 
                 return [
-                    'html' => smarty_function_button([
+                    'html' => \SmartyTiki\FunctionHandler\Button::render([
                         'href' => TikiLib::lib('service')->getUrl([
                             'controller' => 'h5p',
                             'action' => 'edit',
@@ -114,7 +114,7 @@ class Services_H5P_Controller
                 '$(".edit-h5p-content").on("click", $.clickModal({title: "' . tr('Edit H5P Content') . '", size: "modal-lg"}))'
             );
 
-            $html .= smarty_function_button([
+            $html .= \SmartyTiki\FunctionHandler\Button::render([
                 'href' => TikiLib::lib('service')->getUrl([
                     'controller' => 'h5p',
                     'action' => 'edit',

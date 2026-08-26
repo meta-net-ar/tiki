@@ -1661,7 +1661,7 @@ class TikiLib extends TikiDb_Bridge
                 $star = "<img src='img/icons/$star' height='11' width='11' alt='$alt' />&nbsp;";
             } else {
                 $smarty = TikiLib::lib('smarty');
-                $star = smarty_function_icon(['name' => 'star', 'istyle' => 'color:' . $color, 'iclass' => 'tips',
+                $star = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'star', 'istyle' => 'color:' . $color, 'iclass' => 'tips',
                     'ititle' => ':' . $alt], $smarty->getEmptyInternalTemplate()) . "&nbsp;";
             }
         }
@@ -7269,7 +7269,7 @@ class TikiLib extends TikiDb_Bridge
 
             $url = [];
             foreach ($conflictPages as $pageName) {
-                $url[] = sprintf('<a href="%s">%s</a>', smarty_modifier_sefurl($pageName, 'wiki'), $pageName);
+                $url[] = sprintf('<a href="%s">%s</a>', \SmartyTiki\Modifier\Sefurl::apply($pageName, 'wiki'), $pageName);
             }
 
             $errors[] = tr('Alias <b>%0</b> link already present in %1 page(s)', $pointedPage, implode(', ', $url));

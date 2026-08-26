@@ -7,11 +7,18 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Gets Category Id from the Category name
  */
-class CategId
+class CategId implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'categid';
+    }
+
     public function handle($category)
     {
         return \TikiLib::lib('categ')->get_category_id($category);

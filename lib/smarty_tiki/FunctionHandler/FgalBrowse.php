@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * smarty_function_fgal_browse handler: Display the content of a file gallery in browse mode (i.e. with thumbnails)
@@ -19,8 +20,13 @@ use Smarty\Template;
  *  - _maxRecords
  *  - _find
  */
-class FgalBrowse extends Base
+class FgalBrowse extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'fgal_browse';
+    }
+
     public function handle($params, Template $template)
     {
         if (! is_array($params) || ! isset($params['_id'])) {

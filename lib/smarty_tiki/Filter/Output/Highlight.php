@@ -2,6 +2,8 @@
 
 namespace SmartyTiki\Filter\Output;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 // / (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -16,8 +18,13 @@ namespace SmartyTiki\Filter\Output;
  *           to provide highlighted search terms.
  * -------------------------------------------------------------
  */
-class Highlight implements \Smarty\Filter\FilterInterface
+class Highlight implements \Smarty\Filter\FilterInterface, TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'highlight';
+    }
+
     public function filter($code, \Smarty\Template $template)
     {
         global $prefs;

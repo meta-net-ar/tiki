@@ -311,7 +311,7 @@ function resolve_model3dviewer_src($params, $absolute_links = false, $filename =
     global $tikidomain;
 
     if (! empty($params['fileId'])) {
-        $src = smarty_modifier_sefurl($params['fileId'], 'file');
+        $src = \SmartyTiki\Modifier\Sefurl::apply($params['fileId'], 'file');
         $src = TikiLib::tikiUrl($src);
         $separator = str_contains($src, '?') ? '&' : '?';
         $src .= $separator . 'filename=' . rawurlencode($filename);

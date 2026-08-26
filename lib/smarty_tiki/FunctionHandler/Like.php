@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * This is a like smarty function. It sets a thumb button link that allows you to like (and unlike) an object. It also
@@ -23,8 +24,13 @@ use Smarty\Template;
  * @return string|void
  * @throws Exception
  */
-class Like extends Base
+class Like extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'like';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs, $user;

@@ -10,6 +10,7 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty function plugin
@@ -21,8 +22,13 @@ use TikiLib;
  * Parameters:   pagechecked - mandatory
  * -------------------------------------------------------------
  */
-class PageAlias extends Base
+class PageAlias extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'page_alias';
+    }
+
     public function handle($params, Template $template)
     {
         $structlib = TikiLib::lib('struct');
