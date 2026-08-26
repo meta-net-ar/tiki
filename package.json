@@ -76,37 +76,38 @@
         "ui-predicate-vue3" : "https://www.npmjs.com/package/ui-predicate-vue3 — Vue 3 adapter for ui-predicate (replaces vendored lib in vue-mf/tracker-rules)"
     },
     "devDependencies" : {
-        "@commitlint/cli" : "^21.2.1",
-        "@commitlint/config-conventional" : "^21.2.0",
+        "@commitlint/cli" : "^21.2.2",
+        "@commitlint/config-conventional" : "^21.2.2",
         "@stylistic/eslint-plugin" : "^5.10.0",
         "@testing-library/vue" : "^8.1.0",
         "@vitejs/plugin-vue" : "^6.0.8",
-        "@vitest/coverage-v8" : "^4.1.10",
+        "@vitest/coverage-v8" : "^4.1.11",
         "check-engine" : "^1.14.0",
-        "concurrently" : "^10.0.4",
+        "concurrently" : "^10.0.5",
         "copy-and-watch" : "^0.1.8",
         "es-module-shims" : "^2.8.4",
-        "eslint" : "^10.8.0",
+        "eslint" : "^10.9.1",
         "eslint-config-prettier" : "^10.1.8",
         "eslint-plugin-prettier" : "^5.5.6",
         "eslint-plugin-vue" : "^10.10.0",
-        "happy-dom" : "^20.11.1",
+        "happy-dom" : "^20.11.6",
         "husky" : "^9.1.7",
         "npm-run-all2" : "^9.0.3",
         "patch-package" : "^8.0.1",
         "prettier" : "^3.9.6",
-        "rollup-plugin-visualizer" : "^7.0.1",
+        "rollup-plugin-visualizer" : "^7.1.1",
         "tinyglobby" : "^0.2.17",
-        "unplugin-auto-import" : "^21.0.0",
+        "unplugin-auto-import" : "^21.1.0",
         "unplugin-vue-components" : "^32.1.0",
-        "vite" : "^8.2.0",
+        "vite" : "^8.2.2",
         "vite-plugin-static-copy" : "^4.1.1",
-        "vitest" : "^4.1.10"
+        "vitest" : "^4.1.11"
     },
     "devDepencenciesCommentWillAlsoBeAvailableAsDevDependenciesInWorkspace" : {
         "@commitlint/*": "https://github.com/conventional-changelog/commitlint/blob/master/CHANGELOG.md",
         "@stylistic/eslint-plugin" : "https://github.com/eslint-stylistic/eslint-stylistic/blob/main/CHANGELOG.md",
         "@vitejs/plugin-vue" : "https://github.com/vitejs/vite-plugin-vue/blob/main/packages/plugin-vue/CHANGELOG.md",
+        "concurrently": "https://github.com/open-cli-tools/concurrently/releases",
         "es-module-shims" : "https://github.com/guybedford/es-module-shims. Copied to be available as an external, but not in common-externals, because it will not be included from import-maps",
         "eslint" : "",
         "eslint-config-prettier" : "",
@@ -127,21 +128,14 @@
         "dompurify" : "3.4.12",
         "devalue" : "5.8.1",
         "glob" : "10.5.0",
-        "svelte" : "5.51.0",
         "jspdf" : "4.2.1",
+        "svelte" : "5.51.0",
         "svgedit" : {
             "jspdf" : "4.2.1"
         },
         "postcss" : "8.5.25"
     },
     "overridesComment" : {
-        "jspdf": [
-            "npm audit flagged jspdf <= 4.2.0 (critical). Pin 4.2.1 so the root install and svgedit (nested 4.0.0) resolve to a patched release."
-        ],
-        "postcss": [
-            "vue3-sfc-loader -> @vue/component-compiler-utils still pulls PostCSS 7.0.x (npm audit range <=8.5.17: parsing/XSS/sourceMappingURL issues).",
-            "Force PostCSS 8.5.25 everywhere (already used by Vite). Remove when upstream stops depending on PostCSS 7."
-        ],
         "dompurify": [
             "This override forces all packages to use DOMPurify v3.4.12 to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
             "Upgrading from v2 to v3 is safe for our project because we do not support Internet Explorer (IE).",
@@ -153,6 +147,13 @@
         ],
         "glob": [
             "copy-and-watch pins glob 10.3.12 (vulnerable CLI <=10.4.5). Override to 10.5.0; Tiki uses glob programmatically, not the CLI -c/--cmd flag."
+        ],
+        "jspdf": [
+            "npm audit flagged jspdf <= 4.2.0 (critical). Pin 4.2.1 so the root install and svgedit (nested 4.0.0) resolve to a patched release."
+        ],
+        "postcss": [
+            "vue3-sfc-loader -> @vue/component-compiler-utils still pulls PostCSS 7.0.x (npm audit range <=8.5.17: parsing/XSS/sourceMappingURL issues).",
+            "Force PostCSS 8.5.25 everywhere (already used by Vite). Remove when upstream stops depending on PostCSS 7."
         ],
         "svelte": [
             "Svelte is pinned to 5.51.0 (and devalue to 5.8.1) for @event-calendar/core 4.x compatibility: Svelte >= 5.51.1 breaks calendar interactions (https://github.com/vkurko/calendar/issues/623). devalue is overridden separately so we can take the npm audit fix without upgrading Svelte. Upgrade path: @event-calendar/core 5.4.1+ then remove both svelte and devalue overrides."
