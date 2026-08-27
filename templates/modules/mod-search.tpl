@@ -157,21 +157,23 @@ $("#search_mod_input_{{$search_mod_usage_counter}}")
                         {rdelim},
                         excludeIdentifiers: (function() {ldelim}
                             const ids = {ldelim}{rdelim};
-                            {foreach from=$smod_params.autocomplete_exclude_parent_ids key=key item=id}
-                                const pair{$key} = "{$id|escape:javascript}".split(':');
-                                if (ids[pair{$key}[0]]) {ldelim}
-                                    if (Array.isArray(ids[pair{$key}[0]])) {ldelim}
-                                        ids[pair{$key}[0]].push(pair{$key}[1]);
+                            {if isset($smod_params.autocomplete_exclude_parent_ids)}
+                               {foreach from=$smod_params.autocomplete_exclude_parent_ids key=key item=id}
+                                    const pair{$key} = "{$id|escape:javascript}".split(':');
+                                    if (ids[pair{$key}[0]]) {ldelim}
+                                        if (Array.isArray(ids[pair{$key}[0]])) {ldelim}
+                                            ids[pair{$key}[0]].push(pair{$key}[1]);
+                                        {rdelim} else {ldelim}
+                                            ids[pair{$key}[0]] = [ids[pair{$key}[0]], pair{$key}[1]];
+                                        {rdelim}
                                     {rdelim} else {ldelim}
-                                        ids[pair{$key}[0]] = [ids[pair{$key}[0]], pair{$key}[1]];
+                                        ids[pair{$key}[0]] = pair{$key}[1];
                                     {rdelim}
-                                {rdelim} else {ldelim}
-                                    ids[pair{$key}[0]] = pair{$key}[1];
-                                {rdelim}
-                            {/foreach}
+                                {/foreach}
+                            {/if}
                             return ids;
                         {rdelim})(),
-                        types: [{foreach from=$smod_params.autocomplete_objecttypes item=type}"{$type|escape:javascript}"{if !$smarty.foreach.type.last},{/if}{/foreach}]
+                        types: [{if isset($smod_params.autocomplete_objecttypes)}{foreach from=$smod_params.autocomplete_objecttypes item=type}"{$type|escape:javascript}"{if !$smarty.foreach.type.last},{/if}{/foreach}{/if}]
                     {/capture}
                     {autocomplete element="#search_mod_input_"|cat:$search_mod_usage_counter type="search_module" options=$smarty.capture.selectFn}
                 {/if}
