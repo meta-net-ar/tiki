@@ -4,7 +4,11 @@ const autocompleteExcludeParentIds = $("#assign_params\\[autocomplete_exclude_pa
 updateAutocompleteExcludeParentIdsOptions();
 
 autocompleteObjectTypes.on("change", function () {
-    autocompleteExcludeParentIds.empty();
+    if (!$(this).val().length) {
+        autocompleteExcludeParentIds.empty();
+        return;
+    }
+
     updateAutocompleteExcludeParentIdsOptions();
 });
 

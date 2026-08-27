@@ -17,6 +17,10 @@ export function fetchSuggestions(query, callback, sourceRemoteUrl = null, source
         return;
     }
 
+    if (window.jqueryTiki.tiki_object_selector_wildcardsearch) {
+        query = "*" + query + "*";
+    }
+
     const url = new URL(sourceRemoteUrl);
     url.searchParams.append(remoteQueryKey, query);
     fetch(url.href, {
