@@ -3494,45 +3494,35 @@ class Services_Tracker_Controller
 
     public function actionPreviewItemEmail($input)
     {
-        $itemId = $input->itemId->int();
-        $fieldId = $input->fieldId->int();
-        $fileId = $input->fileId->int();
+        global $tikipath;
 
-        $trk = TikiLib::lib('trk');
+        require_once $tikipath . '/lib/cypht/integration/classes.php';
 
-        $item = Tracker_Item::fromId($itemId);
-        $field = $trk->get_field_info($fieldId);
+        $config = new Tiki_Hm_Site_Config_File([]);
+        $environment->define_default_constants($config);
+        $session = (new Hm_Session_Setup($config))->setup_session();
 
-        if (! $item || ! $field) {
-            throw new Services_Exception_NotFound();
-        }
+        $module_exec = new Hm_Module_Exec($config);
+        $module_exec->session = $session;
+        $module_exec->load_module_set_files(['core', 'imap', 'tiki'], ['core', 'imap', 'tiki']);
+        $request = new Hm_Request($module_exec->filters, $config);
 
-        $trackerId = $item->getDefinition()->getId();
-        $perms = Perms::get('tracker', $trackerId);
-        if (! $perms->view_trackers) {
-            throw new Services_Exception_Denied(tr("You don't have permission to view the tracker"));
-        }
+        $request->post = [
+            'imap_msg_uid' => $input->uid->int(),
+            'list_path' => $input->listPath->text(),
+        ];
 
-        /** @var Tracker_Field_EmailFolder $fieldHandler */
-        $fieldHandler = $item->getDefinition()->getFieldFactory()->getHandler($field, $item->getData());
+        $module_exec->request = $request;
+        $handler_output = $module_exec->run_handler_module([], [], 'tiki_message_content', [], $session);
 
-        if (! method_exists($fieldHandler, 'getEmailFromFile')) {
-            throw new ServicesExceptionBadRequest(tr('Incorrect field type'));
-        }
+        $headers_output = $module_exec->run_output_module($handler_output[0], [], 'filter_message_headers', [], $session, $request->format, $module_exec->get_current_language());
 
-        $email = $fieldHandler->getEmailFromFile($fileId);
+        $body_output = $module_exec->run_output_module($handler_output[0], [], 'filter_message_body', [], $session, $request->format, $module_exec->get_current_language());
 
-        if (! $email) {
-            throw new Services_Exception_NotFound();
-        }
-
-        // TODO: Fetch proper output from Cypht and return it here instead of raw data.
         return [
-            'subject' => $email['subject'],
-            'from' => $email['from'],
-            'date' => $email['date'] ? TikiLib::lib('tiki')->get_long_datetime($email['date']) : '',
-            'html' => $email['html'],
-            'plaintext' => $email['plaintext'],
+            'headers' => $headers_output[0]['msg_headers'],
+            'body' => $body_output[0]['msg_text'],
+            'raw_headers' => $headers_output[0],
         ];
     }
 }

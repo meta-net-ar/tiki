@@ -47,14 +47,12 @@ $(".tracker-email-view-path")
 
             previewPopover.show();
 
-            const fieldId = $(this).data("fieldId");
-            const itemId = $(this).data("itemId");
-            const fileId = $(this).data("fileId");
+            const urlParams = new URLSearchParams($(this).attr("href").split("?")[1]);
 
-            $.get($.service("tracker", "previewItemEmail", { fieldId, itemId, fileId }), function (email) {
+            $.get($.service("tracker", "previewItemEmail", { uid: urlParams.get("uid"), listPath: urlParams.get("list_path") }), function (email) {
                 if (email) {
                     // Do not use popover.setContent() here, as it causes the popover to flicker.
-                    $(previewPopover.tip).find(".popover-body")[0].innerHTML = `<pre>${email.plaintext || ""}</pre>`;
+                    $(previewPopover.tip).find(".popover-body")[0].innerHTML = `${email.headers} ${email.body}`;
                 }
             });
         }, 500);
