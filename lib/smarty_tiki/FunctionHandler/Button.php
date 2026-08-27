@@ -220,7 +220,7 @@ class Button extends Base implements TikiSmartyExtensionInterface
                 unset($params['_type']);
             }
 
-            $url = str_replace('+', ' ', str_replace('&amp;', '&', urldecode($_SERVER['REQUEST_URI'])));
+            $url = str_replace('+', ' ', str_replace('&amp;', '&', urldecode($_SERVER['REQUEST_URI'] ?? ''))); //In unit tests or indexing, REQUEST_URI won't be present
             $encoded_html = htmlentities($html);
             $dom = new \DOMDocument();
 
