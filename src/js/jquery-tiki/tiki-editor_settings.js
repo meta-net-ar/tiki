@@ -4,15 +4,17 @@ export default function () {
 
         const domId = $(this).data("areaId");
         const $textarea = $("#" + domId);
+        const $editZone = $textarea.closest(".edit-zone");
         const $form = $textarea.parents("form");
         const $editorSelect = $("#editor-select", event.target);
-        const $syntaxSelect = $("#syntax-select", event.target);
         const $wysiwygInput = $form.find("input[name=wysiwyg]");
         const $syntaxInput = $form.find("input[name=syntax]");
 
         const initialEditorType = $wysiwygInput.val() === "y" ? "wysiwyg" : "plain";
+        const editorType = $editorSelect.val();
+        const syntaxType = $syntaxInput.val();
 
-        if ($editorSelect.val() === initialEditorType && $syntaxSelect.val() === $syntaxInput.val()) {
+        if (editorType === initialEditorType && syntaxType === $syntaxInput.val()) {
             $.closeModal();
             return;
         }
@@ -21,8 +23,8 @@ export default function () {
             event.target.action,
             {
                 data: $textarea.val(),
-                syntax: $syntaxSelect.val(),
-                editor: $editorSelect.val(),
+                syntax: syntaxType,
+                editor: editorType,
                 domId: domId,
                 domName: $textarea.attr("name"),
                 page: $form.find("input[name=page]").val(),
@@ -43,7 +45,7 @@ export default function () {
                     $textarea.remove();
                     $(tuiEditor.options.el).replaceWith(data);
                 } else {
-                    $textarea.closest(".edit-zone").replaceWith(data);
+                    $editZone.replaceWith(data);
                 }
             }
         );

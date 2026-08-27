@@ -1,0 +1,1 @@
+{include file="edit/post_editor_settings.tpl"}

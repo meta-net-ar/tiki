@@ -412,6 +412,11 @@ class WYSIWYGLib
                 'area_id' => $dom_id,
                 '_wysiwyg' => 'y',
                 'is_html' => false,
+                'section' => $params['section'] ?? 'wiki page',
+                'comments' => $params['comments'] ?? 'n',
+                'switcheditor' => $params['switcheditor'] ?? 'y',
+                'switchsyntax' => $params['switchsyntax'] ?? 'y',
+                'objectId' => $params['objectId'] ?? '',
             ];
             $tuitools = \SmartyTiki\FunctionHandler\Toolbars::render($toolbarParams, $smarty->getEmptyInternalTemplate());
         } else {

@@ -48,6 +48,12 @@ class Toolbars extends Base implements TikiSmartyExtensionInterface
         ) {
             $hidden[] = 'switcheditor';
         }
+        if (
+            (empty($params['switchsyntax']) && ! in_array($params['section'], $switchableWysiwygSections)) ||
+            (! empty($params['switchsyntax']) && $params['switchsyntax'] !== 'y')
+        ) {
+            $hidden[] = 'switchsyntax';
+        }
 
         if ($tiki_p_admin != 'y' || $tiki_p_admin_toolbars != 'y') {
             $hidden[] = 'admintoolbar';
@@ -58,7 +64,7 @@ class Toolbars extends Base implements TikiSmartyExtensionInterface
         }
 
         if (isset($params['inline']) && $params['inline']) {
-            $hidden = array_merge($hidden, ['switcheditor', 'admintoolbar', 'autosave', 'source']);
+            $hidden = array_merge($hidden, ['switcheditor', 'switchsyntax', 'admintoolbar', 'autosave', 'source']);
         }
 
         $list = ToolbarsList::fromPreference($params, $hidden);

@@ -12,20 +12,10 @@ class ToolbarSwitchEditor extends ToolbarUtilityItem
     public $onClick;
     public function __construct()
     {
-        global $prefs;
-
-
-        if ($prefs['markdown_enabled'] === 'y') {
-            $label = tra('Syntax and Editor Settings');
-        } else {
-            $label = tra('Switch Editor (wiki or WYSIWYG)');
-        }
-
-        $this->setLabel(tra($label))
+        $this->setLabel(tra('Switch Editor (wiki or WYSIWYG)'))
             ->setIconName('cog')
             ->setIcon('img/icons/gear.png')
             ->setWysiwygToken('tikiswitch')
-            ->setMarkdownSyntax('tikiswitch')
             ->setMarkdownWysiwyg('tikiswitch')
             ->setType('SwitchEditor')
             ->setClass('qt-switcheditor')

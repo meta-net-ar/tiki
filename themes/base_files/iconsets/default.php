@@ -2250,6 +2250,10 @@ function iconset_default()
                 'id' => 'mars-and-venus-burst',
                 'prepend' => 'fas fa-',
             ],
+            'markdown' => [
+                'id' => 'markdown',
+                'prepend' => 'fab fa-',
+            ],
             'mask-face' => [
                 'id' => 'mask-face',
                 'prepend' => 'fas fa-',
