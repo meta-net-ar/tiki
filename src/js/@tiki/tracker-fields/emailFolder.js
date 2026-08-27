@@ -1,5 +1,3 @@
-import DOMPurify from "dompurify";
-
 $(".add-email-folder").on("click", function () {
     const fieldId = $(this).data("fieldId");
     const itemId = $(this).data("itemId");
@@ -21,50 +19,38 @@ $(".add-email-folder").on("click", function () {
 });
 
 const isHoverable = matchMedia("(hover: hover) and (pointer: fine)").matches;
-let previewEmailTimeout = null;
 
-$(".tracker-email-view-path")
-    .on("mouseenter", function (e) {
-        if (!isHoverable) return;
+$(".tracker-email-view-path").on("click", function (e) {
+    if (!isHoverable) return;
 
-        // Add a small delay before showing the preview to avoid flickering when moving the mouse quickly over multiple emails
-        previewEmailTimeout = setTimeout(() => {
-            const previewPopover = bootstrap.Popover.getOrCreateInstance(this, {
-                trigger: "manual",
-                html: true,
-                content: " ", // non-empty content, otherwise the popover won't show
-            });
+    e.preventDefault();
 
-            // Avoid refetching popover content if it's already loaded
-            if (previewPopover._element.querySelector(".popover-body")?.innerHTML.trim()) {
-                previewPopover.show();
-                return;
-            }
-
-            previewPopover.setContent({
-                ".popover-body": $.BUTTON_LOADER_MARKUP,
-            });
-
-            previewPopover.show();
-
-            const urlParams = new URLSearchParams($(this).attr("href").split("?")[1]);
-
-            $.get($.service("tracker", "previewItemEmail", { uid: urlParams.get("uid"), listPath: urlParams.get("list_path") }), function (email) {
-                if (email) {
-                    // Do not use popover.setContent() here, as it causes the popover to flicker.
-                    $(previewPopover.tip).find(".popover-body")[0].innerHTML = `${email.headers} ${email.body}`;
-                }
-            });
-        }, 500);
-    })
-    .on("mouseleave", function (e) {
-        if (!isHoverable) return;
-        clearTimeout(previewEmailTimeout);
-        const previewPopover = bootstrap.Popover.getInstance(this);
-        if (previewPopover) {
-            previewPopover.hide();
-        }
+    $.openModal({
+        content: `<div class="email-preview-content">${$.IMPORT_LOADER_MARKUP}</div>`,
+        size: "modal-xl",
+        buttons: [],
+        open: function () {
+            $(this)
+                .find(".modal-header")
+                .html(
+                    `<a href="${$(e.target).attr("href")}" target="_blank" class="ms-auto">${tr("Expand")} ${$.fn.getIcon("link-external").prop("outerHTML")}</a>`
+                );
+        },
     });
+
+    const urlParams = new URLSearchParams($(this).attr("href").split("?")[1]);
+
+    $.get($.service("tracker", "previewItemEmail", { uid: urlParams.get("uid"), listPath: urlParams.get("list_path") }), function (email) {
+        if (email) {
+            $(".email-preview-content").html(`${email.headers} ${email.body}`);
+        } else {
+            $(".email-preview-content").html(tr("Failed to load email preview."));
+        }
+    }).fail(() => {
+        showMessage(tr("An error occurred while fetching the email preview."), "error");
+        $.closeModal();
+    });
+});
 
 function submitFolder(triggerButton, modal, fieldId, itemId) {
     const folder = $(modal).find("#email-folder-name").val().trim();
