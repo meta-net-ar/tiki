@@ -3522,7 +3522,6 @@ class Services_Tracker_Controller
         return [
             'headers' => $headers_output[0]['msg_headers'],
             'body' => $body_output[0]['msg_text'],
-            'raw_headers' => $headers_output[0],
         ];
     }
 }
