@@ -150,10 +150,10 @@ class Language_CollectFiles
                 continue;
             }
 
-            if (preg_match($pattern, $file)) {
-                $files[] = $path;
-            } elseif (is_dir($path)) {
+            if (is_dir($path)) {
                 $files = array_merge($files, $this->scanDir($path));
+            } elseif (preg_match($pattern, $file)) {
+                $files[] = $path;
             }
         }
 
