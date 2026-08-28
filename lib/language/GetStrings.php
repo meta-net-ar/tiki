@@ -492,7 +492,15 @@ class Language_GetStrings
     protected function getAllLanguages()
     {
         $languages = [];
+
+        if (! is_dir($this->langDir)) {
+            return $languages;
+        }
+
         $dirs = dir($this->langDir);
+        if ($dirs === false) {
+            return $languages;
+        }
 
         while (false !== ($entry = $dirs->read())) {
             if ($entry == '.' || $entry == '..') {
