@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-import { FIXTURE_CMD } from "./fixtures";
+import { fixtureCommand } from "./fixtures";
 
 // Runs once before the whole test session (wired via playwright.config.ts → globalSetup).
 // Seeds the shared prerequisites that every suite assumes but that no per-TC fixture owns:
@@ -13,13 +13,13 @@ import { FIXTURE_CMD } from "./fixtures";
 type Step = { label: string; script: string };
 
 const STEPS: Step[] = [
-    { label: "test users", script: "/tests/e2e/fixtures/create_test_users.php" },
-    { label: "encryption feature", script: "/tests/e2e/fixtures/enable_encryption.php" },
+    { label: "test users", script: "create_test_users.php" },
+    { label: "encryption feature", script: "enable_encryption.php" },
 ];
 
 export default function globalSetup(): void {
     for (const { label, script } of STEPS) {
-        const cmd = `${FIXTURE_CMD}${script}`;
+        const cmd = fixtureCommand(script);
         try {
             const out = execSync(cmd, { stdio: "pipe" }).toString().trim();
             console.log(`[e2e setup] ${label}: ${out || "ok"}`);

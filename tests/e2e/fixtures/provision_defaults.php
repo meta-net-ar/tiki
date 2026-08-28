@@ -5,32 +5,27 @@
 // interactive install (web installer + admin wizard) would normally handle,
 // so the UI behaves like an established instance during tests.
 // Idempotent — safe to run repeatedly. Called by bin/e2e-provision.sh.
-// Usage: php tests/e2e/fixtures/provision_defaults.php
 // Output: JSON {"changed": ["pref", ...]}
 
-// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
-error_reporting(E_ERROR);
-ini_set('display_errors', 'stderr');
+// Preferences are written directly, so no admin permissions are needed.
+return [
+    'admin' => false,
+    'run'   => function (array $input): array {
+        $defaults = [
+            // Keep the admin wizard from auto-opening on first admin login.
+            'wizard_admin_hide_on_login' => 'y',
+        ];
 
-if (PHP_SAPI !== 'cli') {
-    die;
-}
+        $tikilib = TikiLib::lib('tiki');
+        $changed = [];
 
-require_once __DIR__ . '/../../../tiki-setup.php';
+        foreach ($defaults as $pref => $value) {
+            if ($tikilib->get_preference($pref) !== $value) {
+                $tikilib->set_preference($pref, $value);
+                $changed[] = $pref;
+            }
+        }
 
-$defaults = [
-    // Keep the admin wizard from auto-opening on first admin login.
-    'wizard_admin_hide_on_login' => 'y',
+        return ['changed' => $changed];
+    },
 ];
-
-$tikilib = TikiLib::lib('tiki');
-$changed = [];
-
-foreach ($defaults as $pref => $value) {
-    if ($tikilib->get_preference($pref) !== $value) {
-        $tikilib->set_preference($pref, $value);
-        $changed[] = $pref;
-    }
-}
-
-echo json_encode(['changed' => $changed]) . "\n";

@@ -4,27 +4,23 @@
 // Also stamps pass_confirm: a clean install leaves it NULL, which forces an
 // interactive password change at first login and would break automated login
 // (same approach as upsert_test_user() in helpers.php).
-// Called by bin/e2e-provision.sh.
-// Usage: php tests/e2e/fixtures/provision_admin.php {password}
+// Called by bin/e2e-provision.sh with {"password": "..."} as input.
 // Output: JSON {"admin":"updated"}
 
-// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
-error_reporting(E_ERROR);
-ini_set('display_errors', 'stderr');
+// PDO only: a freshly installed instance is not worth booting for one UPDATE.
+return [
+    'tiki' => false,
+    'run'  => function (array $input): array {
+        $password = (string) ($input['password'] ?? '');
 
-if (PHP_SAPI !== 'cli') {
-    die;
-}
-require_once __DIR__ . '/helpers.php';
+        if ($password === '') {
+            throw new RuntimeException('missing password in input');
+        }
 
-$password = $argv[1] ?? '';
-if ($password === '') {
-    echo json_encode(['success' => false, 'error' => 'missing password arg']);
-    exit(1);
-}
+        get_pdo()
+            ->prepare('UPDATE users_users SET hash = ?, pass_confirm = ? WHERE login = ?')
+            ->execute([password_hash($password, PASSWORD_BCRYPT), time(), 'admin']);
 
-$pdo = get_pdo();
-$pdo->prepare('UPDATE users_users SET hash = ?, pass_confirm = ? WHERE login = ?')
-    ->execute([password_hash($password, PASSWORD_BCRYPT), time(), 'admin']);
-
-echo json_encode(['admin' => 'updated']) . "\n";
+        return ['admin' => 'updated'];
+    },
+];

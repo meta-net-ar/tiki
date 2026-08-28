@@ -47,6 +47,27 @@ export const FIXTURE_CMD =
         ? `php ${resolve(__dirname, "../../..")}`
         : (process.env.TIKI_FIXTURE_CMD ?? buildDefaultFixtureCmd());
 
+// Every PHP fixture runs through fixtures/bootstrap.php, which owns the CLI guard, the
+// Tiki bootstrap, admin permissions and the JSON in/out contract, so the fixture files
+// themselves hold only their own logic. Script paths are relative to fixtures/, which
+// keeps callers from having to know where the Tiki root sits inside a container.
+const BOOTSTRAP_SCRIPT = "tests/e2e/fixtures/bootstrap.php";
+
+/**
+ * Build the shell command that runs one PHP fixture through the bootstrap.
+ *
+ * @param script Path relative to tests/e2e/fixtures/, e.g. "shared-secrets/tc04_setup.php"
+ * @param input  Optional payload for the fixture, passed base64-encoded so it survives
+ *               `ddev exec` / docker / plain php quoting.
+ */
+export function fixtureCommand(script: string, input?: unknown): string {
+    const arg =
+        input === undefined
+            ? ""
+            : ` ${Buffer.from(JSON.stringify(input)).toString("base64")}`;
+    return `${FIXTURE_CMD}/${BOOTSTRAP_SCRIPT} ${script}${arg}`;
+}
+
 // Subpath prefix extracted from TIKI_BASE_URL by playwright.config.ts.
 // Empty string for root installs (DDEV, bare localhost) — no-op in that case.
 export const BASE_PATH: string = process.env.TIKI_BASE_PATH ?? "";
@@ -75,14 +96,13 @@ export interface SuiteFixtures {
  *
  * Contract:
  *  - setup prints a single JSON object on stdout → exposed as `fx.data`;
- *  - teardown receives that same JSON base64-encoded as its first CLI
- *    argument (shell-safe through `ddev exec` / docker / plain php);
+ *  - teardown receives that same JSON back as `$input`, handed over
+ *    base64-encoded so it is shell-safe through `ddev exec` / docker / plain php;
  *  - if setup fails, the whole spec file is skipped with a warning
  *    pointing at TIKI_FIXTURE_CMD.
  */
 export function useSuiteFixtures(test: TestType<any, any>): SuiteFixtures {
     const fx: SuiteFixtures = { data: {}, loaded: false };
-    let rawSetupOutput = "";
 
     test.beforeAll(async ({}, testInfo) => {
         const scripts = resolveFixtureScripts(testInfo.file);
@@ -90,12 +110,12 @@ export function useSuiteFixtures(test: TestType<any, any>): SuiteFixtures {
             return;
         }
         try {
-            rawSetupOutput = execSync(`${FIXTURE_CMD}/${scripts.setupRel}`, {
+            const out = execSync(fixtureCommand(scripts.setupRel), {
                 stdio: "pipe",
             })
                 .toString()
                 .trim();
-            fx.data = JSON.parse(rawSetupOutput);
+            fx.data = JSON.parse(out);
             fx.loaded = true;
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -126,8 +146,7 @@ export function useSuiteFixtures(test: TestType<any, any>): SuiteFixtures {
             return;
         }
         try {
-            const arg = Buffer.from(rawSetupOutput).toString("base64");
-            execSync(`${FIXTURE_CMD}/${scripts.teardownRel} ${arg}`, {
+            execSync(fixtureCommand(scripts.teardownRel, fx.data), {
                 stdio: "pipe",
             });
         } catch (_) {
@@ -150,8 +169,8 @@ function resolveFixtureScripts(specFile: string) {
     const tc = tcMatch[1].toLowerCase();
     const suite = basename(dirname(specFile));
     const e2eRoot = resolve(__dirname, "..");
-    const setupRel = `tests/e2e/fixtures/${suite}/${tc}_setup.php`;
-    const teardownRel = `tests/e2e/fixtures/${suite}/${tc}_teardown.php`;
+    const setupRel = `${suite}/${tc}_setup.php`;
+    const teardownRel = `${suite}/${tc}_teardown.php`;
     return {
         label: tc.replace(/^tc/, "TC-").toUpperCase(),
         setupRel,

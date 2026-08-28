@@ -83,10 +83,12 @@ Test1/Test2 are created automatically by the global setup above. To create or re
 manually, run from the Tiki root:
 
 ```bash
-php tests/e2e/fixtures/create_test_users.php
+php tests/e2e/fixtures/bootstrap.php create_test_users.php
 ```
 
-Adapt the PHP invocation to your environment (`ddev exec php`, `docker exec`, plain `php`, etc.).
+Every PHP fixture is run this way: `bootstrap.php` first, then the script path relative to
+`tests/e2e/fixtures/`. Adapt the PHP invocation to your environment (`ddev exec php`,
+`docker exec`, plain `php`, etc.).
 
 ## Running the Tests
 
@@ -160,6 +162,7 @@ tests/e2e/
 │   ├── test.ts                Custom test fixture (BASE_PATH subpath prefixing)
 │   └── ui.ts                  activateBootstrapTab (async Bootstrap tab activation)
 ├── fixtures/                  PHP setup/teardown scripts for test data
+│   ├── bootstrap.php          Runs every fixture: CLI guard, Tiki + admin, JSON in/out
 │   ├── helpers.php            Shared PHP helpers (bootstrap, key/tracker ops, PDO)
 │   ├── create_test_users.php  Global — ensures Test1/Test2 exist
 │   ├── enable_encryption.php  Global — persists feature_user_encryption='y'
@@ -188,11 +191,58 @@ tests/e2e/
 1. Create a subdirectory: `tests/e2e/suites/<domain-name>/`
 2. Add `helpers.ts` — import shared auth from `../../common/auth`, add domain-specific helpers
 3. Add `tc*.spec.ts` spec files
-4. If PHP fixtures are needed, add a `fixtures/<domain-name>/` subfolder
+4. If PHP fixtures are needed, add a `fixtures/<domain-name>/` subfolder and write each
+   script to the fixture contract below: a `return function (array $input): array { ... }`,
+   with no bootstrap code of its own
 
 ## Fixtures
 
 PHP scripts in `fixtures/` create and clean up database objects required by specific test cases.
+
+### The bootstrap
+
+No fixture script bootstraps itself. They are all run through `fixtures/bootstrap.php`, which
+owns every step they would otherwise repeat: routing errors to stderr, the CLI-only guard,
+`tiki-setup.php` and `helpers.php`, `bootstrap_admin()`, decoding the input argument, printing
+the result as JSON on stdout, and turning a thrown exception into a stderr message and a
+non-zero exit.
+
+```bash
+php tests/e2e/fixtures/bootstrap.php <script> [base64(JSON input)]
+```
+
+The script path is relative to `fixtures/`, so no caller has to know where the Tiki root sits
+inside a container. A fixture therefore contains only its own logic, and returns a callable:
+
+```php
+<?php
+
+// TC-11 setup: creates an encryption key assigned to Test1.
+
+return function (array $input): array {
+    delete_keys_by_name('TC11-EncKey');
+
+    $key = create_encryption_key('TC11-EncKey', 'Test1');
+
+    return ['keyId' => $key['keyId'], 'share' => $key['shares'][0]];
+};
+```
+
+The returned array is printed as JSON on stdout, the only thing ever written there. `$input` is
+the decoded argument: for a `tcNN_teardown.php` that is whatever `tcNN_setup.php` printed.
+Failures throw, and `common/fixtures.ts` surfaces the message and skips the suite.
+
+A fixture that needs a different environment says so instead of hand-rolling one:
+
+```php
+return [
+    'tiki'  => false,   // skip tiki-setup.php, raw PDO access only
+    'admin' => false,   // skip bootstrap_admin(), defaults to the 'tiki' value
+    'run'   => function (array $input): array { ... },
+];
+```
+
+### Wiring a fixture to a spec
 
 Per-testcase fixtures are wired **by naming convention** — a spec never writes its own
 `beforeAll`/`afterAll` plumbing. Add one line at the top of the spec:
@@ -210,16 +260,13 @@ whichever exist (the call is a no-op for specs without fixture scripts):
 - **setup** runs in `beforeAll` and must print a single JSON object on stdout —
   available to the spec as `fx.data` (e.g. `fx.data.trackerId`). If setup fails,
   the whole spec file is skipped with a warning pointing at `TIKI_FIXTURE_CMD`.
-- **teardown** runs in `afterAll` and receives the setup's JSON output
-  **base64-encoded as its first CLI argument** (shell-safe through
-  `ddev exec` / docker / plain php), so it can read back the IDs setup created.
-
-Most scripts use `require_once tiki-setup.php` and must be invoked with the Tiki web root as the
-working directory. Exception: `create_test_users.php` connects to the database via PDO directly
-(`db/local.php`) — it requires no Tiki bootstrap and works with plain PHP CLI.
+- **teardown** runs in `afterAll` and receives that same JSON as its `$input`
+  (handed over base64-encoded, so it is shell-safe through `ddev exec` / docker /
+  plain php), and can read back the IDs setup created.
 
 | Script                                       | Used by        | Purpose                                       |
 |----------------------------------------------|----------------|-----------------------------------------------|
+| `bootstrap.php`                              | Every fixture  | Runs a fixture script: CLI guard, Tiki bootstrap, admin permissions, JSON in/out |
 | `create_test_users.php`                      | Global setup   | Ensure Test1/Test2 exist with known passwords |
 | `enable_encryption.php`                      | Global setup   | Persist `feature_user_encryption='y'` in the DB (idempotent) |
 | `clean_baseline.php`                         | Maintenance    | Wipe all TC-prefixed keys and trackers from DB (recovery after a killed run in existing-instance mode) |

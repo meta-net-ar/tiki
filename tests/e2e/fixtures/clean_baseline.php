@@ -1,34 +1,21 @@
 <?php
 
-// Wipes TC-prefixed test encryption keys and trackers from the DB.
-// Run before dump_baseline.php to ensure the baseline starts clean.
-// Usage: ddev exec php /var/www/html/tests/e2e/fixtures/clean_baseline.php
-// Outputs JSON: {"keys_deleted":N,"trackers_deleted":N}
+// Maintenance: wipes every TC-prefixed test encryption key and tracker from the DB.
+// Use it to recover after a killed run in existing-instance mode.
+// Run by hand: php tests/e2e/fixtures/bootstrap.php clean_baseline.php
+// Output: JSON {"keys_deleted":N,"trackers_deleted":N}
 
-// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
-error_reporting(E_ERROR);
-ini_set('display_errors', 'stderr');
+return function (array $input): array {
+    $enclib = TikiLib::lib('encryption');
+    $keys   = array_filter($enclib->get_keys(), fn($k) => str_starts_with((string) $k['name'], 'TC'));
+    array_walk($keys, fn($k) => $enclib->delete_key($k['keyId']));
 
-if (PHP_SAPI !== 'cli') {
-    die;
-}
+    $tikilib    = TikiLib::lib('tiki');
+    $trackerIds = array_column(
+        $tikilib->fetchAll("SELECT trackerId FROM tiki_trackers WHERE name LIKE 'TC%'"),
+        'trackerId'
+    );
+    array_walk($trackerIds, fn($id) => delete_tracker_by_id((int) $id));
 
-require_once __DIR__ . '/../../../tiki-setup.php';
-require_once __DIR__ . '/helpers.php';
-
-bootstrap_admin();
-
-$enclib = TikiLib::lib('encryption');
-$keys   = array_filter($enclib->get_keys(), fn($k) => str_starts_with((string) $k['name'], 'TC'));
-array_walk($keys, fn($k) => $enclib->delete_key($k['keyId']));
-$keysDeleted = count($keys);
-
-$tikilib    = TikiLib::lib('tiki');
-$trackerIds = array_column(
-    $tikilib->fetchAll("SELECT trackerId FROM tiki_trackers WHERE name LIKE 'TC%'"),
-    'trackerId'
-);
-array_walk($trackerIds, fn($id) => delete_tracker_by_id((int) $id));
-$trackersDeleted = count($trackerIds);
-
-echo json_encode(['keys_deleted' => $keysDeleted, 'trackers_deleted' => $trackersDeleted]) . "\n";
+    return ['keys_deleted' => count($keys), 'trackers_deleted' => count($trackerIds)];
+};

@@ -1,32 +1,18 @@
 <?php
 
-// TC-06 teardown: removes tracker + key
-// Invoked by common/fixtures.ts (useSuiteFixtures) with the setup script's
-// JSON output base64-encoded as the first argument.
-// Usage: php tc06_teardown.php {base64(setup JSON)}
+// TC-06 teardown: removes the tracker and key created by tc06_setup.php.
+// Input: that setup's JSON output, handed back by common/fixtures.ts.
 
-// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
-error_reporting(E_ERROR);
-ini_set('display_errors', 'stderr');
+return function (array $input): array {
+    $trackerId = (int) ($input['trackerId'] ?? 0);
+    $keyId     = (int) ($input['keyId'] ?? 0);
 
-if (PHP_SAPI !== 'cli') {
-    die;
-}
-require_once __DIR__ . '/../../../../tiki-setup.php';
-require_once __DIR__ . '/../helpers.php';
+    if (! $trackerId || ! $keyId) {
+        throw new RuntimeException('missing trackerId/keyId in setup output');
+    }
 
-bootstrap_admin();
+    delete_tracker_by_id($trackerId);
+    delete_key_by_id($keyId);
 
-$setupData = json_decode(base64_decode($argv[1] ?? ''), true) ?: [];
-$trackerId = (int) ($setupData['trackerId'] ?? 0);
-$keyId     = (int) ($setupData['keyId'] ?? 0);
-
-if (! $trackerId || ! $keyId) {
-    echo json_encode(['success' => false, 'error' => 'missing trackerId/keyId args']);
-    exit(1);
-}
-
-delete_tracker_by_id($trackerId);
-delete_key_by_id($keyId);
-
-echo json_encode(['success' => true, 'trackerId' => $trackerId, 'keyId' => $keyId]);
+    return ['success' => true, 'trackerId' => $trackerId, 'keyId' => $keyId];
+};
