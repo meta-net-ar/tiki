@@ -56,6 +56,27 @@
                     {textarea rows="2" class="form-control" name="description" id="description" maxlength="{$MAX_COMMENT_DESCRIPTION_LENGTH}"}{$description|escape}{/textarea}
                 </div>
             </div>
+            <fieldset>
+                <legend class="h3">{tr}SEO{/tr}</legend>
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label" for="metatag_description">{tr}Meta description{/tr}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="metatag_description" id="metatag_description" value="{$category_metatag_description|escape}" maxlength="200">
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label" for="metatag_keywords">{tr}Meta keywords{/tr}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="metatag_keywords" id="metatag_keywords" value="{$category_metatag_keywords|escape}">
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-sm-3 col-form-label" for="metatag_robots">{tr}Meta robots{/tr}</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="metatag_robots" id="metatag_robots" value="{$category_metatag_robots|escape}" placeholder="{tr}noimageindex, nocache{/tr}">
+                    </div>
+                </div>
+            </fieldset>
             {if isset($role_groups) && count($role_groups)}
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="description">{tr}Group Roles{/tr}</label>

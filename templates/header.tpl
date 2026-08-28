@@ -12,7 +12,9 @@
 {include file="canonical.tpl"}
 
 {* --- Blog description --- *}
-{if isset($section) and $section eq "blogs"}
+{if not empty($metatag_object_description)}
+    {$metatag_description = $metatag_object_description|escape}
+{elseif isset($section) and $section eq "blogs"}
     {if not empty($post_info) and not empty($post_info.parsed_excerpt)}
         {$metatag_description = $post_info.parsed_excerpt|strip_tags:false|truncate:150|escape}
     {elseif not empty($post_info) and not empty($post_info.parsed_data|strip_tags)}
@@ -60,7 +62,9 @@
     <meta name="twitter:description" content="{if not empty($prefs.browsertitle_translated)}{$prefs.browsertitle_translated|tr_if|escape}{else}{$prefs.browsertitle|tr_if|escape}{/if}{if isset($title)} {$prefs.site_nav_seper} {$title}{/if}">
 {/if}
 {* --- Meta keywords: forum, per-page keywords, and/or tags (when "Include tags" is on) --- *}
-{if !empty($forum_info.name) and $prefs.metatag_threadtitle eq 'y'}
+{if !empty($metatag_object_keywords)}
+    <meta name="keywords" content="{$metatag_object_keywords|escape}">
+{elseif !empty($forum_info.name) and $prefs.metatag_threadtitle eq 'y'}
     <meta name="keywords" content="{tr}Forum{/tr} {$forum_info.name|escape} {if !empty($thread_info.title)}{$thread_info.title|escape}{/if} {if $prefs.metatag_freetags eq 'y' and isset($tags) and !empty($tags)}{foreach from=$tags item=taginfo}{$taginfo.tag|escape} {/foreach}{/if}">
 {elseif !empty($metatag_local_keywords) or ($prefs.metatag_freetags eq 'y' and isset($tags) and !empty($tags))}
     <meta name="keywords" content="{if $prefs.metatag_freetags eq 'y' and isset($tags) and !empty($tags)}{foreach from=$tags item="taginfo"}{$taginfo.tag|escape}, {/foreach}{/if}{if !empty($metatag_local_keywords)}{$metatag_local_keywords|escape}{/if}">
@@ -81,7 +85,7 @@
 {if $prefs.metatag_geoplacename neq ''}
     <meta name="geo.placename" content="{$prefs.metatag_geoplacename|escape}">
 {/if}
-{if ($prefs.metatag_robotscustom == 'y' and not empty($metatag_robotscustom))}
+{if not empty($metatag_robotscustom)}
     {* PRIORITY 1: Page-specific custom robots (highest priority, complete override) *}
     <meta name="robots" content="{$metatag_robotscustom|escape}">
     <meta name="googlebot" content="{$metatag_robotscustom|escape}">

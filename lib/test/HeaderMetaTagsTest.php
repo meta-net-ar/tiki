@@ -56,7 +56,7 @@ class HeaderMetaTagsTest extends TikiTestCase
      * Render header template with given preferences
      * Uses output buffering to capture template output
      */
-    private function renderHeaderTemplate(array $testPrefs = []): string
+    private function renderHeaderTemplate(array $testPrefs = [], array $templateVars = []): string
     {
         global $prefs, $base_url_canonical, $metatag_robotscustom, $metatag_robots, $headerlib;
 
@@ -104,6 +104,12 @@ class HeaderMetaTagsTest extends TikiTestCase
         $smarty->assign('thread_info', []);
         $smarty->assign('tags', []);
         $smarty->assign('metatag_local_keywords', '');
+        $smarty->assign('metatag_object_description', '');
+        $smarty->assign('metatag_object_keywords', '');
+
+        foreach ($templateVars as $name => $value) {
+            $smarty->assign($name, $value);
+        }
 
         // Use output buffering to capture any errors
         ob_start();
@@ -631,6 +637,59 @@ class HeaderMetaTagsTest extends TikiTestCase
             htmlspecialchars($testDescription, ENT_QUOTES),
             $output,
             'description meta tag should contain the preference value'
+        );
+    }
+
+    public function testObjectDescriptionOverridesGlobalDescription(): void
+    {
+        $globalDescription = 'Global site description';
+        $objectDescription = 'Object specific SEO description';
+        $output = $this->renderHeaderTemplate(
+            ['metatag_description' => $globalDescription],
+            ['metatag_object_description' => $objectDescription]
+        );
+
+        $this->assertStringContainsString(
+            '<meta name="description" content="' . $objectDescription . '">',
+            $output,
+            'object description should be rendered as the description meta tag'
+        );
+        $this->assertStringNotContainsString(
+            '<meta name="description" content="' . $globalDescription . '">',
+            $output,
+            'global description should not be rendered when object description is present'
+        );
+    }
+
+    public function testObjectKeywordsOverridePageKeywordsAndTags(): void
+    {
+        $output = $this->renderHeaderTemplate(
+            [
+                'metatag_freetags' => 'y',
+            ],
+            [
+                'metatag_object_keywords' => 'object, seo',
+                'metatag_local_keywords' => 'page, keywords',
+                'tags' => [
+                    ['tag' => 'tag-one'],
+                ],
+            ]
+        );
+
+        $this->assertStringContainsString(
+            '<meta name="keywords" content="object, seo">',
+            $output,
+            'object keywords should be rendered as the keywords meta tag'
+        );
+        $this->assertStringNotContainsString(
+            'page, keywords',
+            $output,
+            'page keywords should not be rendered when object keywords are present'
+        );
+        $this->assertStringNotContainsString(
+            'tag-one',
+            $output,
+            'tags should not be rendered when object keywords are present'
         );
     }
 }
