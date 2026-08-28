@@ -35,6 +35,13 @@ if (empty($_REQUEST['user']) || ! $userlib->user_exists($_REQUEST['user'])) {
     Feedback::errorAndDie(tra('Invalid username'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
+if (! isset($_REQUEST['change']) && ! empty($_REQUEST['actpass']) && ! $userlib->isValidActivationCode($_REQUEST['user'], $_REQUEST['actpass'])) {
+    $smarty->assign('msg', tra('Invalid username or activation code. Maybe this code has already been used.'));
+    $smarty->assign('errortype', 'no_redirect_login');
+    $smarty->display('error.tpl');
+    die;
+}
+
 if (! isset($_REQUEST["oldpass"])) {
     $_REQUEST["oldpass"] = '';
 }
