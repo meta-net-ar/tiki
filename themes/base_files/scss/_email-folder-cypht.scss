@@ -1,0 +1,36 @@
+.email-folder-preview {
+    // Copy of styles for the .msg_parts container from Cypht (modules/imap/site.css)
+    .msg_parts {
+        table-layout: fixed;
+        border-top: solid 1px #ddd;
+        padding-top: 20px;
+        padding-left: 20px;
+        width: 100%;
+        padding-bottom: 40px;
+    }
+    .msg_parts td {
+        padding: 3px;
+        padding-right: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 20%;
+    }
+    .msg_parts td * {
+        white-space: nowrap;
+    }
+
+    // Copy of styles for the .msg_text_inner container from Cypht (modules/imap/site.css)
+    .msg_text_inner {
+        min-height: 300px;
+        font-family: monospace;
+        padding: 20px;
+    }
+
+    // customization from cypht-tiki.scss
+    .msg_parts {
+        table-layout: auto;
+        td { width: 100% !important; }
+    }
+    .msg_parts tr:not(:last-child) { border-bottom: 1px solid #444; }
+}
