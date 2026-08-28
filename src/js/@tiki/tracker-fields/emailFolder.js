@@ -41,9 +41,9 @@ $(".tracker-email-view-path").on("click", function (e) {
     const urlParams = new URLSearchParams($(this).attr("href").split("?")[1]);
 
     $.get($.service("tracker", "previewItemEmail", { uid: urlParams.get("uid"), listPath: urlParams.get("list_path") }), function (email) {
-        $(".email-preview-content").html(`${email.headers} ${email.body}`);
-        // Remove .msg_actions, if the user wants more interaction, they can expand the email in a new tab.
-        $(".email-preview-content .msg_actions").remove();
+        $(".email-preview-content").html(`${email.headers} ${email.body} ${email.msg_parts}`);
+        // Remove .msg_actions and .long_header, if the user wants more interaction, they can expand the email in a new tab.
+        $(".email-preview-content").find(".msg_actions, .long_header").remove();
     }).fail(() => {
         showMessage(tr("An error occurred while fetching the email preview."), "error");
         $.closeModal();

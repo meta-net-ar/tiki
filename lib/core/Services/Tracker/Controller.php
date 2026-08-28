@@ -3519,9 +3519,12 @@ class Services_Tracker_Controller
 
         $body_output = $module_exec->run_output_module($handler_output[0], [], 'filter_message_body', [], $session, $request->format, $module_exec->get_current_language());
 
+        $msg_struct_output = $module_exec->run_output_module($handler_output[0], [], 'filter_message_struct', [], $session, $request->format, $module_exec->get_current_language());
+
         return [
             'headers' => $headers_output[0]['msg_headers'],
             'body' => $body_output[0]['msg_text'],
+            'msg_parts' => $msg_struct_output[0]['msg_parts'],
         ];
     }
 }
