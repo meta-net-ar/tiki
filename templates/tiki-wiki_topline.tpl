@@ -79,11 +79,7 @@
                                 {capture name=backlink_title}{object_title id=$backlinks[back].objectId type=$backlinks[back].type}{/capture}
                                 {*<li role="presentation">*}
                                     <span class="dropdown-item" role="menuitem" tabindex="-1">
-                                        {if $backlinks[back].type eq 'wiki page'}
-                                            <span class="me-1">{icon name="notepad"}</span>
-                                        {elseif $backlinks[back].type eq 'trackeritemfield'}
-                                            <span class="me-1">{icon name="database"}</span>
-                                        {/if}
+                                        <span class="me-1">{icon name=$backlinks[back].icon}</span>
                                         {if $prefs.wiki_backlinks_name_len ge '1'}
                                             {object_link id=$backlinks[back].objectId type=$backlinks[back].type title=$smarty.capture.backlink_title|truncate:$prefs.wiki_backlinks_name_len:"...":true}
                                         {else}
