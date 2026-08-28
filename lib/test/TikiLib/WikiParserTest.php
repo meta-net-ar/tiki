@@ -208,7 +208,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
                 ['page' => 'HomePage']
             ],
 
-            ["||r1c1|r1c2\nr2c1|r2c2||", '<table class="wikitable table table-striped table-hover"><tr><td class="wikicell" >r1c1</td><td class="wikicell" >r1c2</td></tr><tr><td class="wikicell" >r2c1</td><td class="wikicell" >r2c2</td></tr></table><br />'],
+            ["||r1c1|r1c2\nr2c1|r2c2||", '<table class="wikitable table table-striped table-hover table-responsive"><tr><td class="wikicell" >r1c1</td><td class="wikicell" >r1c2</td></tr><tr><td class="wikicell" >r2c1</td><td class="wikicell" >r2c2</td></tr></table><br />'],
             ["~pp~foo~/pp~", "<pre>foo</pre><br />"],
         ];
     }

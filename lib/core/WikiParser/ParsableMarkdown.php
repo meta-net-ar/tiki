@@ -69,7 +69,7 @@ class WikiParser_ParsableMarkdown extends ParserLib
                 public function render(Node $node, ChildNodeRendererInterface $childRenderer)
                 {
                     $htmlEl = (new TableRenderer())->render($node, $childRenderer);
-                    $class = $htmlEl->getAttribute('class') ?: 'wikitable table table-striped table-hover';
+                    $class = $htmlEl->getAttribute('class') ?: 'wikitable table table-striped table-hover table-responsive';
                     $htmlEl->setAttribute('class', $class);
                     return $htmlEl;
                 }

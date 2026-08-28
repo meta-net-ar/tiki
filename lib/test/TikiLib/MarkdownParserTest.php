@@ -388,7 +388,7 @@ line 3 of code
 </code></pre>
 <div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#md-codebox1"><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting" id="md-codebox1" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;"><div class="code">Sample text here...
 </div></pre></div>
-<table class="wikitable table table-striped table-hover">
+<table class="wikitable table table-striped table-hover table-responsive">
 <thead>
 <tr>
 <th>Option</th>
@@ -411,7 +411,7 @@ line 3 of code
 </tbody>
 </table>
 <p>Right aligned columns</p>
-<table class="wikitable table table-striped table-hover">
+<table class="wikitable table table-striped table-hover table-responsive">
 <thead>
 <tr>
 <th align="right">Option</th>
