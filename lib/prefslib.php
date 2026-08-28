@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Package\ComposerManager;
+use Tiki\Config\Config;
 
 class PreferencesLib
 {
@@ -723,10 +724,10 @@ class PreferencesLib
             }
             $function = '_get' . ucfirst($info['type']) . 'Value';
             $value = $this->$function($info, $data);
-            return $value;
+            return Config::normalizeDirectoryPrefValue($pref, $value);
         } else {
             if (isset($data[$pref])) {
-                return $data[$pref];
+                return Config::normalizeDirectoryPrefValue($pref, $data[$pref]);
             }
             return null;
         }
