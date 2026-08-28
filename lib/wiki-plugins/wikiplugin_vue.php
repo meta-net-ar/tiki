@@ -49,6 +49,6 @@ function wikiplugin_vue($data, $params)
 
     $repeat = false;
 
-    $ret = smarty_block_vue($params, $data, $smarty->getEmptyInternalTemplate(), $repeat);
+    $ret = \SmartyTiki\BlockHandler\Vue::render($params, $data, $smarty->getEmptyInternalTemplate(), $repeat);
     return $ret;
 }

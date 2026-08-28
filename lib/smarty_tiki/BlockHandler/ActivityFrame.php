@@ -9,9 +9,15 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class ActivityFrame extends Base
+class ActivityFrame extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'activityframe';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {

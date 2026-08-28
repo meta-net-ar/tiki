@@ -16,7 +16,7 @@
  *   php check_composer_stability.php 24.x 27.x    # Compare only 24.x and 27.x
  *   php check_composer_stability.php 24.x 26.x master  # Compare specific versions
  *
- * Available versions: 24.x, 27.x, 29.x, 30.x, master
+ * Available versions: 24.x, 27.x, 30.x, master
  *
  * Output:
  * - Lists packages with unstable versions
@@ -131,7 +131,7 @@ function getComposerJson($source)
  */
 function getAvailableTikiVersions()
 {
-    return ['24.x', '27.x', '29.x', '30.x', 'master'];
+    return ['24.x', '27.x', '30.x', 'master'];
 }
 
 /**

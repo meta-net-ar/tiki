@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty plugin
@@ -18,8 +19,13 @@ use Smarty\Template;
  * Parameters: count [required] - number of times to repeat
  * assign [optional] - variable to collect output
  */
-class Repeat extends Base
+class Repeat extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'repeat';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat || ! empty($content)) {

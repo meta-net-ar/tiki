@@ -7,6 +7,9 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -15,8 +18,15 @@ namespace SmartyTiki\Modifier;
  * Purpose:  returns size in Mb, Kb or bytes.
  * -------------------------------------------------------------
  */
-class KbSize
+class KbSize implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'kbsize';
+    }
+
     public function handle($string, $bytes = false, $nb_decimals = 2, $unit_separator = '&nbsp;')
     {
         if ($string == '') {

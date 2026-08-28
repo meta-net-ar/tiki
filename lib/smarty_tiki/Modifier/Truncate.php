@@ -7,6 +7,9 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
 /**
  * Smarty truncate modifier
  *
@@ -22,8 +25,15 @@ namespace SmartyTiki\Modifier;
  * @param boolean
  * @return string
  */
-class Truncate
+class Truncate implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'truncate';
+    }
+
     public function handle($string, $length = 80, $etc = '...', $break_words = false, $middle = false)
     {
         if (! isset($string) || $length == 0) {

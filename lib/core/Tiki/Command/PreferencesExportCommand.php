@@ -195,7 +195,7 @@ class PreferencesExportCommand extends Command
                 continue;
             }
 
-            include $file;
+            include_once $file;
             $list = $function();
 
             foreach ($list as $name => $raw) {

@@ -4,6 +4,7 @@ namespace SmartyTiki\Compile\Modifier;
 
 use Smarty\Exception;
 use Smarty\Compile\Modifier\Base;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty escape modifier plugin
@@ -14,8 +15,13 @@ use Smarty\Compile\Modifier\Base;
  * @author Rodney Rehm
  */
 
-class EscapeModifierCompiler extends Base
+class EscapeModifierCompiler extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'escape';
+    }
+
     public function compile($params, \Smarty\Compiler\Template $compiler)
     {
         // pass through to regular plugin fallback

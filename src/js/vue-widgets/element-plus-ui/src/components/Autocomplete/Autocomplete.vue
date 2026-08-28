@@ -110,6 +110,10 @@ export const DATA_TEST_ID = {
             clearable
             :teleported="false"
         >
+            <template #default="{ item }">
+                <span v-if="item.html" v-html="item.html"></span>
+                <span v-else>{{ item[valueKey] }}</span>
+            </template>
         </el-autocomplete>
     </ConfigWrapper>
 </template>

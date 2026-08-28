@@ -8,7 +8,8 @@ namespace Tiki\Security;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use Tiki\Lib\Diff\DiffUtils;
+use Tiki\Lib\Diff\Renderer\Unified;
+use Tiki\Lib\Diff\TextDiff;
 
 /**
  * Performs integrity checks on the active webroot .htaccess compared to the shipped _htaccess reference.
@@ -243,7 +244,8 @@ class HtaccessChecker
     }
 
     /**
-     * Build a lightweight unified diff representation between reference and active contents.
+     * Line-based unified diff. Avoid character-level HTML (ins/del): .htaccess
+     * contains Apache tags that the template must escape once for display.
      *
      * @param string $reference
      * @param string $active
@@ -251,7 +253,24 @@ class HtaccessChecker
      */
     private function buildUnifiedDiff(string $reference, string $active): ?array
     {
-        $diff = DiffUtils::diff2($reference, $active, 'unidiff');
-        return empty($diff) ? null : $diff;
+        $old = $reference === '' ? [] : explode("\n", $reference);
+        $new = $active === '' ? [] : explode("\n", $active);
+
+        $diff = new TextDiff($old, $new);
+        if ($diff->isEmpty()) {
+            return null;
+        }
+
+        $renderer = new class (2) extends Unified {
+            // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore -- overrides Unified::_changed
+            protected function _changed($orig, $final)
+            {
+                $this->_deleted($orig);
+                $this->_added($final);
+            }
+        };
+
+        $table = $renderer->render($diff);
+        return empty($table) ? null : $table;
     }
 }

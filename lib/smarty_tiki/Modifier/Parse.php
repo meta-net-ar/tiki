@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class Parse
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class Parse implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'parse';
+    }
+
     /**
      * Smarty parse modifier plugin
      * Type:     modifier

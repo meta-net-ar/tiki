@@ -9,6 +9,8 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /*
  * Smarty function button handler: Display a Tiki button
@@ -36,8 +38,15 @@ use Smarty\Template;
  *  - _selected_text: button text to use if _selected is set to y
  *  - _selected_icon_name: button icon to use if _selected is set to y
  */
-class Button extends Base
+class Button extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'button';
+    }
+
     public function handle($params, Template $template)
     {
         if (! is_array($params) || (! isset($params['_text']) && ! isset($params['_icon_name']))) {
@@ -211,7 +220,7 @@ class Button extends Base
                 unset($params['_type']);
             }
 
-            $url = str_replace('+', ' ', str_replace('&amp;', '&', urldecode($_SERVER['REQUEST_URI'])));
+            $url = str_replace('+', ' ', str_replace('&amp;', '&', urldecode($_SERVER['REQUEST_URI'] ?? ''))); //In unit tests or indexing, REQUEST_URI won't be present
             $encoded_html = htmlentities($html);
             $dom = new \DOMDocument();
 

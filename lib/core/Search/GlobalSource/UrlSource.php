@@ -12,7 +12,7 @@ class Search_GlobalSource_UrlSource implements Search_GlobalSource_Interface
             return false;
         }
 
-        $url = smarty_modifier_sefurl($objectId, $objectType);
+        $url = \SmartyTiki\Modifier\Sefurl::apply($objectId, $objectType);
         return [
             'url' => $typeFactory->identifier($url),
         ];

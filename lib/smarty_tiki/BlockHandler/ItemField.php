@@ -9,9 +9,15 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class ItemField extends Base
+class ItemField extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'itemfield';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         include_once('lib/wiki-plugins/wikiplugin_trackeritemfield.php');

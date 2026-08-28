@@ -10,9 +10,15 @@ namespace SmartyTiki\FunctionHandler;
 use Language;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class InteractiveTranslation extends Base
+class InteractiveTranslation extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'interactivetranslation';
+    }
+
     public function handle($params, Template $template)
     {
         $headerlib = \TikiLib::lib('header');
@@ -29,7 +35,7 @@ class InteractiveTranslation extends Base
         $strings = json_encode($strings);
 
         // add wrench icon link
-        $help .= smarty_block_self_link(
+        $help .= \SmartyTiki\BlockHandler\SelfLink::render(
             [
                 '_icon' => 'wrench',
                 '_script' => 'tiki-edit_languages.php',

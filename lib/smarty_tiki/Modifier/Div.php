@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /*
     * Smarty plugin
     * -------------------------------------------------------------
@@ -14,8 +16,13 @@ namespace SmartyTiki\Modifier;
     *
     * -------------------------------------------------------------
     */
-class Div
+class Div implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'div';
+    }
+
     public function handle($string, $num, $max = 10)
     {
         if ($num == 0) {

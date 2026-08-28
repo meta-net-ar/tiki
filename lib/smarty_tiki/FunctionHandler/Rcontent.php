@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Rcontent extends Base
+class Rcontent extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'rcontent';
+    }
+
     public function handle($params, Template $template)
     {
         $dcslib = \TikiLib::lib('dcs');

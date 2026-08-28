@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty plugin Display
@@ -18,8 +19,13 @@ use Smarty\Template;
  * ex.: {display groups='Anonymous,-Registered,foo' friends=$f_42[ error='You may not see this item']}$f_1...$f_9///else///Become friend with $_42 first{/display}
  * TODO : Re-implement friend filter
  */
-class Display extends Base
+class Display extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'display';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs, $user;

@@ -454,7 +454,7 @@ class SurveyLib extends TikiLib
                 if ($question['type'] == 'x') {
                     $questionOption['qoption'] = TikiLib::lib('parser')->parse_data($questionOption['qoption']);
                 } else {
-                    $questionOption['qoption'] = smarty_modifier_escape($questionOption['qoption']);
+                    $questionOption['qoption'] = \SmartyTiki\Modifier\Escape::apply($questionOption['qoption']);
                 }
 
                 // when question with multiple options

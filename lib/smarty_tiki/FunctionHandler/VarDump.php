@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /** \file
  * \author zaufi <zaufi@sendmail.ru>
@@ -20,8 +21,13 @@ use Smarty\Template;
  *
  * Adapted to do more than string for tiki 5
  */
-class VarDump extends Base
+class VarDump extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'var_dump';
+    }
+
     public function handle($params, Template $template)
     {
         global $debugger;

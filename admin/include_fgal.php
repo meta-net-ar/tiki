@@ -80,14 +80,16 @@ if (! empty($_POST['mimes']) && $access->checkCsrf()) {
         $mime = trim($mime);
         if (empty($cmd)) {
             $filegallib->delete_file_handler($mime);
-        } else {
-            $filegallib->change_file_handler($mime, $cmd);
+        } elseif (! $filegallib->change_file_handler($mime, $cmd)) {
+            Feedback::error(tr('Invalid file handler command for MIME type "%0". Only known extractor binaries are allowed, and shell metacharacters are not permitted.', $mime));
         }
     }
 }
 
 if (! empty($_POST['newMime']) && ! empty($_POST['newCmd']) && $access->checkCsrf()) {
-    $filegallib->change_file_handler($_POST['newMime'], $_POST['newCmd']);
+    if (! $filegallib->change_file_handler($_POST['newMime'], $_POST['newCmd'])) {
+        Feedback::error(tr('Invalid file handler command for MIME type "%0". Only known extractor binaries are allowed, and shell metacharacters are not permitted.', $_POST['newMime']));
+    }
 }
 
 if (isset($_REQUEST["filegalfixvndmsfiles"]) && $access->checkCsrf()) {
@@ -96,7 +98,7 @@ if (isset($_REQUEST["filegalfixvndmsfiles"]) && $access->checkCsrf()) {
 
 //*** end state-changing actions
 
-if (isset($_REQUEST["filegalredosearch"])) {
+if (isset($_REQUEST["filegalredosearch"]) && $access->checkCsrf()) {
     $searchTextReindexedFilesAmount = $filegallib->reindex_all_files_for_search_text();
     Feedback::success(tr("The search text was reindexed for a total of %0 files.", $searchTextReindexedFilesAmount));
 }

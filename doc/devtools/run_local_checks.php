@@ -70,6 +70,12 @@ function listFiles(array $files): string
 {
     return implode(' ', $files);
 }
+
+function quoteFiles(array $files): string
+{
+    return implode(' ', array_map('escapeshellarg', $files));
+}
+
 function hasComposerChanges(array $files): bool
 {
     foreach ($files as $file) {
@@ -104,7 +110,16 @@ if (! empty($phpFiles)) {
     ];
     $steps[] = [
         'PHPLint',
-        'php vendor_bundled/vendor/overtrue/phplint/bin/phplint ' . listFiles($phpFiles) . ' --no-interaction --no-cache --progress path',
+        'php vendor_bundled/vendor/overtrue/phplint/bin/phplint ' . quoteFiles($phpFiles) . ' --no-interaction --no-cache --progress path',
+    ];
+    $steps[] = [
+        'Rector',
+        'php bin/rector process --dry-run ' . quoteFiles($phpFiles),
+    ];
+
+    $steps[] = [
+        'PHPStan',
+        'php bin/phpstan --memory-limit=' . escapeshellarg($phpstanMemoryLimit) . ' --configuration=phpstan-tikiCi.neon analyse ' . quoteFiles($phpFiles),
     ];
 }
 

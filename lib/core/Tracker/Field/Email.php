@@ -207,7 +207,7 @@ class Tracker_Field_Email extends \Tracker\Field\AbstractItemField implements \T
             ->setLabel($this->getConfiguration('name'))
             ->setPlainReplacement('default')
             ->setRenderTransform(function ($value) {
-                $escape = smarty_modifier_escape($value);
+                $escape = \SmartyTiki\Modifier\Escape::apply($value);
                 return "<a href=\"mailto:$escape\">$escape</a>";
             })
             ->setParseIntoTransform(function (&$info, $value) use ($permName) {

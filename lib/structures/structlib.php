@@ -1482,7 +1482,6 @@ class StructLib extends TikiLib
     public function to_menu($channels, $structure, $sectionLevel = 0, $cumul = 0, $params = [])
     {
         $smarty = TikiLib::lib('smarty');
-        include_once('lib/smarty_tiki/function.sefurl.php');
         $options = [];
         $count = 0;
         if (empty($channels)) {
@@ -1504,9 +1503,9 @@ class StructLib extends TikiLib
             }
             $option['name'] = empty($channel['page_alias']) ? $pageName : $channel['page_alias'];
             $option['type'] = empty($channel['sub']) ? 'o' : ($sectionLevel ? $sectionLevel : 's');
-            $option['url'] = smarty_function_sefurl(['page' => $channel['pageName'], 'structure' => $structure, 'page_ref_id' => $channel['page_ref_id'], 'sefurl' => 'n'], $smarty->getEmptyInternalTemplate());
+            $option['url'] = \SmartyTiki\FunctionHandler\Sefurl::render(['page' => $channel['pageName'], 'structure' => $structure, 'page_ref_id' => $channel['page_ref_id'], 'sefurl' => 'n'], $smarty->getEmptyInternalTemplate());
             $option['canonic'] = '((' . $channel['pageName'] . '))';
-            $option['sefurl'] = smarty_function_sefurl(['page' => $channel['pageName'], 'structure' => $structure, 'page_ref_id' => $channel['page_ref_id']], $smarty->getEmptyInternalTemplate());
+            $option['sefurl'] = \SmartyTiki\FunctionHandler\Sefurl::render(['page' => $channel['pageName'], 'structure' => $structure, 'page_ref_id' => $channel['page_ref_id']], $smarty->getEmptyInternalTemplate());
             $option['position'] = $count + $cumul;
             $option['sectionLevel'] = $sectionLevel;
 

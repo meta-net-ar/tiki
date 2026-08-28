@@ -60,7 +60,7 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
             }
 
             $smarty = TikiLib::lib('smarty');
-            return smarty_function_icon(['name' => 'status-' . $status, 'iclass' => 'tips', 'ititle' => ':'
+            return \SmartyTiki\FunctionHandler\Icon::render(['name' => 'status-' . $status, 'iclass' => 'tips', 'ititle' => ':'
                 . $istatus ], $smarty->getEmptyInternalTemplate());
         } elseif (! str_starts_with($name, 'tracker_field_') && $name !== 'title') {
             return $value;

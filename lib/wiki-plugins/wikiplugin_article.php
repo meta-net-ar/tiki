@@ -68,7 +68,7 @@ function wikiplugin_article($data, $params)
         || (isset($article_data) && $article_data["author"] == $user && $article_data["creator_edit"] == 'y')
     ) {
         $add = "&nbsp;<a href='tiki-edit_article.php?articleId=$Id' class='editplugin'>" .
-            smarty_function_icon(['name' => 'edit'], $smarty->getEmptyInternalTemplate()) . '</a>';
+            \SmartyTiki\FunctionHandler\Icon::render(['name' => 'edit'], $smarty->getEmptyInternalTemplate()) . '</a>';
     } else {
         $add = "";
     }

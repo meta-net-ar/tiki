@@ -56,7 +56,7 @@ class Hm_Handler_check_path_redirect extends Hm_Handler_Module
     {
         $path = $this->request->get['list_path'];
         if (preg_match("/tracker_folder_(\d+)_(\d+)/", $path, $m)) {
-            $url = smarty_modifier_sefurl($m[1], 'trackeritem');
+            $url = \SmartyTiki\Modifier\Sefurl::apply($m[1], 'trackeritem');
             Hm_Dispatch::page_redirect($url);
         }
     }
@@ -76,7 +76,7 @@ class Hm_Handler_check_path_redirect_after_sent extends Hm_Handler_Module
         }
         $path = $this->request->post['compose_msg_path'];
         if (preg_match("/tracker_folder_(\d+)_(\d+)/", $path, $m)) {
-            $url = smarty_modifier_sefurl($m[1], 'trackeritem');
+            $url = \SmartyTiki\Modifier\Sefurl::apply($m[1], 'trackeritem');
             Hm_Dispatch::page_redirect($url);
         }
     }

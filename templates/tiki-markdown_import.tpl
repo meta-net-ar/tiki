@@ -45,8 +45,18 @@
                 <div class="row mb-2">
                     <label class="col-sm-3 col-form-label">{tr}Access Token (HTTPS) (Required for private repos){/tr}</label>
                     <div class="col-sm-9">
-                        <input class="form-control" type="password" name="repo_token" value="" autocomplete="new-password">
-                        <div class="form-text">{tr}GitHub: Fine-grained token with “Contents: Read-only” on this repo. GitLab: Access Token with read_repository.{/tr}</div>
+                        <input class="form-control" type="password" name="repo_token" value=""
+                            placeholder="{if $md_source.repo_token}{tr}•••••••• (token saved — leave blank to keep it){/tr}{else}{tr}No token saved yet{/tr}{/if}"
+                            autocomplete="new-password">
+                        <div class="form-text">{tr}GitHub: Fine-grained token with “Contents: Read-only” on this repo. GitLab: Access Token with read_repository.{/tr}
+                            {tr}The saved token is never displayed here for security. Leaving this field blank keeps the current one — it is not cleared just by saving other options.{/tr}
+                        </div>
+                        {if $md_source.repo_token}
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="clear_repo_token" name="clear_repo_token" value="1">
+                            <label class="form-check-label" for="clear_repo_token">{tr}Clear the saved token{/tr}</label>
+                        </div>
+                        {/if}
                     </div>
                 </div>
                 <div class="row mb-3">

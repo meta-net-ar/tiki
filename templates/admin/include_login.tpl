@@ -10,7 +10,7 @@
         warning_ept = $('#empty_pretty_tracker_warning');
     warning_ept.hide();
     //prevent space, backslash and bad chars in template name, see lib/wiki/wikilib.php:188
-    pretty_tracker_tpl.keypress(function(e){
+    pretty_tracker_tpl.on('keypress', function(e){
     return /[^ //?#\[\]@$&+;=<>\\]/i.test(e.key);
     });
     frm.on("submit", function(){
@@ -201,7 +201,7 @@
                     {preference name=cookie_consent_feature}
                     <div class="adminoptionboxchild" id="cookie_consent_feature_childcontainer">
                         {preference name=cookie_consent_expires}
-                        {preference name=cookie_consent_description}
+                        {preference name=cookie_consent_description syntax=''}
                         {preference name=cookie_consent_mode}
                         {preference name=cookie_consent_dom_id}
                         {preference name=cookie_consent_disable_builtin_categories}

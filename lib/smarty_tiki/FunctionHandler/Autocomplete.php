@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /* {autocomplete element=$element type=$type }
  * Attach jQuery autocomplete to element/s
@@ -23,8 +24,13 @@ use Smarty\Template;
  *                 N.B. Will be wrapped in {} chars here to avoid smarty delimiter difficulties
  *
  */
-class Autocomplete extends Base
+class Autocomplete extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'autocomplete';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;

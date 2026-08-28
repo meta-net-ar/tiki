@@ -140,7 +140,7 @@
             {/if}
 
             {if $htaccess_global_warning}
-                {remarksbox type="warning" title="{tr}.htaccess differs from the bundled _htaccess{/tr}"}
+                {remarksbox type="info" title="{tr}.htaccess differs from the bundled _htaccess{/tr}"}
                     <p class="mb-2">
                         {tr}Your active <code>.htaccess</code> does not match the reference <code>_htaccess</code> shipped with Tiki.{/tr}
                     </p>

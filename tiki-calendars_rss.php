@@ -60,19 +60,16 @@ if ($output["data"] == "EMPTY") {
     $cur_time = explode(',', $tikilib->date_format('%Y,%m,%d,%H,%M,%S', $publishDate));
     $items = $calendarlib->list_raw_items($calendars, "", $publishDate, $tikilib->make_time($cur_time[3], $cur_time[4], $cur_time[5], $cur_time[1], $cur_time[2], $cur_time[0] + 1), 0, $maxCalEntries);
 
-    require_once("lib/smarty_tiki/modifier.tiki_short_datetime.php");
-    require_once("lib/smarty_tiki/modifier.tiki_long_datetime.php");
-    require_once("lib/smarty_tiki/modifier.compactisodate.php");
 
     foreach ($items as &$item) {
-        $start_d = smarty_modifier_compactisodate($item["start"]);
-        $end_d = smarty_modifier_compactisodate($item["end"]);
+        $start_d = \SmartyTiki\Modifier\CompactIsoDate::apply($item["start"]);
+        $end_d = \SmartyTiki\Modifier\CompactIsoDate::apply($item["end"]);
 
         $item["body"] = "<div class=\"vevent\"> <span class=\"summary\">" . $item["name"] . "</span>" . "<br />\n";
-         $item["body"] .= "<abbr class=\"dtstart\" title=\"" . $start_d . "\">" . tra("Start:") . " " . smarty_modifier_tiki_long_datetime($item["start"]) . "</abbr>" . "<br />\n";
-        $item["body"] .= "<abbr class=\"dtend\" title=\"" . $end_d . "\">" . tra("End:") . " " . smarty_modifier_tiki_long_datetime($item["end"]) . "</abbr>" . "<br />\n";
+         $item["body"] .= "<abbr class=\"dtstart\" title=\"" . $start_d . "\">" . tra("Start:") . " " . \SmartyTiki\Modifier\TikiLongDateTime::apply($item["start"]) . "</abbr>" . "<br />\n";
+        $item["body"] .= "<abbr class=\"dtend\" title=\"" . $end_d . "\">" . tra("End:") . " " . \SmartyTiki\Modifier\TikiLongDateTime::apply($item["end"]) . "</abbr>" . "<br />\n";
         $item["body"] .= "<span class=\"description\">" . ($item["description"]) . "</span>" . "</div>";
-        $item["sefurl"] = smarty_modifier_sefurl($item["calitemId"], 'calendaritem');
+        $item["sefurl"] = \SmartyTiki\Modifier\Sefurl::apply($item["calitemId"], 'calendaritem');
     }
     unset($item);
 

@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Tests whether a user is in a specific group, usage:
  *
@@ -19,8 +21,13 @@ namespace SmartyTiki\Modifier;
  * @return bool
  * @throws Exception
  */
-class InGroup
+class InGroup implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'in_group';
+    }
+
     public function handle($group, $auser = '')
     {
         global $user;

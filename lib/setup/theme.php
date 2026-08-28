@@ -125,6 +125,7 @@ Sections::onSectionChange(function ($section) {
     }
 
     //6) include UAB admin CSS and layout in case we are on an admin or management page
+    static $forcedAdminLayout = false;
     if (Sections::getCurrentSection() === Sections::SECTION_ADMIN_LAYOUT) {
         $addSectionThemeCssFile('themes/base_files/css/feature/adminui.css');
         if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) {
@@ -132,6 +133,7 @@ Sections::onSectionChange(function ($section) {
         }
         /* Force the admin layout on admin pages */
         $prefs['site_layout_admin'] = 'admin';
+        $forcedAdminLayout = true;
 
         include_once 'admin/define_admin_icons.php';
         foreach ($admin_icons as & $admin_icon) {
@@ -142,6 +144,11 @@ Sections::onSectionChange(function ($section) {
         $smarty->assign('admin_icons', $admin_icons);
     } else {
         $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant']);
+        if ($forcedAdminLayout) {
+            // Undo the forcing above; leave a genuinely configured site_layout_admin alone.
+            unset($prefs['site_layout_admin']);
+            $forcedAdminLayout = false;
+        }
     }
 
     //7) include optional custom.css if there. In case of theme option, first include main theme's custom.css, than the option's custom.css

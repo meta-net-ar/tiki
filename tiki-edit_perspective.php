@@ -94,14 +94,13 @@ if ($selectedId && $selectedPerspectiveInfo) {
 
     if (isset($_REQUEST['criteria'])) {
         $prefslib = TikiLib::lib('prefs');
-        require_once 'lib/smarty_tiki/function.preference.php';
 
         $criteria = $_REQUEST['criteria'];
         $results = $prefslib->getMatchingPreferences($criteria);
         $results = array_diff($results, array_keys($selectedPerspectiveInfo['preferences']));
 
         foreach ($results as $name) {
-            echo smarty_function_preference(['name' => $name], $smarty->getEmptyInternalTemplate());
+            echo \SmartyTiki\FunctionHandler\Preference::render(['name' => $name], $smarty->getEmptyInternalTemplate());
         }
 
         exit;

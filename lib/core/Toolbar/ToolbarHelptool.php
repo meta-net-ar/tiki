@@ -52,7 +52,7 @@ class ToolbarHelptool extends ToolbarUtilityItem
             $params['sheet'] = 1;
         }
 
-        $icon = smarty_function_icon(['name' => 'help'], $smarty->getEmptyInternalTemplate());
+        $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'help'], $smarty->getEmptyInternalTemplate());
         $url = $servicelib->getUrl($params);
         $help = tra('Help');
 

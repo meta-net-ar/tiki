@@ -158,7 +158,7 @@ $attributelib = TikiLib::lib('attribute');
 $attributes = $attributelib->get_attributes('file', $info['fileId']);
 
 if (isset($attributes['tiki.content.url'])) {
-    $src = smarty_modifier_sefurl($info['fileId'], 'file');
+    $src = \SmartyTiki\Modifier\Sefurl::apply($info['fileId'], 'file');
     session_write_close();
 
     $client = $tikilib->get_http_client($src);

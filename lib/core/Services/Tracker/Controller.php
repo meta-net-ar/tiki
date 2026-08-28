@@ -235,7 +235,7 @@ class Services_Tracker_Controller
                 if ($dupeFields) {
                     foreach ($dupeFields as & $df) {
                         $df['message'] = tr('Warning: There is a conflict in permanent names, which can cause indexing errors.') .
-                            '<br><a href="' . smarty_modifier_sefurl($df['trackerId'], 'trackerfields') . '">' .
+                            '<br><a href="' . \SmartyTiki\Modifier\Sefurl::apply($df['trackerId'], 'trackerfields') . '">' .
                             tr(
                                 'Field #%0 "%1" of type "%2" also found in tracker #%3 with perm name %4',
                                 $df['fieldId'],
@@ -861,6 +861,48 @@ class Services_Tracker_Controller
     }
 
 
+    /**
+     * After an item is created through duplication, copy Secret (SEC) field
+     * values from the source item at the database level. SEC values are never
+     * rendered into the form, so the copy cannot ride the submission; instead the
+     * source item id travels in a hidden 'ins_<fid>_clone_source' input. The
+     * source item's view permission is re-checked here because the marker arrives
+     * from the (potentially crafted) POST body.
+     */
+    private function copyDuplicatedSecretFields($definition, $input, $newItemId)
+    {
+        $trk = TikiLib::lib('trk');
+        foreach ($definition->getFields() as $field) {
+            if (($field['type'] ?? '') !== 'SEC') {
+                continue;
+            }
+            $fid = (int) $field['fieldId'];
+            $key = 'ins_' . $fid . '_clone_source';
+            if (! $input->offsetExists($key)) {
+                continue;
+            }
+            $sourceItemId = (int) $input->offsetGet($key);
+            if ($sourceItemId <= 0) {
+                continue;
+            }
+            // A value typed into the duplicate form wins over the copy: it was saved
+            // through the normal submission path, so the database-level copy must not
+            // overwrite it (matches the precedence in Secret::getFieldData()).
+            $submitted = $input->offsetExists('ins_' . $fid) ? $input->offsetGet('ins_' . $fid) : '';
+            if (is_string($submitted) && $submitted !== '') {
+                continue;
+            }
+            try {
+                $sourceItem = Tracker_Item::fromId($sourceItemId);
+            } catch (Exception $e) {
+                continue;
+            }
+            if ($sourceItem && $sourceItem->canView() && $sourceItem->canViewField($fid)) {
+                $trk->copyItemFieldValueRaw($sourceItemId, $newItemId, $fid);
+            }
+        }
+    }
+
     public function action_insert_item($input)
     {
         $processedFields = [];
@@ -910,7 +952,12 @@ class Services_Tracker_Controller
                     $rule = $duplicateRules[$fid] ?? 'copy';
 
                     if ($rule === 'copy') {
-                        if (isset($sourceData['fields'][$permName])) {
+                        if (($field['type'] ?? '') === 'SEC') {
+                            // Secret values are never rendered into the form. Carry only
+                            // the source item id; the value is copied server-side after
+                            // insert (see copyDuplicatedSecretFields).
+                            $input->offsetSet('ins_' . $fid . '_clone_source', $cloneFrom);
+                        } elseif (isset($sourceData['fields'][$permName])) {
                             $value = $sourceData['fields'][$permName];
                             if ($permName) {
                                 $input->offsetSet($permName, $value);
@@ -1082,6 +1129,7 @@ class Services_Tracker_Controller
             );
 
             if ($itemId) {
+                $this->copyDuplicatedSecretFields($definition, $input, $itemId);
                 if ($cloneFrom) {
                     $this->utilities->cascadeChildItems($cloneFrom, $itemId);
                 }
@@ -1130,7 +1178,7 @@ class Services_Tracker_Controller
                 $item['nextTicket'] = $util->getTicket();
 
                 if (! $redirect && ! $access->is_xml_http_request() && ! TIKI_API) {
-                    $redirect = smarty_modifier_sefurl($trackerId, 'tracker');
+                    $redirect = \SmartyTiki\Modifier\Sefurl::apply($trackerId, 'tracker');
                 }
 
                 if ($redirect) {
@@ -1263,7 +1311,7 @@ class Services_Tracker_Controller
             } catch (Services_Exception_EditConflict $e) {
                 if ($input->modal->int() && $access->is_xml_http_request()) {
                     $smarty = TikiLib::lib('smarty');
-                    $href = smarty_function_service([
+                    $href = \SmartyTiki\FunctionHandler\Service::render([
                         'controller' => 'tracker',
                         'action' => 'update_item',
                         'trackerId' => $trackerId,
@@ -1412,7 +1460,7 @@ class Services_Tracker_Controller
 
                 // also $prefs['tracker_legacy_insert'] === 'y'
                 if (! $redirect && ! $access->is_xml_http_request() && ! TIKI_API) {
-                    $redirect = smarty_modifier_sefurl($itemId, 'trackeritem');
+                    $redirect = \SmartyTiki\Modifier\Sefurl::apply($itemId, 'trackeritem');
                 }
 
                 if ($input->addComment->bool()) {
@@ -1761,7 +1809,7 @@ class Services_Tracker_Controller
             $message = tr('The requested element cannot be displayed. One of the view/edit templates is missing or has errors: %0', $e->getMessage());
             trigger_error($e->getMessage(), E_USER_WARNING);
             $access = TikiLib::lib('access');
-            $access->redirect(smarty_modifier_sefurl($trackerId, 'tracker'), $message, 302, 'error');
+            $access->redirect(\SmartyTiki\Modifier\Sefurl::apply($trackerId, 'tracker'), $message, 302, 'error');
         }
     }
 
@@ -1845,10 +1893,9 @@ class Services_Tracker_Controller
         }
 
         if ($trackerlistParams = $input->asArray('trackerlistParams')) {
-            include_once 'lib/smarty_tiki/block.wikiplugin.php';
             $trackerlistParams['_name'] = 'trackerlist';
             $trackerlistParams['checkbox'] = preg_replace('#/[\d,]*$#', '/' . implode(',', $linkedItemIds), $trackerlistParams['checkbox']);
-            return smarty_block_wikiplugin($trackerlistParams, '', TikiLib::lib('smarty')) . TikiLib::lib('header')->output_js();
+            return \SmartyTiki\BlockHandler\Wikiplugin::render($trackerlistParams, '', TikiLib::lib('smarty')) . TikiLib::lib('header')->output_js();
         } else {
             return [
                 'status' => 'ok'
@@ -2434,7 +2481,7 @@ class Services_Tracker_Controller
                         $emptyTemplate = TikiLib::lib('smarty')->getEmptyInternalTemplate();
                         if (empty($diff_style)) {
                             $field_value['value'] = $hist['value'];
-                            $hist['rendered_value'] = smarty_function_trackeroutput([
+                            $hist['rendered_value'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                 'field' => $field_value,
                                 'list_mode' => 'csv',
                                 'history' => 'y',
@@ -2442,7 +2489,7 @@ class Services_Tracker_Controller
                                 'process' => 'y',
                             ], $emptyTemplate);
                             $field_value['value'] = $hist['new'];
-                            $hist['rendered_new'] = smarty_function_trackeroutput([
+                            $hist['rendered_new'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                 'field' => $field_value,
                                 'list_mode' => 'csv',
                                 'history' => 'y',
@@ -2454,7 +2501,7 @@ class Services_Tracker_Controller
                                 $hist['value'] = $hist['rendered_value'];
                                 $hist['new'] = $hist['rendered_new'];
                                 $field_value['value'] = $hist['value'];
-                                $hist['rendered_value'] = smarty_function_trackeroutput([
+                                $hist['rendered_value'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                     'field' => $field_value,
                                     'list_mode' => 'y',
                                     'history' => 'y',
@@ -2462,7 +2509,7 @@ class Services_Tracker_Controller
                                     'process' => 'y',
                                 ], $emptyTemplate);
                                 $field_value['value'] = $hist['new'];
-                                $hist['rendered_new'] = smarty_function_trackeroutput([
+                                $hist['rendered_new'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                     'field' => $field_value,
                                     'list_mode' => 'y',
                                     'history' => 'y',
@@ -2472,7 +2519,7 @@ class Services_Tracker_Controller
                             }
                         } else {
                             $field_value['value'] = $hist['new'];
-                            $hist['rendered_diff'] = smarty_function_trackeroutput([
+                            $hist['rendered_diff'] = \SmartyTiki\FunctionHandler\TrackerOutput::render([
                                 'field' => $field_value,
                                 'list_mode' => 'y',
                                 'history' => 'y',
@@ -2693,14 +2740,14 @@ class Services_Tracker_Controller
                         if ($dateFormatUnixTimestamp) {
                             $toDisplay[] = $row['created'];
                         } else {
-                            $toDisplay[] = smarty_modifier_tiki_short_datetime($row['created'], '', 'n');
+                            $toDisplay[] = \SmartyTiki\Modifier\TikiShortDateTime::apply($row['created'], '', 'n');
                         }
                     }
                     if ($showLastModif) {
                         if ($dateFormatUnixTimestamp) {
                             $toDisplay[] = $row['lastModif'];
                         } else {
-                            $toDisplay[] = smarty_modifier_tiki_short_datetime($row['lastModif'], '', 'n');
+                            $toDisplay[] = \SmartyTiki\Modifier\TikiShortDateTime::apply($row['lastModif'], '', 'n');
                         }
                     }
                     foreach ($row['field_values'] as $val) {
@@ -3116,6 +3163,64 @@ class Services_Tracker_Controller
             return '';
         }
         return $fieldHandler->renderOutput();
+    }
+
+    public function action_get_field_value($input)
+    {
+        // Secret values must never transit through a URL (query strings end up in
+        // access logs, proxy logs and browser history), so the endpoint is POST-only.
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            throw new Services_Exception(tr('This service action only accepts POST requests.'), 405);
+        }
+
+        $itemId  = $input->itemId->int();
+        $fieldId = $input->fieldId->int();
+
+        if (! $itemId) {
+            throw new Services_Exception_MissingValue('itemId');
+        }
+        if (! $fieldId) {
+            throw new Services_Exception_MissingValue('fieldId');
+        }
+
+        $itemInfo = TikiLib::lib('trk')->get_tracker_item($itemId);
+        if (! $itemInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
+        $trackerId  = $itemInfo['trackerId'];
+        $definition = Tracker_Definition::get($trackerId);
+        if (! $definition) {
+            throw new Services_Exception_NotFound();
+        }
+
+        $field = $definition->getField($fieldId);
+        if (! $field || ($field['type'] ?? '') !== 'SEC') {
+            throw new Services_Exception_NotFound();
+        }
+
+        $itemObject = Tracker_Item::fromInfo($itemInfo);
+        if (! $itemObject->canView() || ! $itemObject->canViewField($fieldId)) {
+            throw new Services_Exception_Denied();
+        }
+
+        // Encrypted SEC fields: only serve the value if the key is already in session.
+        if (! empty($field['encryptionKeyId'])) {
+            $encKey = new \Tiki\Encryption\Key((int) $field['encryptionKeyId']);
+            if (! $encKey->isKeyAccessible()) {
+                throw new Services_Exception_Denied();
+            }
+            $raw = TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId);
+            try {
+                return ['value' => $encKey->decryptData($raw)];
+            } catch (\Exception $e) {
+                return ['value' => null, 'error' => tr('Decryption failed: %0', $e->getMessage())];
+            }
+        }
+
+        $value = TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId);
+
+        return ['value' => (string) $value];
     }
 
     public function actionFileTrackers($input)

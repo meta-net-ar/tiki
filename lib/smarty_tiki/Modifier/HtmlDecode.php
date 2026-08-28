@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -15,8 +17,13 @@ namespace SmartyTiki\Modifier;
  * Purpose:  Convert all HTML entities to their applicable characters
  * -------------------------------------------------------------
  */
-class HtmlDecode
+class HtmlDecode implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'htmldecode';
+    }
+
     public function handle($s)
     {
         return \TikiLib::htmldecode($s);

@@ -205,7 +205,7 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
             ];
             // clever way of filtering by keys from http://stackoverflow.com/questions/4260086
             $info = array_intersect_key($info, array_flip($allowed));
-            $info['link'] = smarty_function_object_link(
+            $info['link'] = \SmartyTiki\FunctionHandler\ObjectLink::render(
                 [
                     'id' => $info['galleryId'],
                     'type' => 'file gallery',
@@ -227,7 +227,7 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
             } else {
                 $type = 'file';
             }
-            $info['link'] = smarty_function_object_link(
+            $info['link'] = \SmartyTiki\FunctionHandler\ObjectLink::render(
                 [
                     'id' => $info['fileId'],
                     'type' => $type,

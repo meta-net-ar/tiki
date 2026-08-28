@@ -169,12 +169,10 @@ function wikiplugin_trade($data, $params, $offset)
             $paymentlib->register_behavior($id, 'complete', 'perform_trade', [$params]);
 
             //$smarty->assign( 'wp_trade_title', $desc );
-            require_once 'lib/smarty_tiki/function.payment.php';
-            return '^~np~' . smarty_function_payment([ 'id' => $id ], $smarty->getEmptyInternalTemplate()) . '~/np~^';
+            return '^~np~' . \SmartyTiki\FunctionHandler\Payment::render([ 'id' => $id ], $smarty->getEmptyInternalTemplate()) . '~/np~^';
         } elseif ($prefs['payment_system'] == 'cclite' && isset($_POST['cclite_payment_amount']) && isset($_POST['invoice'])) {
-            require_once 'lib/smarty_tiki/function.payment.php';
             $params['id'] = $_POST['invoice'];
-            return '^~np~' . smarty_function_payment($params, $smarty->getEmptyInternalTemplate()) . '~/np~^';
+            return '^~np~' . \SmartyTiki\FunctionHandler\Payment::render($params, $smarty->getEmptyInternalTemplate()) . '~/np~^';
         }
     } elseif ($info['waiting'] != null) {
         return '{REMARKSBOX(type=warning, title=Plugin Trade Error)}' . tra('The user ') . '<em>' . $info['login']

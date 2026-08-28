@@ -130,6 +130,10 @@ function get_typography_parser_config($lg)
     } else {
         $typography = [];
 
+        if (! is_string($lg) || ! Language::isValidLocaleIdentifier($lg)) {
+            return $typography;
+        }
+
         if (is_file("lang/$lg/typography.php")) {
             include("lang/$lg/typography.php");
         }

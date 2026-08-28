@@ -562,8 +562,8 @@
 {/tabset}
 
 {jq}
-    const confirmDeleteMsg = '{tr}Are you sure you want to delete the selected items?{/tr}';
-    const selectItemMsg = '{tr}Please select at least one item.{/tr}';
+    const confirmDeleteMsg = {{"{tr}Are you sure you want to delete the selected items?{/tr}"|json_encode}};
+    const selectItemMsg = {{"{tr}Please select at least one item.{/tr}"|json_encode}};
     // Target the batch delete button to add validation.
     $('.js-confirm-delete').on('click', function(event) {
         const form = $(this).closest('form');

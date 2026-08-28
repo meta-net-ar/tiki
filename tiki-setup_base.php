@@ -302,14 +302,13 @@ if (isset($_SERVER["REQUEST_URI"]) && ! str_contains($_SERVER['REQUEST_URI'], 't
                 } else {
                     $sequence = $tikilib->generate_unique_sequence(16, true);
                     $_SESSION['extra_validation'] = $sequence;
-                    setcookie($extra_cookie_name, $sequence, [
-                        'expires' => time() + 365 * 24 * 3600,
-                        'path' => $session_params['path'],
-                        'domain' => $session_params['domain'],
-                        'secure' => $session_params['secure'],
-                        'httponly' => $session_params['httponly'],
-                        'samesite' => $session_params['samesite'],
-                    ]);
+                    $tikilib->setCookieWithSessionSecurityAttributes(
+                        $extra_cookie_name,
+                        $sequence,
+                        time() + 365 * 24 * 3600,
+                        $session_params['path'],
+                        $session_params['domain']
+                    );
                     unset($sequence);
                 }
             }
@@ -344,7 +343,9 @@ $maxRecords = $prefs['maxRecords'];
 $smarty->assign('maxRecords', $maxRecords);
 
 $userlib = TikiLib::lib('user');
-$user = null;  //We are still in the global scope, this variable will be available everywhere as a global.  This assignment is here so IDEs will find it.
+// Remember-me cookie name comes only from UsersLib getRememberMeCookieName so it cannot drift.
+$user_cookie_site = $userlib->getRememberMeCookieName();
+$user = null;  // Global scope for IDEs and included scripts.
 require_once('lib/breadcrumblib.php');
 // ------------------------------------------------------
 // DEAL WITH XSS-TYPE ATTACKS AND OTHER REQUEST ISSUES
@@ -530,10 +531,7 @@ if (TIKI_API) {
         $user = null;
     }
 } else {
-    // in the case of tikis on same domain we have to distinguish the realm
-    // changed cookie and session variable name by a name made with browsertitle
-    $cookie_site = preg_replace("/[^a-zA-Z0-9]/", "", $prefs['cookie_name']);
-    $user_cookie_site = 'tiki-user-' . $cookie_site;
+    // Same domain, several Tikis: login cookie realm. user_cookie_site is set once after prefs load.
     $login_cookie_value = $_COOKIE["$user_cookie_site"] ?? '';
     // if remember me is enabled, check for cookie where auth hash is stored
     // user gets logged in as the first user in the db with a matching hash
@@ -560,10 +558,7 @@ if (TIKI_API) {
                 if (empty($userId)) {    // for intertiki
                     $userId = $userlib->get_user_id($user);
                 }
-                $cookie_parts = explode('.', $login_cookie_value, 2);
-                $secret = array_shift($cookie_parts);
-                $secret = $userlib->create_user_cookie($userId, $secret);
-                setcookie($user_cookie_site, $secret . '.' . $userId, $tikilib->now + $prefs['remembertime'], $prefs['feature_intertiki_sharedcookie'] == 'y' ? '/' : $prefs['cookie_path'], $prefs['cookie_domain']);
+                $userlib->refreshRememberMeCookieFromLoginValue($login_cookie_value, (int)$userId);
                 $logslib->add_log('login', 'refreshed a cookie for ' . $prefs['remembertime'] . ' seconds');
             }
         }

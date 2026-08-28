@@ -190,7 +190,7 @@
       </contributor>
       <comment>adsfasdf</comment>
       <filename>test3.jpg</filename>
-      <src>fixtures/sourceTest3.jpg</src>
+      <src>https://example.com/sourceTest3.jpg</src>
       <size>3252598</size>
     </upload>
     <upload>
@@ -201,7 +201,7 @@
       </contributor>
       <comment>adsfasdf</comment>
       <filename>test2.jpg</filename>
-      <src>fixtures/sourceTest2.jpg</src>
+      <src>https://example.com/sourceTest2.jpg</src>
       <size>3252598</size>
     </upload>
   </page>
@@ -234,7 +234,7 @@
       </contributor>
       <comment />
       <filename>test.jpg</filename>
-      <src>fixtures/sourceTest.jpg</src>
+      <src>https://example.com/sourceTest.jpg</src>
       <size>94751</size>
     </upload>
   </page>

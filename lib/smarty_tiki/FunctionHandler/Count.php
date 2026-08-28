@@ -10,9 +10,15 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\Exception;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Count extends Base
+class Count extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'count';
+    }
+
     public function handle($params, Template $template)
     {
         extract($params);

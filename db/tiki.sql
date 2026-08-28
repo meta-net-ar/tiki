@@ -2005,6 +2005,9 @@ CREATE TABLE `tiki_preferences` (
   PRIMARY KEY (`name`(191))
 ) ENGINE=MyISAM;
 
+INSERT INTO `tiki_preferences` (`name`, `value`)
+SELECT 'auth_token_secret', LOWER(HEX(RANDOM_BYTES(32)));
+
 DROP TABLE IF EXISTS `tiki_private_messages`;
 CREATE TABLE `tiki_private_messages` (
   `messageId` int(8) NOT NULL auto_increment,
@@ -3126,7 +3129,11 @@ CREATE TABLE `tiki_object_scores` (
   `pointsAssigned` INT NOT NULL,
   `pointsBalance` INT NOT NULL,
   `date` INT NOT NULL,
-  `reversalOf` INT UNSIGNED
+  `reversalOf` INT UNSIGNED,
+  KEY `recipient_latest` (`recipientObjectType`(32), `recipientObjectId`(191), `id`),
+  KEY `recipient_rule` (`recipientObjectType`(32), `recipientObjectId`(128), `ruleId`(80)),
+  KEY `trigger_event` (`triggerObjectType`(32), `triggerObjectId`(64), `triggerUser`(64), `triggerEvent`(64), `id`),
+  KEY `trigger_rule` (`triggerObjectType`(24), `triggerObjectId`(64), `ruleId`(48), `recipientObjectType`(24), `recipientObjectId`(64), `reversalOf`, `id`)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `tiki_file_handlers`;
@@ -3705,7 +3712,7 @@ CREATE TABLE `tiki_auth_tokens` (
     `timeout` INT NOT NULL DEFAULT 0,
     `hits` INT NOT NULL DEFAULT 1,
     `maxhits` INT NOT NULL DEFAULT 1,
-    `token` CHAR(32),
+    `token` VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin,
     `entry` MEDIUMTEXT,
     `user` VARCHAR(200) default NULL,
     `email` varchar(255) NOT NULL,
@@ -4322,8 +4329,8 @@ CREATE TABLE `tiki_markdown_imports` (
   `error_note` TEXT NULL,
   `is_journal` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_source_relpath` (`source_key`(120), `relpath`(120)),
+  UNIQUE KEY `uq_source_relpath` (`source_key`(75), `relpath`(165)),
   KEY `idx_page` (`page_name`(190)),
-  KEY `idx_status` (`last_status`),
-  KEY `idx_orphaned` (`orphaned_at`)
+  KEY `idx_orphaned` (`orphaned_at`),
+  KEY `idx_source_status` (`source_key`, `last_status`)
 ) ENGINE=MyISAM;

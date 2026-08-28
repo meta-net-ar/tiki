@@ -95,7 +95,7 @@ class WikiPut implements ActionInterface
         $page = $this->getPage($message, true);
 
         if (strlen($page) > 160) {
-            $page = smarty_modifier_truncate($page, 159, '...', false, true);
+            $page = \SmartyTiki\Modifier\Truncate::apply($page, 159, '...', false, true);
         }
 
         if ($this->canAttach($account, $message) && $account->hasAutoAttach()) {

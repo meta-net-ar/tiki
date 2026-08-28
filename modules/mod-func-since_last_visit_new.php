@@ -207,7 +207,7 @@ function module_since_last_visit_new($mod_reference, &$module_params)
                 $objectType = 'wiki';
             }
 
-            $baseUrl = smarty_modifier_sefurl($res['object'], $objectType);
+            $baseUrl = \SmartyTiki\Modifier\Sefurl::apply($res['object'], $objectType);
             $ret['items']['comments']['list'][$count]['href'] = $baseUrl . '#threadId=' . $res['threadId'];
         } else {
             $ret['items']['comments']['list'][$count]['href'] = TikiLib::lib('comments')->getHref($res['objectType'], $res['object'], $res['threadId']);
@@ -266,7 +266,7 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         }
 
         if ($visible) {
-            $ret['items']['comments']['list'][$count]['title'] = $tikilib->get_short_datetime($res['commentDate']) . ' ' . tra('by') . ' ' . smarty_modifier_username($res['userName']);
+            $ret['items']['comments']['list'][$count]['title'] = $tikilib->get_short_datetime($res['commentDate']) . ' ' . tra('by') . ' ' . \SmartyTiki\Modifier\Username::apply($res['userName']);
             $ret['items']['comments']['list'][$count]['label'] = TikiLib::lib('comments')->process_comment_title($res, $module_params['commentlength']);
             ;
 
@@ -300,11 +300,11 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         while ($res = $result->fetchRow()) {
             if ($userlib->user_has_perm_on_object($user, $res['parentId'], 'thread', 'tiki_p_forum_read')) {
                 if ($res['parentId']) {
-                    $ret['items']['posts']['list'][$count]['href'] = smarty_modifier_sefurl($res['parentId'], 'forumthread') . '#threadId=' . $res['threadId'];
+                    $ret['items']['posts']['list'][$count]['href'] = \SmartyTiki\Modifier\Sefurl::apply($res['parentId'], 'forumthread') . '#threadId=' . $res['threadId'];
                 } else {
-                    $ret['items']['posts']['list'][$count]['href'] = smarty_modifier_sefurl($res['threadId'], 'forumthread');
+                    $ret['items']['posts']['list'][$count]['href'] = \SmartyTiki\Modifier\Sefurl::apply($res['threadId'], 'forumthread');
                 }
-                $ret['items']['posts']['list'][$count]['title'] = $tikilib->get_short_datetime($res['commentDate']) . ' ' . tra('by') . ' ' . smarty_modifier_username($res['userName']);
+                $ret['items']['posts']['list'][$count]['title'] = $tikilib->get_short_datetime($res['commentDate']) . ' ' . tra('by') . ' ' . \SmartyTiki\Modifier\Username::apply($res['userName']);
                 if ($res['parentId'] == 0 || $prefs['forum_reply_notitle'] != 'y') {
                     $ret['items']['posts']['list'][$count]['label'] = $res['title'];
                 } else {
@@ -328,8 +328,8 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         $count = 0;
         foreach ($result as $res) {
             if ($userlib->user_has_perm_on_object($user, $res['pageName'], 'wiki page', 'tiki_p_view')) {
-                $ret['items']['pages']['list'][$count]['href']  = smarty_modifier_sefurl($res['pageName']);
-                $ret['items']['pages']['list'][$count]['title'] = $tikilib->get_short_datetime($res['lastModif']) . ' ' . tra('by') . ' ' . smarty_modifier_username($res['user']);
+                $ret['items']['pages']['list'][$count]['href']  = \SmartyTiki\Modifier\Sefurl::apply($res['pageName']);
+                $ret['items']['pages']['list'][$count]['title'] = $tikilib->get_short_datetime($res['lastModif']) . ' ' . tra('by') . ' ' . \SmartyTiki\Modifier\Username::apply($res['user']);
                 $ret['items']['pages']['list'][$count]['label'] = $res['pageName'];
                 $count++;
             }
@@ -367,7 +367,7 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         $count = 0;
         foreach ($rows as $res) {
             if ($userlib->user_has_perm_on_object($user, $res['articleId'], 'article', 'tiki_p_read_article')) {
-                $ret['items']['articles']['list'][$count]['href']  = smarty_modifier_sefurl($res['articleId'], 'article', $res['title']);
+                $ret['items']['articles']['list'][$count]['href']  = \SmartyTiki\Modifier\Sefurl::apply($res['articleId'], 'article', $res['title']);
                 $ret['items']['articles']['list'][$count]['title'] = $tikilib->get_short_datetime($res['publishDate']) . ' ' . tra('by') . ' ' . $res['authorName'];
                 $ret['items']['articles']['list'][$count]['label'] = $res['title'];
                 $count++;
@@ -389,7 +389,7 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         $count = 0;
         while ($res = $result->fetchRow()) {
             if ($userlib->user_has_perm_on_object($user, $res['faqId'], 'faq', 'tiki_p_view_faq')) {
-                $ret['items']['faqs']['list'][$count]['href']  = smarty_modifier_sefurl($res['faqId'], 'faq');
+                $ret['items']['faqs']['list'][$count]['href']  = \SmartyTiki\Modifier\Sefurl::apply($res['faqId'], 'faq');
                 $ret['items']['faqs']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']);
                 $ret['items']['faqs']['list'][$count]['label'] = $res['title'];
                 $count++;
@@ -411,8 +411,8 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         $count = 0;
         while ($res = $result->fetchRow()) {
             if ($userlib->user_has_perm_on_object($user, $res['blogId'], 'blog', 'tiki_p_read_blog')) {
-                $ret['items']['blogs']['list'][$count]['href']  = smarty_modifier_sefurl($res['blogId'], 'blog', $res['title']);
-                $ret['items']['blogs']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . smarty_modifier_username($res['user']);
+                $ret['items']['blogs']['list'][$count]['href']  = \SmartyTiki\Modifier\Sefurl::apply($res['blogId'], 'blog', $res['title']);
+                $ret['items']['blogs']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . \SmartyTiki\Modifier\Username::apply($res['user']);
                 $ret['items']['blogs']['list'][$count]['label'] = $res['title'];
                 $count++;
             }
@@ -429,8 +429,8 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         $count = 0;
         while ($res = $result->fetchRow()) {
             if ($userlib->user_has_perm_on_object($user, $res['postId'], 'blog post', 'tiki_p_read_blog')) {
-                $ret['items']['blogPosts']['list'][$count]['href']  = smarty_modifier_sefurl($res['postId'], 'blogpost', $res['title']);
-                $ret['items']['blogPosts']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . smarty_modifier_username($res['user']);
+                $ret['items']['blogPosts']['list'][$count]['href']  = \SmartyTiki\Modifier\Sefurl::apply($res['postId'], 'blogpost', $res['title']);
+                $ret['items']['blogPosts']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . \SmartyTiki\Modifier\Username::apply($res['user']);
                 $ret['items']['blogPosts']['list'][$count]['label'] = $res['title'];
                 $count++;
             }
@@ -450,8 +450,8 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         $count = 0;
         while ($res = $result->fetchRow()) {
             if ($userlib->user_has_perm_on_object($user, $res['galleryId'], 'file gallery', 'tiki_p_view_file_gallery')) {
-                $ret['items']['fileGalleries']['list'][$count]['href']  = smarty_modifier_sefurl($res['galleryId'], 'file gallery');
-                $ret['items']['fileGalleries']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . smarty_modifier_username($res['user']);
+                $ret['items']['fileGalleries']['list'][$count]['href']  = \SmartyTiki\Modifier\Sefurl::apply($res['galleryId'], 'file gallery');
+                $ret['items']['fileGalleries']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . \SmartyTiki\Modifier\Username::apply($res['user']);
                 $ret['items']['fileGalleries']['list'][$count]['label'] = $res['name'];
                 $count++;
             }
@@ -467,8 +467,8 @@ function module_since_last_visit_new($mod_reference, &$module_params)
             // Use sefurl for file details with galleryId:fileId format
             $source = $res['galleryId'] . ':' . $res['fileId'];
             $ret['items']['files']['list'][] = [
-                'href' => smarty_modifier_sefurl($source, 'filedetails'),
-                'title' => $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . smarty_modifier_username($res['user']),
+                'href' => \SmartyTiki\Modifier\Sefurl::apply($source, 'filedetails'),
+                'title' => $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . \SmartyTiki\Modifier\Username::apply($res['user']),
                 'label' => $res['name'] . ' (' . $res['filename'] . ')'
             ];
         }
@@ -487,7 +487,7 @@ function module_since_last_visit_new($mod_reference, &$module_params)
 
         $count = 0;
         while ($res = $result->fetchRow()) {
-            $ret['items']['polls']['list'][$count]['href']  = smarty_modifier_sefurl($res['pollId'], 'pollresults');
+            $ret['items']['polls']['list'][$count]['href']  = \SmartyTiki\Modifier\Sefurl::apply($res['pollId'], 'pollresults');
             $ret['items']['polls']['list'][$count]['title'] = $tikilib->get_short_datetime($res['publishDate']);
             $ret['items']['polls']['list'][$count]['label'] = $res['title'];
             $count++;
@@ -508,13 +508,13 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         while ($res = $result->fetchRow()) {
             if ($userlib->user_has_permission($user, 'tiki_p_admin')) {
                 // For admins, use clean URL to assign user page
-                $ret['items']['users']['list'][$count]['href'] = smarty_modifier_sefurl($res['login'], 'assignuser');
+                $ret['items']['users']['list'][$count]['href'] = \SmartyTiki\Modifier\Sefurl::apply($res['login'], 'assignuser');
             } else {
                 // For regular users, use clean URL to user information page
-                $ret['items']['users']['list'][$count]['href'] = smarty_modifier_sefurl($res['login'], 'user');
+                $ret['items']['users']['list'][$count]['href'] = \SmartyTiki\Modifier\Sefurl::apply($res['login'], 'user');
             }
             $ret['items']['users']['list'][$count]['title'] = $tikilib->get_short_datetime($res['registrationDate']);
-            $ret['items']['users']['list'][$count]['label'] = smarty_modifier_username($res['login']);
+            $ret['items']['users']['list'][$count]['label'] = \SmartyTiki\Modifier\Username::apply($res['login']);
             $count++;
         }
         $ret['items']['users']['count'] = $count;
@@ -553,7 +553,7 @@ function module_since_last_visit_new($mod_reference, &$module_params)
 
                 $ret['items']['trackers']['tid'][$res['trackerId']]['label'] = tra('in') . ' ' . tra($tracker_name[$res['trackerId']]);
                 $ret['items']['trackers']['tid'][$res['trackerId']]['cname'] = 'slvn_tracker' . $res['trackerId'] . '_menu';
-                $ret['items']['trackers']['tid'][$res['trackerId']]['list'][$counta[$res['trackerId']]]['href'] = smarty_modifier_sefurl(
+                $ret['items']['trackers']['tid'][$res['trackerId']]['list'][$counta[$res['trackerId']]]['href'] = \SmartyTiki\Modifier\Sefurl::apply(
                     $res['itemId'],
                     'trackeritem'
                 );
@@ -613,7 +613,7 @@ function module_since_last_visit_new($mod_reference, &$module_params)
 
                 $ret['items']['utrackers']['tid'][$res['trackerId']]['label'] = tra('in') . ' ' . tra($tracker_name[$res['trackerId']]);
                 $ret['items']['utrackers']['tid'][$res['trackerId']]['cname'] = 'slvn_utracker' . $res['trackerId'] . '_menu';
-                $ret['items']['utrackers']['tid'][$res['trackerId']]['list'][$countb[$res['trackerId']]]['href']  = smarty_modifier_sefurl(
+                $ret['items']['utrackers']['tid'][$res['trackerId']]['list'][$countb[$res['trackerId']]]['href']  = \SmartyTiki\Modifier\Sefurl::apply(
                     $res['itemId'],
                     'trackeritem'
                 );
@@ -657,8 +657,8 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         $count = 0;
         while ($res = $result->fetchRow()) {
             if ($userlib->user_has_perm_on_object($user, $res['calendarId'], 'calendar', 'tiki_p_view_calendar')) {
-                $ret['items']['calendar']['list'][$count]['href']  = smarty_modifier_sefurl($res['calendarId'], 'calendar', $res['name']);
-                $ret['items']['calendar']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . smarty_modifier_username($res['user']);
+                $ret['items']['calendar']['list'][$count]['href']  = \SmartyTiki\Modifier\Sefurl::apply($res['calendarId'], 'calendar', $res['name']);
+                $ret['items']['calendar']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . \SmartyTiki\Modifier\Username::apply($res['user']);
                 $ret['items']['calendar']['list'][$count]['label'] = $res['name'];
                 $count++;
             }
@@ -675,8 +675,8 @@ function module_since_last_visit_new($mod_reference, &$module_params)
         $count = 0;
         while ($res = $result->fetchRow()) {
             if ($userlib->user_has_perm_on_object($user, $res['calendarId'], 'calendar', 'tiki_p_view_events')) {
-                $ret['items']['events']['list'][$count]['href']  = smarty_modifier_sefurl($res['calitemId'], 'calendar event', $res['name']);
-                $ret['items']['events']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . smarty_modifier_username($res['user']) . ', ' . tra('starting on') . ' ' . $tikilib->get_short_datetime($res['start']);
+                $ret['items']['events']['list'][$count]['href']  = \SmartyTiki\Modifier\Sefurl::apply($res['calitemId'], 'calendar event', $res['name']);
+                $ret['items']['events']['list'][$count]['title'] = $tikilib->get_short_datetime($res['created']) . ' ' . tra('by') . ' ' . \SmartyTiki\Modifier\Username::apply($res['user']) . ', ' . tra('starting on') . ' ' . $tikilib->get_short_datetime($res['start']);
                 $ret['items']['events']['list'][$count]['label'] = $res['name'];
                 $count++;
             }

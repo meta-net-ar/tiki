@@ -200,32 +200,22 @@ class WikiMediawikiTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $this->obj->attachmentsDestDir = __DIR__ . '/fixtures/';
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
+            ->onlyMethods(['fetchAttachmentContents'])
+            ->getMock();
+        $obj->attachmentsDestDir = __DIR__ . '/fixtures/';
+        $obj->method('fetchAttachmentContents')->willReturn('fake-image-bytes');
 
-        $sourceAttachments = ['sourceTest.jpg', 'sourceTest2.jpg'];
-        $destAttachments = ['test.jpg', 'test2.jpg'];
-        $i = count($sourceAttachments) - 1;
-        $cwd = getcwd();
-        chdir(__DIR__);
+        $obj->dom = new DOMDocument();
+        $obj->dom->load(__DIR__ . '/fixtures/mediawiki_sample.xml');
+        $obj->downloadAttachments();
 
-        while ($i >= 0) {
-            fopen($this->obj->attachmentsDestDir . $sourceAttachments[$i], 'w');
-            $i--;
-        }
-
-        $this->obj->dom = new DOMDocument();
-        $this->obj->dom->load(__DIR__ . '/fixtures/mediawiki_sample.xml');
-        $this->obj->downloadAttachments();
-
-        $i = count($sourceAttachments) - 1;
-        while ($i >= 0) {
-            $filePath = $this->obj->attachmentsDestDir . $destAttachments[$i];
+        foreach (['test.jpg', 'test2.jpg'] as $attachment) {
+            $filePath = $obj->attachmentsDestDir . $attachment;
             $this->assertFileExists($filePath);
+            $this->assertSame('fake-image-bytes', file_get_contents($filePath));
             unlink($filePath);
-            unlink($this->obj->attachmentsDestDir . $sourceAttachments[$i]);
-            $i--;
         }
-        chdir($cwd);
 
         $output = ob_get_clean();
         $this->assertEquals("\n\nImporting attachments:\nFile test2.jpg successfully imported!\nFile test.jpg successfully imported!\n", $output);
@@ -271,13 +261,101 @@ class WikiMediawikiTest extends AbstractImporterTestCase
     {
         ob_start();
 
-        $this->obj->attachmentsDestDir = __DIR__ . '/fixtures/';
-        $this->obj->dom = new DOMDocument();
-        $this->obj->dom->load(__DIR__ . '/fixtures/mediawiki_invalid_upload.xml');
-        $this->obj->downloadAttachments();
+        $obj = $this->getMockBuilder(WikiMediawiki::class)
+            ->onlyMethods(['fetchAttachmentContents'])
+            ->getMock();
+        $obj->attachmentsDestDir = __DIR__ . '/fixtures/';
+        $obj->method('fetchAttachmentContents')->willReturn(false);
+        $obj->dom = new DOMDocument();
+        $obj->dom->load(__DIR__ . '/fixtures/mediawiki_invalid_upload.xml');
+        $obj->downloadAttachments();
 
         $output = ob_get_clean();
         $this->assertEquals("\n\nImporting attachments:\nUnable to download file Qlandkartegt-0.11.1.tar.gz. File not found.\nUnable to download file Passelivre.jpg. File not found.\n", $output);
+    }
+
+    public function testDownloadAttachmentsShouldRejectNonHttpSrc(): void
+    {
+        ob_start();
+
+        $xml = <<<'XML'
+<mediawiki>
+  <page>
+    <upload>
+      <filename>evil.png</filename>
+      <src>file:///etc/passwd</src>
+      <size>1</size>
+    </upload>
+  </page>
+  <page>
+    <upload>
+      <filename>local.php.png</filename>
+      <src>db/local.php</src>
+      <size>1</size>
+    </upload>
+  </page>
+</mediawiki>
+XML;
+
+        $this->obj->attachmentsDestDir = __DIR__ . '/fixtures/';
+        $this->obj->dom = new DOMDocument();
+        $this->obj->dom->loadXML($xml);
+        $this->obj->downloadAttachments();
+
+        $this->assertFileDoesNotExist($this->obj->attachmentsDestDir . 'evil.png');
+        $this->assertFileDoesNotExist($this->obj->attachmentsDestDir . 'local.php.png');
+
+        $output = ob_get_clean();
+        $this->assertEquals(
+            "\n\nImporting attachments:\n"
+            . "File evil.png not imported: attachment URL must be a public http(s) address.\n"
+            . "File local.php.png not imported: attachment URL must be a public http(s) address.\n",
+            $output
+        );
+    }
+
+    public function testSanitizeAttachmentFileNameRejectsPathTraversal(): void
+    {
+        $this->assertSame('photo.jpg', $this->obj->sanitizeAttachmentFileName('photo.jpg'));
+        $this->assertSame('photo.jpg', $this->obj->sanitizeAttachmentFileName('  photo.jpg  '));
+
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('../../outside.jpg'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('..\\..\\outside.jpg'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('/etc/passwd'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('subdir/photo.jpg'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('..'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName('.'));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName(''));
+        $this->assertNull($this->obj->sanitizeAttachmentFileName("evil\0.jpg"));
+    }
+
+    public function testDownloadAttachmentsShouldRejectPathTraversalFilenames(): void
+    {
+        ob_start();
+
+        $this->obj->attachmentsDestDir = __DIR__ . '/fixtures/';
+        $outsidePath = __DIR__ . '/outside.jpg';
+        $outsidePath2 = __DIR__ . '/outside2.jpg';
+
+        if (file_exists($outsidePath)) {
+            unlink($outsidePath);
+        }
+        if (file_exists($outsidePath2)) {
+            unlink($outsidePath2);
+        }
+
+        $this->obj->dom = new DOMDocument();
+        $this->obj->dom->load(__DIR__ . '/fixtures/mediawiki_path_traversal_upload.xml');
+        $this->obj->downloadAttachments();
+
+        $this->assertFileDoesNotExist($outsidePath);
+        $this->assertFileDoesNotExist($outsidePath2);
+        $this->assertFileDoesNotExist($this->obj->attachmentsDestDir . 'outside.jpg');
+        $this->assertFileDoesNotExist($this->obj->attachmentsDestDir . 'outside2.jpg');
+
+        $output = ob_get_clean();
+        $this->assertStringContainsString('filename must not contain directory separators or `..`', $output);
+        $this->assertStringNotContainsString('successfully imported', $output);
     }
 
     public function testExtractInfo(): void

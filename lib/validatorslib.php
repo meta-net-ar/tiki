@@ -102,6 +102,16 @@ class Validators
                             $validationjs .= $field_name . 'Hour: {required_in_group: [' . $date_ins_num . ', "select[name^=\'' . $field_name . '\']"]}, ' .
                                 $field_name . 'Minute: {required_in_group: [' . $date_ins_num . ', "select[name^=\'' . $field_name . '\']"], ';
                         }
+                    } elseif ($field_value['type'] == 'SEC') {
+                        // Secret fields render empty even when a stored value (edit keep-on-blank)
+                        // or a duplication copy marker (hidden clone_source input) backs the
+                        // submission; only require input when neither is present. The server-side
+                        // counterpart lives in TrackerLib::check_field_values().
+                        $validationjs .= 'required: function(element){ ' .
+                            'var $el = $(element); ' .
+                            'if ($el.data("hasStored") == 1) { return false; } ' .
+                            'return $el.closest(".js-secret-field").find("input[name$=\'_clone_source\']").length === 0; ' .
+                            '}, ';
                     } elseif (! in_array($field_value['type'], ['q', 'GF'])) {
                         // exclude AutoIncrement and GeographicFeature type fields as they are read-only in the default edit form
                         if ($field_value['isMultilingual'] == 'y') {

@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class CategorySelector extends Base
+class CategorySelector extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'categoryselector';
+    }
+
     public function handle($params, Template $template)
     {
         $categlib = \TikiLib::lib('categ');

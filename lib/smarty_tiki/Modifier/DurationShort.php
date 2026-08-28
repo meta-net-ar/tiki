@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -15,8 +17,13 @@ namespace SmartyTiki\Modifier;
  * Purpose:  formats a duration from seconds
  * -------------------------------------------------------------
  */
-class DurationShort
+class DurationShort implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'duration_short';
+    }
+
     public function handle($string)
     {
         $result = '';

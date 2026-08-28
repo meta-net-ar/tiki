@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty modifier plugin to render a country flag emoji from a country name.
  *
@@ -19,8 +21,13 @@ namespace SmartyTiki\Modifier;
  *
  * Example: {$country|countryflagwithlabel}
  */
-class CountryFlagWithLabel
+class CountryFlagWithLabel implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'countryflagwithlabel';
+    }
+
     public function handle(string $countryName): string
     {
         if (empty($countryName) || $countryName === 'None' || $countryName === 'Other') {

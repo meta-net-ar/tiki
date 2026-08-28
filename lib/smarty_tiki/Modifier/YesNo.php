@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class YesNo
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class YesNo implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'yesno';
+    }
+
     public function handle($string)
     {
         switch ($string) {

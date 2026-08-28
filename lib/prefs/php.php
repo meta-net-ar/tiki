@@ -17,6 +17,9 @@ function prefs_php_list()
             'keywords' => 'command line php path',
             'type' => 'text',
             'default' => '',
+            'tags' => ['advanced'],
+            'warning' => tra('Security-sensitive setting. An incorrect path can lead to arbitrary command execution under the web server account.'),
+            'hint' => tra('Set this using system configuration (tiki.ini) so only server administrators can configure it. Hidden by default as a risky preference.'),
             'help' => 'General-Settings',
         ],
     ];

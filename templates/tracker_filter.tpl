@@ -184,7 +184,7 @@
             let $form = $(this).closest('form');
             // Remove any explicit status parameter so backend defaults apply
             $form.find('input[name="status"]').remove();
-            $form.submit();
+            $form.trigger('submit');
         });
 
         // Handle individual status checkbox changes
@@ -198,7 +198,7 @@
             if (checkboxes.length === 0) {
                 // Reset to default: remove explicit status, let backend decide
                 $form.find('input[name="status"]').remove();
-                $form.submit();
+                $form.trigger('submit');
                 return;
             }
 
@@ -217,7 +217,7 @@
                 value: outputVal
             }).appendTo($form);
 
-            $form.submit();
+            $form.trigger('submit');
         });
         {/jq}
     </form>

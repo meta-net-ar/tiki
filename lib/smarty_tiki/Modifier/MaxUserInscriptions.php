@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -15,8 +17,13 @@ namespace SmartyTiki\Modifier;
  * Purpose:  to use with the tracker field type "User inscription"
  * -------------------------------------------------------------
  */
-class MaxUserInscriptions
+class MaxUserInscriptions implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'max_user_inscriptions';
+    }
+
     public function handle($text)
     {
         return substr($text, 0, strpos($text, '#'));

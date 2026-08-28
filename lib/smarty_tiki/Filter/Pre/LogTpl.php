@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Filter\Pre;
 
-class LogTpl implements \Smarty\Filter\FilterInterface
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class LogTpl implements \Smarty\Filter\FilterInterface, TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'log_tpl';
+    }
+
     public function filter($source, \Smarty\Template $template)
     {
         global $prefs;

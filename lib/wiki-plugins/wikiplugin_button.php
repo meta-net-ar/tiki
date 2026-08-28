@@ -228,11 +228,6 @@ function wikiplugin_button($data, $params)
     $parserlib = TikiLib::lib('parser');
     $smarty = TikiLib::lib('smarty');
 
-    $path = 'lib/smarty_tiki/function.button.php';
-    if (! file_exists($path)) {
-        return tra('lib/smarty_tiki/function.button.php is missing or unreadable');
-    }
-
     // for some unknown reason if a wikiplugin param is named _text all whitespaces from
     // its value are removed, but we need to rename the param to _text for smarty_functin
     if (isset($params['text'])) {
@@ -253,7 +248,6 @@ function wikiplugin_button($data, $params)
     // Parse wiki argument variables in the url, if any (i.e.: {{itemId}} for it's numeric value).
     $parserlib->parse_wiki_argvariable($params['href']);
 
-    include_once($path);
-    $content = smarty_function_button($params, $smarty->getEmptyInternalTemplate());
+    $content = \SmartyTiki\FunctionHandler\Button::render($params, $smarty->getEmptyInternalTemplate());
     return '~np~' . $content . '~/np~';
 }

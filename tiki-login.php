@@ -368,6 +368,10 @@ if (
         Feedback::errorAndDie(tra('An error occurred trying to login. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
     }
 } else {
+    // Validate CSRF before processing credentials so forged requests never reach authentication.
+    // OpenID Connect is handled above and intentionally skips CSRF (redirect-based flow).
+    $access->checkCsrf(null, null, null, null, null, 'page');
+
     // Verify user is valid
     if ($twoFaPrevalidated) {
         // Password was already validated before the 2FA prompt; use a token instead of re-checking
@@ -608,14 +612,16 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
             // Now if the remember me feature is on and the user checked the rememberme checkbox then ...
             if ($prefs['rememberme'] == 'always' || $prefs['rememberme'] != 'disabled' && isset($_REQUEST['rme']) && $_REQUEST['rme'] == 'on') {
                 $userInfo = $userlib->get_user_info($user);
-                $userId = $userInfo['userId'];
-                $secret = $userlib->create_user_cookie($userId);
-                setcookie($user_cookie_site, $secret . '.' . $userId, $tikilib->now + $prefs['remembertime'], $prefs['feature_intertiki_sharedcookie'] == 'y' ? '/' : $prefs['cookie_path'], $prefs['cookie_domain']);
+                $userlib->issueRememberMeCookieForUserId((int)$userInfo['userId']);
                 $logslib->add_log('login', 'got a cookie for ' . $prefs['remembertime'] . ' seconds');
             }
         }
     }
 } else {
+    // Unsuccessful login (bad credentials or CSRF) — do not leave a partial user context
+    unset($user);
+    $smarty->assign('user', '');
+
     // if ($isvalid) = false - record bruteforce attempts
     if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
         $bruteForce->attempt('login', $bruteForceProperties());

@@ -74,7 +74,7 @@ function wp_fixture_tracker_math($data, $params)
         return '__' . tr('Tracker not found.') . '__';
     }
 
-    $url = smarty_modifier_sefurl($trackerId, 'tracker');
+    $url = \SmartyTiki\Modifier\Sefurl::apply($trackerId, 'tracker');
     $table->setTitle(tr('Tracker Math for [%0|%1]', $url, $tracker->getConfiguration('name')));
 
     $factory = new Tracker_Field_Factory($tracker);
@@ -128,7 +128,7 @@ function wp_fixture_tracker_data($data, $params, $mock)
         return '__' . tr('Tracker not found.') . '__';
     }
 
-    $url = smarty_modifier_sefurl($trackerId, 'tracker');
+    $url = \SmartyTiki\Modifier\Sefurl::apply($trackerId, 'tracker');
     $table->setTitle(tr('Tracker Data for [%0|%1]', $url, $tracker->getConfiguration('name')));
 
     if (! in_array('itemId', $headings)) {

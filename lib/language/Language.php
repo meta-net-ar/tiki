@@ -25,6 +25,7 @@ class Language extends TikiDb_Bridge
      * Characters at end of translation string that are not a part of the translation
      */
     public const PUNCTUATIONS = [':', '!', ';', '.', ',', '?'];
+    private const LOCALE_IDENTIFIER_PATTERN = '/\A[A-Za-z][A-Za-z0-9_-]*\z/';
 
     /**
      * Return a list of languages available in Tiki
@@ -143,7 +144,7 @@ class Language extends TikiDb_Bridge
     }
 
     /**
-     * @param bool $path
+     * @param string|bool $path Directory to scan, or false to use the default 'lang' directory
      * @param null $short
      * @param bool $all
      * @return array|mixed
@@ -172,6 +173,11 @@ class Language extends TikiDb_Bridge
      */
     private static function list_disk_languages($path = 'lang')
     {
+        // Callers pass false to mean "use the default path"
+        if (! $path) {
+            $path = 'lang';
+        }
+
         if (! is_dir($path)) {
             return [];
         }
@@ -209,8 +215,17 @@ class Language extends TikiDb_Bridge
      */
     public static function is_valid_language($language)
     {
-        return preg_match("/^[a-zA-Z-_]*$/", $language)
+        return is_string($language)
+            && self::isValidLocaleIdentifier($language)
             && file_exists('lang/' . $language . '/language.php');
+    }
+
+    /**
+     * Validate the language directory name syntax before it is used in any path.
+     */
+    public static function isValidLocaleIdentifier(string $localeIdentifier = ''): bool
+    {
+        return preg_match(self::LOCALE_IDENTIFIER_PATTERN, $localeIdentifier) === 1;
     }
 
     /**
@@ -292,6 +307,10 @@ class Language extends TikiDb_Bridge
      */
     public static function loadExtensions($lg, $useCache = true)
     {
+        if (! is_string($lg) || ! self::isValidLocaleIdentifier($lg)) {
+            return [];
+        }
+
         $language = [];
         foreach (\Tiki\Package\ExtensionManager::getEnabledPackageExtensions() as $package) {
             $lang = null;
@@ -680,9 +699,8 @@ class Language extends TikiDb_Bridge
             }
         }
 
-        return preg_match("/[a-zA-Z-_]+$/", $localeIdentifier)
-            && file_exists('lang/' . $localeIdentifier . '/language.php')
-            && ($prefs['restrict_language'] === 'n' || empty($availableLanguages) || in_array($localeIdentifier, $availableLanguages));
+        return self::is_valid_language($localeIdentifier)
+            && ($prefs['restrict_language'] === 'n' || empty($availableLanguages) || in_array($localeIdentifier, $availableLanguages, true));
     }
 
     /**

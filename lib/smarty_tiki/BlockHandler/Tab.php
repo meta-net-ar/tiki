@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * \brief smarty_block_tabs : add tabs to a template
@@ -32,8 +33,13 @@ use Smarty\Template;
  *  {/tab}
  * \endcode
  */
-class Tab extends Base
+class Tab extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tab';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs, $smarty_tabset, $cookietab, $cookietabTabset, $smarty_tabset_i_tab, $smarty_tabset_name;
