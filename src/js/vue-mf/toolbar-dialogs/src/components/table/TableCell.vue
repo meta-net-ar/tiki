@@ -13,25 +13,37 @@ const myRow = ref(props.row)
 const myCol = ref(props.col)
 
 function update(e) {
-  cells.value[myRow.value][myCol.value] = e.target.value.trim()
+    cells.value[myRow.value][myCol.value] = e.target.value.trim()
+}
+
+function alignmentMarker(align, length) {
+    const hyphenLength = Math.max(length - (align === "center" ? 2 : 1), 3);
+    const hyphens = "-".repeat(hyphenLength);
+    switch (align) {
+        case "right":
+            return hyphens + ":";
+        case "center":
+            return ":" + hyphens + ":";
+        case "left":
+        default:
+            return ":" + hyphens;
+    }
 }
 
 function alignCol(align) {
-    let length = cells.value[myRow.value][myCol.value].length
-    let $columnInputs = $(props.table).find("tr td:nth-child(" + (myCol.value + 1) + ") input")
+    let length = cells.value[myRow.value][myCol.value].length;
+    let $columnInputs = $(props.table).find("tr td:nth-child(" + (myCol.value + 1) + ") input");
+    cells.value[myRow.value][myCol.value] = alignmentMarker(align, length);
 
     switch (align) {
         case "right":
-            cells.value[myRow.value][myCol.value] = "-".repeat(length - 1) + ":"
             $columnInputs.removeClass("text-center text-start").addClass("text-end")
             break
         case "center":
-            cells.value[myRow.value][myCol.value] = ":" + "-".repeat(length - 2) + ":"
             $columnInputs.removeClass("text-end text-start").addClass("text-center")
             break
         case "left":
         default:
-            cells.value[myRow.value][myCol.value] = ":" + "-".repeat(length - 1)
             $columnInputs.removeClass("text-center text-end").addClass("text-start")
             break
     }

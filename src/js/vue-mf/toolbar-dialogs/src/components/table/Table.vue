@@ -102,6 +102,7 @@ function _insert() {
         output = output.replace("  |", " |").replace("|  ", "| ")
         output = output.substring(0, output.length - 1) + " ||"
     }
+    output = '{DIV(class="table-responsive")}' + output + '{DIV}'
     insertAt(toolbarObject.value.domElementId, output, true, false, true)
 
     return output
