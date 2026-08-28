@@ -2554,6 +2554,7 @@ class Services_Tracker_Controller
         );
 
         return [
+            'title' => tra('Tracker Item History'),
             'fieldId' => $fieldId,
             'filter' => $filter,
             'diff_style' => $diff_style,
