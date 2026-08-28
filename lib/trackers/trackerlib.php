@@ -4035,7 +4035,7 @@ class TrackerLib extends TikiLib
                 ORDER BY tf.`position`";
         $queryResult = $this->fetchAll($query, [(int) $itemId, "y"]);
 
-        if (! $trackerId && ! empty($queryResult[0]['trackerId'])) {
+        if (! $trackerId) {
             $trackerId = $queryResult[0]['trackerId'];
         }
 

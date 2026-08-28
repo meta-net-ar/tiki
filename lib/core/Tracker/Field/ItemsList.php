@@ -568,9 +568,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
 
     public function getItemValue($itemId)
     {
-        $labels = $this->getItemLabels([$itemId], ['list_mode' => 'csv']);
-
-        return array_shift($labels);
+        return array_shift($this->getItemLabels([$itemId], ['list_mode' => 'csv']));
     }
 
     public function getTabularSchema()
