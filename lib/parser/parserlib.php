@@ -1986,7 +1986,7 @@ class ParserLib extends TikiDb_Bridge
 
                 $temp_max3 = count($tables[0]);
                 for ($i = 0; $i < $temp_max3; $i++) {
-                    $repl = '<table class="wikitable table table-striped table-hover">';
+                    $repl = '<table class="wikitable table table-striped table-hover table-responsive">';
 
                     $temp_max4 = count($cols[$i]);
                     for ($j = 0; $j < $temp_max4; $j++) {
@@ -2037,7 +2037,7 @@ class ParserLib extends TikiDb_Bridge
 
                 $temp_max7 = count($tables[0]);
                 for ($i = 0; $i < $temp_max7; $i++) {
-                    $repl = '<table class="wikitable table table-striped table-hover">';
+                    $repl = '<table class="wikitable table table-striped table-hover table-responsive">';
                     $temp_max8 = count($cols[$i]);
                     for ($j = 0; $j < $temp_max8; $j++) {
                         $ncols = count($cols[$i][$j]);
