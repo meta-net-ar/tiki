@@ -95,11 +95,22 @@
                     <div class="row form-group">
                         <label for="category-select" class="sr-only">{tr}Destination categories{/tr}</label>
                        {*   Note: placeholder attribute isn’t valid on a native <select>, but Element Plus uses it to show the default placeholder text.                     *}
-                        <select id="category-select" name="categIds[]" class="form-select" multiple required placeholder="{tr}Select destination categories{/tr}">
+                        <select
+                            id="category-select"
+                            name="categIds[]"
+                            class="form-select"
+                            multiple
+                            required
+                            placeholder="{tr}Select destination categories{/tr}"
+                        >
                             <option value="" disabled class="fw-bold">{tr}Select destination categories{/tr}</option>
                             {foreach $categories as $category}
                                 {if $category.categId neq $parentId and ($category.can_add neq '' or $category.can_remove neq '')}
-                                    <option value="{$category.categpath|escape}-{$category.categId}">
+                                    <option
+                                        value="{$category.categpath|escape}-{$category.categId}"
+                                        data-can-add="{if $category.can_add neq ''}1{else}0{/if}"
+                                        data-can-remove="{if $category.can_remove neq ''}1{else}0{/if}"
+                                    >
                                         {$category.categpath|escape}
                                     </option>
                                 {/if}
@@ -133,7 +144,38 @@
     $('.object-list tr:not(.available) .obj-item:checkbox').attr('disabled', true);
 
     $("#toId").on("change", function () {
-    const url = $(this).find("option:selected").attr('data-href');
-    window.location = url;
+        const url = $(this).find("option:selected").attr('data-href');
+        window.location = url;
     });
+
+    const updateDestinationCategories = function () {
+        const $categorySelect = $("#category-select");
+        const action = $("#object-check-action").val();
+
+        $("option", $categorySelect).each(function () {
+            const $option = $(this);
+
+            if ($option.val() === "") {
+                return;
+            }
+
+            let disabled = action !== "categorize" && action !== "uncategorize";
+
+            if (! disabled && action === "categorize") {
+                disabled = $option.attr("data-can-add") !== "1";
+            } else if (! disabled && action === "uncategorize") {
+                disabled = $option.attr("data-can-remove") !== "1";
+            }
+
+            if (disabled) {
+                $option.prop("selected", false);
+            }
+            $option.prop("disabled", disabled);
+        });
+
+        $categorySelect.trigger("change");
+    };
+
+    $("#object-check-action").on("change", updateDestinationCategories);
+    updateDestinationCategories();
 {/jq}
