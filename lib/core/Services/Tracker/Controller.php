@@ -3498,14 +3498,14 @@ class Services_Tracker_Controller
 
         require_once $tikipath . '/lib/cypht/integration/classes.php';
 
-        $config = new Tiki_Hm_Site_Config_File([]);
+        $config = new Tiki_Hm_Site_Config_File([]); // @phpstan-ignore class.notFound
         $environment->define_default_constants($config);
-        $session = (new Hm_Session_Setup($config))->setup_session();
+        $session = (new Hm_Session_Setup($config))->setup_session(); // @phpstan-ignore class.notFound
 
-        $module_exec = new Hm_Module_Exec($config);
+        $module_exec = new Hm_Module_Exec($config); // @phpstan-ignore class.notFound
         $module_exec->session = $session;
         $module_exec->load_module_set_files(['core', 'imap', 'tiki'], ['core', 'imap', 'tiki']);
-        $request = new Hm_Request($module_exec->filters, $config);
+        $request = new Hm_Request($module_exec->filters, $config); // @phpstan-ignore class.notFound
 
         $request->post = [
             'imap_msg_uid' => $input->uid->int(),
