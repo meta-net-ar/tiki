@@ -508,7 +508,8 @@ class Services_Category_Controller
         foreach ($categories as $cat) {
             $perms = Perms::get('category', $cat['id']);
 
-            $hasPermission = ($action === 'categorize' && $perms->add_objects) || ($action === 'uncategorize' && $perms->remove_objects);
+            $hasPermission = ($action === 'categorize' && $perms->add_object)
+                || ($action === 'uncategorize' && $perms->remove_object);
 
             if ($hasPermission) {
                 $allowed[] = $cat;
