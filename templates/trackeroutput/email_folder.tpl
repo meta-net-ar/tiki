@@ -9,7 +9,7 @@
         <div class="btn-group">
             {foreach from=$data.folders key=folder item=folderName}
                 {if isset($data.emails[$folder]) and $data.emails[$folder]|count gt 0}
-                    <button class="btn btn-outline-secondary btn-sm email-folder-switcher" data-folder="{$folder}">{$folderName} ({$data.emails[$folder]|count})</button>
+                    <button class="btn btn-outline-secondary btn-sm email-folder-switcher{if in_array($folder, $data.opened)} active{/if}" data-folder="{$folder}">{$folderName} ({$data.emails[$folder]|count})</button>
                 {/if}
             {/foreach}
             {if $field.options_map.useItemFolders}
@@ -18,19 +18,21 @@
         </div>
         {foreach from=$data.folders key=folder item=folderName}
             {if isset($data.emails[$folder]) and $data.emails[$folder]|count gt 0}
-                <div class="email-folder-contents folder-{$folder}" style="display: {if in_array($folder, $data.opened)}block{else}none{/if}">
-                    {include file='trackeroutput/email_single_folder.tpl' emails=$data.emails[$folder]}
+                <div class="email-folder-contents folder-{$folder} mt-3" style="display: {if in_array($folder, $data.opened)}block{else}none{/if}">
+                    <h5>{$folderName|escape}</h5>
+                    {include file='trackeroutput/email_single_folder.tpl' emails=$data.emails[$folder] folder=$folder}
                 </div>
             {/if}
         {/foreach}
         {jq}
             $(".email-folder-switcher").on('click', function(e){
                 e.preventDefault();
+                $(this).toggleClass('active');
                 $(this).closest('.email-folder-field').find(".email-folder-contents.folder-"+$(this).data('folder')).toggle();
                 return false;
             });
         {/jq}
     {else}
-        {include file='trackeroutput/email_single_folder.tpl' emails=$data.emails.inbox}
+        {include file='trackeroutput/email_single_folder.tpl' emails=$data.emails.inbox folder='inbox'}
     {/if}
 </div>

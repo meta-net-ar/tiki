@@ -161,6 +161,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         $autoMoveReplies = [];
         foreach ($fileIds as $folder => $files) {
             $emails[$folder] = [];
+            $isSentFolder = $folder === 'sent';
             foreach ($files as $fileId) {
                 if (empty($fileId)) {
                     continue;
@@ -169,6 +170,11 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                 if (! $email) {
                     continue;
                 }
+
+                // In sent/draft folders the useful "other party" is the recipient; everywhere else it's the sender.
+                $other = $isSentFolder ? ($email['recipient'] ?? '') : ($email['sender'] ?: $email['from']);
+                [$email['contact_name'], $email['contact_email']] = self::parseAddress($other);
+
                 $emails[$folder][] = $email;
 
                 if ($email['auto_move_reply']) {
@@ -207,6 +213,20 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                 'inbox' => array_filter(explode(',', $value))
             ];
         }
+    }
+
+    /**
+     * Splits a raw "Name <email@example.com>" header value into its display name and address.
+     * @return array{0: string, 1: string} [$name, $email]
+     */
+    private static function parseAddress(string $raw): array
+    {
+        $raw = trim($raw);
+        if ($raw !== '' && preg_match('/^"?([^"<>]*?)"?\s*<([^<>]+)>$/', $raw, $m)) {
+            return [trim($m[1]), trim($m[2])];
+        }
+
+        return ['', $raw];
     }
 
     public function getEmailFromFile($fileId)
