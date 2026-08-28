@@ -7526,6 +7526,14 @@ class UsersLib extends TikiLib
         return false;
     }
 
+    public function isValidActivationCode(string $user, string $actpass): bool
+    {
+        $query = 'select `provpass` from `users_users` where `login`=?';
+        $pass = $this->getOne($query, [$user]);
+
+        return ! empty($pass) && hash_equals(md5($pass), $actpass);
+    }
+
    /**
     * Tests the password against policy enforcement (Admin->Login), namely
     * $min_pass_length
