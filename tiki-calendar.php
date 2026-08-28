@@ -73,6 +73,7 @@ if (empty($rawcals['data'])) {
 $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
 $calendarInitialParams['initialView'] = $_REQUEST['viewmode'] ?? 'dayGridMonth';
 $smarty->assign('eventCalendarParams', $calendarInitialParams);
+$smarty->assign('fullCalendarParams', $calendarInitialParams);
 
 $calendars = $calendarInitialParams['calendars'];
 $canEditAnything = $calendarInitialParams['canEditAnything'];
@@ -222,10 +223,11 @@ if (isset($_REQUEST['sort_mode'])) {
     $sort_mode = $_REQUEST['sort_mode'];
 }
 
-$viewstart = $_REQUEST['todate'] ?? $tikilib->now;
-$viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
+$viewstart = $daystart;
+$viewend = $dayend;
 
-if ($_SESSION['CalendarViewGroups']) {
+$listevents = [];
+if (! empty($_SESSION['CalendarViewGroups'])) {
     if (array_key_exists('CalendarViewList', $_SESSION) && $_SESSION['CalendarViewList'] == "list") {
         if (! isset($sort_mode)) {
             $sort_mode = "start_asc";
@@ -238,7 +240,7 @@ if ($_SESSION['CalendarViewGroups']) {
             $viewstart,
             $viewend,
             0,
-            $prefs['maxRecords'],
+            -1,
             $sort_mode
         );
 
@@ -253,13 +255,12 @@ if ($_SESSION['CalendarViewGroups']) {
         foreach ($listevents as & $event) {
             $event['perms'] = Perms::get([ 'type' => 'calendaritem', 'object' => $event['calitemId']]);
         }
+        unset($event);
     } else {
         $listevents = $calendarlib->list_items($_SESSION['CalendarViewGroups'], $user, $viewstart, $viewend, 0, -1);
     }
-    $smarty->assign_by_ref('listevents', $listevents);
-} else {
-    $listevents = [];
 }
+$smarty->assign_by_ref('listevents', $listevents);
 
 $mloop = TikiLib::date_format("%m", $viewstart);
 $dloop = TikiLib::date_format("%d", $viewstart);

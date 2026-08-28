@@ -83,4 +83,85 @@ class Calendar_DateTest extends TikiTestCase
         $previous = $calendarlib->focusNext($calendarlib->infoDate($date), 'month');
         $this->assertEquals('2010-09-30', TikiLib::date_format('%Y-%m-%d', $previous['date']));
     }
+
+    public function testNextDayAndWeekRollOverDateBoundaries(): void
+    {
+        global $tikilib;
+        $calendarlib = TikiLib::lib('calendar');
+        $cases = [
+            ['2026-06-30', 'day', '2026-07-01'],
+            ['2026-06-30', 'week', '2026-07-07'],
+            ['2026-12-31', 'day', '2027-01-01'],
+            ['2026-12-31', 'week', '2027-01-07'],
+            ['2024-02-29', 'day', '2024-03-01'],
+            ['2024-02-29', 'week', '2024-03-07'],
+        ];
+
+        foreach ($cases as [$input, $view, $expected]) {
+            [$year, $month, $day] = array_map('intval', explode('-', $input));
+            $date = $tikilib->make_time(0, 0, 0, $month, $day, $year);
+            $next = $calendarlib->focusNext($calendarlib->infoDate($date), $view);
+
+            $this->assertSame($expected, TikiLib::date_format('%Y-%m-%d', $next['date']), "$view navigation from $input");
+        }
+    }
+
+    public function testCalendarListRanges(): void
+    {
+        global $calendarViewMode, $prefs, $tikilib;
+        $originalRequest = $_REQUEST;
+        $originalSession = $_SESSION;
+        $originalPrefs = $prefs;
+        $hadCalendarViewMode = isset($calendarViewMode);
+        $originalCalendarViewMode = $calendarViewMode ?? null;
+        $cases = [
+            ['day', 'y', '0', '2026-08-24 00:00:00', '2026-08-24 23:59:59'],
+            ['week', 'y', '0', '2026-08-24 00:00:00', '2026-08-30 23:59:59'],
+            ['month', 'y', '0', '2026-08-24 00:00:00', '2026-09-23 23:59:59'],
+            ['quarter', 'y', '0', '2026-08-24 00:00:00', '2026-11-23 23:59:59'],
+            ['semester', 'y', '0', '2026-08-24 00:00:00', '2027-02-23 23:59:59'],
+            ['year', 'y', '0', '2026-08-24 00:00:00', '2027-08-23 23:59:59'],
+            ['week', 'n', '0', '2026-08-23 00:00:00', '2026-08-29 23:59:59'],
+            ['week', 'n', '1', '2026-08-24 00:00:00', '2026-08-30 23:59:59'],
+            ['month', 'n', '0', '2026-08-01 00:00:00', '2026-08-31 23:59:59'],
+            ['quarter', 'n', '0', '2026-08-01 00:00:00', '2026-10-31 23:59:59'],
+            ['semester', 'n', '0', '2026-08-01 00:00:00', '2027-01-31 23:59:59'],
+            ['year', 'n', '0', '2026-01-01 00:00:00', '2026-12-31 23:59:59'],
+        ];
+
+        try {
+            foreach ($cases as [$viewmode, $beginsFocus, $firstDay, $expectedStart, $expectedEnd]) {
+                $_SESSION = [];
+                $_REQUEST = [
+                    'todate' => $tikilib->make_time(0, 0, 0, 8, 24, 2026),
+                    'viewmode' => $viewmode,
+                    'viewlist' => 'list',
+                ];
+                $prefs['feature_calendar'] = 'y';
+                $prefs['feature_action_calendar'] = 'n';
+                $prefs['calendar_list_begins_focus'] = $beginsFocus;
+                $prefs['calendar_firstDayofWeek'] = $firstDay;
+                $prefs['calendar_view_mode'] = 'month';
+                $prefs['calendar_timespan'] = '30';
+                unset($calendarViewMode);
+
+                include TIKI_PATH . '/tiki-calendar_setup.php';
+
+                $message = "view=$viewmode, begins-focus=$beginsFocus, first-day=$firstDay";
+                $actualStart = TikiLib::date_format('%Y-%m-%d %H:%M:%S', $daystart);
+                $actualEnd = TikiLib::date_format('%Y-%m-%d %H:%M:%S', $dayend);
+                $this->assertSame($expectedStart, $actualStart, "$message start");
+                $this->assertSame($expectedEnd, $actualEnd, "$message end");
+            }
+        } finally {
+            $_REQUEST = $originalRequest;
+            $_SESSION = $originalSession;
+            $prefs = $originalPrefs;
+            if ($hadCalendarViewMode) {
+                $calendarViewMode = $originalCalendarViewMode;
+            } else {
+                unset($calendarViewMode);
+            }
+        }
+    }
 }
