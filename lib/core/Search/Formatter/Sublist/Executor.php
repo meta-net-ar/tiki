@@ -30,6 +30,8 @@ class Executor
     private $formatterPlugins = [];
     private $reverseMapping = [];
     private $paginationRequested = false;
+    private $paginationOffset = 0;
+    private $paginationMax = 0;
 
     public function __construct(Record $record, Search_Formatter $sf)
     {
@@ -45,7 +47,7 @@ class Executor
         $body = $this->replacePlaceholders();
         $result = $this->performSearch($body);
         $this->formatResult($result);
-        $this->stampPaginationInfo($result);
+        $this->applySublistPagination();
         $this->processSublists();
     }
 
@@ -206,39 +208,51 @@ class Executor
 
         $builder = new Search_Query_WikiBuilder($query);
         $builder->enableAggregate();
-        if (! $this->paginationRequested) {
-            $builder->skipPagination();
-        }
+        $builder->skipPagination();
         $builder->apply($matches);
 
-        if (! $this->paginationRequested) {
-            // try to retrieve as many as possible from the sublist subqueries
-            $query->setRange(0, 9999);
+        if ($this->paginationRequested) {
+            // This search is shared (OR'd) across every matched parent row, so limiting it
+            // here would paginate that shared pool, not one parent's own children. Record the
+            // requested offset/max and apply them per parent row in applySublistPagination().
+            $paginationArguments = $builder->getPaginationArguments();
+            $offsetArg = $paginationArguments['offset_arg'];
+            $this->paginationMax = max(1, (int) $paginationArguments['max']);
+            $this->paginationOffset = max(0, (int) ($_REQUEST[$offsetArg] ?? 0));
         }
+
+        // try to retrieve as many as possible from the sublist subqueries
+        $query->setRange(0, 9999);
 
         $index = TikiLib::lib('unifiedsearch')->getIndex();
         return $query->search($index);
     }
 
     /**
-     * When the sublist body includes an explicit {pagination} block, expose the search's
-     * count/offset/max alongside the formatted entries (as `<key>_count`, `<key>_offset`,
-     * `<key>_max`) so the enclosing template can build {pagination_links} for this specific
-     * sublist. Sublists without a {pagination} block keep their previous "fetch everything"
-     * behavior and no metadata is added, to avoid changing the shape of existing datasets.
+     * Slices each parent row's already-joined children down to the requested page, once
+     * formatResult() has resolved who belongs to whom, so it pages correctly regardless of how
+     * many parent rows are in play. Exposes `<key>_count`/`_offset`/`_max` for
+     * {pagination_links}. No-op (same data, same shape) when no {pagination} block is present.
      */
-    protected function stampPaginationInfo(Search_ResultSet $result): void
+    protected function applySublistPagination(): void
     {
-        if (! $this->paginationRequested) {
+        if (! $this->paginationRequested || ! $this->record->isMultiple()) {
+            // A non-multiple sublist holds one entry, not a list - nothing to paginate.
             return;
         }
 
         $key = $this->record->getKey();
-        $info = [
-            $key . '_count' => count($result),
-            $key . '_offset' => $result->getOffset(),
-            $key . '_max' => $result->getMaxRecords(),
-        ];
+        $offset = $this->paginationOffset;
+        $max = $this->paginationMax;
+
+        $paginate = function ($fullList) use ($key, $offset, $max) {
+            return [
+                $key => array_slice($fullList, $offset, $max),
+                $key . '_count' => count($fullList),
+                $key . '_offset' => $offset,
+                $key . '_max' => $max,
+            ];
+        };
 
         foreach ($this->data as $i => $row) {
             if (empty($row)) {
@@ -246,12 +260,12 @@ class Executor
             }
             if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
                 foreach ($row as $j => $_) {
-                    foreach ($info as $infoKey => $value) {
+                    foreach ($paginate($this->data[$i][$j][$key] ?? []) as $infoKey => $value) {
                         $this->data[$i][$j][$infoKey] = $value;
                     }
                 }
             } else {
-                foreach ($info as $infoKey => $value) {
+                foreach ($paginate($this->data[$i][$key] ?? []) as $infoKey => $value) {
                     $this->data[$i][$infoKey] = $value;
                 }
             }
