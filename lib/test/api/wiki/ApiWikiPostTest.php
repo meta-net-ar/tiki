@@ -351,6 +351,61 @@ class ApiWikiPostTest extends ApiBaseWikiTest
         $this->assertCount(0, $history, 'No history row should be written for a page that does not exist');
     }
 
+    public function testApiLockPageRequiresLockPermission()
+    {
+        $pageName = 'ApiLockPerm_' . uniqid();
+        static::createWikiPage($pageName, 'Page for lock permission test');
+
+        $userlib = TikiLib::lib('user');
+        $wikilib = TikiLib::lib('wiki');
+        $hadLock = (bool) $userlib->group_has_permission('Anonymous', 'tiki_p_lock');
+
+        try {
+            $userlib->remove_permission_from_group('tiki_p_lock', 'Anonymous');
+
+            $response = $this->makeApiRequest('POST', '/wiki/lock', null, [
+                'items' => [$pageName],
+            ], 'application/x-www-form-urlencoded');
+
+            $this->assertValidErrorResponse($this->getResponseBody($response), 403);
+            $this->assertFalse((bool) $wikilib->is_locked($pageName), 'View permission alone must not lock a page');
+
+            $userlib->assign_permission_to_group('tiki_p_lock', 'Anonymous');
+
+            $response = $this->makeApiRequest('POST', '/wiki/lock', null, [
+                'items' => [$pageName],
+            ], 'application/x-www-form-urlencoded');
+
+            $this->assertResponseStatus(200, $response);
+            $this->assertTrue((bool) $wikilib->is_locked($pageName), 'tiki_p_lock should allow locking');
+        } finally {
+            if (! $hadLock) {
+                $userlib->remove_permission_from_group('tiki_p_lock', 'Anonymous');
+            }
+        }
+    }
+
+    public function testApiUnlockPageWithoutPermissionIsRefused()
+    {
+        $pageName = 'ApiUnlockPerm_' . uniqid();
+        static::createWikiPage($pageName, 'Page for unlock permission test');
+
+        // Lock it as admin so the page has an owner Anonymous cannot claim
+        $this->makeApiRequest('POST', '/wiki/lock', 'Admins', [
+            'items' => [$pageName],
+        ], 'application/x-www-form-urlencoded');
+
+        $wikilib = TikiLib::lib('wiki');
+        $this->assertTrue((bool) $wikilib->is_locked($pageName), 'Page should be locked before the test');
+
+        $response = $this->makeApiRequest('POST', '/wiki/unlock', null, [
+            'items' => [$pageName],
+        ], 'application/x-www-form-urlencoded');
+
+        $this->assertValidErrorResponse($this->getResponseBody($response), 403);
+        $this->assertTrue((bool) $wikilib->is_locked($pageName), 'Anonymous must not be able to unlock a page');
+    }
+
     public function testApiLockPageWithFeatureDisabled()
     {
         // Temporarily disable feature_wiki_usrlock

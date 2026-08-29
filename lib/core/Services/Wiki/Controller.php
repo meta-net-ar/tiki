@@ -781,7 +781,7 @@ class Services_Wiki_Controller
             $pages = array_map(function ($pageName) {
                 return ['pageName' => $pageName];
             }, $util->items);
-            $pages = Perms::simpleFilter('wiki page', 'pageName', 'view', $pages);
+            $pages = Perms::simpleFilter('wiki page', 'pageName', 'lock', $pages);
             $util->items = array_map(function ($pageName) {
                 return array_pop($pageName);
             }, $pages);
@@ -817,7 +817,7 @@ class Services_Wiki_Controller
             $pages = array_map(function ($pageName) {
                 return ['pageName' => $pageName];
             }, $util->items);
-            $pages = Perms::simpleFilter('wiki page', 'pageName', 'view', $pages);
+            $pages = Perms::simpleFilter('wiki page', 'pageName', 'lock', $pages);
             $util->items = array_map(function ($pageName) {
                 return array_pop($pageName);
             }, $pages);
