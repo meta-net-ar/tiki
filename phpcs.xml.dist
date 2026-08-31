@@ -43,6 +43,7 @@
     <exclude-pattern>*/lang/*/language.js</exclude-pattern>
     <exclude-pattern>*/lib/test/language/fixtures/language_*</exclude-pattern>
     <exclude-pattern>*/public/generated/*</exclude-pattern>
+    <exclude-pattern>*/private/generated/*</exclude-pattern>
 
     
     <!-- local config files -->

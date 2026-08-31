@@ -24,6 +24,6 @@
   "devDependencies": {
     "boosted": "~5.2",
     "bootswatch": "^5.3.8",
-    "sass": "^1.97.0"
+    "sass": "^1.103.1"
   }
 }

@@ -3743,7 +3743,7 @@ $alterTableFile = array();
 
 // Get Security token, neccessary for mismatch tables deletion
 if (! $standalone) {
-    $ticket = smarty_function_ticket(array('mode' => 'get'), $smarty->getEmptyInternalTemplate());
+    $ticket = \SmartyTiki\FunctionHandler\Ticket::render(array('mode' => 'get'), $smarty->getEmptyInternalTemplate());
     $smarty->assign('ticket', $ticket);
 }
 

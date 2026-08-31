@@ -10,11 +10,12 @@ use Tiki\Suggestion\SuggestionRulesInterface as SuggestionRules;
 
 class Version implements SuggestionRules
 {
-    public function parser()
+    public function parser(): array
     {
         include_once(__DIR__ . '/../../../../setup/twversion.class.php');
         $TWV = new \TWVersion();
         $versionUtils = new \Tiki_Version_Utils();
-        return $versionUtils->checkUpdatesForVersion($TWV->version);
+        // Suggestions are displayed as plain feedback messages, so only keep the text
+        return $versionUtils->getUpgradeMessages($TWV->version);
     }
 }

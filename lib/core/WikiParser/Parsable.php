@@ -320,7 +320,7 @@ if ( \$('#$id') ) {
 
                 $ret .= '~np~' .
                         '<a id="' . $id . '" href="javascript:void(1)" class="editplugin"' . ' aria-label="Edit plugin" ' . ($displayIcon ? '' : ' style="display:none;"') . '>' .
-                        smarty_function_icon(['name' => 'plugin', 'iclass' => 'tips', 'ititle' => tra('Edit plugin') . ':' . ucfirst($plugin_name)], $smarty->getEmptyInternalTemplate()) .
+                        \SmartyTiki\FunctionHandler\Icon::render(['name' => 'plugin', 'iclass' => 'tips', 'ititle' => tra('Edit plugin') . ':' . ucfirst($plugin_name)], $smarty->getEmptyInternalTemplate()) .
                         '</a>' .
                         '~/np~';
             }

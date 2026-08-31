@@ -9,15 +9,21 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class DefaultMapCenter extends Base
+class DefaultMapCenter extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'defaultmapcenter';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;
         $geolib = \TikiLib::lib('geo');
         $coords = $geolib->parse_coordinates($prefs['gmap_defaultx'] . ',' . $prefs['gmap_defaulty'] . ',' . $prefs['gmap_defaultz']);
         $center = $geolib->build_location_string($coords);
-        return smarty_modifier_escape($center);
+        return \SmartyTiki\Modifier\Escape::apply($center);
     }
 }

@@ -9,6 +9,8 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * Generates a link to the object permission screen, and verifies if there are
@@ -32,8 +34,15 @@ use Smarty\Template;
                showDisabled, parameter to objectpermissions
                addclass: add classes separated by spaces
  */
-class PermissionLink extends Base
+class PermissionLink extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'permission_link';
+    }
+
     public function handle($params, Template $template)
     {
         $smarty = \TikiLib::lib('smarty');

@@ -182,7 +182,7 @@ foreach ($ctall as &$c) {
 }
 unset($c);
 
-$fetchCountIcon = smarty_function_icon(
+$fetchCountIcon = \SmartyTiki\FunctionHandler\Icon::render(
     [
         'name'       => 'calculator',
         '_menu_text' => 'n',
@@ -352,7 +352,7 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
     $eye_rem_desc = '<a href="tiki-browse_categories.php?' . 'parentId=' . $requestid
         . '&amp;watch_event=category_changed&amp;watch_object=' . $categid . '&amp;deep=' . $deep
         . '&amp;watch_action=remove_desc" class="catname">'
-        . smarty_function_icon(
+        . \SmartyTiki\FunctionHandler\Icon::render(
             [
                 'name' => 'stop-watching',
                 '_menu_text' => 'y',
@@ -365,7 +365,7 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
     $eye_rem = '<a href="tiki-browse_categories.php?' . 'parentId=' . $requestid
         . '&amp;watch_event=category_changed&amp;watch_object=' . $categid . '&amp;deep=' . $deep
         . '&amp;watch_action=remove" class="catname">'
-        . smarty_function_icon(
+        . \SmartyTiki\FunctionHandler\Icon::render(
             [
                 'name' => 'stop-watching',
                 '_menu_text' => 'y',
@@ -377,7 +377,7 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
 
     $eye_add_desc = '<a href="tiki-browse_categories.php?' . 'parentId=' . $requestid
         . '&amp;watch_event=category_changed&amp;watch_object=' . $categid . '&amp;deep=' . $deep
-        . '&amp;watch_action=add_desc" class="catname">' . smarty_function_icon(
+        . '&amp;watch_action=add_desc" class="catname">' . \SmartyTiki\FunctionHandler\Icon::render(
             [
                 'name' => 'watch',
                 '_menu_text' => 'y',
@@ -389,7 +389,7 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
 
     $eye_add = '<a href="tiki-browse_categories.php?' . 'parentId=' . $requestid
         . '&amp;watch_event=category_changed&amp;watch_object=' . $categid . '&amp;deep=' . $deep
-        . '&amp;watch_action=add">' . smarty_function_icon(
+        . '&amp;watch_action=add">' . \SmartyTiki\FunctionHandler\Icon::render(
             [
                 'name' => 'watch',
                 '_menu_text' => 'y',
@@ -438,7 +438,7 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
         $eyesgroup = '<a href="tiki-object_watches.php?' . 'objectId=' . $categid
             . '&amp;watch_event=category_changed&amp;objectType=Category&amp;objectName=' . urlencode($objName)
             . '&amp;objectHref=tiki-browse_categories.php?parentId=' . $categid . '&amp;deep=' . $deep . '">'
-            . smarty_function_icon(
+            . \SmartyTiki\FunctionHandler\Icon::render(
                 [
                     'name' => 'watch',
                     '_menu_text' => 'y',
@@ -450,8 +450,8 @@ function add_watch_icons($descendants, $usercatwatches, $requestid, $categid, $d
     }
     $alleyes = $eyes . $eyesgroup;
     $popupparams = ['trigger' => 'click', 'fullhtml' => true, 'center' => true, 'text' => $alleyes];
-    return '<a class="tips" title="' . tra('Monitoring') . '" href="#" ' . smarty_function_popup($popupparams, $smarty->getEmptyInternalTemplate())
-        . 'style="padding:0; margin:0; border:0">' . smarty_function_icon(['name' => 'wrench'], $smarty->getEmptyInternalTemplate()) . '</a>';
+    return '<a class="tips" title="' . tra('Monitoring') . '" href="#" ' . \SmartyTiki\FunctionHandler\Popup::render($popupparams, $smarty->getEmptyInternalTemplate())
+        . 'style="padding:0; margin:0; border:0">' . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'wrench'], $smarty->getEmptyInternalTemplate()) . '</a>';
 
 
 //  return $eyes . $eyesgroup;

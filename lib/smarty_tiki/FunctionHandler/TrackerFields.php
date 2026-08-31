@@ -11,6 +11,7 @@ use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
 use Tiki_Render_Lazy;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /*
  * Render fields of a trackeritem when called from the tracker
@@ -21,8 +22,13 @@ use Tiki_Render_Lazy;
  * These keys treat the template setting in the tracker as a default value and will therefore override if present.
  * They only apply if the default setting would apply - i.e sectionformat must be set to configured.
  */
-class TrackerFields extends Base
+class TrackerFields extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'trackerfields';
+    }
+
     public function handle($params, Template $smartyTemplate)
     {
         if (! isset($params['fields']) || ! is_array($params['fields'])) {
@@ -95,7 +101,7 @@ class TrackerFields extends Base
             $smarty->assign('item', $item);
 
             $auto['input'][$permName] = new Tiki_Render_Lazy(function () use ($field, $smarty, $item) {
-                return smarty_function_trackerinput([
+                return \SmartyTiki\FunctionHandler\TrackerInput::render([
                     'field' => $field,
                     'showlinks' => 'n',
                     'list_mode' => 'n',
@@ -106,7 +112,7 @@ class TrackerFields extends Base
 
             // the item-list field needs the itemId here - passed via the template - otherwise it does not show a value in the template
             $auto['output'][$permName] = new Tiki_Render_Lazy(function () use ($field, $smarty, $itemId, $preview) {
-                return smarty_function_trackeroutput([
+                return \SmartyTiki\FunctionHandler\TrackerOutput::render([
                     'field' => $field,
                     'showlinks' => 'n',
                     'list_mode' => 'n',
@@ -119,7 +125,7 @@ class TrackerFields extends Base
             // not sure wether we can always pass itemId bc i do not know wether the key or the value is checked
             if ($itemId) {
                 $auto['inline'][$permName] = new Tiki_Render_Lazy(function () use ($field, $smarty, $itemId) {
-                    return smarty_function_trackeroutput([
+                    return \SmartyTiki\FunctionHandler\TrackerOutput::render([
                         'field' => $field,
                         'showlinks' => 'n',
                         'list_mode' => 'n',
@@ -196,7 +202,7 @@ class TrackerFields extends Base
         }
 
         if ($datepicker) {
-            $result .= smarty_function_js_insert_icon(['type' => "jscalendar"], $smarty->getEmptyInternalTemplate());
+            $result .= \SmartyTiki\FunctionHandler\JsInsertIcon::render(['type' => "jscalendar"], $smarty->getEmptyInternalTemplate());
         }
 
         return $result;

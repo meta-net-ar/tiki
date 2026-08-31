@@ -9,9 +9,18 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
-class Service extends Base
+class Service extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'service';
+    }
+
     public function handle($params, Template $template)
     {
         $servicelib = \TikiLib::lib('service');
@@ -30,6 +39,6 @@ class Service extends Base
         }
 
         $url = $servicelib->getUrl($params);
-        return smarty_modifier_escape($url);
+        return \SmartyTiki\Modifier\Escape::apply($url);
     }
 }

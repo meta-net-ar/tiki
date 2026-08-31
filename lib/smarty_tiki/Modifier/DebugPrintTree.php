@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -15,8 +17,13 @@ namespace SmartyTiki\Modifier;
  * Purpose:  print_r a vaiable in a collapsible tree
  * -------------------------------------------------------------
  */
-class DebugPrintTree
+class DebugPrintTree implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'debug_print_tree';
+    }
+
     public function handle($data)
     {
         $out = print_r($data, true); // @phpstan-ignore disallowedFunctions.printR (intentional Smarty debug modifier — formats data tree as string for template rendering)

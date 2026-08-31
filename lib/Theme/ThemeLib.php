@@ -57,13 +57,22 @@ class ThemeLib extends TikiLib
      */
     public static function getActiveThemeAndOption(): array
     {
-        global $prefs, $smarty;
+        global $prefs, $smarty, $user;
         $section = Sections::getCurrentSection();
-        //Initialize variables for the actual theme and theme option to be displayed
-        $theme_active = $prefs['theme'] ?? '';
-        $theme_option_active = $prefs['theme_option'] ?? '';
 
-        // User theme previously set up in lib/setup/user_prefs.php
+        //Initialize variables for the actual theme and theme option to be displayed
+        $theme_active = $prefs['site_theme'] ?? ($prefs['theme'] ?? '');
+        $theme_option_active = $prefs['site_theme_option'] ?? ($prefs['theme_option'] ?? '');
+
+        //consider User theme
+        if (($prefs['change_theme'] ?? 'n') === 'y') {
+            $tikilib = TikiLib::lib('tiki');
+            $user_theme = $tikilib->get_user_preference($user, 'theme', '');
+            if ($user_theme !== '') {
+                $theme_active = $user_theme;
+                $theme_option_active = $tikilib->get_user_preference($user, 'theme_option', '');
+            }
+        }
 
         //consider Group theme
         if (! empty($prefs['useGroupTheme']) && $prefs['useGroupTheme'] == 'y') {

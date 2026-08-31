@@ -52,7 +52,7 @@ class Search_Formatter_AppendPagination implements Search_Formatter_Plugin_Inter
         }
         $url .= '?' . http_build_query($filters);
 
-        $pagination = smarty_block_pagination_links($arguments, $url, $smarty->getEmptyInternalTemplate(), $tmp);
+        $pagination = \SmartyTiki\BlockHandler\PaginationLinks::render($arguments, $url, $smarty->getEmptyInternalTemplate(), $tmp);
 
         if ($this->getFormat() == Search_Formatter_Plugin_Interface::FORMAT_WIKI) {
             $pagination = "~np~$pagination~/np~";

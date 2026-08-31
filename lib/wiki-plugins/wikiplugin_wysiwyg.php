@@ -96,9 +96,9 @@ function wikiplugin_wysiwyg($data, $params)
         $smarty = TikiLib::lib('smarty');
 
         $html = "<div id='$exec_key' class='{$class}'$style data-initial='$namespace' data-index='$execution' data-html='{$params['use_html']}' data-ticket='"
-            . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . "'>" . $html . '</div>';
+            . \SmartyTiki\FunctionHandler\Ticket::render(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . "'>" . $html . '</div>';
 
-        $tools = json_encode(smarty_function_toolbars($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
+        $tools = json_encode(\SmartyTiki\FunctionHandler\Toolbars::render($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
         $tools = addslashes($tools);
 
         ['lang' => $lang, 'filePath' => $langFilePath] = TikiLib::lib('wysiwyg')->getEditorLang();

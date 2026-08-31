@@ -206,9 +206,9 @@ class Tokens
                         $current_path = substr($current_path, strlen($tikiroot));
                     }
                     $convertedSefurl = $tikiroot . $current_path;
-                    $current_path = smarty_modifier_sefurl($current_path, $seftype);
+                    $current_path = \SmartyTiki\Modifier\Sefurl::apply($current_path, $seftype);
                 }
-                $stored_entry = smarty_modifier_sefurl($stored_entry, $seftype);
+                $stored_entry = \SmartyTiki\Modifier\Sefurl::apply($stored_entry, $seftype);
                 // Case 1: Direct match after normalization (e.g., "apple" vs "apple")
                 if ($slugmanager->normalizeToDash($stored_entry) === $slugmanager->normalizeToDash($current_path)) {
                     // Paths match; proceed
@@ -216,7 +216,7 @@ class Tokens
                     if (empty($current_path)) {
                         // Token belongs to SEF URL, but accessed via standard URL
                         // Generate SEF path from query parameters (e.g., 'page=apple' -> 'apple')
-                        $current_sef_path = smarty_modifier_sefurl($page, $seftype);
+                        $current_sef_path = \SmartyTiki\Modifier\Sefurl::apply($page, $seftype);
                         // If the stored entry doesn't match the generated SEF path, and the token doesn't belong to standard mode, return null
                         if (
                             $slugmanager->normalizeToDash($stored_entry) !== $slugmanager->normalizeToDash($current_sef_path)
@@ -227,7 +227,7 @@ class Tokens
                     } elseif (isset($storedParams[$key])) {
                         // Token belongs to standard URL, but accessed via SEF URL
                         // Generate SEF path from stored parameters (e.g., 'page=apple' -> 'apple')
-                        $generatedSefPath = smarty_modifier_sefurl($storedParams[$key], $seftype);
+                        $generatedSefPath = \SmartyTiki\Modifier\Sefurl::apply($storedParams[$key], $seftype);
                         if ($slugmanager->normalizeToDash($generatedSefPath) !== $slugmanager->normalizeToDash($current_path)) {
                             return null; // Generated path doesn't match current path
                         }
@@ -240,8 +240,8 @@ class Tokens
                // Token belongs to SEF URL, but accessed via standard URL
             if (! empty($page)) {
                 // Generate SEF path from query parameters (e.g., 'page=apple' -> 'apple')
-                $current_sef_path = smarty_modifier_sefurl($page);
-                $stored_entry = smarty_modifier_sefurl($stored_entry);
+                $current_sef_path = \SmartyTiki\Modifier\Sefurl::apply($page);
+                $stored_entry = \SmartyTiki\Modifier\Sefurl::apply($stored_entry);
                 $path = parse_url($current_sef_path, PHP_URL_PATH);
                 $script = basename($path);
                 // If the stored entry doesn't match the generated SEF path, and the token doesn't belong to standard mode, return null
@@ -380,10 +380,10 @@ class Tokens
                     // Extract numeric ID (e.g., 'blogpost45' -> '45')
                     $id = preg_replace('/[^0-9]/', '', $lastSegment);
 
-                    return smarty_modifier_sefurl($id, $type);
+                    return \SmartyTiki\Modifier\Sefurl::apply($id, $type);
                 }
             }
-            return smarty_modifier_sefurl($lastSegment); // Return 'wiki' type and page name (last segment)
+            return \SmartyTiki\Modifier\Sefurl::apply($lastSegment); // Return 'wiki' type and page name (last segment)
         }
         return $url;
     }

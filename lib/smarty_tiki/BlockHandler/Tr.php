@@ -10,6 +10,7 @@ namespace SmartyTiki\BlockHandler;
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\Smarty;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty block plugin
@@ -29,8 +30,13 @@ use Smarty\Template;
  * @return string content translated
  * @throws \Smarty\Exception
  */
-class Tr implements BlockHandlerInterface
+class Tr implements BlockHandlerInterface, TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tr';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat || empty($content)) {

@@ -199,7 +199,7 @@ $.fn.setupEventCalendar = function (
             true
         );
 
-        const openNewEventModal = (startValue, endValue = null) => {
+        const openNewEventModal = (startValue, endValue = null, allDay = null) => {
             if (isOpeningModal) return;
             const countCals = $(".filtercal .calcheckbox").length;
             if (countCals >= 1 || targetId != "calendar") {
@@ -220,6 +220,10 @@ $.fn.setupEventCalendar = function (
 
                 if (browserTimezone) {
                     params.prefill_tz = browserTimezone;
+                }
+
+                if (typeof allDay === "boolean") {
+                    params.prefill_allday = allDay ? 1 : 0;
                 }
 
                 if (endValue !== null && typeof endValue !== "undefined") {
@@ -443,7 +447,7 @@ $.fn.setupEventCalendar = function (
             eventSources: [{ url: urlEventSource }],
             select: function (info) {
                 // Handle Drag Selection
-                openNewEventModal(info.startStr ?? info.start, info.endStr ?? info.end);
+                openNewEventModal(info.startStr ?? info.start, info.endStr ?? info.end, info.allDay);
             },
             slotMinTime: eventCalendarParams.minHourOfDay,
             slotMaxTime: eventCalendarParams.maxHourOfDay,

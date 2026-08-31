@@ -7,12 +7,19 @@
 
 namespace SmartyTiki\Modifier;
 
-class TikiShortTime
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class TikiShortTime implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tiki_short_time';
+    }
+
     public function handle($string)
     {
         global $prefs;
         \TikiLib::lib('smarty'); //Load SmartyLib for side effects
-        return smarty_modifier_tiki_date_format($string, $prefs['short_time_format']);
+        return \SmartyTiki\Modifier\TikiDateFormat::apply($string, $prefs['short_time_format']);
     }
 }

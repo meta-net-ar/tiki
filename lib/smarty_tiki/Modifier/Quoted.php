@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class Quoted
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class Quoted implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'quoted';
+    }
+
     /*
     * Smarty plugin
     * -------------------------------------------------------------

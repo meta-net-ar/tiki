@@ -7,11 +7,18 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Checks if a given file id is a diagram
  */
-class FileDiagram
+class FileDiagram implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'file_diagram';
+    }
+
     public function handle($fileId)
     {
         return \Tiki\File\DiagramHelper::isDiagram($fileId);

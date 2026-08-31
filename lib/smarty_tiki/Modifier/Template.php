@@ -7,11 +7,18 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  *  Fake modifier for pretty tracker fields. Sets template to use to display
  */
-class Template
+class Template implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'template';
+    }
+
     public function handle($string)
     {
         return $string;

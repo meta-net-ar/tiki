@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty plugin sortlinks handler
@@ -19,8 +20,13 @@ use Smarty\Template;
  * inspiration : block repeat - Scott Matthewman <scott@matthewman.net>
  * -------------------------------------------------------------
  */
-class SortLinks extends Base
+class SortLinks extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'sortlinks';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat || ! empty($content)) {

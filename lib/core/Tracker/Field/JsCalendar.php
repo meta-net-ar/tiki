@@ -145,7 +145,7 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
         $params['minutestep'] = $this->getValidatedMinuteStep();
         $params['enforcestep'] = (int) ($this->trackerField->getOption('enforceStep') ?: 0);
 
-        return smarty_function_jscalendar($params, $smarty->getEmptyInternalTemplate());
+        return \SmartyTiki\FunctionHandler\JsCalendar::render($params, $smarty->getEmptyInternalTemplate());
     }
 
     public function isValid($ins_fields_data)

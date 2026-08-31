@@ -461,7 +461,7 @@ $smarty->assign('categories', $categories);
 
 $treeNodes = [];
 
-$fetchCountIcon = smarty_function_icon(
+$fetchCountIcon = \SmartyTiki\FunctionHandler\Icon::render(
     [
         'name'       => 'calculator',
         '_menu_text' => 'n',
@@ -478,7 +478,7 @@ foreach ($categories as $category) {
             . $category['parentId']
             . '&amp;categId='
             . $category['categId'] . '&cookietab=2">'
-            . smarty_function_icon(
+            . \SmartyTiki\FunctionHandler\Icon::render(
                 [
                     'name' => 'edit',
                     '_menu_text' => 'y',
@@ -493,8 +493,8 @@ foreach ($categories as $category) {
             . '&amp;removeCat='
             . $category['categId']
             . '" onclick="confirmPopup(\'' . tr('Delete category?') . '\', \''
-            . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '\')">'
-            . smarty_function_icon(
+            . \SmartyTiki\FunctionHandler\Ticket::render(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '\')">'
+            . \SmartyTiki\FunctionHandler\Icon::render(
                 [
                     'name' => 'remove',
                     '_menu_text' => 'y',
@@ -512,7 +512,7 @@ foreach ($categories as $category) {
             } else {
                 $title = tra('Assign permissions');
             }
-            $data .= smarty_function_permission_link(
+            $data .= \SmartyTiki\FunctionHandler\PermissionLink::render(
                 [
                     'id' => $category['categId'],
                     'type' => 'category',
@@ -525,17 +525,17 @@ foreach ($categories as $category) {
         $newdata = '<a class="tips" title="'
             . tra('Actions')
             . '" href="#" '
-            . smarty_function_popup(
+            . \SmartyTiki\FunctionHandler\Popup::render(
                 $popupparams,
                 $smarty->getEmptyInternalTemplate()
             )
-            . 'style="padding:0; margin:0; border:0">' . smarty_function_icon(['name' => 'wrench'], $smarty->getEmptyInternalTemplate()) . '</a>';
+            . 'style="padding:0; margin:0; border:0">' . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'wrench'], $smarty->getEmptyInternalTemplate()) . '</a>';
 
 
 
 
         $catlink = '<a class="catname" href="tiki-admin_categories.php?parentId=' . $category["categId"] .
-            '&cookietab=3" style="margin-left:5px">' . smarty_modifier_escape($category['name']) . '</a> ';
+            '&cookietab=3" style="margin-left:5px">' . \SmartyTiki\Modifier\Escape::apply($category['name']) . '</a> ';
 
         if ($category['tplGroupContainerId'] > 0) {
             $catlink .= '

@@ -112,7 +112,7 @@ if ($newDiagram && ! $xmlContent) {
 
 if ($newDiagram) {
     $smarty = TikiLib::lib('smarty');
-    $backLocation = smarty_modifier_sefurl($page ?: $galleryId, $page ? 'wikipage' : 'filegallery');
+    $backLocation = \SmartyTiki\Modifier\Sefurl::apply($page ?: $galleryId, $page ? 'wikipage' : 'filegallery');
 }
 $fileId = null;
 $template = null;

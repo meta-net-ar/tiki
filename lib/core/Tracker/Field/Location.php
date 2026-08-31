@@ -155,7 +155,7 @@ class Tracker_Field_Location extends \Tracker\Field\AbstractItemField implements
             $attributes = TikiLib::lib('attribute')->get_attributes('trackeritem', $this->getItemId());
 
             if (isset($attributes['tiki.icon.src'])) {
-                $context['icon_data'] = ' data-icon-src="' . smarty_modifier_escape($attributes['tiki.icon.src']) . '"';
+                $context['icon_data'] = ' data-icon-src="' . \SmartyTiki\Modifier\Escape::apply($attributes['tiki.icon.src']) . '"';
             } else {
                 $context['icon_data'] = '';
             }

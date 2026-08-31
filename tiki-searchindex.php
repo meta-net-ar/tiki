@@ -62,7 +62,7 @@ if (count($filter) || count($postfilter)) {
                     $res[$f]; // Dynamic load if applicable
                 }
             }
-            $res['link'] = smarty_function_object_link(
+            $res['link'] = \SmartyTiki\FunctionHandler\ObjectLink::render(
                 [
                     'type' => $res['object_type'],
                     'id' => $res['object_id'],

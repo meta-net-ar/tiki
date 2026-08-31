@@ -7,6 +7,9 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
 /**
  * Smarty money_format modifier plugin
  *
@@ -22,8 +25,15 @@ namespace SmartyTiki\Modifier;
  * @link based on money_format(): http://www.php.net/manual/en/function.money-format.php#89060
  * @author lindon
  */
-class MoneyFormat
+class MoneyFormat implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'money_format';
+    }
+
     /** @param number
     * @param locale: currency locale for formatting (default=en_US)
     * @param format: format string

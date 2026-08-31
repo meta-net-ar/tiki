@@ -172,14 +172,14 @@ class Permissions
 
         $smarty = TikiLib::lib('smarty');
         if ($loaded['from'] == 'parent object' && $parentId && $parentType) {
-            $loaded['edit_link'] = smarty_function_permission_link([
+            $loaded['edit_link'] = \SmartyTiki\FunctionHandler\PermissionLink::render([
                 'mode' => 'icon',
                 'type' => $parentType,
                 'permType' => $permType,
                 'id' => $parentId,
             ], $smarty->getEmptyInternalTemplate());
         } elseif ($loaded['from'] == 'object' && $permType) {
-            $loaded['edit_link'] = smarty_function_permission_link([
+            $loaded['edit_link'] = \SmartyTiki\FunctionHandler\PermissionLink::render([
                 'mode' => 'icon',
                 'type' => $objectType,
                 'permType' => $permType,
@@ -189,7 +189,7 @@ class Permissions
             $affecting_categories = TikiLib::lib('categ')->get_object_categories($objectType, $objectId);
             $links = [];
             foreach ($affecting_categories as $categId) {
-                $links[] = smarty_function_permission_link([
+                $links[] = \SmartyTiki\FunctionHandler\PermissionLink::render([
                     'mode' => 'icon',
                     'type' => 'category',
                     'permType' => $permType,
@@ -201,7 +201,7 @@ class Permissions
             $affecting_categories = TikiLib::lib('categ')->get_object_categories($parentType, $parentId);
             $links = [];
             foreach ($affecting_categories as $categId) {
-                $links[] = smarty_function_permission_link([
+                $links[] = \SmartyTiki\FunctionHandler\PermissionLink::render([
                     'mode' => 'icon',
                     'type' => 'category',
                     'permType' => $permType,
@@ -210,7 +210,7 @@ class Permissions
             }
             $loaded['edit_link'] = implode(' ', $links);
         } elseif ($loaded['from'] == 'global') {
-            $loaded['edit_link'] = smarty_function_permission_link([
+            $loaded['edit_link'] = \SmartyTiki\FunctionHandler\PermissionLink::render([
                 'mode' => 'icon',
                 'type' => 'global',
                 'permType' => $permType

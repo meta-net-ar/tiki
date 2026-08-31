@@ -415,18 +415,22 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 }
                 // set up default start and end
                 $dateNow->setTZbyID($displayTimezone);
+                $prefillAllDay = null;
                 if ($input->prefill_start->text()) {
                     $prefillStart = trim($input->prefill_start->text());
                     $prefillEnd = trim((string) $input->prefill_end->text());
                     $prefillTimezoneRequested = trim((string) $input->prefill_tz->text());
                     $prefillTimezone = $this->resolvePrefillTimezone($prefillTimezoneRequested, $displayTimezone);
+                    $prefillAllDay = $input->offsetExists('prefill_allday')
+                        ? $input->prefill_allday->int() === 1
+                        : null;
 
                     $start = $this->parsePrefillDateTime($prefillStart, $prefillTimezone);
                     if (! is_null($start) && $prefillEnd !== '') {
                         $end = $this->parsePrefillDateTime($prefillEnd, $prefillTimezone);
                         if (! is_null($end)) {
                             // convert exclusive all-day selection end to inclusive end
-                            if ($this->isPrefillStartOfDay($prefillEnd, $prefillTimezone)) {
+                            if ($prefillAllDay !== false && $this->isPrefillStartOfDay($prefillEnd, $prefillTimezone)) {
                                 $end -= 1;
                             }
                             if ($end <= $start) {
@@ -481,7 +485,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                     'end'                   => $end,
                     'duration'              => $duration,
                     'recurrenceId'          => 0,
-                    'allday'                => $calendar['allday'] == 'y' ? 1 : 0,
+                    'allday'                => $prefillAllDay ?? ($calendar['allday'] == 'y' ? 1 : 0),
                     'organizers'            => [$user],
                     'participants'          => $participants,
                     'returnURL'             => $return_url,

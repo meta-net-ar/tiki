@@ -942,8 +942,6 @@ class RSSLib extends TikiDb_Bridge
 
     public function generate_feed_from_data($data, $feed_descriptor)
     {
-        require_once 'lib/smarty_tiki/modifier.sefurl.php';
-
         $tikilib = TikiLib::lib('tiki');
         $writer = new Laminas\Feed\Writer\Feed();
         $writer->setTitle($feed_descriptor['feedTitle']);
@@ -962,7 +960,7 @@ class RSSLib extends TikiDb_Bridge
                 $type = $row[$typeKey];
 
                 if (empty($url)) {
-                    $url = smarty_modifier_sefurl($object, $type);
+                    $url = \SmartyTiki\Modifier\Sefurl::apply($object, $type);
                 }
 
                 if (empty($title)) {

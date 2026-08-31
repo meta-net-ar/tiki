@@ -72,6 +72,36 @@ class HtaccessCheckerTest extends TestCase
         $this->assertNotEmpty($result['diff']);
     }
 
+    public function testMismatchDiffIsPlainTextWithoutCharacterHtml(): void
+    {
+        $this->createFile(
+            $this->tempDir . '/_htaccess',
+            "<IfModule mod_rewrite.c>\nRewriteEngine On\n#<Files tags>\n</IfModule>\n"
+        );
+        $this->createFile(
+            $this->tempDir . '/.htaccess',
+            "<IfModule mod_rewrite.c>\nRewriteEngine Off\n#<Files tags>\n</IfModule>\n"
+        );
+
+        $checker = new HtaccessChecker();
+        $result = $checker->run($this->tempDir, $this->tempDir . '/_htaccess', ['server_software' => 'Apache/2.4']);
+
+        $this->assertSame(HtaccessChecker::STATUS_MISMATCH, $result['status']);
+        $this->assertIsArray($result['diff']);
+
+        $types = array_column($result['diff'], 'type');
+        $this->assertContains('diffdeleted', $types);
+        $this->assertContains('diffadded', $types);
+
+        $serialized = serialize($result['diff']);
+        $this->assertStringNotContainsString('<ins', $serialized);
+        $this->assertStringNotContainsString('<del', $serialized);
+        $this->assertStringContainsString('<IfModule mod_rewrite.c>', $serialized);
+        $this->assertStringContainsString('#<Files tags>', $serialized);
+        $this->assertStringContainsString('RewriteEngine On', $serialized);
+        $this->assertStringContainsString('RewriteEngine Off', $serialized);
+    }
+
     public function testMissingHtaccessReportedAsNotApplicable(): void
     {
         $this->createReference();

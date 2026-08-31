@@ -47,8 +47,8 @@
 
     $('#short-url-get').on('click', function() { getShortUrl(); });
     var defaultText = $('#short-url-copy').html();
-    var successText = '{{icon name="check"}} {tr}Copied{/tr}';
-    var errorText = '{{icon name="close"}} {tr}Error copying url{/tr}';
+    var successText = '{{icon name="check"}} ' + {{"{tr}Copied{/tr}"|escape|json_encode}};
+    var errorText = '{{icon name="close"}} ' + {{"{tr}Error copying url{/tr}"|escape|json_encode}};
     $('#short-url-copy').tiki('copy')(() => $('#short-url-link input[type="text"]').val(), function() {
         $(this).addClass('btn-success').html(successText);
         setTimeout(() => {

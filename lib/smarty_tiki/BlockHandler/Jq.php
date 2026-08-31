@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * \brief Smarty {jq} block handler
@@ -42,8 +43,13 @@ use Smarty\Template;
  * @return string
  * @throws Smarty\Exception
  */
-class Jq extends Base
+class Jq extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'jq';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat || empty($content)) {

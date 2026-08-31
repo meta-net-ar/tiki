@@ -9,13 +9,19 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /* length: length in pixels of the bar (default 50)
     value: length in pixels to display at the left in red (if not set all length is display in red)
 */
 
-class Quotabar extends Base
+class Quotabar extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'quotabar';
+    }
+
     public function handle($params, Template $template)
     {
         extract($params, EXTR_SKIP);

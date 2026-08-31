@@ -7,8 +7,18 @@
 
 namespace SmartyTiki\Modifier;
 
-class Username
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
+class Username implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'username';
+    }
+
     public function handle($user, $login_fallback = true, $check_user_show_realnames = true, $html_encoding = true)
     {
         $userlib = \TikiLib::lib('user');

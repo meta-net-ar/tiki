@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * This is a lock smarty function. It sets a lock button link that allows you to lock (and unlock) an object.
@@ -24,8 +25,13 @@ use Smarty\Template;
  * @return mixed string|void
  * @throws Exception
  */
-class Lock extends Base
+class Lock extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'lock';
+    }
+
     public function handle($params, Template $template)
     {
         global $user;

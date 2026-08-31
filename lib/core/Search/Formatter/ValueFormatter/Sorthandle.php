@@ -35,7 +35,7 @@ class Search_Formatter_ValueFormatter_Sorthandle extends Search_Formatter_ValueF
                 'editable' => 'direct',
             ]
         );
-        return '~np~<span class="fas fa-sort inline-sort-handle" data-current-value="' . smarty_modifier_escape($value) . '"></span><span class="hidden">' . $rendered . '</span>~/np~';
+        return '~np~<span class="fas fa-sort inline-sort-handle" data-current-value="' . \SmartyTiki\Modifier\Escape::apply($value) . '"></span><span class="hidden">' . $rendered . '</span>~/np~';
     }
 
     public function canCache()

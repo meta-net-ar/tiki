@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, esmExternalRequirePlugin } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -144,7 +144,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-lottie": resolve(import.meta.dirname, "tiki-lottie/lottie.js"),
         "tiki-vue-sfc-loader": resolve(import.meta.dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(import.meta.dirname, "tiki-toast-ui/toast-index.js"),
-        "@tiki/modules/search": resolve(__dirname, "@tiki/modules/search.js"),
+        "@tiki/modules/search": resolve(import.meta.dirname, "@tiki/modules/search.js"),
         "@tiki/ui-utils": resolve(import.meta.dirname, "@tiki/ui-utils/index.js"),
         "wysiwyg/summernote": resolve(import.meta.dirname, "wysiwyg/summernote/index.js"),
         "wysiwyg/plugin": resolve(import.meta.dirname, "wysiwyg/plugin.js"),
@@ -217,7 +217,6 @@ export default defineConfig(({ command, mode }) => {
                     "jquery-ui",
                     "jquery-validation",
                     "mermaid",
-                    "moment",
                     /^moment\/.+/, //Moment submodules
                     "pivottablejs",
                     "plyr",
@@ -271,6 +270,11 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         plugins: [
+            // Own this external here to rewrite moment-timezone's require("moment") for browsers.
+            // https://rolldown.rs/builtin-plugins/esm-external-require
+            esmExternalRequirePlugin({
+                external: ["moment"],
+            }),
             vue({
                 template: {
                     transformAssetUrls: {

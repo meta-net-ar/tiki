@@ -161,6 +161,16 @@ class Tiki_Version_Upgrade
         }
     }
 
+    /**
+    * Allows the object to be used directly where a message string is expected,
+    * e.g. in templates rendering data restored from an older session.
+    * @return string
+    */
+    public function __toString(): string
+    {
+        return $this->getMessage();
+    }
+
     private function isMinor()
     {
         return $this->old->getMajor() === $this->new->getMajor();

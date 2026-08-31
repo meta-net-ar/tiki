@@ -21,10 +21,20 @@ export default async function (file, maxWidth, maxHeight) {
         ElMessage.error("Failed to get file data");
     }
 
-    const form = $("form#file_0").serializeArray();
-    form.forEach((item) => {
-        result[item.name] = item.value;
-    });
+    // serializeArray() repeats multi-value fields (cat_categories[], cat_managed[]);
+    // a flat assign keeps only the last and silently drops the selection.
+    $("form#file_0")
+        .serializeArray()
+        .forEach((item) => {
+            if (item.name.endsWith("[]")) {
+                if (!Array.isArray(result[item.name])) {
+                    result[item.name] = [];
+                }
+                result[item.name].push(item.value);
+            } else {
+                result[item.name] = item.value;
+            }
+        });
 
     return result;
 }

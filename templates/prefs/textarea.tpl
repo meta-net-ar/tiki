@@ -10,7 +10,7 @@
                 _wysiwyg="n"
                 name="{$p.preference|escape}"
                 id="{$p.id|escape}"
-                _syntax="{$syntax|escape|default:''}"
+                _syntax="{$syntax|escape|default:'none'}"
                 codemirror="{$codemirror|escape|default:'false'}"
                 class="form-control"
                 rows="{$p.size|escape|default:null}"

@@ -367,7 +367,7 @@ $("input[name=\'' . $filterFieldHereName . '\'], select[name=\'' . $filterFieldH
         if ($this->trackerField->getOption('inputtype') === 't') {
             $smarty = TikiLib::lib('smarty');
 
-            return $oldMarker . smarty_function_jstransfer_list([
+            return $oldMarker . \SmartyTiki\FunctionHandler\JsTransferList::render([
                 'fieldName' => $insertId,
                 'data' => [],
                 'defaultSelected' => $this->getValue(),

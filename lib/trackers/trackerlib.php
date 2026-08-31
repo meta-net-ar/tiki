@@ -30,6 +30,8 @@
  */
 define('HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE', -1);
 
+require_once(__DIR__ . '/../init/tra.php');  //This is required when running phpunit under recent php versions.
+
 use Tiki\Tracker\TrackerConfigHistory;
 
 /**

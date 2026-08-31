@@ -8,9 +8,18 @@
 namespace SmartyTiki\Modifier;
 
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
 
-class TikiShortDate
+class TikiShortDate implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'tiki_short_date';
+    }
+
     /**
      * @param string  $string
      * @param string $same   if set to 'n' will bypass timeago preferences. Useful when markup is illegal in date
@@ -20,7 +29,7 @@ class TikiShortDate
     public function handle($string, $same = 'y')
     {
         global $prefs;
-        $date = smarty_modifier_tiki_date_format($string, $prefs['short_date_format']);
+        $date = \SmartyTiki\Modifier\TikiDateFormat::apply($string, $prefs['short_date_format']);
 
         if ($prefs['jquery_timeago'] === 'y' && $same === 'y') {
             TikiLib::lib('header')->add_jq_onready('$("time.timeago").tikiTimeago();');

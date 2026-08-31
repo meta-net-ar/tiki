@@ -531,7 +531,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {if $prefs.twoFactorAuth eq 'y' and ((isset($module_params.show_two_factor_auth) and $module_params.show_two_factor_auth eq 'y') or ! empty($error_login))}
         <div id="two_factor_div" class="my-3 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
             <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor authentication code:{/tr}</label>
-            <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" id="login-2fa_{$module_logo_instance}">
+            <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" autofocus id="login-2fa_{$module_logo_instance}">
             {if $prefs.twoFactorAuthType eq $EMAIL_2FA}
                 <small class="text-muted">{tr}Please type the 6 digit security code sent to your email address{/tr}</small>
                 <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').trigger('submit')" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>

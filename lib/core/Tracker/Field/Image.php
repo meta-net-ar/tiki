@@ -189,7 +189,7 @@ class Tracker_Field_Image extends \Tracker\Field\AbstractItemField
                 return '';
             }
         }
-        $ret = smarty_function_html_image($params, $smarty->getEmptyInternalTemplate());
+        $ret = (new \Smarty\FunctionHandler\HtmlImage())->handle($params, $smarty->getEmptyInternalTemplate());
         if (! empty($pre)) {
             $ret = $pre . $ret . '</a>';
         }

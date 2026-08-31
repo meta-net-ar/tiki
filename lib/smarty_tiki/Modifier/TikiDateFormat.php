@@ -7,6 +7,9 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -19,8 +22,15 @@ namespace SmartyTiki\Modifier;
  *           forceTimezone: the time zone to be applied, if you prefer to use a specific timezone.
  * -------------------------------------------------------------
  */
-class TikiDateFormat
+class TikiDateFormat implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'tiki_date_format';
+    }
+
     /**
      * @param $string the string representing the date to be formatted.
      * @param $format the desired date format.

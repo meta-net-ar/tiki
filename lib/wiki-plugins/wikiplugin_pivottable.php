@@ -929,7 +929,7 @@ function wikiplugin_pivottable($data, $params)
                     'title' => $row['type'],
                 ];
             }
-            $row['pivotLink'] = smarty_function_object_link($pivotLinkParams, $smarty->getEmptyInternalTemplate());
+            $row['pivotLink'] = \SmartyTiki\FunctionHandler\ObjectLink::render($pivotLinkParams, $smarty->getEmptyInternalTemplate());
         }
     } else {
         $params['aggregateDetails'] = [];

@@ -154,7 +154,8 @@ class GetStringsCommand extends Command
                     TIKI_CUSTOMIZATIONS_SRC_PATH, EXPORT_DUMP_PATH, STATIC_IMG_PATH, LANG_SRC_PATH, BIN_PATH,
                     TIKI_UPGRADE_SQL_SCHEMA_PATH, TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH, TIKI_VENDOR_NONBUNDLED_PATH,
                     TIKI_VENDOR_CUSTOM_PATH, 'lib/test', TEMP_PATH, PERMISSIONCHECK_PATH,
-                    DEPRECATED_STORAGE_PATH, TIKI_TESTS_PATH, DEPRECATED_DEVTOOLS_PATH, TIKI_CONFIG_PATH, 'lib/openlayers', TESTS_PATH
+                    DEPRECATED_STORAGE_PATH, TIKI_TESTS_PATH, DEPRECATED_DEVTOOLS_PATH, TIKI_CONFIG_PATH, 'lib/openlayers',
+                    TESTS_PATH, 'node_modules', PUBLIC_GENERATED_PATH
                 ], 'is_dir');
                 // Files are processed after the base directory, so adding a file here allows to scan it even if its directory was excluded.
                 $includeFiles = $include ?? ['./' . LANG_PATH_FRAGMENT . '/langmapping.php', './' . IMG_FLAGNAMES_FILE];
@@ -179,7 +180,7 @@ class GetStringsCommand extends Command
                 $customOptions['includeDatabase'] = true;
 
                 // Do not scan the generated language files themselves
-                $customExcludeDirs = $exclude ?? [$customOptions['langDir']];
+                $customExcludeDirs = $exclude ?? array_filter([$customOptions['langDir']], 'is_dir');
                 $customIncludeFiles = $include ?? [];
 
                 $result = $this->runPass($output, $customOptions, $customExcludeDirs, $customIncludeFiles, $onlyCustom);

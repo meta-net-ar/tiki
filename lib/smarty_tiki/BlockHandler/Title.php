@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * smarty_block_title : add a title to a template.
@@ -20,8 +21,13 @@ use Smarty\Template;
  *
  * usage: {title help='Example' admpage='example'}{tr}Example{/tr}{/title}
  */
-class Title extends Base
+class Title extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'title';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs, $tiki_p_admin;
@@ -49,7 +55,7 @@ class Title extends Base
 
         if (! isset($params['url'])) {
             if ($current) {
-                $params['url'] = smarty_modifier_sefurl($current['object'], $current['type']);
+                $params['url'] = \SmartyTiki\Modifier\Sefurl::apply($current['object'], $current['type']);
             } else {
                 $params['url'] = $_SERVER['REQUEST_URI'];
             }
@@ -69,14 +75,14 @@ class Title extends Base
         }
 
         $html = '<h1 class="pagetitle">';
-        $html .= '<a class="' . $class . '"' . $metadata . ' href="' . $params['url'] . '">' . smarty_modifier_escape($content) . "</a>\n";
+        $html .= '<a class="' . $class . '"' . $metadata . ' href="' . $params['url'] . '">' . \SmartyTiki\Modifier\Escape::apply($content) . "</a>\n";
 
         if ($template->getTemplateVars('print_page') != 'y') {
             if ($prefs['feature_help'] == 'y' && $prefs['helpurl'] != '' && $params['help'] != '') {
                 $html .= '<a href="';
 
-                $html .= $prefs['helpurl'] . str_replace("%23", "#", rawurlencode($params['help'])) . '" class="tips btn btn-link" title="' . smarty_modifier_escape($content) . '|' . tra('Help page') . '" target="tikihelp">'
-                    . smarty_function_icon(['name' => 'help'], $template)
+                $html .= $prefs['helpurl'] . str_replace("%23", "#", rawurlencode($params['help'])) . '" class="tips btn btn-link" title="' . \SmartyTiki\Modifier\Escape::apply($content) . '|' . tra('Help page') . '" target="tikihelp">'
+                    . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'help'], $template)
                     . "</a>\n";
             }
 
@@ -84,7 +90,7 @@ class Title extends Base
                 $html .= '<a class="tips btn btn-link" href="tiki-admin.php?page=';
 
                 $html .= $params['admpage'] . '#' . ($params['help']) . '" title="' . htmlspecialchars($content) . '|' . tra('Settings') . '">'
-                    . smarty_function_icon(['name' => 'settings'], $template)
+                    . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'settings'], $template)
                     . "</a>\n";
             }
             if ($params['actions'] != '') {

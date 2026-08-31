@@ -83,8 +83,7 @@ function wikiplugin_registermemberpayment($data, $params, $offset)
         }
 
         if (empty($user)) {
-            include_once('lib/smarty_tiki/function.user_registration.php');
-            $register = smarty_function_user_registration([], $smarty->getEmptyInternalTemplate());
+            $register = \SmartyTiki\FunctionHandler\UserRegistration::render([], $smarty->getEmptyInternalTemplate());
         } else {
             $register = "<table>
                 <tr class='registerSubmitTr'>

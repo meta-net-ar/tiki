@@ -24,7 +24,7 @@ class ToolbarFileGalleryFile extends ToolbarFileGallery
     {
         $smarty = TikiLib::lib('smarty');
         return 'openFgalsWindow(\''
-            . smarty_function_filegal_manager_url(['area_id' => $this->domElementId], $smarty->getEmptyInternalTemplate())
+            . \SmartyTiki\FunctionHandler\FileGalManagerUrl::render(['area_id' => $this->domElementId], $smarty->getEmptyInternalTemplate())
             . '&insertion_syntax=file\', true);';
     }
 }

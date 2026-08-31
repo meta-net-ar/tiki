@@ -1167,7 +1167,7 @@ class ModLib extends TikiLib
             foreach ((array) $info['prefs'] as $preference) {
                 if ($prefs[$preference] != 'y') {
                     $this->add_pref_error($mod_reference['name'], $preference);
-                    return smarty_block_remarksbox(
+                    return \SmartyTiki\BlockHandler\Remarksbox::render(
                         [
                             'type' => 'warning',
                             'title' => tr('Failed to execute "%0" module', $mod_reference['name']),
@@ -1268,7 +1268,7 @@ class ModLib extends TikiLib
                 $message = tr('Contact the system administrator');
             }
             $repeat = false;
-            return smarty_block_remarksbox(
+            return \SmartyTiki\BlockHandler\Remarksbox::render(
                 [
                     'type' => 'warning',
                     'title' => tr('Failed to execute "%0" module', $mod_reference['name']),
@@ -1342,7 +1342,8 @@ class ModLib extends TikiLib
             $info = $this->parse($info);
 
             // re-assign module_params for the custom module in case a module plugin is used inside it
-            $smarty->assign_by_ref('user_module_params', $module_params);
+            // by value, not by ref, so a nested recursive call can't repoint it
+            $smarty->assign('user_module_params', (array) $module_params);
             $smarty->assign('user_title', tra($info['title']));
             $smarty->assign_by_ref('user_data', $info['data']);
             $smarty->assign_by_ref('user_module_name', $info['name']);

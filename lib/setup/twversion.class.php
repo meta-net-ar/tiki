@@ -121,6 +121,7 @@ class TWVersion
                 38 => 'Miaplacidus',     // 27.x
                 39 => 'Castor',          // 28.x
                 40 => 'Bellatrix',       // 29.x
+                41 => 'Alpheratz',       // 30.x
         ];
     }
 
@@ -388,6 +389,7 @@ class TWVersion
                 '24.12',
                 '24.13',
                 '24.14',
+                '24.15',
                 '25.0alpha',
                 '25.0beta',
                 '25.0RC1',
@@ -413,6 +415,7 @@ class TWVersion
                 '27.5',
                 '27.6',
                 '27.7',
+                '27.8',
                 '28.0alpha',
                 '28.0beta',
                 '28.0RC1',
@@ -429,10 +432,12 @@ class TWVersion
                 '29.1',
                 '29.2',
                 '29.3',
+                '29.4',
                 '30.0alpha',
                 '30.0beta',
                 '30.0RC1',
                 '30.0',
+                '30.1',
             ];
     }
 

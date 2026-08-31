@@ -9,9 +9,18 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\BlockHandlerStaticFacadeTrait;
 
-class Wikiplugin implements BlockHandlerInterface
+class Wikiplugin implements BlockHandlerInterface, TikiSmartyExtensionInterface
 {
+    use BlockHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'wikiplugin';
+    }
+
     public function handle($params, $content, Template $template, &$repeat = false)
     {
 

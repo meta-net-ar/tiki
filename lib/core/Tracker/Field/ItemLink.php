@@ -608,7 +608,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
             $smarty = TikiLib::lib('smarty');
 
-            return smarty_function_jstransfer_list([
+            return \SmartyTiki\FunctionHandler\JsTransferList::render([
                 'fieldName' => $this->getHTMLFieldName(),
                 'data' => $data['list'],
                 'defaultSelected' => $this->getValue(),
@@ -698,7 +698,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
         if ($item && ! is_array($item) && (! isset($context['list_mode']) || $context['list_mode'] !== 'csv') && $this->trackerField->getOption('fieldId')) {
             if ($this->trackerField->getOption('linkPage')) {
-                $link = smarty_function_object_link(
+                $link = \SmartyTiki\FunctionHandler\ObjectLink::render(
                     [
                         'type' => 'wiki page',
                         'id' => $this->trackerField->getOption('linkPage') . '&itemId=' . $item,  // add itemId param TODO properly

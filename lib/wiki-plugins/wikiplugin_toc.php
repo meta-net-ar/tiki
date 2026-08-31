@@ -140,7 +140,7 @@ function wikiplugin_toc($data, $params)
                 ->add_jsfile('lib/structures/tiki-edit_structure.js');
 
         $smarty = TikiLib::lib('smarty');
-        $button = smarty_function_button(
+        $button = \SmartyTiki\FunctionHandler\Button::render(
             [
                 '_text'     => tra('Save'),
                 '_style'    => 'display:none;',

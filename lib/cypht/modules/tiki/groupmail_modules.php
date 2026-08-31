@@ -556,7 +556,7 @@ if (! hm_exists('sender_callback')) {
         global $smarty, $tikiroot;
         list($class, $from, $operator, $contactId, $wikiPage) = $vals;
         if ($contactId > 0) {
-            $output = smarty_block_self_link([
+            $output = \SmartyTiki\BlockHandler\SelfLink::render([
                 '_script' => $tikiroot . 'tiki-contacts.php',
                 'contactId' => $contactId,
                 '_icon_name' => 'user',
@@ -564,12 +564,12 @@ if (! hm_exists('sender_callback')) {
                 '_height' => 12
             ], tr('View contact'), $smarty->getEmptyInternalTemplate()) . ' ';
             if (! empty($wikiPage)) {
-                $output .= smarty_block_self_link([
-                    '_script' => $tikiroot . smarty_modifier_sefurl($wikiPage),
+                $output .= \SmartyTiki\BlockHandler\SelfLink::render([
+                    '_script' => $tikiroot . \SmartyTiki\Modifier\Sefurl::apply($wikiPage),
                     '_class' => "mod_webmail_from"
                 ], $from, $smarty->getEmptyInternalTemplate());
             } else {
-                $output .= smarty_block_self_link([
+                $output .= \SmartyTiki\BlockHandler\SelfLink::render([
                 '_script' => $tikiroot . 'tiki-contacts.php',
                 'contactId' => $contactId,
                 '_class' => "mod_webmail_from"

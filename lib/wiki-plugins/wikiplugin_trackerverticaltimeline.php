@@ -241,7 +241,7 @@ function wikiplugin_trackerverticaltimeline($data, $params)
                 }
                 if (is_numeric($image)) {
                     // a fileId
-                    $image = smarty_modifier_sefurl($image, 'thumbnail');
+                    $image = \SmartyTiki\Modifier\Sefurl::apply($image, 'thumbnail');
                 }
 
                 $event['img'] .= $event['title'] . "<br><img src='./" . $image . "'>";

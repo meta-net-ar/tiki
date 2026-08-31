@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * smarty_function_thumb handler: Display a thumbnail of a file/image (from a file gallery)
@@ -17,8 +18,13 @@ use Smarty\Template;
  *  - _id: ID of the file
  *  - _max: Reduce image height and width to be less or equal the value of '_max' in pixels (keep ratio)
  */
-class Thumb extends Base
+class Thumb extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'thumb';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;
@@ -32,9 +38,6 @@ class Thumb extends Base
         }
 
         // Smarty html_image has some problems to detect height and width of such a file...
-        //  $html = smarty_function_html_image(array(
-        //      'src' => 'tiki-download_file.php?fileId='.((int)$params['_id']).'&amp;thumbnail&amp;max='.((int)$params['_max'])
-        //  ), $smarty);
 
         $html = '<img ';
         foreach ($params as $k => $v) {

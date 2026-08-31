@@ -9,6 +9,8 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /*
  * smarty_function_select_all: Display a checkbox that allows users with javascript to select multiple checkboxes in one click
@@ -22,8 +24,15 @@ use Smarty\Template;
  *                     Used 1 to enable since that is the value of {$ts.enabled} that would typically be used
  *                     to set this parameter in the relevant smarty template
  */
-class SelectAll extends Base
+class SelectAll extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'select_all';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;
@@ -54,7 +63,7 @@ class SelectAll extends Base
             $onclick = '';
         } else {
             foreach ($checkbox_names as $cn) {
-                $onclick .= "switchCheckboxes(this.form,'" . htmlspecialchars(smarty_modifier_escape($cn, 'javascript')) . "',this.checked$hidden_too);";
+                $onclick .= "switchCheckboxes(this.form,'" . htmlspecialchars(\SmartyTiki\Modifier\Escape::apply($cn, 'javascript')) . "',this.checked$hidden_too);";
             }
             $onclick = ' onclick="' . $onclick . '"';
         }

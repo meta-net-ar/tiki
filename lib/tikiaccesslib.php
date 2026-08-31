@@ -1256,7 +1256,7 @@ class TikiAccessLib extends TikiLib
 
         session_write_close();
         if (headers_sent()) {
-            echo "<script>document.location.href='" . smarty_modifier_escape($url, 'javascript') . "';</script>\n";
+            echo "<script>document.location.href='" . \SmartyTiki\Modifier\Escape::apply($url, 'javascript') . "';</script>\n";
         } else {
             @ob_end_clean(); // clear output buffer
             if ($prefs['feature_obzip'] == 'y') {

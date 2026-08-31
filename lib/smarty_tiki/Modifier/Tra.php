@@ -7,13 +7,20 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * smarty modifier tra
  * -------------------
  * Purpose: Translate an English string
  */
-class Tra
+class Tra implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tra';
+    }
+
     /**
      * @param string $content English string
      * @param string $lg      language - if not specify = global current language

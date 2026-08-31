@@ -603,6 +603,9 @@ function iconset_default()
                 'id' => 'file-alt',
                 'prepend' => 'far fa-'
             ],
+            'find' => [
+                'id' => 'binoculars',
+            ],
             //filter in defaults
             'firefox' => [
                 'id' => 'firefox',

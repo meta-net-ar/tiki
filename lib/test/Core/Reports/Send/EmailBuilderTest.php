@@ -58,7 +58,7 @@ class Reports_Send_EmailBuilderTest extends TikiTestCase
         ];
 
         $output = $this->obj->makeEmailBody($reportCache, $this->defaultReportPreferences);
-        $user = smarty_modifier_username('admin');
+        $user = \SmartyTiki\Modifier\Username::apply('admin');
 
         $this->assertStringContainsString("2011-09-13 11:19: $user added or updated event Calendar item name", $output);
     }
@@ -91,7 +91,7 @@ class Reports_Send_EmailBuilderTest extends TikiTestCase
         ];
 
         $output = $this->obj->makeEmailBody($reportCache, $this->defaultReportPreferences);
-        $user = smarty_modifier_username('admin');
+        $user = \SmartyTiki\Modifier\Username::apply('admin');
 
         $this->assertStringContainsString("2011-09-12 20:30: $user added a new comment to Tracker item name", $output);
     }
