@@ -1,16 +1,25 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { Menu, Edit, Delete } from "@element-plus/icons-vue";
 import Sortable from "sortablejs";
 import ConfigWrapper from '../ConfigWrapper.vue';
 
 const props = defineProps(['data', 'fieldName', 'filterable', 'defaultValue', 'sourceListTitle', 'targetListTitle', 'filterPlaceholder', 'ordering', 'minItems', 'maxItems', 'helperText', 'emitValueChange', 'isInvalid', 'language', 'showEdit', '_emit']);
-const data = typeof props.data === 'string' ? JSON.parse(props.data) : props.data;
-const defaultValue = typeof props.defaultValue === 'string' ? JSON.parse(props.defaultValue) : props.defaultValue;
+const parseProp = (value) => typeof value === 'string' ? JSON.parse(value) : value;
 
-const selected = ref(defaultValue ? [...defaultValue]: []);
+const selected = ref([...(parseProp(props.defaultValue) ?? [])]);
 
-const arrayData = Object.entries(data).map(([key, value]) => ({ key, label: value }));
+const arrayData = computed(() => Object.entries(parseProp(props.data) ?? {}).map(([key, value]) => ({ key, label: value })));
+
+/*
+    Callers update the `data` and `default-value` attributes of the custom element to change
+    the lists on the fly, so both have to be watched. Emitting the new value is what keeps the
+    select that gets submitted with the form up to date, as it is only fed by the change event.
+*/
+watch(() => props.defaultValue, (newValue) => {
+    selected.value = [...(parseProp(newValue) ?? [])];
+    props.emitValueChange?.({ value: selected.value });
+});
 
 const elTransferContainer = ref(null);
 
