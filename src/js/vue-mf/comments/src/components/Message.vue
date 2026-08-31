@@ -27,14 +27,20 @@ export default {
         useCommentsUiStore().drawMessagesTree();
     },
     computed: {
+        // The pinned tab filters on its own text (pinnedSearchQuery); every other tab uses searchQuery.
+        activeSearchQuery() {
+            const uiStore = useCommentsUiStore();
+            return this.pinnedTab ? uiStore.pinnedSearchQuery : uiStore.searchQuery;
+        },
         highlightedTitle() {
-            return highlightMatches(this.item.title, useCommentsUiStore().searchQuery);
+            return highlightMatches(this.item.title, this.activeSearchQuery);
         },
         highlightedMessage() {
-            return highlightMatches(this.item.message, useCommentsUiStore().searchQuery);
+            return highlightMatches(this.item.message, this.activeSearchQuery);
         },
         isSearchMatch() {
-            return useCommentsUiStore().itemMatchesSearch(this.item);
+            const uiStore = useCommentsUiStore();
+            return this.pinnedTab ? uiStore.pinnedItemMatchesSearch(this.item) : uiStore.itemMatchesSearch(this.item);
         },
         repliesVisible() {
             return useCommentsUiStore().areRepliesVisible(this.item.messageId);
@@ -139,13 +145,15 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.message-body.search-match {
+.message-body.search-match,
+.pinnedMessageCard.search-match {
     background-color: rgba(255, 193, 7, 0.08);
     box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.5);
     border-radius: 4px;
 }
 
-.message-body :deep(mark) {
+.message-body :deep(mark),
+.pinnedMessageCard :deep(mark) {
     background-color: #fff3a3;
     padding: 0 1px;
     border-radius: 2px;

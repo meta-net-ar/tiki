@@ -25,6 +25,7 @@
                             </div>
                         </div>
                         <div class="tab-pane" id="tabpanel-pinned" role="tabpanel" aria-labelledby="tab-pinned">
+                            <PinnedSearchBar />
                             <PinnedMessages :messages=pinnedMsgs :key="identifier" />
                         </div>
                     </div>
@@ -37,19 +38,18 @@
 <script setup>
     import Messages from "./components/Messages.vue";
     import SearchBar from "./components/SearchBar.vue";
+    import PinnedSearchBar from "./components/PinnedSearchBar.vue";
     import ReplyForm from "./components/ReplyForm.vue";
     import PinnedMessages from "./components/PinnedMessages.vue";
     import {provide} from "vue";
     import { computed } from 'vue';
-    import useCommentsStore from "./store/comments";
     import useCommentsUiStore from "./store/commentsUi";
     provide('tr', tr)
 
-    const store = useCommentsStore();
     const uiStore = useCommentsUiStore();
 
     const msgs = computed(() => uiStore.getFilteredParentMessages);
-    const pinnedMsgs = computed(() => store.getPinnedMessages);
+    const pinnedMsgs = computed(() => uiStore.getFilteredPinnedMessages);
 </script>
 
 <script>

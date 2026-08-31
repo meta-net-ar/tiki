@@ -9,12 +9,25 @@ export default defineStore("commentsUiStore", {
         // TODO: replace with the actual logged-in user once auth is wired into this module
         currentUser: "Angelo",
         searchQuery: "",
+        // Separate filter text for the "pinned only" tab, kept apart from searchQuery
+        // so filtering one tab never affects the other.
+        pinnedSearchQuery: "",
         manuallyToggledThreads: [],
     }),
     getters: {
         // Whether a single item (not its descendants) matches the current search query.
         itemMatchesSearch: (state) => (item) => {
             const query = state.searchQuery.trim().toLowerCase();
+            if (!query) {
+                return false;
+            }
+            return (
+                item.title.toLowerCase().includes(query) || item.message.toLowerCase().includes(query) || item.author.toLowerCase().includes(query)
+            );
+        },
+        // Same as itemMatchesSearch, but for the "pinned only" tab's own filter text.
+        pinnedItemMatchesSearch: (state) => (item) => {
+            const query = state.pinnedSearchQuery.trim().toLowerCase();
             if (!query) {
                 return false;
             }
@@ -50,6 +63,22 @@ export default defineStore("commentsUiStore", {
 
             return parents.filter((root) => this.subtreeMatchesSearch(root.messageId));
         },
+        // Pinned messages to display in the "pinned only" tab: all of them when the
+        // pinned filter is empty, otherwise only those whose title, message or author
+        // matches the filter text.
+        getFilteredPinnedMessages(state) {
+            const pinned = useCommentsStore().getPinnedMessages;
+            const query = state.pinnedSearchQuery.trim().toLowerCase();
+            if (!query) {
+                return pinned;
+            }
+            return pinned.filter(
+                (item) =>
+                    item.title.toLowerCase().includes(query) ||
+                    item.message.toLowerCase().includes(query) ||
+                    item.author.toLowerCase().includes(query)
+            );
+        },
         // Whether a root thread's replies should currently be shown: resolved threads default to hidden and
         // others to visible, a manual toggle flips that default either way, and a search match always wins.
         // messageId must be a root thread's own id (parentId === 0) — every call site already only ever
@@ -66,6 +95,9 @@ export default defineStore("commentsUiStore", {
     actions: {
         setSearchQuery(query) {
             this.searchQuery = query;
+        },
+        setPinnedSearchQuery(query) {
+            this.pinnedSearchQuery = query;
         },
         // Toggles messageId in/out of manuallyToggledThreads; never touches resoved,
         // so this only affects display, not the actual resolved status.
