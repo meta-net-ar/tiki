@@ -20,7 +20,10 @@
                     <option value="{$data.selected_users[ix]}" selected>{if ($field.showRealname == 'y')}{$data.selected_users[ix]|username}{else}{$data.selected_users[ix]}{/if}</option>
                 {/section}
             </select>
-            <input type="hidden" name="{$field.html_name}" id="hidden_{$field.fieldId}" value="{$data.selected_users|implode:','}">
+            {*NOTE: submitted with an empty value so the field can be cleared. It must NOT carry the
+              selected users: sharing the select name, its value would be submitted as an extra
+              entry that matches no login.*}
+            <input type="hidden" name="{$field.html_name}" value="">
         </div>
     {/if}
 </div>
@@ -81,20 +84,14 @@
             $selector.val(selected);
             const fieldName = "{{$field.html_name}}";
             const elementPlusTransfer = document.querySelector("el-transfer[field-name=\'" + fieldName + "\']");
-            if (elementPlusTransfer?.shadowRoot) {
-                const selectedOptions = elementPlusTransfer.shadowRoot.querySelector("select[name=\'" + fieldName + "\']").selectedOptions;
-                const elementPlusTransferCopy = elementPlusTransfer.cloneNode(true);
-                elementPlusTransferCopy.setAttribute("data", JSON.stringify(group_users));
-                elementPlusTransferCopy.setAttribute("default-value", JSON.stringify([...selectedOptions].map(option => option.value).filter(value => group_users[value])));
-                elementPlusTransfer.replaceWith(elementPlusTransferCopy);
-            } else if (elementPlusTransfer) { // when the inner content hasn't been rendered yet by the scipt
+            if (elementPlusTransfer) {
                 elementPlusTransfer.setAttribute("data", JSON.stringify(group_users));
+                // Nothing to carry over when the inner content hasn't been rendered yet by the script
+                const innerSelect = elementPlusTransfer.shadowRoot?.querySelector("select[name=\'" + fieldName + "\']");
+                if (innerSelect) {
+                    elementPlusTransfer.setAttribute("default-value", JSON.stringify([...innerSelect.selectedOptions].map(option => option.value).filter(value => group_users[value])));
+                }
             }
         }
-    }).trigger('change');
-
-    $("#user_selector_{{$field.fieldId}}").on("change", function() {
-        var selectedUsers = $(this).val() || [];
-        $("#hidden_{{$field.fieldId}}").val(selectedUsers.join(","));
     }).trigger('change');
 {/jq}

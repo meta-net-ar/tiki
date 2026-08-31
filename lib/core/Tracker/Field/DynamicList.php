@@ -329,9 +329,7 @@ $("body").on("change", "input[name=\'' . $filterFieldHereName . '\'], select[nam
 
                 const elementPlusTransfer = document.querySelector("el-transfer[field-name=\'" + data.request.insertId + "\']");
                 if (elementPlusTransfer) {
-                    const elementPlusTransferCopy = elementPlusTransfer.cloneNode(true);
-                    elementPlusTransferCopy.setAttribute("data", JSON.stringify(transferData));
-                    elementPlusTransfer.replaceWith(elementPlusTransferCopy);
+                    elementPlusTransfer.setAttribute("data", JSON.stringify(transferData));
                 }
                     
                 if (data.request.originalValue) {

@@ -213,10 +213,18 @@ class UserSelector extends Base implements TikiSmartyExtensionInterface
             ], $template);
         }
 
-        $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . ' style="' . $params['style'] . '" class="form-control">';
-        if ($params['allowNone'] === 'y') {
+        $placeholder = '';
+        if ($params['allowNone'] === 'y' && $params['multiple'] === 'true' && $params['noneLabel'] !== '') {
+            // When selecting several users, "None" is not a value: the hidden input below already
+            // submits the empty value. Render it as a placeholder, which clears itself once a user
+            // is picked, instead of an option that can be selected alongside real users.
+            $placeholder = ' placeholder="' . htmlspecialchars(tra($params['noneLabel'])) . '"';
+        }
+
+        $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . $placeholder . ' style="' . $params['style'] . '" class="form-control">';
+        if ($params['allowNone'] === 'y' && $params['multiple'] !== 'true') {
             $noneOptionAttributes = (empty($params['user']) ? ' selected="selected"' : '');
-            if ($params['multiple'] !== 'true' && $params['noneSelectable'] !== 'y') {
+            if ($params['noneSelectable'] !== 'y') {
                 $noneOptionAttributes .= ' disabled="disabled" hidden';
             }
 
