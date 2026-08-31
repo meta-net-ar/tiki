@@ -474,6 +474,7 @@ CREATE TABLE `tiki_calendar_items` (
   `hideParticipants` tinyint(1) default '0',
   PRIMARY KEY (`calitemId`),
   KEY `calendarId` (`calendarId`),
+  KEY `idx_calendarid_start_end` (`calendarId`, `start`, `end`),
   KEY `idx_lastmodif` (`lastmodif`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
