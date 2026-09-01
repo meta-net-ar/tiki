@@ -24,12 +24,20 @@ function module_wiki_last_comments_info()
                 'name' => tra('More in tooltips'),
                 'description' => tra('If set to "y", the name of the object on which a comment is made is not displayed in the module box, but instead moved in the item\'s tooltip.'),
                 'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'type' => [
                 'name' => tra('Object type'),
-                'description' => tra('Type of the objects from which comments will be listed. Possible values:') . '  wiki page, article. ',
+                'description' => tra('Type of the objects from which comments will be listed.'),
                 'filter' => 'word',
                 'default' => 'wiki page',
+                'options' => [
+                    ['text' => tra('Wiki page'), 'value' => 'wiki page'],
+                    ['text' => tra('Article'), 'value' => 'article'],
+                ],
             ],
             'commentlength' => [
                 'name' => tra('Maximum comment length'),
@@ -42,6 +50,10 @@ function module_wiki_last_comments_info()
                 'description' => tra('Display user profile pictures instead of numbers.'),
                 'filter' => 'alpha',
                 'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'language' => [
                 'name' => tra('Language'),

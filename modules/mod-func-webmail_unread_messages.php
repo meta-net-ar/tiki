@@ -23,8 +23,7 @@ function module_webmail_unread_messages_info()
                 'filter' => 'alpha',
                 'default' => 'all',
                 'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('All'), 'value' => 'true'],
+                    ['text' => tra('All'), 'value' => 'all'],
                     ['text' => tra('Trackers'), 'value' => 'trackers'],
                     ['text' => tra('Pages'), 'value' => 'pages'],
                     ['text' => tra('Main webmail'), 'value' => 'main_webmail']

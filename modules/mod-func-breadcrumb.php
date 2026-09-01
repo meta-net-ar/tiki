@@ -22,8 +22,12 @@ function module_breadcrumb_info()
             ],
             'show_namespace' => [
                 'name' => tra('Show Namespace'),
-                'description' => tra('Show namespace prefix in page names.') . ' ( y / n )',    // Do not translate y/n
-                'default' => 'y'
+                'description' => tra('Show namespace prefix in page names.'),
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ]
         ],
         'common_params' => ['nonums', 'rows']

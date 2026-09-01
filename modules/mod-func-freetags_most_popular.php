@@ -16,8 +16,13 @@ function module_freetags_most_popular_info()
         'params' => [
             'type' => [
                 'name' => tra('Display type'),
-                'description' => tra('If set to "cloud", links are displayed as a cloud.') . " " . tr('Default: "list".'),
-                'filter' => 'word'
+                'description' => tra('How the links are displayed.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: List'), 'value' => ''],
+                    ['text' => tra('List'), 'value' => 'list'],
+                    ['text' => tra('Cloud'), 'value' => 'cloud'],
+                ],
             ],
             'max' => [
                 'name' => tra('Maximum elements'),

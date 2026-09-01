@@ -22,19 +22,40 @@ function module_search_info()
         'params' => [
             'legacy_mode' => [
                 'name' => tra('Legacy Mode'),
-                'description' => tra('Setting to emulate previous behaviour.') . ' ' . tra('Default:') . ' ""' . ' ("search"=search_box, "page"=search_wiki_page, "quick"=quick_edit)'
+                'description' => tra('Setting to emulate previous behaviour.'),
+                'options' => [
+                    ['text' => tra('Default: None'), 'value' => ''],
+                    ['text' => tra('Search box'), 'value' => 'search'],
+                    ['text' => tra('Search wiki page'), 'value' => 'page'],
+                    ['text' => tra('Quick edit'), 'value' => 'quick'],
+                ],
             ],
             'tiki_search' => [
                 'name' => tra('Tiki'),
-                'description' => tra('If set to "y" the search performed is a "Tiki search".') . ' ' . tra('Default:') . ' "n"' . tra(' (full text search)')
+                'description' => tra('If set to "y" the search performed is a "Tiki search".') . tra(' (full text search)'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_object_filter' => [
                 'name' => tra('Show Object Type Filter'),
-                'description' => tra('If set to "y" shows a dropdown of sections to search.') . ' ' . tra('Default:') . ' "n"' . tra(' (no object filter)')
+                'description' => tra('If set to "y" shows a dropdown of sections to search.') . tra(' (no object filter)'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'use_autocomplete' => [
                 'name' => tra('Use autocomplete'),
-                'description' => tra('If set to "y" input uses autocomplete for specified object types.') . ' ' . tra('Default:') . ' "y"' . tra(' (use autocomplete)')
+                'description' => tra('If set to "y" input uses autocomplete for specified object types.') . tra(' (use autocomplete)'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'autocomplete_objecttypes' => [
                 'name' => tra('Autocomplete object types'),
@@ -43,7 +64,9 @@ function module_search_info()
                 'separator' => ',',
                 'type' => 'select',
                 'set_value_as_array' => true,
-                'options' => array_combine(TikiLib::lib('object')->get_supported_types(), TikiLib::lib('object')->get_supported_types()),
+                'options' => array_map(function ($type) {
+                    return ['text' => $type, 'value' => $type];
+                }, TikiLib::lib('object')->get_supported_types()),
             ],
             'autocomplete_exclude_parent_ids' => [
                 'name' => tra('Autocomplete exclude parent'),
@@ -55,23 +78,49 @@ function module_search_info()
             ],
             'advanced_search' => [
                 'name' => tra('Advanced search'),
-                'description' => tra('Use advanced (boolean) search (full text search only).') . ' ' . tra('Default:') . ' "y"' . tra(' (use advanced search)'),
+                'description' => tra('Use advanced (boolean) search (full text search only).') . tra(' (use advanced search)'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_search_button' => [
                 'name' => tra('Show Search Button'),
-                'description' => tra('Show search button.') . ' ' . tra('Default:') . ' "y"' . tra(' (do show search button)'),
+                'description' => tra('Show search button.') . tra(' (do show search button)'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_go_button' => [
                 'name' => tra('Show Go Button'),
-                'description' => tra('Show go to page button.') . ' ' . tra('Default:') . ' "y"' . tra(' (do show go button)'),
+                'description' => tra('Show go to page button.') . tra(' (do show go button)'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_edit_button' => [
                 'name' => tra('Show Edit Button'),
-                'description' => tra('Show edit button.') . ' ' . tra('Default:') . ' "y"' . tra(' (do show edit button)'),
+                'description' => tra('Show edit button.') . tra(' (do show edit button)'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'default_button' => [
                 'name' => tra('Default Button'),
-                'description' => tra('Action to perform on entering <return>.') . ' ' . tra('Default:') . ' "search"' . tra(' (search|go|edit)'),
+                'description' => tra('Action to perform on entering <return>.'),
+                'options' => [
+                    ['text' => tra('Default: Search'), 'value' => ''],
+                    ['text' => tra('Search'), 'value' => 'search'],
+                    ['text' => tra('Go'), 'value' => 'go'],
+                    ['text' => tra('Edit'), 'value' => 'edit'],
+                ],
             ],
             // initially from quick-edit
             'search_action' => [
@@ -122,7 +171,12 @@ function module_search_info()
             ],
             'compact' => [
                 'name' => tra('Compact mode'),
-                'description' => tra('Makes the three buttons only appear on mouse-over.') . ' ' . tra('Default:') . ' "n"'
+                'description' => tra('Makes the three buttons only appear on mouse-over.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'additional_filters' => [
                 'name' => tr('Additional filters'),

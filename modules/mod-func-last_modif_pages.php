@@ -16,7 +16,12 @@ function module_last_modif_pages_info()
         'params' => [
             'absurl' => [
                 'name' => tra('Absolute URL'),
-                'description' => tra('If set to "y", some of the links use an absolute URL instead of a relative one. This can avoid broken links if the module is to be sent in a newsletter, for example.') . " " . tr('Default: "n".')
+                'description' => tra('If set to "y", some of the links use an absolute URL instead of a relative one. This can avoid broken links if the module is to be sent in a newsletter, for example.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'url' => [
                 'name' => tra('Link Target'),
@@ -29,24 +34,48 @@ function module_last_modif_pages_info()
             ],
             'show_namespace' => [
                     'name' => tra('Show Namespace'),
-                    'description' => tra('Show namespace prefix in page names.') . ' ( y / n )',    // Do not translate y/n
-                    'default' => 'y'
+                    'description' => tra('Show namespace prefix in page names.'),
+                    'default' => 'y',
+                    'options' => [
+                        ['text' => tra('Yes'), 'value' => 'y'],
+                        ['text' => tra('No'), 'value' => 'n'],
+                    ],
             ],
             'date' => [
                 'name' => tra('Date'),
-                'description' => tra('If set to "y", show page edit dates.') . ' ( y / n )',
+                'description' => tra('If set to "y", show page edit dates.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'user' => [
                 'name' => tra('User'),
-                'description' => tra('If set to "y", show who edited the pages.') . ' ( y / n )',
+                'description' => tra('If set to "y", show who edited the pages.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'action' => [
                 'name' => tra('Action'),
-                'description' => tra('If set to "y", show action performed on the pages.') . ' ( y / n )',
+                'description' => tra('If set to "y", show action performed on the pages.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'comment' => [
                 'name' => tra('Comment'),
-                'description' => tra('If set to "y", show the descriptions of the change made on the pages.') . ' ( y / n )',
+                'description' => tra('If set to "y", show the descriptions of the change made on the pages.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'maxcomment' => [
                 'name' => tra('Maximum Length for comments'),

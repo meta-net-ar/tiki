@@ -16,8 +16,13 @@ function module_messages_unread_messages_info()
         'params' => [
             'showempty' => [
                 'name' => tra('Show If Empty'),
-                'description' => tra('Show the module when there are no messages waiting. y|n ') . tra('Default=y'),
+                'description' => tra('Show the module when there are no messages waiting.'),
                 'required' => false,
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ]
         ]
     ];

@@ -16,7 +16,12 @@ function module_last_blog_posts_info()
         'params' => [
             'nodate' => [
                 'name' => tra('No date'),
-                'description' => tra('If set to "y", the date of posts is not displayed in the module box.') . " " . tra('Default: "n".'),
+                'description' => tra('If set to "y", the date of posts is not displayed in the module box.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'blogid' => [
                 'name' => tra('Blog identifier'),

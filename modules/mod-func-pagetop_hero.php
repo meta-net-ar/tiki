@@ -31,8 +31,12 @@ function module_pagetop_hero_info()
             'breadcrumbs_auto_link' => [
                 'required' => false,
                 'name' => tr('Breadcrumbs auto-link'),
-                'description' => tr('Automatically convert breadcrumb items to links. When enabled, each item becomes a link to itself unless pipe (|) is used to override. (y|n)'),
-                'default' => 'n'
+                'description' => tr('Automatically convert breadcrumb items to links. When enabled, each item becomes a link to itself unless pipe (|) is used to override.'),
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'content_position' => [
                 'required' => false,
@@ -59,8 +63,12 @@ function module_pagetop_hero_info()
             'usepagename' => [
                 'required' => false,
                 'name' => tr('Use page title'),
-                'description' => tra('Allows the page title to be used as title of the pagetop module (y|n)'),
-                'default' => 'n'
+                'description' => tra('Allows the page title to be used as title of the pagetop module'),
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ]
         ]
     ];

@@ -27,23 +27,40 @@ function module_menu_info()
             ],
             'type' => [
                 'name' => tra('Type'),
-                'description' => tra('Orientation of menu: horiz or vert (default: vert)'),
+                'description' => tra('Orientation of menu'),
                 'filter' => 'text',
+                'options' => [
+                    ['text' => tra('Default: Vertical'), 'value' => ''],
+                    ['text' => tra('Horizontal'), 'value' => 'horiz'],
+                    ['text' => tra('Vertical'), 'value' => 'vert'],
+                ],
             ],
             'bootstrap' => [
                 'name' => tra('Use Bootstrap menu'),
-                'description' => tra('If Bootstrap menu isn\'t chosen, the result will be a legacy-style vertical menu.') . ' ( y / n )',
+                'description' => tra('If Bootstrap menu isn\'t chosen, the result will be a legacy-style vertical menu.'),
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'megamenu' => [
                 'name' => tra('Use Smartmenu megamenu'),
-                'description' => tra('This is a Smartmenu that has a flattened structure of level 1 (Smartmenu preference must be turned on).') . ' ( y / n )',
+                'description' => tra('This is a Smartmenu that has a flattened structure of level 1 (Smartmenu preference must be turned on).'),
                 'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'megamenu_static' => [
                 'name' => tra('Align megamenu dropdown with the full width of the menu'),
-                'description' => tra('This is instead of the dropdown being in the standard position under its parent item in the menu') . ' ( y / n )',
+                'description' => tra('This is instead of the dropdown being in the standard position under its parent item in the menu'),
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             // TODO - needs image url field
             // 'megamenu_images' => [
@@ -54,8 +71,12 @@ function module_menu_info()
 
             'navbar_toggle' => [
                 'name' => tra('Show navbar toggle button'),
-                'description' => tra('Used in Bootstrap navbar menus when viewport is too narrow for menu items') . ' ( y / n )',
+                'description' => tra('Used in Bootstrap navbar menus when viewport is too narrow for menu items'),
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'navbar_brand' => [
                 'name' => tra('The URL of the navbar brand (logo)'),
@@ -88,28 +109,51 @@ function module_menu_info()
             ],
             'link_on_section' => [
                 'name' => tra('Link on section'),
-                'description' => tra('Create links on menu sections') . ' ' . tra('(y/n default y)'),
+                'description' => tra('Create links on menu sections'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'translate' => [
                 'name' => tra('Translate'),
-                'description' => tra('Enable translation of menu text') . ' ' . tra('(y/n default y)'),
+                'description' => tra('Enable translation of menu text'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'menu_cookie' => [
                 'name' => tra('Menu cookie'),
-                'description' => tra('Open the menu to show current option if possible') . ' ' . tra('(y/n default y)'),
+                'description' => tra('Open the menu to show current option if possible'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_namespace' => [
                 'name' => tra('Show namespace'),
-                'description' => tra('Show namespace prefix in page names') . ' ( y / n )', // Do not translate y/n
-                'default' => 'y'
+                'description' => tra('Show namespace prefix in page names'),
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'setSelected' => [
                 'name' => tra('Set selected'),
-                'description' => tra('Process all menu items to show currently selected item and other dynamic states. Useful when disabled on very large menus where performance becomes an issue.') . ' ( y / n )',
-                'default' => 'y'
+                'description' => tra('Process all menu items to show currently selected item and other dynamic states. Useful when disabled on very large menus where performance becomes an issue.'),
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ]
     ];

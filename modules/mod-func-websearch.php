@@ -20,7 +20,6 @@ function module_websearch_info()
                         'default' => 'false',
                         'filter' => 'text',
                         'options' => [
-                            ['text' => '', 'value' => ''],
                             ['text' => tra('True'), 'value' => 'true'],
                             ['text' => tra('False'), 'value' => 'false']
                         ]

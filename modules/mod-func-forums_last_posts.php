@@ -16,8 +16,13 @@ function module_forums_last_posts_info()
         'params' => [
             'topics' => [
                 'name' => tra('Topics only'),
-                'description' => tra('If set to "y", only displays topics.') . " " . tr('Not set by default.'),
+                'description' => tra('Only display topics.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
                 ],
+            ],
             'forumId' => [
                 'name' => tra('List of forum identifiers'),
                 'description' => tra('If set to a list of forum identifiers, restricts the posts to those in the identified forums. Identifiers are separated by colons (":").') . " " . tra('Example values:') . '"13", "31:49". ' . tra('Not set by default.'),
@@ -26,15 +31,30 @@ function module_forums_last_posts_info()
             ],
             'date' => [
                 'name' => tra('Show date'),
-                'description' => tra('If set to "y", show post date directly instead of as tooltip.') . ' ' . tra('Default:') . ' n',
+                'description' => tra('Show post date directly instead of as tooltip.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'time' => [
                 'name' => tra('Show time'),
-                'description' => tra('Show times after dates.') . ' ' . tra('Default:') . ' y',
+                'description' => tra('Show times after dates.'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'author' => [
                 'name' => tra('Show author'),
-                'description' => tra('If set to "y", show post author directly instead of as tooltip.') . ' ' . tra('Default:') . ' n',
+                'description' => tra('Show post author directly instead of as tooltip.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
         'common_params' => ['nonums', 'rows']

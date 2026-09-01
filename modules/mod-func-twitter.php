@@ -23,8 +23,12 @@ function module_twitter_info()
             ],
             'timelinetype' => [
                 'name' => 'Timeline type',
-                'description' => tra('Show public|friends timeline. '),
+                'description' => tra('Which timeline to show.'),
                 'default' => 'public',
+                'options' => [
+                    ['text' => tra('Public'), 'value' => 'public'],
+                    ['text' => tra('Friends'), 'value' => 'friends'],
+                ],
             ],
             'search' => [
                 'name' => 'search',
@@ -33,8 +37,12 @@ function module_twitter_info()
             ],
             'showuser' => [
                 'name' => 'showuser',
-                'description' => tra('Show username in timeline. y|n'),
+                'description' => tra('Show username in timeline.'),
                 'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
         'common_params' => ['nonums', 'rows'],

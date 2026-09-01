@@ -33,35 +33,48 @@ function module_calendar_new_info()
             ],
             'viewlist' => [
                 'name' => tra('View type'),
-                'description' => tr('Determines how to show events. Possible values: %0, %1.', 'table', 'list'),
+                'description' => tra('Determines how to show events.'),
                 'filter' => 'word',
                 'default' => 'table',
+                'options' => [
+                    ['text' => tra('Table'), 'value' => 'table'],
+                    ['text' => tra('List'), 'value' => 'list'],
+                ],
             ],
             'viewmode' => [
                 'name' => tra('Calendar view type time span'),
-                'description' => tr(
-                    'If in calendar (or "table") view type, determines the time span displayed by the calendar. Possible values: %0, %1, %2, %3 ,%4, %5. A user changing this time span in the calendar can change the time span the module displays for him.',
-                    'year',
-                    'semester',
-                    'quarter',
-                    'month',
-                    'week',
-                    'day'
-                ),
+                'description' => tra('If in calendar (or "table") view type, determines the time span displayed by the calendar. A user changing this time span in the calendar can change the time span the module displays for him.'),
                 'filter' => 'word',
                 'default' => 'month',
+                'options' => [
+                    ['text' => tra('Year'), 'value' => 'year'],
+                    ['text' => tra('Semester'), 'value' => 'semester'],
+                    ['text' => tra('Quarter'), 'value' => 'quarter'],
+                    ['text' => tra('Month'), 'value' => 'month'],
+                    ['text' => tra('Week'), 'value' => 'week'],
+                    ['text' => tra('Day'), 'value' => 'day'],
+                ],
             ],
             'showaction' => [
                 'name' => tra('Show action'),
-                'description' => 'y|n',
+                'description' => tra('Show the action links.'),
                 'filter' => 'word',
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'viewnavbar' => [
                 'name' => tra('View navigation bar'),
-                'description' => 'y|n|partial',
+                'description' => tra('Show the navigation bar.'),
                 'filter' => 'word',
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                    ['text' => tra('Partial'), 'value' => 'partial'],
+                ],
             ]
         ]
     ];

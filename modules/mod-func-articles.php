@@ -17,18 +17,33 @@ function module_articles_info()
         'params' => [
             'showpubl' => [
                 'name' => tra('Show publication time'),
-                'description' => tra('If set to "y", article publication times are shown.') . " " . tr('Default: "n".'),
+                'description' => tra('If set to "y", article publication times are shown.'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showcreated' => [
                 'name' => tra('Show creation time'),
-                'description' => tra('If set to "y", article creation times are shown.') . " " . tr('Default: "n".'),
+                'description' => tra('If set to "y", article creation times are shown.'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_rating_selector' => [
                 'name' => tra('Show rating selector'),
-                'description' => tra('If set to "y", offers the user to filter articles based on a minimum and a maximum rating.') . " " . tr('Default: "n".'),
+                'description' => tra('If set to "y", offers the user to filter articles based on a minimum and a maximum rating.'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'img' => [
                 'name' => tra('Image width'),
@@ -70,12 +85,22 @@ function module_articles_info()
             ],
             'more' => [
                 'name' => tra('More'),
-                'description' => tra('If set to "y", displays a button labelled "More" that links to a paginated view of the selected articles.') . " " . tr('Default: "n".'),
+                'description' => tra('If set to "y", displays a button labelled "More" that links to a paginated view of the selected articles.'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'absurl' => [
                 'name' => tra('Absolute URL'),
-                'description' => tra('If set to "y", some of the links use an absolute URL instead of a relative one. This can avoid broken links if the module is to be sent in a newsletter, for example.') . " " . tr('Default: "n".'),
+                'description' => tra('If set to "y", some of the links use an absolute URL instead of a relative one. This can avoid broken links if the module is to be sent in a newsletter, for example.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
         'common_params' => ['nonums', 'rows']

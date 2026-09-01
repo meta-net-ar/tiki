@@ -26,7 +26,12 @@ function module_translation_info()
             ],
             'show_language' => [
                 'name' => tra('Show language'),
-                'description' => tra('If "y" the page language will be shown instead of the page name.') . tra('Default = "y".')
+                'description' => tra('If "y" the page language will be shown instead of the page name.'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ]
         ]
     ];

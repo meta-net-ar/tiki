@@ -29,31 +29,65 @@ function module_since_last_visit_new_info()
         'params' => [
             'simple_view' => [
                 'name' => tra('Simple View'),
-                'description' => tra('If set to "y", only show counts of new items without details.') . ' ' . tra('Default:') . ' "n"'
+                'description' => tra('If set to "y", only show counts of new items without details.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showuser' => [
                 'name' => tra('Show users'),
-                'description' => tra('If set to "n", do not show new users.') . ' ' . tra('Default:') . ' "y"'
+                'description' => tra('If set to "n", do not show new users.'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showtracker' => [
                 'name' => tra('Show trackers'),
-                'description' => tra('If set to "n", do not show tracker changes.') . ' ' . tra('Default:') . ' "y"'
+                'description' => tra('If set to "n", do not show tracker changes.'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'calendar_focus' => [
                 'name' => tra('Calendar focus'),
-                'description' => tra('Unless set to "ignore", the module changes the reference point in time from the user\'s last login date and time to a day where users browse to using the calendar.')
+                'description' => tra('The module changes the reference point in time from the user\'s last login date and time to a day where users browse to using the calendar.'),
+                'options' => [
+                    ['text' => tra('Default: Follow the calendar'), 'value' => ''],
+                    ['text' => tra('Ignore the calendar'), 'value' => 'ignore'],
+                ],
             ],
             'date_as_link' => [
                 'name' => tra('Show date as a calendar link'),
-                'description' => tra('If set to "n", do not add a link to tiki calendar on the date in the header (even if feature calendar is set).') . ' ' . tra('Default:') . ' "y"'
+                'description' => tra('If set to "n", do not add a link to tiki calendar on the date in the header (even if feature calendar is set).'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'fold_sections' => [
                 'name' => tra('Fold sections by default'),
-                'description' => tra('If set to "y", fold automatically sections and show only the title (user has to click on each section in order to see the details of modifications).') . ' ' . tra('Default:') . ' "n"'
+                'description' => tra('If set to "y", fold automatically sections and show only the title (user has to click on each section in order to see the details of modifications).'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'use_jquery_ui' => [
                 'name' => tra('Use tabbed presentation'),
-                'description' => tra('If set to "y", use Bootstrap tabs to show the result.') . ' ' . tra('Default:') . ' "n"'
+                'description' => tra('If set to "y", use Bootstrap tabs to show the result.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'daysAtLeast' => [
                 'name' => tra('Minimum timespan'),

@@ -16,13 +16,23 @@ function module_last_actions_info()
         'params' => [
             'showuser' => [
                 'name' => tra('Show user'),
-                'description' => tra('If set to "y", user names are displayed in the module box.') . " " . tra('Default: "n"'),
-                'filter' => 'word'
+                'description' => tra('If set to "y", user names are displayed in the module box.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showdate' => [
                 'name' => tra('Show date'),
-                'description' => tra('If set to "y", action dates are displayed in the module box.') . " " . tra('Default: "n"'),
-                'filter' => 'word'
+                'description' => tra('If set to "y", action dates are displayed in the module box.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'maxlen' => [
                 'name' => tra('Maximum length'),

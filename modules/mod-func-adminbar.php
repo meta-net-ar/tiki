@@ -16,7 +16,11 @@ function module_adminbar_info()
         'params' => [
             'mode' => [
                 'name' => tra('Mode'),
-                'description' => tra('Display mode: module or header. Leave empty for module mode'),
+                'description' => tra('Display mode'),
+                'options' => [
+                    ['text' => tra('Default: Module'), 'value' => ''],
+                    ['text' => tra('Header'), 'value' => 'header'],
+                ],
             ],
         ]
     ];

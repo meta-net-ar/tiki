@@ -39,8 +39,13 @@ function module_shoutbox_info()
         'params' => [
             'tooltip' => [
                 'name' => tra('Tooltip'),
-                'description' => tra('If set to "1", displays message post dates and times as tooltips instead of showing directly in the module content.') . " " . tr('Default:') . '"0".',
-                'filter' => 'word'
+                'description' => tra('Display message post dates and times as tooltips instead of showing directly in the module content.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ],
             ],
             'buttontext' => [
                 'name' => tra('Button label'),
@@ -57,13 +62,23 @@ function module_shoutbox_info()
             ],
             'tweet' => [
                 'name' => tra('Tweet'),
-                'description' => tra('If set to "1" and the user has authorized us to tweet messages with Twitter, the user can decide, if he wants to shout via Twitter.'),
-                'filter' => 'word'
+                'description' => tra('If the user has authorized us to tweet messages with Twitter, the user can decide whether to shout via Twitter.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ],
             ],
             'facebook' => [
                 'name' => tra('Facebook'),
-                'description' => tra('If set to "1" and the user has authorized us with Facebook, the user can decide, if he wants to add the shout to his Facebook wall.'),
-                'filter' => 'word'
+                'description' => tra('If the user has authorized us with Facebook, the user can decide whether to add the shout to their Facebook wall.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ],
             ]
 
         ]

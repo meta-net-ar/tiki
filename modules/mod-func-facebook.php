@@ -22,8 +22,12 @@ function module_facebook_info()
             ],
             'showuser' => [
                 'name' => 'showuser',
-                'description' => tra('Show username in timeline. y|n'),
+                'description' => tra('Show username in timeline.'),
                 'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'pageid' => [
                 'name' => 'pageid',

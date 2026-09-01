@@ -44,18 +44,30 @@ function module_breadcrumbs_info()
                 'description' => tra('Display the first crumb, usually the site, when using menu crumbs.'),
                 'filter' => 'alpha',
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showLast' => [
                 'name' => tra('Show Page Crumb'),
                 'description' => tra('Display the last crumb, usually the page, when using menu crumbs.'),
                 'filter' => 'alpha',
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showLinks' => [
                 'name' => tra('Show Crumb Links'),
                 'description' => tra('Display links on the crumbs.'),
                 'filter' => 'alpha',
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
     ];

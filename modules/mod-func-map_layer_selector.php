@@ -25,6 +25,10 @@ function module_map_layer_selector_info()
                 'name' => tr('Include optional layers'),
                 'description' => tr('Include the checkboxes for the optional layers.'),
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
     ];

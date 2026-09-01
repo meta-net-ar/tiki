@@ -62,7 +62,6 @@ function module_reading_time_info()
                 'filter' => 'alpha',
                 'default' => 'n',
                 'options' => [
-                    ['text' => tra(''), 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
                     ['text' => tra('No'), 'value' => 'n'],
                 ],

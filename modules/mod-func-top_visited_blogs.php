@@ -16,9 +16,14 @@ function module_top_visited_blogs_info()
         'params' => [
             'showlastpost' => [
                 'name' => tra('Show Last Post'),
-                'description' => 'y|n',
+                'description' => tra('Show the last post.'),
                 'required' => false,
-                'filter' => 'alpha'
+                'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'sort_mode' => [
                 'name' => tra('Sort Mode'),

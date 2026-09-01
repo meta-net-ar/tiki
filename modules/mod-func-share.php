@@ -21,28 +21,53 @@ function module_share_info()
         'params' => [
             'report' => [
                 'name' => tra('Report'),
-                'description' => tra('Report to Webmaster') . ' (y/n)',
+                'description' => tra('Report to Webmaster'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'share' => [
                 'name' => tra('Share'),
-                'description' => tra('Share this page') . ' (y/n)',
+                'description' => tra('Share this page'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'email' => [
                 'name' => tra('Email'),
-                'description' => tra('Email this page') . ' (y/n)',
+                'description' => tra('Email this page'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'icons' => [
                 'name' => tra('Icons'),
-                'description' => tra('Use icons for report, share and email links') . ' (n/y)',
+                'description' => tra('Use icons for report, share and email links'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'facebook' => [
                 'name' => tra('Facebook'),
-                'description' => tra('Show Facebook "Like" button on the current page') . ' (n/y)',
+                'description' => tra('Show Facebook "Like" button on the current page'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'facebook_href' => [
                 'name' => tra('Facebook: URL'),
@@ -51,13 +76,24 @@ function module_share_info()
             ],
             'facebook_send' => [
                 'name' => tra('Facebook: Send'),
-                'description' => tra('Show Facebook "Send" button') . ' (y/n)',
+                'description' => tra('Show Facebook "Send" button'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'facebook_layout' => [
                 'name' => tra('Facebook: Layout'),
-                'description' => tra('Size, layout and amount of social context') . ' (standard/button_count/box_count)',
+                'description' => tra('Size, layout and amount of social context'),
                 'filter' => 'text',
+                'options' => [
+                    ['text' => tra('Default: Standard'), 'value' => ''],
+                    ['text' => tra('Standard'), 'value' => 'standard'],
+                    ['text' => tra('Button count'), 'value' => 'button_count'],
+                    ['text' => tra('Box count'), 'value' => 'box_count'],
+                ],
             ],
             'facebook_width' => [
                 'name' => tra('Facebook: Width'),
@@ -71,23 +107,47 @@ function module_share_info()
             ],
             'facebook_show_faces' => [
                 'name' => tra('Facebook: Show Faces'),
-                'description' => tra('Show pictures of others who like this') . ' (y/n)',
+                'description' => tra('Show pictures of others who like this'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'facebook_verb' => [
                 'name' => tra('Facebook: Verb'),
-                'description' => tra('Verb to display in button') . ' (' . tra('like') . '/' . tra('recommend') . ')',
+                'description' => tra('Verb to display in button'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: Like'), 'value' => ''],
+                    ['text' => tra('Like'), 'value' => 'like'],
+                    ['text' => tra('Recommend'), 'value' => 'recommend'],
+                ],
             ],
             'facebook_colorscheme' => [
                 'name' => tra('Facebook: Colors'),
-                'description' => tra('Color scheme') . ' (' . tra('light') . '/' . tra('dark') . ')',
+                'description' => tra('Color scheme'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: Light'), 'value' => ''],
+                    ['text' => tra('Light'), 'value' => 'light'],
+                    ['text' => tra('Dark'), 'value' => 'dark'],
+                ],
             ],
             'facebook_font' => [
                 'name' => tra('Facebook: Font'),
-                'description' => tra('Font to display') . ' (lucida grande/arial/segoe ui/tahoma/trebuchet ms/verdana)',
+                'description' => tra('Font to display'),
                 'filter' => 'text',
+                'options' => [
+                    ['text' => tra('Default: Lucida Grande'), 'value' => ''],
+                    ['text' => 'Lucida Grande', 'value' => 'lucida grande'],
+                    ['text' => 'Arial', 'value' => 'arial'],
+                    ['text' => 'Segoe UI', 'value' => 'segoe ui'],
+                    ['text' => 'Tahoma', 'value' => 'tahoma'],
+                    ['text' => 'Trebuchet MS', 'value' => 'trebuchet ms'],
+                    ['text' => 'Verdana', 'value' => 'verdana'],
+                ],
             ],
             'facebook_locale' => [
                 'name' => tra('Facebook: Locale'),
@@ -106,8 +166,13 @@ function module_share_info()
             ],
             'twitter' => [
                 'name' => tra('Twitter'),
-                'description' => tra('Show Twitter Follow Button on the current page') . ' (n/y)',
+                'description' => tra('Show Twitter Follow Button on the current page'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'twitter_username' => [
                 'name' => tra('Twitter: User Name'),
@@ -126,12 +191,33 @@ function module_share_info()
             ],
             'twitter_show_count' => [
                 'name' => tra('Twitter: Show Count'),
-                'description' => tra('Position of Tweet count') . ' (horizontal/vertical/none)',
+                'description' => tra('Position of Tweet count'),
+                'options' => [
+                    ['text' => tra('Default: Horizontal'), 'value' => ''],
+                    ['text' => tra('Horizontal'), 'value' => 'horizontal'],
+                    ['text' => tra('Vertical'), 'value' => 'vertical'],
+                    ['text' => tra('None'), 'value' => 'none'],
+                ],
                 'filter' => 'alpha',
             ],
             'twitter_language' => [
                 'name' => tra('Twitter: Language'),
-                'description' => tra('Two letter language code') . ' (en/de/es/fr/id/it/ko/ja/nl/pt/re/tr)',
+                'description' => tra('Two letter language code'),
+                'options' => [
+                    ['text' => tra('Default: English'), 'value' => ''],
+                    ['text' => tra('English'), 'value' => 'en'],
+                    ['text' => tra('German'), 'value' => 'de'],
+                    ['text' => tra('Spanish'), 'value' => 'es'],
+                    ['text' => tra('French'), 'value' => 'fr'],
+                    ['text' => tra('Indonesian'), 'value' => 'id'],
+                    ['text' => tra('Italian'), 'value' => 'it'],
+                    ['text' => tra('Korean'), 'value' => 'ko'],
+                    ['text' => tra('Japanese'), 'value' => 'ja'],
+                    ['text' => tra('Dutch'), 'value' => 'nl'],
+                    ['text' => tra('Portuguese'), 'value' => 'pt'],
+                    ['text' => tra('Reunionese'), 'value' => 're'],
+                    ['text' => tra('Turkish'), 'value' => 'tr'],
+                ],
                 'filter' => 'word',
             ],
             'twitter_width' => [
@@ -151,7 +237,12 @@ function module_share_info()
             ],
             'linkedin' => [
                 'name' => tra('LinkedIn'),
-                'description' => tra('Linked in share button') . ' (n/y)',
+                'description' => tra('Linked in share button'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
                 'filter' => 'alpha',
             ],
             'linkedin_url' => [
@@ -161,22 +252,46 @@ function module_share_info()
             ],
             'linkedin_mode' => [
                 'name' => tra('LinkedIn: Count Mode'),
-                'description' => tra('Position of count') . ' (none/top/right)',
+                'description' => tra('Position of count'),
+                'options' => [
+                    ['text' => tra('Default: None'), 'value' => ''],
+                    ['text' => tra('None'), 'value' => 'none'],
+                    ['text' => tra('Top'), 'value' => 'top'],
+                    ['text' => tra('Right'), 'value' => 'right'],
+                ],
                 'filter' => 'word',
             ],
             'google' => [
                 'name' => tra('Google +1'),
-                'description' => tra('Google +1 button') . ' (n/y)',
+                'description' => tra('Google +1 button'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
                 'filter' => 'alpha',
             ],
             'google_size' => [
                 'name' => tra('Google: Size'),
-                'description' => tra('Google button size') . ' (standard|small|medium|tall)',
+                'description' => tra('Google button size'),
+                'options' => [
+                    ['text' => tra('Default: Standard'), 'value' => ''],
+                    ['text' => tra('Standard'), 'value' => 'standard'],
+                    ['text' => tra('Small'), 'value' => 'small'],
+                    ['text' => tra('Medium'), 'value' => 'medium'],
+                    ['text' => tra('Tall'), 'value' => 'tall'],
+                ],
                 'filter' => 'word',
             ],
             'google_annotation' => [
                 'name' => tra('Google: Annotation'),
-                'description' => tra('Google annotation') . ' (bubble|inline|none)',
+                'description' => tra('Google annotation'),
+                'options' => [
+                    ['text' => tra('Default: Bubble'), 'value' => ''],
+                    ['text' => tra('Bubble'), 'value' => 'bubble'],
+                    ['text' => tra('Inline'), 'value' => 'inline'],
+                    ['text' => tra('None'), 'value' => 'none'],
+                ],
                 'filter' => 'word',
             ],
             'google_language' => [

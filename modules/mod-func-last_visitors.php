@@ -15,7 +15,12 @@ function module_last_visitors_info()
         'params' => [
             'showavatars' => [
                 'name' => tra('Show profile pictures'),
-                'description' => tra('If set to "y", show user profile pictures.') . ' ' . tra('Default:') . ' "n"'
+                'description' => tra('If set to "y", show user profile pictures.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'maxlen' => [
                 'name' => tra('Maximum length'),
@@ -25,6 +30,11 @@ function module_last_visitors_info()
             'nodate' => [
                 'name' => tra("Don't show date"),
                 'description' => tra('If set to "y", it will hide date.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ]
         ],
         'common_params' => ['nonums', 'rows'],

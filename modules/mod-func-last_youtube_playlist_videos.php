@@ -48,12 +48,11 @@ function module_last_youtube_playlist_videos_info()
                 'required' => false,
                 'name' => tra('Allow FullScreen'),
                 'description' => tra('Enlarge video to full screen size'),
-                'default' => true,
+                'default' => 'y',
                 'filter' => 'alpha',
                 'options' => [
-                    ['text' => tra(''), 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'true'],
-                    ['text' => tra('No'), 'value' => 'false'],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
                 ],
             ],
             'link_url' => [
@@ -75,12 +74,11 @@ function module_last_youtube_playlist_videos_info()
             'verbose' => [
                 'required' => false,
                 'name' => tra('Video Descriptions'),
-                'description' => tra('Display description of video on title mouseover if \'y\'. Default is \'y\''),
-                'default' => '',
+                'description' => tra('Display description of video on title mouseover'),
                 'filter' => 'striptags',
                 'advanced' => true,
                 'options' => [
-                    ['text' => tra(''), 'value' => ''],
+                    ['text' => tra('Default: Yes'), 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
                     ['text' => tra('No'), 'value' => 'n'],
                 ],
@@ -92,7 +90,6 @@ function module_last_youtube_playlist_videos_info()
                 'default' => 'position',
                 'filter' => 'striptags',
                 'options' => [
-                    ['text' => tra(''), 'value' => ''],
                     ['text' => tra('position'), 'value' => 'position'],
                     ['text' => tra('commentCount'), 'value' => 'commentCount'],
                     ['text' => tra('duration'), 'value' => 'duration'],
@@ -164,7 +161,7 @@ function module_last_youtube_playlist_videos($mod_reference, $module_params)
             $params = [];
             $params['width'] = $module_params['width'] ?? 425;
             $params['height'] = $module_params['height'] ?? 350;
-            $params['allowFullScreen'] = $module_params['allowFullScreen'] ?? true;
+            $params['allowFullScreen'] = $module_params['allowFullScreen'] ?? 'y';
 
             // Get information from all videos from playlist
             // Limit to $module_rows first videos if $module_rows is set

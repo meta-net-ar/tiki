@@ -16,7 +16,12 @@ function module_directory_last_sites_info()
         'params' => [
             'absurl' => [
                 'name' => tra('Absolute URL'),
-                'description' => tra('If set to "y", some of the links use an absolute URL instead of a relative one. This can avoid broken links if the module is to be sent in a newsletter, for example.') . " " . tr('Default: "n".'),
+                'description' => tra('If set to "y", some of the links use an absolute URL instead of a relative one. This can avoid broken links if the module is to be sent in a newsletter, for example.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'categoryId' => [
                 'name' => tra('Directory category identifier'),
@@ -25,12 +30,22 @@ function module_directory_last_sites_info()
             ],
             'more' => [
                 'name' => tra('More'),
-                'description' => tra('If set to "y", displays a button labelled "More" that links to the directory.') . " " . tr('Not set by default.'),
+                'description' => tra('If set to "y", displays a button labelled "More" that links to the directory.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'desc' => [
                 'name' => tra('Show description'),
-                'description' => tra('If set to "y", the description of the directory site appears.') . " " . tr('Default: "n".'),
+                'description' => tra('If set to "y", the description of the directory site appears.'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'maxdesc' => [
                 'name' => tra('Maximum length of description'),
