@@ -527,6 +527,13 @@ if ((! $content_changed and ! isset($_GET['display'])) || isset($_GET['pdf'])) {
     header("Content-Disposition: filename=\"$file\"");
     $downloading  = false;
 }
+if (! empty($_GET['cpath']) && ! empty($_GET['reqid'])) {
+    $reqid = preg_replace('/[^0-9a-fA-F]/', '', $_GET['reqid']);
+    if ($reqid !== '') {
+        setcookie('elfdl' . $reqid, '1', 0, urlencode($_GET['cpath']));
+    }
+}
+
 if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
     $filesize = filesize($filepath);
     header("Accept-Ranges: bytes");
