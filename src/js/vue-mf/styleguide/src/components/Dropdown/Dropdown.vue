@@ -22,7 +22,6 @@
 
 <script>
 import vClickOutside from 'click-outside-vue3'
-import { createPopper } from '@popperjs/core';
 
 export default {
     name: 'Dropdown',
@@ -50,20 +49,16 @@ export default {
     },
     methods: {
         initPopper: function () {
-            this.popper = createPopper(this.$refs.button, this.$refs.dropdown, {
-                placement: 'bottom-start',
-                modifiers: [
-                    {
-                        name: 'offset',
-                        options: {
-                            offset: [0, 5],
-                        },
-                    },
-                ],
+            this.popper = new window.bootstrap.Dropdown(this.$refs.button, {
+                offset: [0, 5],
+                popperConfig: { placement: 'bottom-start' }
             })
         },
         destroyPopper: function () {
-            this.popper.destroy()
+            if (this.popper) {
+                this.popper.dispose()
+                this.popper = null
+            }
         },
         handleToggleMenu: function () {
             this.showMenu = !this.showMenu
