@@ -119,7 +119,8 @@ class ObjectLink extends Base implements TikiSmartyExtensionInterface
         global $base_url;
 
         if (empty($title)) {
-            $title = \TikiLib::lib('object')->get_title($type, $object, empty($params['format']) ? null : $params['format'], $params['metaItemId'] ?? null);
+            $displayFormat = $params['display_format'] ?? $params['format'] ?? null;
+            $title = \TikiLib::lib('object')->get_title($type, $object, $displayFormat, $params['metaItemId'] ?? null);
         }
 
         if (empty($title) && ! empty($params['backuptitle'])) {
@@ -138,7 +139,9 @@ class ObjectLink extends Base implements TikiSmartyExtensionInterface
             $text = \TikiLib::lib('wiki')->get_without_namespace($title);
         }
 
-        $escapedText = \SmartyTiki\Modifier\Escape::apply($text ? $text : tra('No title specified'), 'html', 'UTF-8', false);
+        $escapedText = ! empty($params['rawHtml'])
+            ? ($text !== '' ? $text : tra('No title specified'))
+            : \SmartyTiki\Modifier\Escape::apply($text ? $text : tra('No title specified'), 'html', 'UTF-8', false);
 
         if ($url) {
             $escapedHref = \SmartyTiki\Modifier\Escape::apply(\TikiLib::tikiUrlOpt($url));
@@ -256,10 +259,39 @@ class ObjectLink extends Base implements TikiSmartyExtensionInterface
                 \TikiLib::lib('access')->is_serializable_request()
             )
         ) {
+            $format = $params['format'] ?? null;
+            if ($format && $format !== '{title}') {
+                $fullTitle = (string) \TikiLib::lib('object')->get_title($type, $object, $format, $params['metaItemId'] ?? null);
+                $linkTitle = (string) \TikiLib::lib('object')->get_title($type, $object, '{title}', $params['metaItemId'] ?? null);
+
+                if ($linkTitle !== '' && ($pos = mb_strpos($fullTitle, $linkTitle)) !== false) {
+                    // Keep the whole line as a single clickable link, with the title
+                    // portion bolded inside it for visual distinction (rather than the
+                    // rest of the line being plain, non-clickable text).
+                    $before = mb_substr($fullTitle, 0, $pos);
+                    $after = mb_substr($fullTitle, $pos + mb_strlen($linkTitle));
+                    $innerHtml = \SmartyTiki\Modifier\Escape::apply($before)
+                        . '<strong>' . \SmartyTiki\Modifier\Escape::apply($linkTitle) . '</strong>'
+                        . \SmartyTiki\Modifier\Escape::apply($after);
+                    return $pre . $this->smartyFunctionObjectLinkDefault($template, $object, $innerHtml, $type, $url, $params + ['rawHtml' => true]);
+                } elseif ($fullTitle !== '') {
+                    // No distinct title to bold (ex: item's main field is blank) but there's
+                    // still other formatted content to show — link the whole thing plain,
+                    // same as an item that never had a custom format.
+                    return $pre . $this->smartyFunctionObjectLinkDefault($template, $object, $fullTitle, $type, $url, $params);
+                } else {
+                    // Nothing at all resolved for this format (ex: item has no data yet).
+                    // Same idea as the freetag case above: quietly show what we have (the
+                    // status icon, if any) rather than a "No title specified" placeholder.
+                    return rtrim($pre);
+                }
+            }
             return $pre . $this->smartyFunctionObjectLinkDefault($template, $object, $title, $type, $url, $params);
         } else {
+            // Handle display_format for non-viewable items
+            $displayFormat = $params['display_format'] ?? $params['format'] ?? null;
             if (empty($title)) {
-                $title = \TikiLib::lib('object')->get_title($type, $object, empty($params['format']) ? null : $params['format'], $params['metaItemId'] ?? null);
+                $title = \TikiLib::lib('object')->get_title($type, $object, $displayFormat, $params['metaItemId'] ?? null);
             }
 
             return $pre . \SmartyTiki\Modifier\Escape::apply($title);
