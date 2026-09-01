@@ -115,6 +115,7 @@ export default defineConfig(({ command, mode }) => {
     );
     Object.assign(rollupInput, {
         //Watch out, __dirname is the path of the config file, no matter how vite is called...
+        "vendor_dist/bootstrap/dist/js/bootstrap.esm.min": resolve(__dirname, "../../node_modules/bootstrap/dist/js/bootstrap.esm.js"),
         "duration-picker": resolve(__dirname, "vue-mf/duration-picker/src/duration-picker.js"),
         "emoji-picker": resolve(__dirname, "vue-mf/emoji-picker/src/emoji-picker.js"),
         "element-plus-ui": resolve(__dirname, "vue-widgets/element-plus-ui/src/element-plus-ui.ce.js"),
@@ -151,7 +152,6 @@ export default defineConfig(({ command, mode }) => {
                 external: [
                     /^@vue-mf\/.+/,
                     /^@vue-widgets\/.+/,
-                    "@popperjs/core",
                     "bootstrap",
                     "clipboard",
                     "converse.js",
@@ -239,14 +239,6 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/bootstrap/dist/css/bootstrap.min.*",
                         dest: "vendor_dist/bootstrap/dist/css",
-                    },
-                    {
-                        src: "node_modules/bootstrap/dist/js/bootstrap.esm.min.js",
-                        dest: "vendor_dist/bootstrap/dist/js",
-                    },
-                    {
-                        src: "node_modules/@popperjs/core/dist/esm/*",
-                        dest: "vendor_dist/@popperjs/core/dist/esm",
                     },
                     {
                         src: "node_modules/bootstrap-icons/font/*",

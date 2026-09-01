@@ -12,7 +12,6 @@
   "devDependencies": {
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.8",
     "click-outside-vue3": "^4.0.1"
   }
 }
