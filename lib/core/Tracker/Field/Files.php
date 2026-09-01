@@ -1098,7 +1098,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                 'geo_located' => $typeFactory->identifier('y'),
                 'geo_file' => $typeFactory->identifier(implode(',', $urls)),
                 'geo_file_format' => $typeFactory->identifier($this->getOption('indexGeometry')),
-                $baseKey => $typeFactory->identifier($value),
+                $baseKey => $typeFactory->sortable($value),
             ];
         } else {
             $fileIds = array_filter(explode(',', $value));
