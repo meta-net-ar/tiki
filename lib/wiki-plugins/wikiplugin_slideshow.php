@@ -266,6 +266,18 @@ function wikiplugin_slideshow_info()
                     ['text' => 'h6', 'value' => '6'],
                 ],
             ],
+            'speakerNotes' => [
+                'required' => false,
+                'name' => tra("Speaker's Notes"),
+                'description' => tra("Enable speaker's notes for the slideshow. Use {NOTES()}...{NOTES} within slides to add notes visible in the speaker view (press S key) and when printing."),
+                'filter' => 'word',
+                'default' => 'n',
+                'since' => '30.2',
+                'options' => [
+                    ['text' => tra('On'), 'value' => 'y'],
+                    ['text' => tra('Off'), 'value' => 'n'],
+                ],
+            ],
         ],
     ];
 }
@@ -273,6 +285,21 @@ function wikiplugin_slideshow_info()
 function wikiplugin_slideshow($data, $params)
 {
     if (! str_contains($_SERVER['PHP_SELF'], 'tiki-slideshow.php')) {
+        if (($params['speakerNotes'] ?? 'n') === 'y') {
+            TikiLib::lib('header')->add_jq_onready(<<<JS
+                (function () {
+                    var pageData = document.getElementById('page-data');
+                    if (! pageData) {
+                        return;
+                    }
+
+                    pageData.innerHTML = pageData.innerHTML
+                        .replace(/\\{NOTES\\(\\)\\}[\\s\\S]*?\\{NOTES\\}/gi, '')
+                        .replace(/<p>\\s*<\\/p>/gi, '');
+                }());
+            JS);
+        }
+
         if (str_contains($_SERVER['PHP_SELF'], 'tiki-index.php')) {
             return '<a class="btn btn-primary hidden-print" data-role="button" data-inline="true" title="Start Slideshow" href="./tiki-slideshow.php?page='
                 . $_REQUEST['page'] . '">' . tr('Start Slideshow Presentation') . '</a>';

@@ -594,6 +594,10 @@ export default defineConfig(({ command, mode }) => {
                         rename: { stripBase: 3 },
                     },
                     {
+                        src: "node_modules/reveal.js/plugin/**/*",
+                        dest: "vendor_dist/reveal.js/plugin",
+                    },
+                    {
                         src: "node_modules/signature_pad/dist/signature_pad.umd.min.js",
                         dest: "vendor_dist/signature_pad/dist",
                         rename: { stripBase: 3 },
