@@ -1267,7 +1267,7 @@ import { defaults as defaultControls } from "ol/control";
                                     placement: "auto",
                                 })
                                 .popover("show")
-                                .on("shown.bs.popover", function (event) {
+                                .one("shown.bs.popover", function (event) {
                                     const $popover = $(".popover.show").first();
                                     let $h3 = $popover.find("h3").text("");
                                     if ($h3.length === 0) {
@@ -1284,16 +1284,9 @@ import { defaults as defaultControls } from "ol/control";
                                             event: event,
                                             element: this,
                                             callback: function (event, $html) {
-                                                $html.find("a.service-dialog").remove();
                                                 const title = $html.find("h1").remove().text() || feature.get("content");
                                                 $("h3", $popover).text(title);
                                                 $(".popover-body", $popover).empty().html($html.html());
-                                                $popover.on("mouseleave", function () {
-                                                    $popover.find("h3").text("");
-                                                    $popover.find(".popover-body").empty();
-                                                    $mapBootstrapPopoverDummy.popover("dispose");
-                                                    selectionInteraction.getFeatures().clear();
-                                                });
                                             },
                                         });
                                     } else {
@@ -1301,13 +1294,22 @@ import { defaults as defaultControls } from "ol/control";
                                         // just a marker, info it in the link
                                         $popover.find("h3").text($el.text());
                                         $popover.find(".popover-body").empty().text($el.attr("title"));
-                                        $popover.on("mouseleave", function () {
+                                    }
+                                    let timeout = 0;
+                                    $popover.on("mouseleave", function () {
+                                        timeout = setTimeout(function () {
                                             $popover.find("h3").text("");
                                             $popover.find(".popover-body").empty();
-                                            $mapBootstrapPopoverDummy.popover("hide");
+                                            $mapBootstrapPopoverDummy.popover("dispose");
                                             selectionInteraction.getFeatures().clear();
-                                        });
-                                    }
+                                        }, 1000);
+                                    });
+                                    $popover.on("mouseenter", function () {
+                                        if (timeout) {
+                                            clearTimeout(timeout);
+                                            timeout = 0;
+                                        }
+                                    });
                                 });
                             break;
                     }
