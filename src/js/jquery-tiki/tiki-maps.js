@@ -208,16 +208,6 @@ import { defaults as defaultControls } from "ol/control";
                             }),
                             title: "Stadia" + flavor,
                         });
-                    } else if (name.match(/arcgis\//)) {
-                        const flavor = name.substring(7);
-
-                        layer = new ol.layer.Tile({
-                            source: new ol.source.Tile({
-                                layer: `${flavor.replace(/-/g, "_")}`,
-                                retina: true,
-                            }),
-                            title: "Stadia" + flavor,
-                        });
                     } else if (name.match(/^http.*\.json.*/)) {
                         layer = new ol.layer.Tile({
                             source: new ol.source.TileJSON({
@@ -227,9 +217,9 @@ import { defaults as defaultControls } from "ol/control";
                             }),
                             title: name.replace(/^.*?\/(.*?)\//, "$1") + " json",
                         });
-                    } else if (name.match(/^http.*\{z}\/\{[yx]}\/\{[xy]}.*/)) {
+                    } else if (name.match(/^http.*\{z}\/\{x}\/\{y}.*/)) {
                         layer = new ol.layer.Tile({
-                            source: new ol.source.XYZ({
+                            source: new ol.source.ImageTile({
                                 url: name,
                             }),
                             title: name.replace(/^.*?\/(.*?)\//, "$1") + " xyz",
@@ -1275,10 +1265,6 @@ import { defaults as defaultControls } from "ol/control";
                                     content: tr("Loading..."),
                                     container: "body",
                                     placement: "auto",
-                                    delay: {
-                                        show: 500,
-                                        hide: 1000,
-                                    },
                                 })
                                 .popover("show")
                                 .one("shown.bs.popover", function (event) {
