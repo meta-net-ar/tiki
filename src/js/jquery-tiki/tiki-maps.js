@@ -1267,7 +1267,7 @@ import { defaults as defaultControls } from "ol/control";
                                     placement: "auto",
                                 })
                                 .popover("show")
-                                .on("shown.bs.popover", function (event) {
+                                .one("shown.bs.popover", function (event) {
                                     const $popover = $(".popover.show").first();
                                     let $h3 = $popover.find("h3").text("");
                                     if ($h3.length === 0) {
@@ -1284,7 +1284,6 @@ import { defaults as defaultControls } from "ol/control";
                                             event: event,
                                             element: this,
                                             callback: function (event, $html) {
-                                                $html.find("a.service-dialog").remove();
                                                 const title = $html.find("h1").remove().text() || feature.get("content");
                                                 $("h3", $popover).text(title);
                                                 $(".popover-body", $popover).empty().html($html.html());
