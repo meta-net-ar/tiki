@@ -355,8 +355,9 @@ HTML;
         $this->_getImages($html, $tempImgArr);
         $defaults = new \Mpdf\Config\ConfigVariables(); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
         $defaultVariables = $defaults->getDefaults();
+        $customFontDirs = defined('CUSTOM_FONT_DIR') ? [CUSTOM_FONT_DIR . '/'] : [];
         $mpdfConfig = [
-            'fontDir' => array_merge([TIKI_PATH . '/' . FONTAWESOME_WEBFONTS_PATH . '/'], $defaultVariables['fontDir']),
+            'fontDir' => array_merge($customFontDirs, [TIKI_PATH . '/' . FONTAWESOME_WEBFONTS_PATH . '/'], $defaultVariables['fontDir']),
             'mode' => 'utf8',
             'format' => $pdfSettings['pagesize'],
             'margin_left' => $pdfSettings['margin_left'],
@@ -391,6 +392,12 @@ HTML;
          ],
          'fontawesome-brands' => [
             'R' => "fa-brands-400.ttf"
+         ],
+         'calibri' => [
+            'R' => 'calibri.ttf',
+            'B' => 'calibrib.ttf',
+            'I' => 'calibrii.ttf',
+            'BI' => 'calibriz.ttf'
          ]];
 
         //calling function to add custom fonts
