@@ -8246,6 +8246,9 @@ class UsersLib extends TikiLib
             )
         );
 
+        // falls back to login if not enabled
+        $smarty->assign('mail_realname', $this->clean_user($name));
+
         include_once('lib/webmail/tikimaillib.php');
 
         if ($second == 'y') {
