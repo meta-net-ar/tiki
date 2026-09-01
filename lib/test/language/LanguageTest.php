@@ -11,6 +11,52 @@
  */
 class LanguageTest extends TikiTestCase
 {
+    public function testDefaultAdminLanguageUsesDefaultSiteLanguage(): void
+    {
+        global $prefs, $user, $user_preferences;
+
+        $oldPrefs = $prefs;
+        $hadUser = array_key_exists('user', $GLOBALS);
+        $oldUser = $user ?? null;
+        $hadUserPreferences = array_key_exists('user_preferences', $GLOBALS);
+        $oldUserPreferences = $user_preferences ?? [];
+        $currentSection = new ReflectionProperty(Tiki\Sections::class, 'currentSection');
+        $oldSection = Tiki\Sections::getCurrentSection();
+
+        try {
+            $user = 'admin-language-test-user';
+            $user_preferences[$user]['language'] = 'en';
+            $prefs['language'] = 'en';
+            $prefs['language_admin'] = '';
+            $prefs['site_language'] = 'fr';
+            $prefs['restrict_language'] = 'n';
+            $prefs['available_languages'] = [];
+            $prefs['feature_multilingual'] = 'n';
+            $prefs['change_language'] = 'n';
+            $prefs['theme_unified_admin_backend'] = 'y';
+
+            foreach ([Tiki\Sections::SECTION_ADMIN, Tiki\Sections::SECTION_ADMIN_LAYOUT] as $section) {
+                Tiki\Sections::setCurrentSection($section);
+                Language::setSectionLanguage();
+                $this->assertSame('fr', Language::getCurrentLanguage());
+                $this->assertSame('en', $user_preferences[$user]['language']);
+            }
+        } finally {
+            $currentSection->setValue(null, $oldSection);
+            $prefs = $oldPrefs;
+            if ($hadUser) {
+                $user = $oldUser;
+            } else {
+                unset($GLOBALS['user']);
+            }
+            if ($hadUserPreferences) {
+                $user_preferences = $oldUserPreferences;
+            } else {
+                unset($GLOBALS['user_preferences']);
+            }
+        }
+    }
+
     public function testLocaleIdentifierValidationRejectsPaths(): void
     {
         $this->assertTrue(Language::isValidLocaleIdentifier('en'));
