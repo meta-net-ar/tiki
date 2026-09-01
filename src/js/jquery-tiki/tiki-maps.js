@@ -208,6 +208,16 @@ import { defaults as defaultControls } from "ol/control";
                             }),
                             title: "Stadia" + flavor,
                         });
+                    } else if (name.match(/arcgis\//)) {
+                        const flavor = name.substring(7);
+
+                        layer = new ol.layer.Tile({
+                            source: new ol.source.Tile({
+                                layer: `${flavor.replace(/-/g, "_")}`,
+                                retina: true,
+                            }),
+                            title: "Stadia" + flavor,
+                        });
                     } else if (name.match(/^http.*\.json.*/)) {
                         layer = new ol.layer.Tile({
                             source: new ol.source.TileJSON({
@@ -217,9 +227,9 @@ import { defaults as defaultControls } from "ol/control";
                             }),
                             title: name.replace(/^.*?\/(.*?)\//, "$1") + " json",
                         });
-                    } else if (name.match(/^http.*\{z}\/\{x}\/\{y}.*/)) {
+                    } else if (name.match(/^http.*\{z}\/\{[yx]}\/\{[xy]}.*/)) {
                         layer = new ol.layer.Tile({
-                            source: new ol.source.ImageTile({
+                            source: new ol.source.XYZ({
                                 url: name,
                             }),
                             title: name.replace(/^.*?\/(.*?)\//, "$1") + " xyz",
@@ -1265,6 +1275,10 @@ import { defaults as defaultControls } from "ol/control";
                                     content: tr("Loading..."),
                                     container: "body",
                                     placement: "auto",
+                                    delay: {
+                                        show: 500,
+                                        hide: 1000,
+                                    },
                                 })
                                 .popover("show")
                                 .one("shown.bs.popover", function (event) {
@@ -1287,12 +1301,6 @@ import { defaults as defaultControls } from "ol/control";
                                                 const title = $html.find("h1").remove().text() || feature.get("content");
                                                 $("h3", $popover).text(title);
                                                 $(".popover-body", $popover).empty().html($html.html());
-                                                $popover.on("mouseleave", function () {
-                                                    $popover.find("h3").text("");
-                                                    $popover.find(".popover-body").empty();
-                                                    $mapBootstrapPopoverDummy.popover("dispose");
-                                                    selectionInteraction.getFeatures().clear();
-                                                });
                                             },
                                         });
                                     } else {
@@ -1300,13 +1308,22 @@ import { defaults as defaultControls } from "ol/control";
                                         // just a marker, info it in the link
                                         $popover.find("h3").text($el.text());
                                         $popover.find(".popover-body").empty().text($el.attr("title"));
-                                        $popover.on("mouseleave", function () {
+                                    }
+                                    let timeout = 0;
+                                    $popover.on("mouseleave", function () {
+                                        timeout = setTimeout(function () {
                                             $popover.find("h3").text("");
                                             $popover.find(".popover-body").empty();
-                                            $mapBootstrapPopoverDummy.popover("hide");
+                                            $mapBootstrapPopoverDummy.popover("dispose");
                                             selectionInteraction.getFeatures().clear();
-                                        });
-                                    }
+                                        }, 1000);
+                                    });
+                                    $popover.on("mouseenter", function () {
+                                        if (timeout) {
+                                            clearTimeout(timeout);
+                                            timeout = 0;
+                                        }
+                                    });
                                 });
                             break;
                     }
