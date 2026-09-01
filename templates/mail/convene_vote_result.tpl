@@ -1,4 +1,4 @@
-{tr}Hi{/tr} {$mail_user},
+{tr}Hi{/tr} {$mail_realname},
 
 {tr _0=$vote_result}There was %0 on the vote.{/tr} ({$mail_site}).
 
