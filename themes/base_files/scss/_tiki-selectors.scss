@@ -774,6 +774,7 @@ ul.all_languages > li {
     &, & .edit-zone-footer {
         background-color: var(--bs-body-bg);
     }
+    z-index: 1040 !important;
 }
 
 .TextArea-fullscreen .actions,

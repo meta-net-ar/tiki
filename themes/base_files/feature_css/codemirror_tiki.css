@@ -12,6 +12,10 @@
 /*from the codemirror website*/
 .CodeMirror-fullscreen  #editwiki_toolbar{
     width: 100% ! important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
 }
 
 .CodeMirror-fullscreen  .CodeMirror-scroll{
@@ -31,6 +35,7 @@
     top: 0px ! important;
     left: 0px ! important;
     position: fixed;
+    z-index: 1040 ! important;
     background-color: gray;
 }
 
