@@ -8,8 +8,6 @@ _Backports are costly and can add regressions, so we justify the ones we keep. "
 
 ## 1. Based on
 
-<!-- Cherry-pick with `git cherry-pick -x`, then run
-     `php doc/devtools/gitlab/backport_mr.php 27.x` to get these bullets filled in. -->
 - **Backport of**: _!MR-number_
 - **Cherry-picked from**: _commit-hash(es)_
 - **From branch**: _normally the one just above the target_
@@ -39,6 +37,6 @@ _Operators run old releases to avoid surprises, so every change must appear here
 
 ## 6. Checklist
 - [ ] Backport chain followed: each active branch between source and target has this fix
-- [ ] Cherry-picked with `-x`, one by one, squash OFF
+- [ ] Commits cherry-picked one by one, squash OFF
 - [ ] `CherryPickDownTo` label on the highest-version MR (Source MR)
 - [ ] A reviewer who can look promptly is assigned
