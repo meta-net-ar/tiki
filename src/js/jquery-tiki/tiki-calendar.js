@@ -677,7 +677,7 @@ $.fn.setupEventCalendar = function (
                 if (event.id && event.extendedProps.viewable) {
                     let $this = $(info.el).tikiModal(" ");
                     $.openModal({
-                        title: tr("New event"),
+                        title: tr("Event details"),
                         size: "modal-lg",
                         remote: "tiki-ajax_services.php?controller=calendar&action=view_item&calitemId=" + event.id + "&modal=1",
                         open: function () {
