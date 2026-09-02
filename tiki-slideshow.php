@@ -222,7 +222,7 @@ if (isset($_REQUEST['pdf'])) {
         $pdata = str_replace(
             "</section><section",
             "</section><pagebreak /><section",
-            $pdata . '<style>' . str_replace([".reveal {","vertical-align: baseline;"], [".reveal,.reveal table{ ","vertical-align:top;"], $customCSS) . ' div.reveal, .reveal li{font-size:1.3em;font-weight:normal;line-height:1.5;height:auto !important; } img{max-height:400px;}  .reveal h1 {font-size: 2.8em; text-transform:none !important;} .reveal li ul li {font-size: 0.95em !important;margin: 0em !important;}</style>'
+            $pdata . '<style>' . str_replace([".reveal {","vertical-align: baseline;"], [".reveal,.reveal table{ ","vertical-align:top;"], $customCSS) . ' div.reveal, .reveal li{font-size:1.3em;font-weight:normal;line-height:1.5;height:auto !important; } img{max-height:400px;}  .reveal h1,.reveal h2,.reveal h3,.reveal h4,.reveal h5,.reveal h6 {text-transform:none !important;} .reveal h1 {font-size: 2.8em;} .reveal h2 {font-size: 2.4em;} .reveal h3 {font-size: 2em;} .reveal h4 {font-size: 1.7em;} .reveal h5 {font-size: 1.45em;} .reveal h6 {font-size: 1.25em;} .reveal li ul li {font-size: 0.95em !important;margin: 0em !important;}</style>'
         ) . $pdfStyles;
 
 
@@ -393,11 +393,34 @@ $headerlib->add_jq_onready(<<<JS
                 font-size: 0.7em !important;
             }
             
-            .reveal h1 {
-                font-size: 2.8em;
+            .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
                 text-transform: none !important;
                 margin-bottom: 0 !important;
-            } 
+            }
+
+            .reveal h1 {
+                font-size: 2.8em;
+            }
+
+            .reveal h2 {
+                font-size: 2.4em;
+            }
+
+            .reveal h3 {
+                font-size: 2em;
+            }
+
+            .reveal h4 {
+                font-size: 1.7em;
+            }
+
+            .reveal h5 {
+                font-size: 1.45em;
+            }
+
+            .reveal h6 {
+                font-size: 1.25em;
+            }
             
             .reveal  {
                 font-size: 1.4em;
@@ -742,9 +765,11 @@ function slideshow_section($slide, $headingStart, $slideStart, $slideEnd, $headi
     for ($i = 1; $i <= $headingLevelSlideSeparator; $i++) {
         $endHeadingTags [] = '</h' . $i . '>';
     }
-    return '<section>' . $headingStart . '<h1' . str_replace(
+    // the split consumed the opening tag, but the closing one still carries the level
+    $level = preg_match('#</h([1-6])>#', $slide, $matches) ? $matches[1] : '1';
+    return '<section>' . $headingStart . '<h' . $level . str_replace(
         $endHeadingTags,
-        '</h1>' . $slideStart,
+        '</h' . $level . '>' . $slideStart,
         $slide
     ) . $slideEnd . '</section>';
 }
