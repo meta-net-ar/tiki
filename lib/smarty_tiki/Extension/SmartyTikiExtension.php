@@ -110,6 +110,15 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             return $this->functionHandlers[$functionName];
         }
 
+        // No TikiLib outside a full Tiki bootstrap, see SecurityPolicy::isTrustedModifier()
+        if (class_exists('TikiLib') && ($tikilib = TikiLib::lib('tiki'))) {
+            $allowed_builtin_php_functions = array_filter($tikilib->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
+            if (in_array($functionName, $allowed_builtin_php_functions) && is_callable($functionName)) {
+                $this->functionHandlers[$functionName] = new NativeFunctionHandler($functionName);
+                return $this->functionHandlers[$functionName];
+            }
+        }
+
         return $this->functionHandlers[$functionName] ?? null;
     }
 
