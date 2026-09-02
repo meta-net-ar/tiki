@@ -134,6 +134,7 @@ const TIKI_CUSTOMIZATIONS_SHARED_PATH = '_custom/shared';
 const TIKI_CUSTOMIZATIONS_SHARED_PUBLIC_PATH = 'public/generated/_custom/shared';
 const TIKI_CUSTOMIZATIONS_SHARED_TEMPLATES_PATH = '_custom/shared/templates';
 const TIKI_CUSTOMIZATIONS_SHARED_WIKIPLUGINS_PATH = '_custom/shared/wiki-plugins';
+const TIKI_CUSTOMIZATIONS_SHARED_FONTS_PATH = '_custom/shared/fonts';
 const TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT = 'js/custom.js';
 const TIKI_CUSTOMIZATIONS_WIKIPLUGINS_PATH_FRAGMENT = 'wiki-plugins';
 /** If present, this php file will be included at the end of tiki-setup.php.  A last resort for custom php code.  Before tiki 27 this was in  _custom/lib/setup/custom.php */
