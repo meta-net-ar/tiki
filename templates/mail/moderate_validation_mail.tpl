@@ -1,4 +1,4 @@
-{tr}Hi,{/tr}
+{tr}Hi{/tr} {$mail_realname},
 
 {if $mail_again}
 {tr _0=$mail_user _1=$mail_email _2=$mail_site _3=$prefs.mail_template_custom_text}%0 <%1> has requested a new password on %2, but you need to validate his %3 account first{/tr}

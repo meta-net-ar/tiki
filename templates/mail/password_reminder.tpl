@@ -1,4 +1,4 @@
-{tr}Hi{/tr} {$mail_user},
+{tr}Hi{/tr} {$mail_realname},
 
 {tr _0=$prefs.mail_template_custom_text}Someone requested a password reset for your %0account{/tr} ({$mail_site}).
 
