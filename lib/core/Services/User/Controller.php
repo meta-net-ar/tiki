@@ -281,9 +281,9 @@ class Services_User_Controller
                 }
 
                 if ($prefs['feature_community_mouseover_lastlogin'] == 'y') {
-                    $result['lastSeen'] = $info['currentLogin'] ? $info['currentLogin'] : null;
+                    $result['currentLogin'] = $info['currentLogin'] ? $info['currentLogin'] : null;
                 }
-
+                $result['lastActivity'] = $info['lastActivity'] ? $info['lastActivity'] : null;
 
                 if ($prefs['feature_community_mouseover_picture'] == 'y') {
                     $result['avatarHtml'] = $tikilib->get_user_avatar($other_user);

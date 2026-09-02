@@ -126,6 +126,14 @@
                                 <div class="col-sm-4">{tr}Last login:{/tr}</div>
                                 <div class="col-sm-8">{$userinfo.lastLogin|tiki_short_datetime}</div>
                             </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">{tr}Current login:{/tr}</div>
+                                <div class="col-sm-8">{$userinfo.currentLogin|tiki_short_datetime}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">{tr}Last Activity:{/tr}</div>
+                                <div class="col-sm-8">{$userinfo.lastActivity|tiki_short_datetime}</div>
+                            </div>
 
                             {* Custom database fields *}
                             {section name=ir loop=$customfields}
