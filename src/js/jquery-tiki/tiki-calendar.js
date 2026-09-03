@@ -234,7 +234,6 @@ $.fn.setupEventCalendar = function (
                 }
 
                 $.openModal({
-                    title: tr("New event"),
                     size: "modal-lg",
                     remote: $.service("calendar", "edit_item", params),
                     open: function () {
@@ -706,6 +705,14 @@ $.fn.setupEventCalendar = function (
         });
     });
 };
+
+$(document).on("click", ".add-calendar-event", function (event) {
+    event.preventDefault();
+    $.openModal({
+        size: "modal-lg",
+        remote: $(this).attr("href"),
+    });
+});
 
 // open modal for edit form
 $(document).on("click", ".edit-calendar-item-btn", function (e) {
