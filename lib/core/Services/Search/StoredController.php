@@ -189,14 +189,15 @@ class Services_Search_StoredController
         $formatter = Search_Formatter_Factory::newFormatter($plugin);
 
         $wiki = $formatter->format($resultset);
-        $tikilib = TikiLib::lib('tiki');
-        $results = TikiLib::lib('parser')->parse_data(
+        $parserLib = TikiLib::lib('parser');
+        $wiki = $parserLib->searchFilePreview($wiki);
+        $html = $parserLib->parse_data(
             $wiki,
             [
                 'is_html' => true,
             ]
         );
 
-        return $results;
+        return $html;
     }
 }

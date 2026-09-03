@@ -6633,7 +6633,13 @@ class TikiLib extends TikiDb_Bridge
         $defaultOptions = ['indexing' => false, 'is_html' => false];
         $options = array_merge($defaultOptions, $options);
 
-        if ($prefs['search_parsed_snippet'] == 'y') {
+        // Parsing multi-MB indexed contents through PluginMatcher to keep ~240
+        // characters exceeds max_execution_time (seen on tiki.org). Skip wiki parse
+        // when the source is larger than a normal snippet needs.
+        $snippetParseLimit = 32768;
+        $skipParse = is_string($data) && mb_strlen($data) > $snippetParseLimit;
+
+        if ($prefs['search_parsed_snippet'] == 'y' && ! $skipParse) {
             $data = preg_replace('/{(:?make)?toc[^}]*}/', '', $data);
 
             $_REQUEST['redirectpage'] = 'y'; //do not interpret redirect

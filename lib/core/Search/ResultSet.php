@@ -186,7 +186,7 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
         }
         }*/
 
-        if (! empty($content['contents'])) {
+        if (! empty($content['contents']) && $this->highlightHelper) {
             return $this->highlightHelper->filter($content['contents']);
         }
     }
