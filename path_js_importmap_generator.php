@@ -31,6 +31,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@tiki/plugin-base/registerFieldDependency" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/registerFieldDependency.js",
                 "@tiki/plugins/bigbluebutton" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/bigbluebutton.js",
                 "@tiki/plugins/dialog" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/dialog.js",
+                "@tiki/plugins/fade" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/fade.js",
                 "@tiki/plugins/pagetabs" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/pagetabs.js",
                 "@tiki/tracker-field-base/dirtyCheck" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/tracker-field-base/dirtyCheck.js",
                 "@tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/tracker-fields/emailFolder.js",

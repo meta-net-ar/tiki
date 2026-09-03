@@ -124,6 +124,10 @@
                         {preference name=wikiplugin_footnotearea}
                         {preference name=footnote_popovers}
                     </div>
+                    {preference name=wikiplugin_fade}
+                    <div class="adminoptionboxchild" id="wikiplugin_fade_childcontainer">
+                        {preference name=wikiplugin_fade_default_expanded}
+                    </div>
                     {preference name=wikiplugin_fancylink}
                 </fieldset>
             </div>

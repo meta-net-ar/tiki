@@ -812,30 +812,134 @@ pre.codelisting code {
 }
 
 // /* wikiplugin_fade */
-.wpfade-hidden {
-    background: url('#{$imagePath}toggle-expand-dark.png') no-repeat;
-    margin-left: -19px;
-    padding-left: 19px;
-}
-
-.wpfade-shown {
-    background: url('#{$imagePath}toggle-collapse-dark.png') no-repeat;
-    margin-left: -19px;
-    padding-left: 19px;
-}
-
+// Legacy FADE (icon=y): flex toggle with ::before icon (class toggling in wikiplugin-fade.js).
 .wpfade-span-plain {
     cursor: pointer;
 }
 
 .wpfade-span-icon {
     cursor: pointer;
-    margin-left: 19px;
 }
 
 .wpfade-div-icon {
     display: none;
-    margin-left: 19px;
+    margin-left: calc(19px + 0.35rem);
+}
+
+.wikiplugin-fade--initial-open .wpfade-div-plain,
+.wikiplugin-fade--initial-open .wpfade-div-icon {
+    display: block;
+}
+
+.wpfade-hidden::before,
+.wpfade-shown::before {
+    content: '';
+    flex-shrink: 0;
+    width: 19px;
+    height: 12px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.wpfade-hidden::before {
+    background-image: url('#{$imagePath}toggle-expand-dark.png');
+}
+
+.wpfade-shown::before {
+    background-image: url('#{$imagePath}toggle-collapse-dark.png');
+}
+// wikiplugin_fade: summary, print, initial expanded
+.wikiplugin-fade__header > a {
+    cursor: pointer;
+}
+
+.wikiplugin-fade__header > a:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+// Bootstrap FADE with icon=y: left expand/collapse icon, state tracks aria-expanded (see wikiplugin-fade.js).
+.wikiplugin-fade--icon.card .wikiplugin-fade__header > a::before {
+    content: '';
+    flex-shrink: 0;
+    width: 19px;
+    height: 1.25rem;
+    align-self: flex-start;
+    margin-top: .125rem;
+    margin-right: .35rem;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.wikiplugin-fade--icon.card .wikiplugin-fade__header > a[aria-expanded='true']::before {
+    background-image: url('#{$imagePath}toggle-collapse-dark.png');
+}
+
+.wikiplugin-fade--icon.card .wikiplugin-fade__header > a[aria-expanded='false']::before {
+    background-image: url('#{$imagePath}toggle-expand-dark.png');
+}
+
+// Indent the body so it lines up with the header text rather than the icon.
+.wikiplugin-fade--icon.card .card-body {
+    padding-left: calc(var(--bs-card-spacer-x, 1rem) + 19px + .35rem);
+}
+
+// Right-hand chevron, kept when icon is unset so existing bootstrap=y pages render as before.
+.wikiplugin-fade__chevron {
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: .125rem;
+}
+
+.wikiplugin-fade__header > a[aria-expanded='true'] .wikiplugin-fade__chevron {
+    --fa: "\f077";
+}
+
+.wikiplugin-fade__label-text,
+.wikiplugin-fade__summary-text {
+    min-width: 0;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.wikiplugin-fade--summary-labeled .wikiplugin-fade__summary-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.wikiplugin-fade--summary-labeled .wikiplugin-fade__summary-text {
+    color: var(--bs-secondary-color);
+}
+
+.wikiplugin-fade__legacy-header {
+    display: block;
+}
+
+.wikiplugin-fade__legacy-header .wpfade-legacy-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.wikiplugin-fade--summary .wikiplugin-fade__legacy-header .wpfade-legacy-toggle {
+    align-items: flex-start;
+}
+
+@media print {
+    .wikiplugin-fade .collapse {
+        display: block !important;
+        height: auto !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .wikiplugin-fade .wpfade-div-plain,
+    .wikiplugin-fade .wpfade-div-icon {
+        display: block !important;
+    }
 }
 
 // /* wikiplugin_fancylist */

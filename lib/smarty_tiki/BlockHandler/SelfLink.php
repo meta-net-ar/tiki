@@ -105,7 +105,12 @@ class SelfLink extends Base implements TikiSmartyExtensionInterface
                     parse_str($params['data'], $attrs);
 
                     foreach ($attrs as $attr => $value) {
-                        $dataAttributes .= " data-$attr=\"$value\"";
+                        // Escape at final render point
+                        if (! preg_match('/^[a-zA-Z0-9_-]+$/', (string) $attr)) {
+                            continue;
+                        }
+                        $escapedValue = htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+                        $dataAttributes .= ' data-' . $attr . '="' . $escapedValue . '"';
                     }
                 }
                 unset($params['data']);
@@ -223,7 +228,8 @@ class SelfLink extends Base implements TikiSmartyExtensionInterface
                 $link .= $rel;
                 foreach ($params as $k => $v) {
                     if (strlen($k) > 3 && str_starts_with($k, '_on') && ! empty($v)) {
-                        $link .= htmlentities(substr($k, 1)) . '="' . $v . '" '; // $v should be already htmlentitized in the template
+                        // Encode handler values before insertion into HTML attributes.
+                        $link .= htmlentities(substr($k, 1)) . '="' . htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8') . '" ';
                         unset($params[$k]);
                     }
                 }

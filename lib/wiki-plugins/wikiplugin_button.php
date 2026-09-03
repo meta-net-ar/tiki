@@ -209,6 +209,36 @@ function wikiplugin_button_info()
                 'advanced' => true,
                 'safe' => true,
             ],
+            '_fade_action' => [
+                'required' => false,
+                'name' => tra('Fade Action'),
+                'description' => tra('Structured FADE action for grouped collapsibles.'),
+                'since' => '30.2',
+                'filter' => 'alpha',
+                'default' => '',
+                'advanced' => true,
+                'safe' => true,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Toggle All'), 'value' => 'toggleAll'],
+                    ['text' => tra('Open All'), 'value' => 'openAll'],
+                    ['text' => tra('Close All'), 'value' => 'closeAll'],
+                ],
+            ],
+            '_fade_group' => [
+                'required' => false,
+                'name' => tra('Fade Group'),
+                'description' => tr(
+                    'FADE group identifier (letters, digits, underscore, hyphen). Must match the %0fade_group%1 param of the PluginFade blocks to act on.',
+                    '<code>',
+                    '</code>'
+                ),
+                'since' => '30.2',
+                'filter' => 'text',
+                'default' => '',
+                'advanced' => true,
+                'safe' => true,
+            ],
             'data' => [
                 'required' => false,
                 'name' => tra('Data attributes'),
@@ -227,6 +257,7 @@ function wikiplugin_button($data, $params)
 {
     $parserlib = TikiLib::lib('parser');
     $smarty = TikiLib::lib('smarty');
+    $headerlib = TikiLib::lib('header');
 
     // for some unknown reason if a wikiplugin param is named _text all whitespaces from
     // its value are removed, but we need to rename the param to _text for smarty_functin
@@ -247,6 +278,44 @@ function wikiplugin_button($data, $params)
 
     // Parse wiki argument variables in the url, if any (i.e.: {{itemId}} for it's numeric value).
     $parserlib->parse_wiki_argvariable($params['href']);
+
+    unset($params['_onclick']);
+    foreach (array_keys($params) as $key) {
+        if (str_starts_with((string) $key, '_on')) {
+            unset($params[$key]);
+        }
+    }
+
+    $fadeAction = null;
+    $fadeGroup = null;
+    if (! empty($params['_fade_action'])) {
+        // Enforce strict declarative allowlist; reject unexpected values.
+        $allowedFadeActions = ['toggleAll', 'openAll', 'closeAll'];
+        $candidateAction = (string) $params['_fade_action'];
+        if (in_array($candidateAction, $allowedFadeActions, true)) {
+            $fadeAction = $candidateAction;
+        }
+    }
+    if (! empty($params['_fade_group'])) {
+        // Reject invalid groups instead of mutating input so behavior is predictable.
+        $candidateGroup = (string) $params['_fade_group'];
+        if (preg_match('/^[a-zA-Z0-9_-]{1,120}$/', $candidateGroup)) {
+            $fadeGroup = $candidateGroup;
+        }
+    }
+    unset($params['_fade_action'], $params['_fade_group']);
+
+    if ($fadeAction !== null && $fadeGroup !== null) {
+        $existingData = [];
+        if (! empty($params['data'])) {
+            parse_str((string) $params['data'], $existingData);
+        }
+        $existingData['fade-action'] = $fadeAction;
+        $existingData['fade-group'] = $fadeGroup;
+        $params['data'] = http_build_query($existingData, '', '&', PHP_QUERY_RFC3986);
+
+        $headerlib->add_js_module('import "@tiki/plugins/fade";');
+    }
 
     $content = \SmartyTiki\FunctionHandler\Button::render($params, $smarty->getEmptyInternalTemplate());
     return '~np~' . $content . '~/np~';
