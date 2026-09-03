@@ -11,12 +11,12 @@ namespace Tiki\Redirect;
  * Resolves object-relation redirects stored in tiki_object_relations.
  *
  * The admin "Redirects" panel stores redirect rules with the relation
- * `tiki.link.alias`.  This resolver is used by the routing layer to turn a
+ * `tiki.link.redirect`.  This resolver is used by the routing layer to turn a
  * request path into an HTTP redirect to the configured target.
  */
 class RedirectResolver
 {
-    public const RELATION = 'tiki.link.alias';
+    public const RELATION = 'tiki.link.redirect';
     public const DEFAULT_CODE = 301;
 
     /**
@@ -163,7 +163,7 @@ class RedirectResolver
      */
     protected function getRedirectCode(array $row): int
     {
-        $code = (int) ($row['source_fieldId'] ?? self::DEFAULT_CODE);
+        $code = (int) ($row['relation_code'] ?? self::DEFAULT_CODE);
         return in_array($code, [301, 302, 307, 308], true) ? $code : self::DEFAULT_CODE;
     }
 

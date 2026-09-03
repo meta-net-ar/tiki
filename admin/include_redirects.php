@@ -34,7 +34,7 @@ function get_item_id_from_custom_url(string $url)
 if (! empty($_POST['redirects'])) {
     $redirects = json_decode($_POST['redirects'], true);
     if (is_array($redirects)) {
-        $tikilib->query('DELETE FROM `tiki_object_relations` WHERE relation = ?', ['tiki.link.alias']);
+        $tikilib->query('DELETE FROM `tiki_object_relations` WHERE relation = ?', ['tiki.link.redirect']);
         foreach ($redirects as $redirect) {
             $sourceMode = $redirect['source_mode'] ?? 'existing';
             $targetMode = $redirect['target_mode'] ?? 'existing';
@@ -66,9 +66,9 @@ if (! empty($_POST['redirects'])) {
 
             $tikilib->query(
                 'INSERT INTO `tiki_object_relations`
-                    (`relation`, `source_type`, `source_itemId`, `source_fieldId`, `target_type`, `target_itemId`, `metadata_itemId`)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)',
-                ['tiki.link.alias', $sourceType, $sourceItemId, $redirectCode, $targetType, $targetItemId, null]
+                    (`relation`, `source_type`, `source_itemId`, `source_fieldId`, `target_type`, `target_itemId`, `metadata_itemId`, `relation_code`)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                ['tiki.link.redirect', $sourceType, $sourceItemId, null, $targetType, $targetItemId, null, $redirectCode]
             );
         }
     }
@@ -76,9 +76,9 @@ if (! empty($_POST['redirects'])) {
 
 $list_pages = $tikilib->list_pages();
 
-$object_relations = $tikilib->fetchAll('SELECT * FROM `tiki_object_relations` WHERE relation = ?', ['tiki.link.alias']);
+$object_relations = $tikilib->fetchAll('SELECT * FROM `tiki_object_relations` WHERE relation = ?', ['tiki.link.redirect']);
 foreach ($object_relations as &$relation) {
-    $relation['redirect_code'] = (int) ($relation['source_fieldId'] ?? 301);
+    $relation['redirect_code'] = (int) ($relation['relation_code'] ?? 301);
     if ($relation['source_type'] === 'custom') {
         $relation['source_mode'] = 'custom';
         $relation['custom_source'] = $relation['source_itemId'];

@@ -235,7 +235,7 @@ const redirectCodeOptions = [
 
 const createEmptyRedirect = () => ({
     relationId: null,
-    relation: 'tiki.link.alias',
+    relation: 'tiki.link.redirect',
     redirect_code: 301,
     source_mode: 'existing',
     target_mode: 'existing',
@@ -286,7 +286,7 @@ const pageLookup = computed(() => {
 
 const normalizeRedirect = (redirect = {}) => ({
     relationId: redirect.relationId ?? null,
-    relation: redirect.relation ?? 'tiki.link.alias',
+    relation: redirect.relation ?? 'tiki.link.redirect',
     redirect_code: Number.parseInt(redirect.redirect_code ?? redirect.redirectCode ?? 301, 10) || 301,
     source_mode: redirect.source_mode ?? 'existing',
     target_mode: redirect.target_mode ?? 'existing',
