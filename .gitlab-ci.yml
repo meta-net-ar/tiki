@@ -163,6 +163,8 @@ composer:
     paths:
       - vendor_bundled/vendor/
       - bin/
+      # Post-install hook output (Smarty extension map): templates cannot compile without it.
+      - private/generated/
     expire_in: 2 days
 
 composer-dbdiff:
