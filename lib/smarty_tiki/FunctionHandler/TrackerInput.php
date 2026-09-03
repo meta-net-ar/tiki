@@ -55,20 +55,15 @@ class TrackerInput extends Base implements TikiSmartyExtensionInterface
             unset($context['field']);
 
             $info = '';
-            $keyNotAccessible = false;
+            $encryptionState = 'plain';
             $encryptionKeyId = (int)($field['encryptionKeyId'] ?? 0);
+            $key = null;
             if (! empty($field['encryptionKeyId'])) {
                 try {
                     $key = new \Tiki\Encryption\Key($field['encryptionKeyId']);
                     if (! $key->isKeyAccessible()) {
                         $field['value'] = '';
-                        $keyNotAccessible = true;
-                        if (! empty($field['isMandatory']) && $field['isMandatory'] === 'y') {
-                            $info = tr('Field "%0" is encrypted. Please enter the key before saving.', $key->get('name'));
-                        } else {
-                            $info = tr('Field "%0" is encrypted. Leave empty or enter the key first to fill it.', $key->get('name'));
-                        }
-                        $info .= ' ' . $key->manualEntry();
+                        $encryptionState = 'locked';
                         $context['disabled'] = true;
                     } else {
                         $currentValue = $handler->getValue();
@@ -77,32 +72,26 @@ class TrackerInput extends Base implements TikiSmartyExtensionInterface
                             if ($field['value'] === false) {
                                 unset($_SESSION['encryption_shared_keys'][$encryptionKeyId]);
                                 $field['value'] = '';
-                                $keyNotAccessible = true;
-                                $info = tr('Decryption failed for field "%0": the entered key is incorrect.', $key->get('name'))
-                                    . ' ' . $key->manualEntry();
+                                $encryptionState = 'locked';
                                 $context['disabled'] = true;
                             }
                         }
-                        if (! $keyNotAccessible) {
-                            $info = tr('Field data is encrypted using key "%0".', $key->get('name'));
+                        if ($encryptionState === 'plain') {
+                            $encryptionState = 'unlocked';
                         }
                     }
                 } catch (\Tiki\Encryption\NotFoundException) {
-                    return tr('Field is encrypted with a key that no longer exists!');
-                } catch (\Tiki\Encryption\Exception $e) {
+                    $encryptionState = 'forbidden';
                     $field['value'] = '';
-                    $keyNotAccessible = true;
-                    $info = tr('Field data is encrypted using key "%0" but there was an error: %1', $key->get('name'), $e->getMessage());
-                    $info .= ' ' . $key->manualEntry();
+                    $context['disabled'] = true;
+                } catch (\Tiki\Encryption\Exception $e) {
+                    $encryptionState = 'locked';
+                    $field['value'] = '';
                     $context['disabled'] = true;
                 }
                 $handler = $trklib->get_field_handler($field, $item);
                 $field = array_merge($field, $handler->getFieldData());
                 $handler = $trklib->get_field_handler($field, $item);
-                $infoClass = $keyNotAccessible
-                    ? 'encryption-key-required-info description form-text'
-                    : 'description form-text';
-                $info = '<div class="' . $infoClass . '">' . $info . '</div>';
             }
 
             $desc = '';
@@ -120,19 +109,45 @@ class TrackerInput extends Base implements TikiSmartyExtensionInterface
 
             $fieldHtml = $handler->renderInput($context, $params);
 
-            if ($keyNotAccessible) {
-                \TikiLib::lib('header')->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tracker-field-unlock.js');
+            if ($encryptionState !== 'plain') {
+                $header = \TikiLib::lib('header');
+                $header->add_js_module("import '@vue-widgets/encrypted-field'");
+
+                $fieldId = (int)$field['fieldId'];
+                $keyName = $key ? htmlspecialchars($key->get('name'), ENT_QUOTES) : '';
                 $itemId = (int)($item['itemId'] ?? 0);
-                return '<div class="encrypted-field-wrapper"'
-                    . ' data-encryption-key-id="' . $encryptionKeyId . '"'
-                    . ' data-field-id="' . (int)$field['fieldId'] . '"'
+                $fieldAttrs = ' data-field-id="' . $fieldId . '" data-item-id="' . $itemId . '"';
+
+                if ($encryptionState === 'unlocked') {
+                    return '<tiki-encrypted-field key-name="' . $keyName . '"' . $fieldAttrs . '></tiki-encrypted-field>'
+                        . $fieldHtml
+                        . $desc;
+                }
+
+                $header->add_js_module("import '@vue-widgets/enter-key-modal'");
+                $header->add_js_module(
+                    "import { handleEncryptedField } from '@tiki/ui-utils'; handleEncryptedField();"
+                );
+
+                if ($encryptionState === 'forbidden') {
+                    return '<tiki-encrypted-field forbidden key-name="' . $keyName . '"' . $fieldAttrs . '></tiki-encrypted-field>'
+                        . $fieldHtml . $desc;
+                }
+
+                return '<tiki-encrypted-field locked key-name="' . $keyName . '"' . $fieldAttrs . '></tiki-encrypted-field>'
+                    . $fieldHtml
+                    . '<tiki-enter-key-modal'
+                    . ' data-field-id="' . $fieldId . '"'
                     . ' data-item-id="' . $itemId . '"'
-                    . ' data-network-error="' . htmlspecialchars(tr('A network error occurred. Please try entering the key again.'), ENT_QUOTES) . '">'
-                    . $fieldHtml . $info
-                    . '</div>' . $desc;
+                    . ' field-id="' . $fieldId . '"'
+                    . ' key-name="' . $keyName . '"'
+                    . ' encryption-key-id="' . $encryptionKeyId . '"'
+                    . ' item-id="' . $itemId . '"'
+                    . ' hidden></tiki-enter-key-modal>'
+                    . $desc;
             }
 
-            return $fieldHtml . $info . $desc;
+            return $fieldHtml . $desc;
         }
     }
 }

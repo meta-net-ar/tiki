@@ -2613,7 +2613,7 @@ class UsersLib extends TikiLib
                 }
             }
 
-            if (TIKI_API) {
+            if (defined('TIKI_API') && TIKI_API) {
                 // TODO: handle this as part of the API output serialization module
                 $res['avatar'] = $this->get_user_avatar_inline($res);
                 unset($res['avatarName']);

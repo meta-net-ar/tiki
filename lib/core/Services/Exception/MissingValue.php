@@ -8,7 +8,7 @@ class Services_Exception_MissingValue extends Services_Exception_FieldError
 {
     public function __construct($field)
     {
-        $message = TIKI_API ? tr('Field Required') : tr('%0 is required.', $field);
+        $message = (defined('TIKI_API') && TIKI_API) ? tr('Field Required') : tr('%0 is required.', $field);
         parent::__construct($field, $message);
     }
 }

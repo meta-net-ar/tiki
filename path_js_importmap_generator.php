@@ -177,6 +177,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-mf/tiki-offline" => $tikiUrl . JS_ASSETS_PATH . "/tiki-offline.js",
                 "@vue-mf/toolbar-dialogs" => $tikiUrl . JS_ASSETS_PATH . "/toolbar-dialogs.js",
                 "@vue-mf/tracker-rules" => $tikiUrl . JS_ASSETS_PATH . "/tracker-rules.js",
+                "@vue-mf/sss-admin" => $tikiUrl . JS_ASSETS_PATH . "/sss-admin.js",
 
                 /* src/js/vue-widgets vue widgets */
                 "@vue-widgets/el-autocomplete" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/autocomplete.js",
@@ -189,6 +190,8 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-widgets/el-slider" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/slider.js",
                 "@vue-widgets/el-transfer" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/transfer.js",
                 "@vue-widgets/el-backtop" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/backtop.js",
+                "@vue-widgets/encrypted-field" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/encryptedField.js",
+                "@vue-widgets/enter-key-modal" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/enterKeyModal.js",
 
                 /* src/js/wysiwyg */
                 "@wysiwyg/summernote" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg/summernote.js",
