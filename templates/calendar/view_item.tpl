@@ -5,36 +5,35 @@
 {/block}
 
 {block name="content"}
-    {if not $modal and not $preview}
-        {include
-            file='calendar_header.tpl'
-            viewlist='listEventView'
-        }
-    {/if}
-
     {if not $preview}
-        <div class="float-end">
-            {permission name='change_events' type='calendaritem' object=$calitem.calitemId}
-                <a href="{service controller='calendar' action='edit_item' calitemId=$calitem.calitemId|escape}" class="btn btn-primary edit-calendar-item-btn">
-                    {tr}Edit{/tr}
-                </a>
-            {/permission}
-            {if $tiki_p_add_events eq 'y'}
-                <a 
-                    href="{service controller='calendar' action='edit_item' calitemId=0 copy_from=$calitem.calitemId|escape modal=1 return_url='tiki-calendar.php'}"
-                    class="btn btn-light edit-calendar-item-btn cleanable-false"
-                    title="{tr}Create a new event based on this one{/tr}">
-                    {icon name='copy'} {tr}Duplicate{/tr}
-                </a>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            {if not $modal}
+                {include file='calendar_header.tpl' viewlist='listEventView'}
             {/if}
+
+            <div class="d-flex align-items-center gap-2 ms-auto">
+                {permission name='change_events' type='calendaritem' object=$calitem.calitemId}
+                    <a href="{service controller='calendar' action='edit_item' calitemId=$calitem.calitemId|escape}" class="btn btn-primary edit-calendar-item-btn">
+                        {icon name='edit'} {tr}Edit{/tr}
+                    </a>
+                {/permission}
+                {if $tiki_p_add_events eq 'y'}
+                    <a
+                        href="{service controller='calendar' action='edit_item' calitemId=0 copy_from=$calitem.calitemId|escape modal=1 return_url='tiki-calendar.php'}"
+                        class="btn btn-light edit-calendar-item-btn cleanable-false"
+                        title="{tr}Create a new event based on this one{/tr}">
+                        {icon name='copy'} {tr}Duplicate{/tr}
+                    </a>
+                {/if}
+            </div>
         </div>
     {/if}
   
-    <h5 class="mt-3 mb-3">{tr}Title{/tr} : {$calitem.parsedName}</h5>
+    <h5 class="mt-3 mb-3">{tr}Title:{/tr} {$calitem.parsedName}</h5>
     <div class="summary mb-4">
         {$thiscustombgcolor = $calendar.custombgcolor}
         {$thiscustomfgcolor = $calendar.customfgcolor}
-        <span class="px-3 py-2 rounded" style="background:#{$thiscustombgcolor};color:#{$thiscustomfgcolor};">{tr}Calendar{/tr} : <b>{$calendar.name|escape}</b></span>
+        <span class="px-3 py-2 rounded" style="background:#{$thiscustombgcolor};color:#{$thiscustomfgcolor};">{tr}Calendar:{/tr} <b>{$calendar.name|escape}</b></span>
     </div>
     {if $recurrent}
         {if $recurrence.nbRecurrences eq 1}
@@ -230,7 +229,7 @@
         {/if}
     {/if}
     <div class="summary">
-        <span>{tr}Start{/tr} - {tr}End{/tr} : <b>{$calitem.display_datetimes}</b></span>
+        <span>{tr}Start{/tr} - {tr}End:{/tr} <b>{$calitem.display_datetimes}</b></span>
     </div>
     <div class="my-3">
         <b>{tr}Description{/tr}</b><br>
@@ -238,7 +237,7 @@
     </div>
     {if !empty($trackerItems)}
         <div class="row px-3 py-2">
-            <label class="col-form-label col-sm-3">{tr}Related tracker items{/tr} : </label>
+            <label class="col-form-label col-sm-3">{tr}Related tracker items:{/tr} </label>
             <div class="col-sm-9 mb-0 pt-2">
                 <ul>
                     {foreach from=$trackerItems item=trackerItem}
