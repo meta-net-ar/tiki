@@ -26,6 +26,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
             //IMPORTANT:  All these have to be ESM modules, TEST them, don't assume that they are.
             "imports" => [
                 "@tiki/modules/search" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/modules/search.js",
+                "@tiki/plugins/fade" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/fade.js",
 
                 /* src/js/@tiki/ui-utils */
                 "@tiki/ui-utils" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/ui-utils.js",
