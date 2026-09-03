@@ -2603,7 +2603,7 @@ class UsersLib extends TikiLib
             // indicate whether the user's email is from a disposable mail server
             $res['disposable_email'] = false;
 
-            if ($prefs['email_detect_disposable'] === 'y' && isset($res['email'])) {
+            if ($prefs['email_detect_disposable'] === 'y' && ! empty($res['email'])) {
                 try {
                     if (DisposableEmail::isDisposable($res['email'])) {
                         $res['disposable_email'] = true;
