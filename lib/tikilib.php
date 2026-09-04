@@ -1585,6 +1585,49 @@ class TikiLib extends TikiDb_Bridge
         return $this->table('tiki_score')->fetchFullRow(['event' => $event]);
     }
 
+    /**
+     * Build a query returning one row per user with their current score.
+     *
+     * @param int $scoreExpiryDays
+     * @return array
+     */
+    protected function getLatestUserScoresQuery($scoreExpiryDays = 0)
+    {
+        $params = [];
+
+        if (! empty($scoreExpiryDays)) {
+            $params[] = $scoreExpiryDays;
+            $query = "
+                SELECT `current_score`.`recipientObjectId`,
+                    `current_score`.`pointsBalance` - IFNULL(`expired_score`.`pointsBalance`, 0) AS `score`
+                FROM (
+                    SELECT `recipientObjectId`, MAX(`id`) AS `currentId`,
+                        MAX(CASE
+                            WHEN `date` < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY)) THEN `id`
+                        END) AS `expiredId`
+                    FROM `tiki_object_scores`
+                    WHERE `recipientObjectType` = 'user'
+                    GROUP BY `recipientObjectId`
+                ) `latest_score`
+                INNER JOIN `tiki_object_scores` `current_score`
+                    ON `current_score`.`id` = `latest_score`.`currentId`
+                LEFT JOIN `tiki_object_scores` `expired_score`
+                    ON `expired_score`.`id` = `latest_score`.`expiredId`";
+        } else {
+            $query = "
+                SELECT `current_score`.`recipientObjectId`, `current_score`.`pointsBalance` AS `score`
+                FROM `tiki_object_scores` `current_score`
+                INNER JOIN (
+                    SELECT `recipientObjectId`, MAX(`id`) AS `id`
+                    FROM `tiki_object_scores`
+                    WHERE `recipientObjectType` = 'user'
+                    GROUP BY `recipientObjectId`
+                ) `latest_score` ON `latest_score`.`id` = `current_score`.`id`";
+        }
+
+        return [$query, $params];
+    }
+
     // List users by best scoring
     // shared
     /**
@@ -1601,31 +1644,11 @@ class TikiLib extends TikiDb_Bridge
             $start = "0";
         }
 
-        if (empty($score_expiry_days)) {
-            // score does not expire
-            $query = "select `recipientObjectId` as `login`,
-                `pointsBalance` as `score`
-                from `tiki_object_scores` tos
-                where `recipientObjectType`='user'
-                and tos.`id` = (select max(id) from `tiki_object_scores` where `recipientObjectId` = tos.`recipientObjectId` and `recipientObjectType`='user' group by `recipientObjectId`)
-                group by `recipientObjectId`, `pointsBalance` order by `score` desc";
-
-            $result = $this->fetchAll($query, null, $limit, $start);
-        } else {
-            // score expires
-            $query = "select `recipientObjectId` as `login`,
-                `pointsBalance` - ifnull((select `pointsBalance` from `tiki_object_scores`
-                    where `recipientObjectId`=tos.`recipientObjectId`
-                    and `recipientObjectType`='user'
-                    and `date` < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY))
-                    order by id desc limit 1), 0) as `score`
-                from `tiki_object_scores` tos
-                where `recipientObjectType`='user'
-                and tos.`id` = (select max(id) from `tiki_object_scores` where `recipientObjectId` = tos.`recipientObjectId` and `recipientObjectType`='user' group by `recipientObjectId`)
-                group by `recipientObjectId`, `pointsBalance` order by `score` desc";
-
-            $result = $this->fetchAll($query, $score_expiry_days, $limit, $start);
-        }
+        [$latestUserScoresQuery, $params] = $this->getLatestUserScoresQuery($score_expiry_days);
+        $query = "SELECT `recipientObjectId` AS `login`, `score`
+            FROM ({$latestUserScoresQuery}) `user_scores`
+            ORDER BY `score` DESC";
+        $result = $this->fetchAll($query, $params, $limit, $start);
 
         foreach ($result as & $res) {
             $res['position'] = ++$start;
