@@ -236,14 +236,6 @@ $.fn.setupEventCalendar = function (
                     remote: $.service("calendar", "edit_item", params),
                     open: function () {
                         $(calendarEl).tikiModal();
-                        $("form:not(.no-ajax)", this)
-                            .addClass("no-ajax") // Remove default ajax handling, we replace it
-                            .on(
-                                "submit",
-                                ajaxSubmitEventHandler(function (data) {
-                                    calendarEditSubmit(data, this);
-                                })
-                            );
                         isOpeningModal = false;
                     },
                     error: function () {
@@ -607,14 +599,6 @@ $.fn.setupEventCalendar = function (
                         remote: "tiki-ajax_services.php?controller=calendar&action=view_item&calitemId=" + event.id + "&modal=1",
                         open: function () {
                             $this.tikiModal();
-                            $("form:not(.no-ajax)", this)
-                                .addClass("no-ajax") // Remove default ajax handling, we replace it
-                                .on(
-                                    "submit",
-                                    ajaxSubmitEventHandler(function (data) {
-                                        calendarEditSubmit(data, this);
-                                    })
-                                );
                         },
                     });
                 }
@@ -670,15 +654,6 @@ $(document).on("click", ".edit-calendar-item-btn", function (e) {
                     remote: $this.attr("href"),
                     open: function () {
                         $this.tikiModal();
-
-                        $("form:not(.no-ajax)", this)
-                            .addClass("no-ajax") // Remove default ajax handling, we replace it
-                            .on(
-                                "submit",
-                                ajaxSubmitEventHandler(function (data) {
-                                    calendarEditSubmit(data, this);
-                                })
-                            );
                     },
                 });
             },
