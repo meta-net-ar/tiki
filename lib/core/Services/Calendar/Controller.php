@@ -134,23 +134,19 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $calendarIdFromModuleOrPlugin = $input->calIds->string();
         if ($calendarIdFromModuleOrPlugin) {
             $splitCalendarIdFromModuleOrPlugin = explode(',', $calendarIdFromModuleOrPlugin);
-            $listevents = $this->calendarLib->list_raw_items(
+            $listevents = $this->calendarLib->listEventFeedItems(
                 array_intersect($splitCalendarIdFromModuleOrPlugin, array_keys($calendars)),
                 $user,
                 $viewstart,
-                $viewend,
-                0,
-                -1
+                $viewend
             );
         } else {
             if (isset($_SESSION['CalendarViewGroups']) && $_SESSION['CalendarViewGroups']) {
-                $listevents = $this->calendarLib->list_raw_items(
+                $listevents = $this->calendarLib->listEventFeedItems(
                     array_intersect($_SESSION['CalendarViewGroups'], array_keys($calendars)),
                     $user,
                     $viewstart,
-                    $viewend,
-                    0,
-                    -1
+                    $viewend
                 );
             } else {
                 $listevents = [];
@@ -158,6 +154,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         }
 
         $parserLib = TikiLib::lib('parser');
+        $timezone = new DateTimeZone($prefs['display_timezone']);
         $events = [];
 
         foreach ($listevents as $event) {
@@ -184,7 +181,6 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 ]);
             }
 
-            $timezone = new DateTimeZone($prefs['display_timezone']);
             $start = new DateTime('@' . $event['start']);
             $end   = new DateTime('@' . $event['end']);
 
@@ -304,10 +300,15 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                             if ($input->offsetExists('redirect')) {
                                 return ['url' => $input->redirect->url()];
                             } else {
-                                if ($return_url && ! $access->is_xml_http_request()) {
+                                $isAjaxRequest = $access->is_xml_http_request();
+                                if ($isAjaxRequest && (! defined('TIKI_API') || ! TIKI_API)) {
+                                    return $this->getRefreshEventsResponse();
+                                }
+
+                                if ($return_url && ! $isAjaxRequest) {
                                     $access->redirect($return_url, tr('The event was saved successfully'));
                                 }
-                                // Ensure AJAX modals redirects
+
                                 return ['url' => $return_url ?: 'tiki-calendar.php'];
                             }
                         } else {
@@ -785,7 +786,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             Feedback::success(tr('Event deleted successfully.'));
         }
 
-        return [];
+        return $this->getRefreshEventsResponse();
     }
 
     public function action_remove_calendar(JitFilter $input): array
@@ -859,7 +860,22 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             }
         }
 
-        return [];
+        return $this->getRefreshEventsResponse();
+    }
+
+    /**
+     * Close the modal and reload the calendar event source.
+     */
+    private function getRefreshEventsResponse(): array
+    {
+        if ((defined('TIKI_API') && TIKI_API) || ! TikiLib::lib('access')->is_xml_http_request()) {
+            return [];
+        }
+
+        return array_merge(
+            Services_Utilities::closeModal(),
+            ['refreshEvents' => true]
+        );
     }
 
     /**
