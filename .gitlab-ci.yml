@@ -3,6 +3,7 @@ stages:
   - code-quality
   - tiki-check
   - unit-tests
+  - e2e-tests
   - package-tiki
   - vendors-security
   - vendors_update
@@ -103,7 +104,7 @@ node_modules:
 node_build:
   stage: build
   needs:
-    - node_modules  
+    - node_modules
     #This is only because we still have some scss files installed from composer - 2023-11-17
     #- composer
   image:
@@ -162,6 +163,8 @@ composer:
     paths:
       - vendor_bundled/vendor/
       - bin/
+      # Post-install hook output (Smarty extension map): templates cannot compile without it.
+      - private/generated/
     expire_in: 2 days
 
 composer-dbdiff:
@@ -689,6 +692,71 @@ unit-tests-icon-generator:
     name: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php console.php build:generateiconlist
+
+# End-to-end browser tests (Playwright) — fully self-contained:
+# provisions a disposable Tiki (dedicated test database + schema install) and
+# serves it with PHP's built-in web server, so no pre-existing instance is
+# needed. See tests/e2e/README.md.
+# All jobs are manual + allow_failure while runtimes are validated on shared
+# runners; promote to automatic once stable. `e2e-all` runs every suite;
+# the `e2e-suite` matrix offers one play button per domain.
+.e2e-base:
+  stage: e2e-tests
+  needs:
+    - composer
+    - node_modules
+    # node_build artifacts provide public/generated/ (JS bundles + CSS) —
+    # without them Bootstrap JS 404s and every tab/modal interaction times out.
+    - node_build
+  when: manual
+  allow_failure: true
+  # Official Playwright image (Node + browsers); version must match the
+  # @playwright/test devDependency in the root package.json.
+  image: ${DEPENDENCY_PROXY_PREFIX}mcr.microsoft.com/playwright:v1.58.2-noble
+  services:
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MARIADB_IMAGE_COMMON_LTS}
+      alias: mysql
+      command: ["--explicit-defaults-for-timestamp=off"]
+  variables:
+    TIKI_E2E_WEBSERVER: "1"
+    TIKI_E2E_DB_HOST: mysql
+    TIKI_E2E_DB_NAME: ${MYSQL_DATABASE}
+    TIKI_E2E_DB_USER: ${MYSQL_USER}
+    TIKI_E2E_DB_PASS: ${MYSQL_PASSWORD}
+  script:
+    # php-bcmath is required by teqneers/shamir (Secret::share) — shared-secrets
+    # key creation fatals without it, silently skipping the fixture-based suites.
+    - apt-get update -qq && apt-get install -y -qq php-cli php-mysql php-xml php-mbstring php-zip php-gd php-intl php-curl php-bcmath > /dev/null
+    - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
+    - tests/e2e/bin/e2e-provision.sh
+    - npx playwright install chromium
+    # E2E_SUITE selects one domain (empty = all suites). Anchored to suites/<domain>/
+    # because the bare name is a regex over the full path and could over-match.
+    - npx playwright test --config=tests/e2e/playwright.config.ts ${E2E_SUITE:+suites/${E2E_SUITE}/}
+  after_script:
+    # PHP server output goes to a file (see playwright.config.ts) to keep the
+    # job log under GitLab's 4MB limit; surface fatals here for quick triage.
+    - grep -E 'PHP (Fatal|Parse) error' tests/e2e/php-server.log | tail -20 || true
+  artifacts:
+    when: always
+    paths:
+      - tests/e2e/playwright-report
+      - tests/e2e/php-server.log
+    expire_in: 2 days
+
+e2e-all:
+  extends: .e2e-base
+
+# One manual job per domain. Adding a new domain to the matrix list is the
+# only change needed here after `mkdir tests/e2e/suites/<domain>/`.
+e2e-suite:
+  extends: .e2e-base
+  parallel:
+    matrix:
+      - E2E_SUITE:
+          - smoke
+          - shared-secrets
+          - wiki-pages
 
 #
 # Package this Tiki build

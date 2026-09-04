@@ -53,6 +53,9 @@
         "clean" : "concurrently \"npm:clean:*\"",
         "test" : "vitest --config=src/js/vite.config.mjs",
         "testci" : "vitest --config=src/js/vite.config.mjs --reporter=junit --coverage --run",
+        "test:e2e" : "cd tests/e2e && npx playwright test",
+        "test:e2e:smoke" : "cd tests/e2e && npx playwright test suites/smoke/",
+        "test:e2e:report" : "cd tests/e2e && npx playwright show-report",
         "postinstall" : "patch-package --patch-dir=src/js/patches --error-on-fail",
         "patch" : "patch-package --patch-dir=src/js/patches --error-on-fail",
         "prepare" : "husky"
@@ -78,6 +81,7 @@
     "devDependencies" : {
         "@commitlint/cli" : "^21.2.2",
         "@commitlint/config-conventional" : "^21.2.2",
+        "@playwright/test" : "1.58.2",
         "@stylistic/eslint-plugin" : "^5.10.0",
         "@testing-library/vue" : "^8.1.0",
         "@vitejs/plugin-vue" : "^6.0.8",
