@@ -285,6 +285,7 @@
                     {preference name=feature_wiki_structure}
                     <div class="adminoptionboxchild" id="feature_wiki_structure_childcontainer">
                         {preference name=wiki_structure_bar_position}
+                        {preference name=wiki_structure_add_to_structure_bar}
                         {preference name=feature_wiki_open_as_structure}
                         {preference name=feature_wiki_make_structure}
                         {preference name=feature_wiki_categorize_structure}
