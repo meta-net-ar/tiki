@@ -457,7 +457,7 @@
                         <label class="col-sm-3 col-md-2 col-form-label" for="login">{if $prefs.login_is_email eq 'y'}{tr}Email{/tr}{else}{tr}User{/tr}{/if}</label>
                         <div class="col-sm-7 col-md-6">
                             {if $userinfo.login neq 'admin'}
-                                <input type="text" id='login' class="form-control" name='login' value="{$userinfo.login|escape}">
+                                <input type="text" id='login' class="form-control" name='login' value="{$userinfo.login|escape}" data-original-login="{$userinfo.login|escape}">
                                 {if $prefs.login_is_email eq 'y'}
                                     <br>
                                     <em>{tr}Use the email as username{/tr}.</em>
@@ -477,7 +477,7 @@
                                     </p>
                                 {/if}
                             {else}
-                                <input type="hidden" class="form-control" name='login' value="{$userinfo.login|escape}">{$userinfo.login}
+                                <input type="hidden" id='login' class="form-control" name='login' value="{$userinfo.login|escape}" data-original-login="{$userinfo.login|escape}">{$userinfo.login}
                             {/if}
                         </div>
                     </div>
@@ -525,6 +525,15 @@
                                 </div>
                             </div>
                         </div>
+                        {if isset($userinfo.userId) && $prefs.users_admin_actions_require_validation eq 'y'}
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-md-2 col-form-label" for="confirmpassword">{tr}Confirm your password{/tr}</label>
+                            <div class="col-sm-7 col-md-6">
+                                <input type="password" class="form-control" name="confirmpassword" id="confirmpassword" placeholder="{tr}Your current password{/tr}" autocomplete="current-password">
+                                <div class="form-text">{tr}Required to save a password change: enter your own current password.{/tr}</div>
+                            </div>
+                        </div>
+                        {/if}
                         {if $prefs.generate_password eq 'y' and not ( $prefs.auth_method eq 'ldap' and ( $prefs.ldap_create_user_tiki eq 'n' or $prefs.ldap_skip_admin eq 'y' ) and $prefs.ldap_create_user_ldap eq 'n')}
                             <div class="mb-3 row">
                                 <div class="col-sm-3 offset-sm-3 col-md-3 offset-md-2">

@@ -7551,6 +7551,30 @@ class UsersLib extends TikiLib
         return ! empty($pass) && hash_equals(md5($pass), $actpass);
     }
 
+    /**
+     * Confirms the acting admin's own password for a sensitive action. Call before any mutation.
+     *
+     * @param string $actingUser login of the currently authenticated admin
+     * @param string $submittedPassword password submitted to confirm the action
+     * @return string empty string if allowed, otherwise a user-facing error message
+     */
+    public function checkAdminActionConfirmation($actingUser, $submittedPassword)
+    {
+        global $prefs;
+        if ($prefs['users_admin_actions_require_validation'] != 'y') {
+            return '';
+        }
+        if ($this->isAutologin()) {
+            return $this->getAutologinAdminActionError();
+        }
+        // for_login=false: not a login attempt
+        [$ok] = $this->validate_user($actingUser, (string) $submittedPassword, false, null, false);
+        if (! $ok) {
+            return tra('Invalid password');
+        }
+        return '';
+    }
+
    /**
     * Tests the password against policy enforcement (Admin->Login), namely
     * $min_pass_length

@@ -18,6 +18,7 @@ $inputConfiguration = [
             'login'                       => 'username',     //post
             'pass'                        => 'password',     //post
             'passAgain'                   => 'password',     //post
+            'confirmpassword'             => 'password',     //post
             'pass_first_login'            => 'bool',         //post
             'find'                        => 'text',         //post
              'email'                      => 'email',        //post
@@ -465,6 +466,15 @@ if (isset($_REQUEST['user']) and $_REQUEST['user']) {
         isset($_POST['edituser']) and isset($_POST['login']) and isset($_POST['email'])
         && $access->checkCsrf(true)
     ) {
+        // must run before any mutation below (login rename, email, ...), not just the password change
+        $changingPassword = ! empty($_POST['pass']) || ! empty($_POST['genepass']);
+        if ($changingPassword) {
+            $confirmationError = $userlib->checkAdminActionConfirmation($user, $_POST['confirmpassword'] ?? '');
+            if ($confirmationError !== '') {
+                Feedback::errorAndDie($confirmationError, \Laminas\Http\Response::STATUS_CODE_409);
+            }
+        }
+
         if (! empty($_POST['login'])) {
             $_POST['login'] = trim($_POST['login']);
             if ($prefs['login_is_email'] == 'y' && strlen($_REQUEST['login']) > 200 && ($userinfo['login'] != $_POST['login'] || $userinfo['email'] != $_POST['email'])) {
@@ -506,7 +516,7 @@ if (isset($_REQUEST['user']) and $_REQUEST['user']) {
 
         $pass_first_login = (isset($_REQUEST['pass_first_login']) && $_REQUEST['pass_first_login'] == 'on');
 
-        if (! empty($_POST['pass']) || ! empty($_POST['genepass'])) {
+        if ($changingPassword) {
             if ($_POST['pass'] !== $_POST['passAgain']) {
                 Feedback::error(tra('Passwords do not match'));
             }
