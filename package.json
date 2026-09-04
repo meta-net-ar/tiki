@@ -168,6 +168,7 @@
     "src/js/common-externals*",
     "src/js/common-reexported",
     "src/js/jquery-tiki",
+    "src/js/tiki-annotator",
     "src/js/tiki-figlet",
     "src/js/tiki-iot",
     "src/js/tiki-glightbox",

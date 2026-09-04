@@ -131,6 +131,7 @@ export default defineConfig(({ command, mode }) => {
         kanban: resolve(import.meta.dirname, "vue-mf/kanban/src/kanban.js"),
         "root-config": resolve(import.meta.dirname, "vue-mf/root-config/src/root-config.js"),
         "tiki-3d-model-viewer": resolve(import.meta.dirname, "tiki-model3dviewer/model3dviewer.js"),
+        "tiki-annotator": resolve(import.meta.dirname, "tiki-annotator/annotator.js"),
         "tiki-glightbox": resolve(import.meta.dirname, "tiki-glightbox/glightbox-index.js"),
         "tiki-sentry-browser": resolve(import.meta.dirname, "tiki-sentry-browser/sentry-browser.js"),
         "tiki-figlet": resolve(import.meta.dirname, "tiki-figlet/figlet.js"),

@@ -229,6 +229,52 @@ Sections::onSectionChange(function ($section) use ($prefs) {
     $freetaglib->assignCurrentObjectTagsToSmarty();
 });
 
+Sections::onSectionChange(function ($section) {
+    global $headerlib, $prefs, $user, $jqueryTiki;
+
+    if ($prefs['feature_inline_comments'] !== 'y' || $prefs['comments_inline_annotator'] !== 'y') {
+        return;
+    }
+
+    $object = current_object();
+
+    if (! $object) {
+        return;
+    }
+
+    $commentController = new Services_Comment_Controller();
+
+    if (
+        ! $commentController->isEnabled($object['type'], $object['object']) ||
+        ! $commentController->canView($object['type'], $object['object'])
+    ) {
+        return;
+    }
+
+    $accesslib = TikiLib::lib('access');
+    $accesslib->setTicket();
+
+    $annotatorConfig = [
+        'containerId'  => 'top',
+        'objectUri'    => urlencode($object['type']) . ':' . urlencode($object['object']),
+        'userId'       => (string) $user,
+        'userName'     => (string) ($jqueryTiki['userRealName'] ?? $user),
+        'canPost'      => $commentController->canPost($object['type'], $object['object']),
+        'showUserInfo' => $prefs['comments_inline_annotator_with_info'] === 'y',
+        'ticket'       => $accesslib->getTicket(),
+    ];
+
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/tiki-annotator.css');
+
+    $headerlib->add_js_module(
+        'import { initRecogito } from "@tiki-annotator/annotator";' . "\n"
+        . 'initRecogito(' . json_encode(
+            $annotatorConfig,
+            JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+        ) . ');'
+    );
+});
+
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
@@ -914,81 +960,6 @@ if ($prefs['mustread_enabled'] == 'y') {
 if ($prefs['feature_tasks'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-tasks.js');
 }
-
-Sections::onSectionChange(function ($section) {
-    global $headerlib, $prefs, $user;
-    if ($prefs['feature_inline_comments'] === 'y' && $prefs['comments_inline_annotator'] === 'y') {
-        if (empty($object)) {
-            $object = current_object();
-        }
-        $commentController = new Services_Comment_Controller();
-
-        if (
-            $object &&
-            $commentController->isEnabled($object['type'], $object['object']) &&
-            $commentController->canView($object['type'], $object['object'])
-        ) {
-            $canPost = $commentController->canPost($object['type'], $object['object']);
-            // spoof a URI from type and id
-            $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
-
-            $headerlib
-                ->add_js_module('import moment from "moment"; window.moment = moment;')
-                ->add_jsfile('vendor_bundled/vendor/openannotation/annotator/annotator-full.min.js')
-                ->add_cssfile('vendor_bundled/vendor/openannotation/annotator/annotator.min.css')
-                // language=JavaScript
-                ->add_jq_onready('
-var annotatorContent = $("#top").annotator({readOnly: ' . ($canPost ? 'false' : 'true') . '});
-annotatorContent.annotator("addPlugin", "Store", {
-    prefix: "tiki-ajax_services.php?controller=annotation&action=",
-
-    urls: {
-        create:  "create",
-        update:  "update&threadId=:id",
-        destroy: "destroy&threadId=:id",
-        search:  "search"
-    },
-
-    annotationData: {
-        "uri": "' . $objectIdentifier . '"
-    },
-
-    loadFromSearch: {
-        "limit": 20,
-        "uri": "' . $objectIdentifier . '"
-    },
-
-    emulateJSON: true,    // send the data in a form request so we can get it later
-    emulateHTTP: true    // tiki services need GET or POST
-
-});
-annotatorContent.annotator("addPlugin", "Permissions", {
-    user: "' . $user . '",
-    showViewPermissionsCheckbox: false,    // TODO for private comments
-    showEditPermissionsCheckbox: false,
-    userAuthorize: function(action, annotation, user) {
-        return annotation.permissions[action];
-    }
-});');
-            // handling for extra info
-            if ($prefs['comments_inline_annotator_with_info'] === 'y') {
-                $headerlib->add_jq_onready(
-                    '// a little glue to show the author name and date
-$(".annotator-outer.annotator-viewer").on("load", function (event, annotations) {
-    $(this).find(".annotator-user").text(annotations[0].realName + " - " + annotations[0].commentDate);
-});
-// update the annotaion object with the user name and date for newly created annotations
-$("#top").on("annotationCreated", function (e, annotation) {
-    const momentDate = moment();
-    annotation.commentDate = momentDate.format(jqueryTiki.shortDateFormat) + " " +
-        momentDate.format(jqueryTiki.shortTimeFormat);
-    annotation.realName = jqueryTiki.userRealName || jqueryTiki.username;
-});'
-                );
-            }
-        }
-    }
-});
 
 $headerlib->add_jsfile('lib/jquery_tiki/pluginedit.js');
 

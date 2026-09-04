@@ -7843,16 +7843,6 @@
             "time": "2026-05-07T22:38:04+00:00"
         },
         {
-            "name": "openannotation/annotator",
-            "version": "1.2.10",
-            "dist": {
-                "type": "zip",
-                "url": "https://composer.tiki.org/dist/openannotation/annotator/openannotation-annotator-1.2.10.zip",
-                "shasum": "0e982ad018a75edd758111f9534c03513c7be9bc"
-            },
-            "type": "library"
-        },
-        {
             "name": "opis/json-schema",
             "version": "2.6.0",
             "source": {

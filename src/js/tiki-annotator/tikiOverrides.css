@@ -1,0 +1,12 @@
+html,
+body {
+    overscroll-behavior-y: auto;
+}
+
+.r6o-annotatable {
+    overscroll-behavior-y: none;
+}
+
+:root[data-bs-theme="dark"] .r6o-annotatable .r6o-span-highlight-layer {
+    mix-blend-mode: screen;
+}
