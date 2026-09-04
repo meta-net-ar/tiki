@@ -936,5 +936,6 @@ if (isset($_REQUEST['unit'])) {
     $smarty->assign('unit', $_REQUEST['unit']);
 }
 // Display the template
+$headerlib->add_jsfile("lib/jquery_tiki/tiki-admin_actionlog.js");
 $smarty->assign('mid', 'tiki-admin_actionlog.tpl');
 $smarty->display("tiki.tpl");

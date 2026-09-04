@@ -749,6 +749,8 @@ class WikiLib extends TikiLib
         if (! $skipCache && $wiki_cache > 0 && empty($_REQUEST['offset']) && empty($_REQUEST['itemId']) && (empty($user) || $prefs['wiki_cache'] == 0)) {
             $cache_info = $this->get_cache_info($page);
             if (! empty($cache_info['cache_timestamp']) && $cache_info['cache_timestamp'] + $wiki_cache >= $this->now) {
+                //Cache hit
+                //var_dump("wikilib cache hit");
                 $content = $cache_info['cache'];
                 // get any cached JS and add to headerlib JS
                 $jsFiles = $headerlib->getJsFromHTML($content, false, true);
@@ -764,24 +766,27 @@ class WikiLib extends TikiLib
 
                 $canBeRefreshed = true;
             } else {
-                $jsFile1 = $headerlib->getJsFilesWithScriptTags();
+                //Cache miss
+                //var_dump("wikilib cache miss");
+                $jsFile1 = $headerlib->getJsFilesWithScriptTags([]);//MUST RESSTORE THIS BENOITG- 2024-05-10
                 $js1 = $headerlib->getJs();
                 $info['outputType'] = $tikilib->getOne("SELECT `outputType` FROM `tiki_output` WHERE `entityId` = ? AND `objectType` = ? AND `version` = ?", [$info['pageName'], 'wikiPage', $info['version']]);
                 $content = (new WikiLibOutput($info, $info['data'], $parse_options))->parsedValue;
 
                 // get any JS added to headerlib during parse_data and add to the bottom of the data to cache
-                $jsFile2 = $headerlib->getJsFilesWithScriptTags();
+                $jsFile2 = $headerlib->getJsFilesWithScriptTags([]);
                 $js2 = $headerlib->getJs();
 
                 $jsFile = array_diff($jsFile2, $jsFile1);
                 $js = array_diff($js2, $js1);
 
                 $jsFile = implode("\n", $jsFile);
-                $js = $headerlib->wrap_js(implode("\n", $js));
+                $js = $headerlib->wrapJs(implode("\n", $js), 'STANDARD');
 
                 $this->update_cache($page, $content . $jsFile . $js);
             }
         } else {
+            //var_dump("wikilib not cacheable");
             $content = (new WikiLibOutput($info, $info['data'], $parse_options, $info['version']))->parsedValue;
         }
 

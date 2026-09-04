@@ -87,7 +87,7 @@ $templates_c = $cachelib->count_cache_files(SMARTY_COMPILED_TEMPLATES_PATH . '/'
 $smarty->assign('templates_c', $templates_c);
 $tempcache = $cachelib->count_cache_files(TEMP_CACHE_PATH . '/' . $tikidomain);
 $smarty->assign('tempcache', $tempcache);
-$temppublic = $cachelib->count_cache_files(TEMP_PUBLIC_PATH . '/' . $tikidomain);
+$temppublic = $cachelib->count_cache_files(TEMP_HTTP_PUBLIC_PATH . '/' . $tikidomain);
 $smarty->assign('temppublic', $temppublic);
 $templates = [];
 foreach ($languages as $clang) {

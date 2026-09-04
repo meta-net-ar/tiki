@@ -809,7 +809,7 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         test: {
-            include: ["src/js/**/tests/**/*.test.js"],
+            include: ["src/js/**/*.test.js"],
             globals: true,
             environment: "happy-dom",
             reporters: [["default"]], // ["junit"] will be enabled by the testci script with --reporter=junit

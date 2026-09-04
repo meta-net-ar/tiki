@@ -59,9 +59,9 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
         $this->filesTable = TikiDb::get()->table('tiki_files');
 
         $opts = [
-            'tmbPath'       => TEMP_PUBLIC_PATH . '/' . $tikidomainslash,
+            'tmbPath'       => TEMP_HTTP_PUBLIC_PATH . '/' . $tikidomainslash,
             'tmpPath'       => TEMP_PATH . '/' . $tikidomainslash,
-            'tmbURL'        => TEMP_PUBLIC_PATH . '/' . $tikidomainslash,
+            'tmbURL'        => TEMP_HTTP_PUBLIC_PATH . '/' . $tikidomainslash,
             //'tmbSize'     => $prefs['fgal_thumb_max_size'],
         ];
         $this->options = array_merge($this->options, $opts);

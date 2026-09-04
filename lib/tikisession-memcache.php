@@ -15,11 +15,10 @@ class MemcacheSession implements SessionHandlerInterface
      */
     public function init()
     {
-
         session_set_save_handler($this);
 
-        $this->enabled = TikiLib::lib("memcache")->isEnabled();
-        $this->lib = TikiLib::lib("memcache");
+        $this->enabled = \Tiki\Cache\MemcacheLib::getInstance()->isEnabled();
+        $this->lib = \Tiki\Cache\MemcacheLib::getInstance();
     }
 
     /**

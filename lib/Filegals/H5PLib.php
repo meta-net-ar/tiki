@@ -446,9 +446,10 @@ class H5PLib
         $json_settings = json_encode($settings);
         if ($json_settings !== false) {
             $headerlib = TikiLib::lib('header');
-            if (! empty($headerlib->js['5h5p'])) {
+            /* benoitg - 2024-04-16:  I am not seeing where this would be called multiple times in a single request.  And the js added seems like it would override itself fine it the case it's not deduplicated by headerlib, which it would if it has the same value.*/
+            /*if (! empty($headerlib->js['5h5p'])) {
                 $headerlib->js['5h5p'] = [];    // clear previous plugins js as they are accumulative
-            }
+            }*/
             $headerlib->add_js('var ' . $obj_name . ' = ' . $json_settings . ";\n", '5h5p');
         }
     }

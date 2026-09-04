@@ -862,10 +862,6 @@ if ($prefs['feature_trackers'] == 'y') {
     }
 }
 
-if ($prefs['geo_enabled'] === 'y') {
-    $headerlib->add_map();
-}
-
 if ($prefs['xmpp_conversejs_always_load'] === 'y') {
     require_once 'lib/xmpp/ConverseJS.php';
     $xmppclient = new ConverseJS();
@@ -875,7 +871,7 @@ if ($prefs['xmpp_conversejs_always_load'] === 'y') {
 if ($prefs['markdown_enabled'] === 'y' && $prefs['feature_wysiwyg'] === 'y') {
     $str = $prefs['tiki_minify_javascript'] === 'y' ? '.min' : '';
 
-    $headerlib ->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@toast-ui/editor/dist/toastui-editor.css");
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@toast-ui/editor/dist/toastui-editor.css");
 }
 
 if ($prefs['workspace_ui'] == 'y') {
@@ -1116,6 +1112,7 @@ if ($prefs['feature_realtime'] == 'y') {
 }
 
 if ($prefs['feature_calendar'] === 'y') {
+    //These are pretty huge dependencies (depend on  @fullcalendar) that isn't used on every page.  These should probably be imported by the relevent php code somewhere in calendarlib, not from here. benoitg - 2024-05-02
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/dist/index.css");
     $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar"; window.moduleCalendar = [];');
     $headerlib->add_js_module('import "@jquery-tiki/eventcalendar_to_pdf";');

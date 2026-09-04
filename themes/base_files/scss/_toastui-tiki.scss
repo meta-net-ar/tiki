@@ -75,6 +75,7 @@
         }
     }
 
+    input[id^="save_pivottable"] { pointer-events: none; }
 }
 
 .tiki .toastui-editor-toolbar-item-wrapper { cursor: pointer; }

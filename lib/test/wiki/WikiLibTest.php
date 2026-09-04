@@ -22,6 +22,7 @@ class WikiLibTest extends TestCase
     {
         global $testhelpers;
 
+        require_once(__DIR__ . '/../TestHelpers.php');
         $testhelpers = new \TestHelpers();
         $testhelpers->simulateTikiScriptContext();
 
@@ -63,44 +64,53 @@ Some more text
 
         // processPageDisplayOptions needs this
         $_REQUEST['page'] = $this->pageName;
-        $headerlibVirginCopy = clone TikiLib::lib('header');
 
-        $headerlib = clone $headerlibVirginCopy;
+        $expected = 'lib/jquery_tiki/autoToc.js';
+        $headerlib = TikiLib::lib('header');
+
         $prefs['wiki_toc_default'] = 'on';
+
+        $headerlib->startNewContext();
         $wikilib->set_page_auto_toc($this->pageName, 0);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
-        $expected = 'lib/jquery_tiki/autoToc.js';
+        $tags = $headerlib->output_js();
         $this->assertStringContainsString($expected, $tags, 'Autotoc on, page set to default');
+        $headerlib->dropCurrentContext();
 
-        $headerlib = clone $headerlibVirginCopy;
+        $headerlib->startNewContext();
         $wikilib->set_page_auto_toc($this->pageName, -1);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $this->assertStringNotContainsString($expected, $tags, 'Autotoc on, page set to off');
+        $headerlib->dropCurrentContext();
 
-        $headerlib = clone $headerlibVirginCopy;
+        $headerlib->startNewContext();
         $wikilib->set_page_auto_toc($this->pageName, 1);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $this->assertStringContainsString($expected, $tags, 'Autotoc on, page set to on');
+        $headerlib->dropCurrentContext();
 
         $prefs['wiki_toc_default'] = 'off';
-        $headerlib = clone $headerlibVirginCopy;
+
+        $headerlib->startNewContext();
         $wikilib->set_page_auto_toc($this->pageName, 0);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $this->assertStringNotContainsString($expected, $tags, 'Autotoc off, page set to default');
+        $headerlib->dropCurrentContext();
 
-        $tags = $headerlib->output_js_files();
+        $headerlib->startNewContext();
         $wikilib->set_page_auto_toc($this->pageName, -1);
         $wikilib->processPageDisplayOptions($headerlib);
+        $tags = $headerlib->output_js();
         $this->assertStringNotContainsString($expected, $tags, 'Autotoc off, page set to off');
+        $headerlib->dropCurrentContext();
 
-        $headerlib = clone $headerlibVirginCopy;
+        $headerlib->startNewContext();
         $wikilib->set_page_auto_toc($this->pageName, 1);
         $wikilib->processPageDisplayOptions($headerlib);
-        $tags = $headerlib->output_js_files();
+        $tags = $headerlib->output_js();
         $this->assertStringContainsString($expected, $tags, 'Autotoc off, page set to on');
     }
 

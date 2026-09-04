@@ -969,7 +969,7 @@ class TikiAccessLib extends TikiLib
     /**
      * @param $page
      * @param string $errortitle
-     * @param string $errortype
+     * @param string $errortype http error code, will be casted to int
      * @param bool $enableRedirect
      * @param string $message
      * @throws Exception

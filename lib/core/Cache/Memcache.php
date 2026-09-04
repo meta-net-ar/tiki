@@ -10,7 +10,9 @@ use TikiLib;
 
 //This happens really early in tiki init, autoloading doesn't seem to be available yet
 require_once __DIR__ . '/KvpCacheInterface.php';
-
+/**
+ * This is just a thin wrapper around Tiki\Cache\MemcacheLib which for historical reasons has a different API from KvpCacheInterface
+ */
 class Memcache implements KvpCacheInterface
 {
     private function getKey($key, $type)
@@ -20,12 +22,12 @@ class Memcache implements KvpCacheInterface
 
     public function isFunctional(): bool
     {
-        return TikiLib::lib("memcache")->isFunctional();
+        return \Tiki\Cache\MemcacheLib::getInstance()->isFunctional();
     }
 
     public function cacheItem($key, $data, $type = '')
     {
-        TikiLib::lib("memcache")->set($this->getKey($key, $type), $data);
+        \Tiki\Cache\MemcacheLib::getInstance()->set($this->getKey($key, $type), $data);
         return true;
     }
 
@@ -36,16 +38,16 @@ class Memcache implements KvpCacheInterface
 
     public function getCached($key, $type = '', $lastModif = false)
     {
-        return TikiLib::lib("memcache")->get($this->getKey($key, $type));
+        return \Tiki\Cache\MemcacheLib::getInstance()->get($this->getKey($key, $type));
     }
 
     public function invalidate($key, $type = '')
     {
-        return TikiLib::lib("memcache")->delete($this->getKey($key, $type));
+        return \Tiki\Cache\MemcacheLib::getInstance()->delete($this->getKey($key, $type));
     }
 
     public function invalidateAll($type)
     {
-        return TikiLib::lib("memcache")->flush();
+        return \Tiki\Cache\MemcacheLib::getInstance()->flush();
     }
 }

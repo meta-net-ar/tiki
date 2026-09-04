@@ -101,7 +101,7 @@ class CacheLib
     /**
      * Empty one or more caches
      *
-     * Checks for existance of libs because it's called from the installer
+     * Checks for existence of libs because it's called from the installer
      *
      * @param mixed $dir_names      all|templates_c|temp_cache|temp_public|modules_cache|prefs (default all)
      * @param string $log_section   Type of log message. Default 'system'
@@ -119,7 +119,7 @@ class CacheLib
         }
         if (in_array('all', $dir_names)) {
             $this->erase_dir_content(SMARTY_COMPILED_TEMPLATES_PATH . "/$tikidomain");
-            $this->erase_dir_content(TEMP_PUBLIC_PATH . "/$tikidomain");
+            $this->erase_dir_content(TEMP_HTTP_PUBLIC_PATH . "/$tikidomain");
             $this->erase_dir_content(TEMP_CACHE_PATH . "/$tikidomain");
 
             $banner = glob(TEMP_PATH . "/banner*.*");
@@ -156,9 +156,9 @@ class CacheLib
             }
         }
         if (in_array('temp_public', $dir_names)) {
-            $this->erase_dir_content(TEMP_PUBLIC_PATH . "/$tikidomain");
+            $this->erase_dir_content(TEMP_HTTP_PUBLIC_PATH . "/$tikidomain");
             if (! $skipLog) {
-                $logslib->add_log($log_section, 'erased ' . TEMP_PUBLIC_PATH . ' content');
+                $logslib->add_log($log_section, 'erased ' . TEMP_HTTP_PUBLIC_PATH . ' content');
             }
         }
         if (in_array('prefs', $dir_names)) {
@@ -240,7 +240,7 @@ class CacheLib
     }
 
     /**
-     * Flush memcache if endabled
+     * Flush memcache if enabled
      *
      * @return void
      */
@@ -248,8 +248,8 @@ class CacheLib
     {
         global $prefs;
 
-        if (isset($prefs['memcache_enabled']) && $prefs['memcache_enabled'] === 'y' && ($this->implementation instanceof Memcache)) {
-            $memcachelib = TikiLib::lib("memcache");
+        if (isset($prefs['memcache_enabled']) && $prefs['memcache_enabled'] === 'y' && ($this->implementation instanceof \Tiki\Cache\Memcache)) {
+            $memcachelib = \Tiki\Cache\MemcacheLib::getInstance();
             if ($memcachelib->isFunctional()) {
                 $memcachelib->flush();
             }
