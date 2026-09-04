@@ -565,6 +565,10 @@ if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
         fseek($fp, $start);
         $chunkSize = 8192;  // should be a pref?
 
+        // In the above headers, the end byte is inclusive, but in the loop below it must be exclusive
+        // otherwise we omit sending the last byte.
+        $end += 1;
+
         while ($end) {
             $read = ($end > $chunkSize) ? $chunkSize : $end;
             $end -= $read;
