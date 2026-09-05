@@ -368,10 +368,16 @@ function preprocess_section(&$data, &$tagremove, &$pluginremove)
     }
     $pattern .= ')/';
     preg_match_all($pattern, $data, $matches);
+
+    $keys = [];
     foreach ($matches[0] as $match) {
-        $tagremove['key'][] = '§' . md5($tikilib->genPass()) . '§';
-        $tagremove['data'][] = $match;
-        $data = isset($tagremove['data']) ? str_replace($tagremove['data'], $tagremove['key'], $data) : $data;
+        $keys[] = '§' . md5($tikilib->genPass()) . '§';
+    }
+
+    if ($keys) {
+        $tagremove['key'] = array_merge($tagremove['key'] ?? [], $keys);
+        $tagremove['data'] = array_merge($tagremove['data'] ?? [], $matches[0]);
+        $data = str_replace($matches[0], $keys, $data);
     }
 }
 
