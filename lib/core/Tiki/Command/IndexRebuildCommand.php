@@ -23,10 +23,8 @@ use Tiki\Search\SearchIndexRebuilder;
 )]
 class IndexRebuildCommand extends Command
 {
-    private const EXIT_OK = 0;
-    private const EXIT_INTEGRITY_ERRORS = 1;
-    private const EXIT_SKIPPED_ERRORS = 2;
-    private const EXIT_CATASTROPHIC = 3;
+    private const EXIT_INTEGRITY_ERRORS = 2;
+    private const EXIT_SKIPPED_ERRORS = 3;
 
     protected function configure()
     {
@@ -149,24 +147,27 @@ class IndexRebuildCommand extends Command
 
         $queries_after = $num_queries;
 
-        if (! $result) {
+        if (! is_array($result)) {
             $output->writeln("\n<error>Search index rebuild failed. Last messages shown above.</error>");
             \TikiLib::lib('logs')->add_action('rebuild indexes', 'Search index rebuild failed.', 'system');
-            return self::EXIT_CATASTROPHIC;
+            return Command::FAILURE;
         }
+
+        $integrityErrors = [];
+        $skippedErrors = [];
+        $catastrophicErrors = [];
+        foreach (['default', 'fallback'] as $scope) {
+            $stats = $result[$scope] ?? [];
+            $integrityErrors = array_merge($integrityErrors, $this->formatErrorEntries($stats['integrity_errors'] ?? []));
+            $skippedErrors = array_merge($skippedErrors, $this->formatErrorEntries($stats['skipped_errors'] ?? []));
+            if (! empty($stats['error'])) {
+                $catastrophicErrors[] = $stats['error_message'] ?? 'Search index rebuild failed.';
+            }
+        }
+        $integrityErrors = array_values(array_unique($integrityErrors));
+        $skippedErrors = array_values(array_unique($skippedErrors));
+        $catastrophicErrors = array_values(array_unique($catastrophicErrors));
         $defaultError = ! empty($result['default']['error']);
-
-        // Classify failures from rebuild stats so ops can automate retries/escalation by exit code.
-        $classifiedErrors = $this->extractClassifiedErrors($result);
-        $integrityErrors = $classifiedErrors['integrity'];
-        $skippedErrors = $classifiedErrors['skipped'];
-        $catastrophicErrors = $classifiedErrors['catastrophic'];
-
-        // Also classify direct Feedback errors (some tracker field handlers report issues this way).
-        $feedbackClassified = $this->extractClassifiedFeedbackErrors();
-        $integrityErrors = array_values(array_unique(array_merge($integrityErrors, $feedbackClassified['integrity'])));
-        $skippedErrors = array_values(array_unique(array_merge($skippedErrors, $feedbackClassified['skipped'])));
-        $catastrophicErrors = array_values(array_unique(array_merge($catastrophicErrors, $feedbackClassified['catastrophic'])));
 
         \Feedback::printToConsole($output, $cron);
 
@@ -253,7 +254,7 @@ class IndexRebuildCommand extends Command
     private function resolveExitCode(array $integrityErrors, array $skippedErrors, array $catastrophicErrors): int
     {
         if (! empty($catastrophicErrors)) {
-            return self::EXIT_CATASTROPHIC;
+            return Command::FAILURE;
         }
 
         if (! empty($skippedErrors)) {
@@ -264,7 +265,7 @@ class IndexRebuildCommand extends Command
             return self::EXIT_INTEGRITY_ERRORS;
         }
 
-        return self::EXIT_OK;
+        return Command::SUCCESS;
     }
 
     private function renderFailureSummary(OutputInterface $output, array $integrityErrors, array $skippedErrors, array $catastrophicErrors): void
@@ -300,44 +301,7 @@ class IndexRebuildCommand extends Command
         }
     }
 
-    private function extractClassifiedErrors(array $result): array
-    {
-        $integrityErrors = [];
-        $skippedErrors = [];
-        $catastrophicErrors = [];
-
-        foreach (['default', 'fallback'] as $scope) {
-            if (! isset($result[$scope]) || ! is_array($result[$scope])) {
-                continue;
-            }
-
-            $bucket = $result[$scope];
-
-            foreach (['integrity_errors', 'non_indexable', 'not_indexable'] as $key) {
-                if (! empty($bucket[$key]) && is_array($bucket[$key])) {
-                    $integrityErrors = array_merge($integrityErrors, $this->normalizeErrorLines($bucket[$key]));
-                }
-            }
-
-            foreach (['skipped', 'skipped_errors', 'item_errors', 'errors'] as $key) {
-                if (! empty($bucket[$key]) && is_array($bucket[$key])) {
-                    $skippedErrors = array_merge($skippedErrors, $this->normalizeErrorLines($bucket[$key]));
-                }
-            }
-
-            if (! empty($bucket['error']) && ! empty($bucket['error_message'])) {
-                $catastrophicErrors[] = $bucket['error_message'];
-            }
-        }
-
-        return [
-            'integrity' => array_values(array_unique($integrityErrors)),
-            'skipped' => array_values(array_unique($skippedErrors)),
-            'catastrophic' => array_values(array_unique($catastrophicErrors)),
-        ];
-    }
-
-    private function normalizeErrorLines(array $entries): array
+    private function formatErrorEntries(array $entries): array
     {
         $base = \TikiLib::lib('tiki')->tikiUrl();
         $lines = [];
@@ -368,64 +332,5 @@ class IndexRebuildCommand extends Command
         }
 
         return $lines;
-    }
-
-    private function extractClassifiedFeedbackErrors(): array
-    {
-        $classified = [
-            'integrity' => [],
-            'skipped' => [],
-            'catastrophic' => [],
-        ];
-
-        if (empty($_SESSION['tikifeedback']) || ! is_array($_SESSION['tikifeedback'])) {
-            return $classified;
-        }
-
-        foreach ($_SESSION['tikifeedback'] as $feedback) {
-            if (! is_array($feedback)) {
-                continue;
-            }
-
-            $type = $feedback['type'] ?? 'error';
-            if ($type !== 'error' && $type !== 'warning') {
-                continue;
-            }
-
-            $messages = $feedback['mes'] ?? [];
-            if (! is_array($messages)) {
-                $messages = [$messages];
-            }
-
-            foreach ($messages as $message) {
-                if (! is_string($message) || $message === '') {
-                    continue;
-                }
-
-                $plain = trim(str_replace('<br />', ' ', strip_tags($message)));
-                if ($plain === '') {
-                    continue;
-                }
-
-                if (
-                    preg_match('/field:\s*Gallery\s*#\d+\s+not\s+found/i', $plain)
-                    || stripos($plain, 'data integrity error') !== false
-                    || stripos($plain, 'ItemLink data integrity error') !== false
-                    || stripos($plain, 'ItemsList data integrity error') !== false
-                ) {
-                    $classified['integrity'][] = $plain;
-                } elseif (stripos($plain, 'Indexing failed while processing') !== false) {
-                    $classified['skipped'][] = $plain;
-                } elseif (stripos($plain, 'search index could not be rebuilt') !== false) {
-                    $classified['catastrophic'][] = $plain;
-                }
-            }
-        }
-
-        $classified['integrity'] = array_values(array_unique($classified['integrity']));
-        $classified['skipped'] = array_values(array_unique($classified['skipped']));
-        $classified['catastrophic'] = array_values(array_unique($classified['catastrophic']));
-
-        return $classified;
     }
 }

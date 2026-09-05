@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Package\Extension\Api\Search as PackageApiSearch;
 use Tiki\Profiling\Timer;
+use Search\IntegrityException;
 
 class Search_Indexer
 {
@@ -236,7 +237,18 @@ class Search_Indexer
     {
         $this->log("addDocument $objectType $objectId");
 
-        $data = $this->getDocuments($objectType, $objectId);
+        try {
+            $data = $this->getDocuments($objectType, $objectId);
+        } catch (IntegrityException $e) {
+            $this->stats['integrity_errors'][] = $this->buildErrorEntry($objectType, $objectId, $e->getMessage());
+            return 0;
+        } catch (Throwable $e) {
+            $this->stats['skipped_errors'][] = $this->buildErrorEntry($objectType, $objectId, $e->getMessage());
+            if ($this->errorTrackingEnabled) {
+                TikiLib::lib('errortracking')->captureException($e);
+            }
+            return 0;
+        }
         foreach ($data as $entry) {
             $entryUrl = $this->resolveDocumentUrl($entry);
 
@@ -268,9 +280,7 @@ class Search_Indexer
                     $e = new ErrorException($err['errstr'], 0, $err['errno'], $err['errfile'], $err['errline']);
                     TikiLib::lib('errortracking')->captureException($e);
                 }
-                if (stripos($err['errstr'], 'integrity') !== false) {
-                    $this->stats['integrity_errors'][] = $this->buildErrorEntry($objectType, $objectId, $err['errstr'], $entryUrl);
-                }
+                $this->stats['skipped_errors'][] = $this->buildErrorEntry($objectType, $objectId, $err['errstr'], $entryUrl);
             }
             $this->cacheErrors = [];
             // log file display feedback messages after each document line to make it easier to track
