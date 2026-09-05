@@ -35,31 +35,14 @@ class ScoreLib extends TikiLib
 
         $score = $this->get_user_score($user);
 
-        if (empty($score_expiry_days)) {
-            // score does not expire
-            $query = "select count(*)+1 from `tiki_object_scores` tos
-                where `recipientObjectType`='user'
-                and `recipientObjectId`<> ?
-                and `pointsBalance` > ?
-                and tos.`id` = (select max(id) from `tiki_object_scores` where `recipientObjectId` = tos.`recipientObjectId` and `recipientObjectType`='user' group by `recipientObjectId`)
-                group by `recipientObjectId`";
-
-            $position = $this->getOne($query, [$user, $score]);
-        } else {
-            // score expires
-            $query = "select count(*)+1 from `tiki_object_scores` tos
-                where `recipientObjectType`='user'
-                and `recipientObjectId`<> ?
-                and `pointsBalance` - ifnull((select `pointsBalance` from `tiki_object_scores`
-                    where `recipientObjectId`=tos.`recipientObjectId`
-                    and `recipientObjectType`='user'
-                    and `date` < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY))
-                    order by id desc limit 1), 0) > ?
-                and tos.`id` = (select max(id) from `tiki_object_scores` where `recipientObjectId` = tos.`recipientObjectId` and `recipientObjectType`='user' group by `recipientObjectId`)
-                group by `recipientObjectId`";
-
-            $position = $this->getOne($query, [$user, $score_expiry_days, $score]);
-        }
+        [$latestUserScoresQuery, $params] = $this->getLatestUserScoresQuery($score_expiry_days);
+        $query = "SELECT COUNT(*) + 1
+            FROM ({$latestUserScoresQuery}) `user_scores`
+            WHERE `recipientObjectId` <> ?
+            AND `score` > ?";
+        $params[] = $user;
+        $params[] = $score;
+        $position = $this->getOne($query, $params);
 
         return $position;
     }
@@ -110,29 +93,11 @@ class ScoreLib extends TikiLib
         global $prefs;
         $score_expiry_days = $prefs['feature_score_expday'];
 
-        if (empty($score_expiry_days)) {
-            // score does not expire
-            $query = "select count(*) from `tiki_object_scores` tos
-                where `recipientObjectType`='user'
-                and `pointsBalance` > 0
-                and tos.`id` = (select max(id) from `tiki_object_scores` where `recipientObjectId` = tos.`recipientObjectId` and `recipientObjectType`='user' group by `recipientObjectId`)
-                group by `recipientObjectId`";
-
-            $count = $this->getOne($query, []);
-        } else {
-            // score expires
-            $query = "select count(*) from `tiki_object_scores` tos
-                where `recipientObjectType`='user'
-                and `pointsBalance` - ifnull((select `pointsBalance` from `tiki_object_scores`
-                    where `recipientObjectId`=tos.`recipientObjectId`
-                    and `recipientObjectType`='user'
-                    and `date` < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY))
-                    order by id desc limit 1), 0) > 0
-                and tos.`id` = (select max(id) from `tiki_object_scores` where `recipientObjectId` = tos.`recipientObjectId` and `recipientObjectType`='user' group by `recipientObjectId`)
-                group by `recipientObjectId`";
-
-            $count = $this->getOne($query, [$score_expiry_days]);
-        }
+        [$latestUserScoresQuery, $params] = $this->getLatestUserScoresQuery($score_expiry_days);
+        $query = "SELECT COUNT(*)
+            FROM ({$latestUserScoresQuery}) `user_scores`
+            WHERE `score` > 0";
+        $count = $this->getOne($query, $params);
 
         return $count;
     }
