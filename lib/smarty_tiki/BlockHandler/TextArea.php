@@ -195,7 +195,7 @@ class TextArea extends Base implements TikiSmartyExtensionInterface
             if ($prefs['feature_wysiwyg'] != 'y') {
                 $prefs_pages = '<a class="lm_result label label-default alert-link" href="tiki-admin.php?page=textarea">' . tr('Full WYSIWYG editor') . '</a>';
                 if ($tiki_p_admin == 'y' || $tiki_p_admin_trackers == 'y') {
-                    $html .= smarty_block_remarksbox(
+                    $html .= \SmartyTiki\BlockHandler\Remarksbox::render(
                         ['type' => 'warning', 'title' => tr('Feature required')],
                         tr("The field is set to use WYSIWYG mode; you need to enable '%0' first.", $prefs_pages),
                         $template,
