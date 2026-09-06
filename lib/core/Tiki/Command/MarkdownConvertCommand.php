@@ -107,8 +107,7 @@ class MarkdownConvertCommand extends Command
             $io->note(tr("Processing page %0", $pageInfo['pageName']));
 
             try {
-                $page = $pageInfo['pageName'];
-                $converted = TikiLib::lib('edit')->convertWikiSyntax($pageInfo['data'], $syntax);
+                $converted = TikiLib::lib('edit')->convertWikiSyntax($pageInfo['data'], $syntax, $pageInfo['pageName']);
             } catch (Exception $e) {
                 $io->warning($e->getMessage() . ' ' . tr('Skipping...'));
                 continue;

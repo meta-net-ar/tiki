@@ -4,7 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
 /****
  * Initially just a collection of the functions dotted around tiki-editpage.php for v4.0
  * Started in the edit_fixup experimental branch - jonnybradley Aug 2009
@@ -36,7 +35,19 @@ class EditLib
     // Fields for handling links to external wiki pages
     private $external_wikis = null;
 
-
+    private const HTML_TAGS = [
+        '!DOCTYPE', 'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'base', 'bdo',
+        'bgsound', 'blink', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'col',
+        'colgroup', 'command', 'comme;nt', 'datalist', 'dd', 'del', 'details', 'div', 'dl', 'dt',
+        'embed', 'fieldset', 'figure', 'b', 'i', 'small', 'tt', 'footer', 'form', 'head',
+        'header', 'hgroup', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'html', 'isindex', 'iframe', 'ilayer', 'img',
+        'input', 'ins', 'keygen', 'label', 'layer', 'legend', 'li', 'link', 'map', 'mark',
+        'marquee', 'menu', 'meta', 'meter', 'multicol', 'nav', 'nobr', 'noembed', 'noscript',
+        'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'cite', 'code', 'dfn', 'em',
+        'kbd', 'samp', 'strong', 'var', 'plaintext', 'pre', 'progress', 'q', 'ruby', 'script',
+        'section', 'select', 'spacer', 'span', 's', 'style', 'sub', 'sup', 'table', 'tbody', 'td',
+        'textarea', 'tfoot', 'thead', 'time', 'title', 'tr', 'u', 'ul', 'video', 'wbr', 'xmp', 'strike'
+    ];
     // general
 
     public function make_sure_page_to_be_created_is_not_an_alias($page, $page_info)
@@ -50,7 +61,7 @@ class EditLib
         if (! $page_info && count($aliases) > 0) {
             $error_title = tra("Cannot create aliased page");
             $error_msg = tra("You attempted to create the following page:") . " " .
-                "<b>$page</b>.\n<p>\n";
+                         "<b>$page</b>.\n<p>\n";
             $error_msg .= tra("That page is an alias for the following pages") . ": ";
             foreach ($aliases as $an_alias) {
                 $error_msg .= '<a href="' . $wikilib->editpage_url($an_alias['fromPage'], false) . '">' . $an_alias['fromPage'] . '</a>, ';
@@ -684,8 +695,8 @@ class EditLib
 
         // append=false, create new entries on the stack
         if (! $append) {
-            $p['stack'][] = ['tag' => $tag, 'string' => '', 'wikitags' => 0];
-            $p['wikistack'][] = ['begin' => [], 'end' => []];
+            $p['stack'][] = ['tag' => $tag, 'string' => '', 'wikitags' => 0 ];
+            $p['wikistack'][] = [ 'begin' => [], 'end' => [] ];
         };
 
         // get the entry points on the stacks
@@ -1394,7 +1405,7 @@ class EditLib
          * wiki_lbr  = true if we must use '%%%' for linebreaks instead of '\n'
          */
         $p = ['stack' => [], 'listack' => [], 'wikistack' => [],
-              'wiki_lbr' => 0, 'first_td' => false, 'first_tr' => false];
+            'wiki_lbr' => 0, 'first_td' => false, 'first_tr' => false];
         $this->walk_and_parse($htmlparser->content, $out_data, $p, '');
         // Is some tags still opened? (It can be if HTML not valid, but this is not reason
         // to produce invalid wiki :)
@@ -1647,6 +1658,7 @@ class EditLib
             }
         }
         $data = $this->convertSmileysToUnicode($data);
+
         $wikiParserParsable = new WikiParser_Parsable($data);
         if (! $wikiParserParsable->convertable($data)) {
             throw new Exception(tr("Content has plugins that cannot be automatically converted. You should proceed with manual content conversion."));
@@ -1659,6 +1671,7 @@ class EditLib
         $wikiParserParsable->stripPlugins('wantedpages');
         $wikiParserParsable->stripPlugins('markdown');
         $wikiParserParsable->stripPlugins('js');
+        $wikiParserParsable->stripPlugins('jq');
         $wikiParserParsable->stripNP();
         $html = $wikiParserParsable->parse([
             'noparseplugins' => true,
@@ -1667,6 +1680,7 @@ class EditLib
             'suppress_icons' => true,
             'markdown_conversion' => true,
         ]);
+
         $prefs['wiki_heading_links'] = $old_pref;
 
         if ($page_name) {
@@ -1844,19 +1858,7 @@ class EditLib
 
     private function preserveInvalidTags(&$data)
     {
-        $validTags = [
-            '!DOCTYPE', 'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'base', 'bdo',
-            'bgsound', 'blink', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'col',
-            'colgroup', 'command', 'comme;nt', 'datalist', 'dd', 'del', 'details', 'div', 'dl', 'dt',
-            'embed', 'fieldset', 'figure', 'b', 'i', 'small', 'tt', 'footer', 'form', 'head',
-            'header', 'hgroup', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'html', 'isindex', 'iframe', 'ilayer', 'img',
-            'input', 'ins', 'keygen', 'label', 'layer', 'legend', 'li', 'link', 'map', 'mark',
-            'marquee', 'menu', 'meta', 'meter', 'multicol', 'nav', 'nobr', 'noembed', 'noscript',
-            'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'cite', 'code', 'dfn', 'em',
-            'kbd', 'samp', 'strong', 'var', 'plaintext', 'pre', 'progress', 'q', 'ruby', 'script',
-            'section', 'select', 'spacer', 'span', 's', 'style', 'sub', 'sup', 'table', 'tbody', 'td',
-            'textarea', 'tfoot', 'thead', 'time', 'title', 'tr', 'u', 'ul', 'video', 'wbr', 'xmp', 'strike'
-        ];
+        $validTags = self::HTML_TAGS;
 
         $invalidTags = [];
         $data = preg_replace_callback("/<(?:\"[^\"]*\"['\"]*|'[^']*'['\"]*|[^'\">])+>/s", function ($m) use (&$invalidTags, $validTags) {
@@ -2163,55 +2165,48 @@ class EditLib
     }
 
     /**
-     * Detect if a given content string is HTML code.
+     * Determine whether a given string contains HTML markup.
      *
-     * This function uses regex patterns to identify common HTML structures.
-     * It is designed to catch both readable and nested HTML, especially when
-     * there are multiple <div> or other block-level elements.
+     * This method applies multiple regex checks to detect common HTML structures:
+     *  - Doctype declarations (e.g., <!doctype html>)
+     *  - HTML comments (<!-- ... -->)
+     * - Tags matching known HTML elements (from self::HTML_TAGS) or custom elements
      *
-     * Detection logic includes:
-     *  - Generic opening/closing tags: <tag> ... </tag>
-     *  - Common HTML elements: div, span, p, a, ul, li, table, h1-h6, img, form, input, etc.
-     *  - Attributes inside tags: <div class="...">, <a href="...">
+     * The detection is heuristic: it identifies whether the content appears to be
+     * written as HTML markup, regardless of whether it is strictly valid or well-formed.
      *
-     * @param string $data The input string to analyze.
+     * This function does not validate HTML correctness. It may return true for
+     * malformed or incomplete markup, and false for plain text without tags.
+     *
+     * @param string $content The input string to analyze.
+     *
      * @return bool True if the content is likely HTML code, false otherwise.
      */
-    private function isHtmlContent(string $data): bool
+    private function isHtmlContent(string $content): bool
     {
-        // Remove HTML comments
-        $withoutComments = preg_replace('/<!--[\s\S]*?-->/', '', $data);
-        // Remove JS comments
-        $withoutComments = preg_replace([
-            '/\/\/.*$/m',       // single-line comments
-            '/\/\*[\s\S]*?\*\//' // multi-line comments
-        ], '', $withoutComments);
-        $withoutComments = $this->stripPluginSyntax($withoutComments);
-        // Remove Smarty template tags (optional but reduces noise)
-        $withoutComments = preg_replace('/\{[^{}]*\}/', '', $withoutComments);
+        if (trim($content) === '') {
+            return false;
+        }
 
-        if ($withoutComments) {
-            libxml_use_internal_errors(true);
-            $dom = new DOMDocument();
+        if (preg_match('/<!doctype\s+html\b/i', $content) === 1) {
+            return true;
+        }
 
-            $dom->loadHTML($withoutComments, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        if (preg_match('/<!--(?:.|\R)*?-->/', $content) === 1) {
+            return true;
+        }
 
-            foreach ($dom->childNodes as $node) {
-                if ($node->nodeType === XML_ELEMENT_NODE) {
-                    $tag = "<{$node->nodeName}";
-                    if (strpos($withoutComments, $tag) !== false) {
-                        return true;
-                    }
-                }
+        $tagPattern = '/<\s*\/?\s*([a-z][a-z0-9:-]*)(?=[\s\/>])(?:[^<>"\']|"[^"]*"|\'[^\']*\')*\/?>/i';
+        if (preg_match_all($tagPattern, $content, $matches) === false) {
+            return false;
+        }
+
+        foreach ($matches[1] as $tagName) {
+            $tagName = strtolower($tagName);
+            if (in_array($tagName, self::HTML_TAGS, true) || str_contains($tagName, '-')) {
+                return true;
             }
         }
         return false;
-    }
-
-    private function stripPluginSyntax(string $data): string
-    {
-        $pattern = '/\{([A-Za-z][A-Za-z0-9_]*)\([^)]*\)\}([\s\S]*?)\{\1\}/';
-        // Remove the whole block (tags + content)
-        return preg_replace($pattern, '', $data);
     }
 }
