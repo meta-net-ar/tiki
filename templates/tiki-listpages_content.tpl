@@ -27,7 +27,17 @@
     <div class="container">
         <div class="row">
             <div class="col-12" style="padding:10px 0px; font-weight:bolder;"> {*Leave the style declaration here first but it should be included in the scss files for better maintainance soon*}
-                {tr _0='<span class="icon icon-information fas fa-info-circle"></span>' _1='<a target="_blank" href="tiki-admin.php?page=stats&highlight=feature_stats">' _2='</a>' _3='<a target="_blank" href="https://doc.tiki.org/Stats"><span class="icon icon-help fas fa-question-circle"></span></a>'}%0 To see page hits, please %1 activate %2 the stats feature %3{/tr}
+                {tr _0='<span class="icon icon-information fas fa-info-circle"></span>' _1='<a target="_blank" href="tiki-admin.php?page=">' _2='</a>' _3='<a target="_blank" href="https://doc.tiki.org/Stats"><span class="icon icon-help fas fa-question-circle"></span></a>'}%0 To see page hits, please %1 activate %2 the stats feature %3{/tr}
+            </div>
+        </div>
+    </div>
+{/if}
+
+{if $tiki_p_admin eq 'y'}
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-12" style="padding:10px 0px; font-weight:bolder;">
+                {tr _0='<span class="icon icon-information fas fa-info-circle"></span>' _1='<a target="_blank" href="tiki-admin.php?page=redirects">' _2='</a>'}%0 To see and manage redirections, please visit %1 here %2{/tr}
             </div>
         </div>
     </div>

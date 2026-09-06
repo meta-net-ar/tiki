@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_object_relations` ADD `relation_code` INT(12) NOT NULL DEFAULT 301;

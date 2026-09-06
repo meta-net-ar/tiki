@@ -67,6 +67,79 @@ if ($prefs['feature_wiki_structure'] == 'y') {
     $structlib = TikiLib::lib('struct');
 }
 
+/**
+ * Attempts to route based on custom routes, defined by the admin.
+ * If a suitable rule is found an HTTP redirect will be issued and the user sent to the right page/URL.
+ * Custom routes rules are only processed if none of the built in rules were successful
+ * This function also loads the minimal amount of framework to be able to query the db.
+ */
+function tiki_route_attempt_relation_redirect()
+{
+    global $tikiroot, $prefs;
+
+    $fullpath = $_SERVER['REQUEST_URI']; // get the full path from the request URI, remember we are doing redirections, we need to have exact match
+    $path = preg_match('/^' . preg_quote($tikiroot, '/') . '/', $fullpath) ? preg_replace('/^' . preg_quote($tikiroot, '/') . '/', '', $fullpath, 1) : $fullpath;
+    $page = $_REQUEST['page'] ?? '';
+    $path = $page ? $page : $path;
+
+    tiki_route_bootstrap_minimal();
+
+    if (empty($prefs['feature_redirects']) || $prefs['feature_redirects'] !== 'y') {
+        return;
+    }
+
+    require_once __DIR__ . '/lib/core/Tiki/Redirect/RedirectResolver.php';
+    $resolver = new \Tiki\Redirect\RedirectResolver();
+    $redirect = $resolver->findRedirectForPath($path);
+
+    if (empty($redirect)) {
+        return;
+    }
+
+    $target = $redirect['url'];
+    if (! preg_match('#^https?://#i', $target)) {
+        $target = $tikiroot . ltrim($target, '/');
+    }
+
+    $code = (int) $redirect['code'];
+    if (! in_array($code, [301, 302, 307, 308], true)) {
+        $code = 301;
+    }
+
+    header("HTTP/1.1 $code Found");
+    header("Location: $target");
+    exit;
+}
+
+function tiki_route_bootstrap_minimal()
+{
+    global $tikiroot, $tikipath;
+
+    if (! empty($GLOBALS['tikilib'])) {
+        return;
+    }
+
+    require_once __DIR__ . '/tiki-filter-base.php'; // sets $tikiroot, $tikipath
+    $GLOBALS['tikiroot'] = $tikiroot;
+    $GLOBALS['tikipath'] = $tikipath;
+
+    require_once __DIR__ . '/db/tiki-db.php';
+
+    if (! TikiDb::get()) {
+        return;
+    }
+
+    require_once __DIR__ . '/lib/tikilib.php';
+
+    $tikilib = new TikiLib();
+    $GLOBALS['tikilib'] = $tikilib;
+
+    $tikilib->get_preferences(['feature_redirects', 'feature_sefurl'], true, true);
+}
+
+
+tiki_route_attempt_relation_redirect();
+
 $wikilib = TikiLib::lib('wiki');
 $statslib = TikiLib::lib('stats');
 require_once('lib/wiki/renderlib.php');
@@ -322,6 +395,21 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
         $likepages = $wikilib->get_like_pages($page);
     } else {
         $likepages = [];
+    }
+
+    if ($prefs['feature_redirects'] == 'y') {
+        $redirectResolver = new \Tiki\Redirect\RedirectResolver();
+        $redirect = $redirectResolver->findRedirectForPath($page);
+        if ($redirect) {
+            $targetUrl = $redirect['url'];
+            if (! preg_match('#^https?://#i', $targetUrl)) {
+                $targetUrl = ltrim($targetUrl, '/');
+                $targetUrl = $base_url . $targetUrl;
+            }
+            $allowExternal = (bool) preg_match('#^https?://#i', $redirect['url']);
+            $access->redirect($targetUrl, '', $redirect['code'], '', $allowExternal);
+            exit;
+        }
     }
 
     if ($prefs['feature_wiki_pagealias'] == 'y' && count($referencedPages) == 1) {
