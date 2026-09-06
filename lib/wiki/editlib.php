@@ -223,8 +223,8 @@ class EditLib
 
         if (preg_match("/^rgb\( *(\d+) *, *(\d+) *, *(\d+) *\)$/", $col, $parts)) {
             $hex = str_pad(dechex($parts[1]), 2, '0', STR_PAD_LEFT)
-                . str_pad(dechex($parts[2]), 2, '0', STR_PAD_LEFT)
-                . str_pad(dechex($parts[3]), 2, '0', STR_PAD_LEFT);
+                 . str_pad(dechex($parts[2]), 2, '0', STR_PAD_LEFT)
+                 . str_pad(dechex($parts[3]), 2, '0', STR_PAD_LEFT);
             $hex = '#' . TikiLib::strtoupper($hex);
         } else {
             $hex = $col;
@@ -400,9 +400,9 @@ class EditLib
             /*
              * anchor
              */
-            $link_open = '{ANAME()}';
-            $link_close = '{ANAME}';
-            $link = $args['id']['value'];
+             $link_open = '{ANAME()}';
+             $link_close = '{ANAME}';
+             $link = $args['id']['value'];
         } else {
             /*
              * other links []
@@ -959,7 +959,7 @@ class EditLib
                     $add = $node['data'];
                     $noparsed = [];
                     $parserlib->plugins_remove($add, $noparsed);
-                    $add = str_replace(["\r", "\n"], '', $add);
+                    $add = str_replace(["\r","\n"], '', $add);
                     $add = str_replace('&nbsp;', ' ', $add);
                     $add = str_replace('[', '[[', $add);            // escape square brackets to prevent accidental wiki links
                     $parserlib->plugins_replace($add, $noparsed, true);
@@ -986,13 +986,8 @@ class EditLib
                             return trim(explode(':', $attr)[0]);
                         }, $styleAttrs);
                         $tikiStyleAttrs = [
-                            'text-align',
-                            'font-weight',
-                            'font-style',
-                            'text-decoration',
-                            'color',
-                            'background-color',
-                            'background'
+                            'text-align', 'font-weight', 'font-style', 'text-decoration',
+                            'color', 'background-color', 'background'
                         ];
 
                         $givenCssAttrsHandled = array_intersect($tikiStyleAttrs, $cssAttrs);
@@ -1398,14 +1393,8 @@ class EditLib
          *
          * wiki_lbr  = true if we must use '%%%' for linebreaks instead of '\n'
          */
-        $p = [
-            'stack' => [],
-            'listack' => [],
-            'wikistack' => [],
-            'wiki_lbr' => 0,
-            'first_td' => false,
-            'first_tr' => false
-        ];
+        $p = ['stack' => [], 'listack' => [], 'wikistack' => [],
+              'wiki_lbr' => 0, 'first_td' => false, 'first_tr' => false];
         $this->walk_and_parse($htmlparser->content, $out_data, $p, '');
         // Is some tags still opened? (It can be if HTML not valid, but this is not reason
         // to produce invalid wiki :)
@@ -1856,122 +1845,17 @@ class EditLib
     private function preserveInvalidTags(&$data)
     {
         $validTags = [
-            '!DOCTYPE',
-            'a',
-            'abbr',
-            'address',
-            'area',
-            'article',
-            'aside',
-            'audio',
-            'base',
-            'bdo',
-            'bgsound',
-            'blink',
-            'blockquote',
-            'body',
-            'br',
-            'button',
-            'canvas',
-            'caption',
-            'col',
-            'colgroup',
-            'command',
-            'comme;nt',
-            'datalist',
-            'dd',
-            'del',
-            'details',
-            'div',
-            'dl',
-            'dt',
-            'embed',
-            'fieldset',
-            'figure',
-            'b',
-            'i',
-            'small',
-            'tt',
-            'footer',
-            'form',
-            'head',
-            'header',
-            'hgroup',
-            'h1',
-            'h2',
-            'h3',
-            'h4',
-            'h5',
-            'h6',
-            'hr',
-            'html',
-            'isindex',
-            'iframe',
-            'ilayer',
-            'img',
-            'input',
-            'ins',
-            'keygen',
-            'label',
-            'layer',
-            'legend',
-            'li',
-            'link',
-            'map',
-            'mark',
-            'marquee',
-            'menu',
-            'meta',
-            'meter',
-            'multicol',
-            'nav',
-            'nobr',
-            'noembed',
-            'noscript',
-            'object',
-            'ol',
-            'optgroup',
-            'option',
-            'output',
-            'p',
-            'param',
-            'cite',
-            'code',
-            'dfn',
-            'em',
-            'kbd',
-            'samp',
-            'strong',
-            'var',
-            'plaintext',
-            'pre',
-            'progress',
-            'q',
-            'ruby',
-            'script',
-            'section',
-            'select',
-            'spacer',
-            'span',
-            's',
-            'style',
-            'sub',
-            'sup',
-            'table',
-            'tbody',
-            'td',
-            'textarea',
-            'tfoot',
-            'thead',
-            'time',
-            'title',
-            'tr',
-            'u',
-            'ul',
-            'video',
-            'wbr',
-            'xmp',
-            'strike'
+            '!DOCTYPE', 'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'base', 'bdo',
+            'bgsound', 'blink', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'col',
+            'colgroup', 'command', 'comme;nt', 'datalist', 'dd', 'del', 'details', 'div', 'dl', 'dt',
+            'embed', 'fieldset', 'figure', 'b', 'i', 'small', 'tt', 'footer', 'form', 'head',
+            'header', 'hgroup', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'html', 'isindex', 'iframe', 'ilayer', 'img',
+            'input', 'ins', 'keygen', 'label', 'layer', 'legend', 'li', 'link', 'map', 'mark',
+            'marquee', 'menu', 'meta', 'meter', 'multicol', 'nav', 'nobr', 'noembed', 'noscript',
+            'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'cite', 'code', 'dfn', 'em',
+            'kbd', 'samp', 'strong', 'var', 'plaintext', 'pre', 'progress', 'q', 'ruby', 'script',
+            'section', 'select', 'spacer', 'span', 's', 'style', 'sub', 'sup', 'table', 'tbody', 'td',
+            'textarea', 'tfoot', 'thead', 'time', 'title', 'tr', 'u', 'ul', 'video', 'wbr', 'xmp', 'strike'
         ];
 
         $invalidTags = [];
