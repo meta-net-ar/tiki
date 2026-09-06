@@ -35,13 +35,13 @@ class WikiTools
     private string $user;
     private string $ip;
 
-    private TikiLib $tikilog;
+    private TikiLib $logger;
 
     public function __construct(string $user, string $ip = '')
     {
         $this->user = $user;
         $this->ip = $ip;
-        $this->tikilog = TikiLib::lib('logs');
+        $this->logger = TikiLib::lib('idslog');
     }
 
     // ──────────────────────────────────────────────────────────────────────
@@ -411,7 +411,11 @@ class WikiTools
         } catch (\Services_Exception $e) {
             throw new ToolCallException(tra("Error: ") . $e->getMessage());
         } catch (\Throwable $e) {
-            $this->tikilog->add_log('McpWikiTools', tr("[MCP] Unexpected exception in brokerCall: '%0': '%1'", get_class($e), $e->getMessage()));
+            $this->logger->error(tr('Unexpected error occurred'), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'exception' => tr("[MCP] Unexpected exception in brokerCall: '%0': '%1'", get_class($e), $e->getMessage()),
+            ]);
             throw new ToolCallException(tr("An unexpected error occurred."));
         }
     }
@@ -447,7 +451,7 @@ class WikiTools
      *
      * TikiLib methods sometimes echo directly -- this prevents that
      * from corrupting the JSON-RPC response body. Captured output
-     * is redirected to error_log for debugging.
+    * is redirected to the IDS log for debugging.
      *
      * @template T
      * @param callable(): T $fn
@@ -461,7 +465,11 @@ class WikiTools
         } finally {
             $output = ob_get_clean();
             if ($output !== '' && $output !== false) {
-                $this->tikilog->add_log('McpWikiTools', tr("[MCP] Captured stray output: %0", $output));
+                $this->logger->warning('Captured unexpected output while handling an MCP request.', [
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                    'output' => $output,
+                ]);
             }
         }
         return $result;

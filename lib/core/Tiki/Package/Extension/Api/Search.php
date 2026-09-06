@@ -15,7 +15,13 @@ class Search extends Api
             try {
                 self::$sources[] = new $source->class();
             } catch (\Exception $e) {
-                TikiLib::lib('logs')->add_log('Search', $e->getMessage());
+                TikiLib::lib('idslog')->error(tr('Unexpected error occurred'), [
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                    'package' => $package,
+                    'source' => $source,
+                    'exception' => $e->getMessage(),
+                ]);
             }
         }
     }

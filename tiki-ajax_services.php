@@ -225,7 +225,10 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
             $access->output_serialized(['type' => 'success', 'results' => $references]);
         }
     } catch (Exception $e) {
-        TikiLib::lib('logs')->add_log('AjaxServices', tr("Zotero error: ") . $e->getMessage());
+        TikiLib::lib('idslog')->error(tr('Unexpected error occurred'), [
+            'component' => __FILE__,
+            'exception' => tr("Zotero error: ") . $e->getMessage()
+        ]);
         $access->output_serialized(['type' => 'error', 'message' => $e->getMessage(), 'results' => []]);
     }
 } elseif (isset($_REQUEST['geocode']) && $access->is_serializable_request()) {

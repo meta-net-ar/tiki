@@ -52,18 +52,14 @@ use Monolog\Logger;
  * For an exception, prefer reporting the exception to the error-tracking
  * service and use the logger only for a local operational record.
  *
- * `TikiLib::lib('idslog')` resolves the `tiki.lib.idslog` service from the
- * Tiki service container. The service creates a Monolog `Logger` named `IDS`
- * with a `StreamHandler`. The message is passed to Monolog with its severity,
- * formatted with the context, and written to the configured
- * `ids_log_to_file` path, or to `ids.log` when no path is configured.
  *
- * The handler threshold is `INFO`: `debug()` messages are ignored, while
- * `info()` and all higher levels are written. The context array is structured
- * metadata for the log formatter; it does not select the severity. Use
- * `warning()` for recoverable unexpected conditions, `error()` for failed
- * operations, and `critical()` or higher only when a major service is unable
- * to operate.
+ * The handler threshold is `INFO`:
+ * - `debug()` messages are ignored, while
+ * - `info()` and all higher levels are written. The context array is structured
+ *    metadata for the log formatter; it does not select the severity.
+ * - `warning()` for recoverable unexpected conditions,
+ * - `error()` for failed operations, and
+ * - `critical()` for higher only when a major service is unable to operate.
  *
  * This logger writes to a file. It does not write to Tiki's action-log
  * database, display feedback to users, or report exceptions to Sentry/GlitchTip.
@@ -120,7 +116,7 @@ class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on
      *
      * @param string $message Log message
      * @param array $context Extra contact information
-      * @return void
+    * @return void
      */
     public function emergency($message, array $context = [])
     {
@@ -132,7 +128,7 @@ class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on
      *
      * @param string $message Log message
      * @param array $context Extra contact information
-      * @return void
+    * @return void
      */
     public function alert($message, array $context = [])
     {
@@ -144,7 +140,7 @@ class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on
      *
      * @param string $message Log message
      * @param array $context Extra contact information
-      * @return void
+    * @return void
      */
     public function critical($message, array $context = [])
     {
@@ -156,7 +152,7 @@ class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on
      *
      * @param string $message Log message
      * @param array $context Extra contact information
-      * @return void
+    * @return void
      */
     public function error($message, array $context = [])
     {
@@ -168,7 +164,7 @@ class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on
      *
      * @param string $message Log message
      * @param array $context Extra contact information
-      * @return void
+    * @return void
      */
     public function warning($message, array $context = [])
     {
@@ -180,7 +176,7 @@ class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on
      *
      * @param string $message Log message
      * @param array $context Extra contact information
-      * @return void
+    * @return void
      */
     public function notice($message, array $context = [])
     {
@@ -192,7 +188,7 @@ class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on
      *
      * @param string $message Log message
      * @param array $context Extra contact information
-        * @return void
+      * @return void
      */
     public function info($message, array $context = [])
     {
@@ -204,7 +200,7 @@ class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on
      *
      * @param string $message Log message
      * @param array $context Extra contact information
-    * @return void
+        * @return void
      */
     public function debug($message, array $context = [])
     {
@@ -217,7 +213,7 @@ class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on
      * @param string $level Logging level (ex. info, debug, notice...)
      * @param string $message Log message
      * @param array $context Extra context information
-      * @return void
+    * @return void
      */
     public function log($level, $message, array $context = [])
     {

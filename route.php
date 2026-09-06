@@ -399,7 +399,13 @@ if ($inclusion) {
     $_SERVER['SCRIPT_NAME'] = $base . basename($inclusion);
     include __DIR__ . '/' . $inclusion;
 } else {
-    TikiLib::lib('logs')->add_log('Router', tr("No route found - full:%0 query:%1", $full, $_SERVER['QUERY_STRING']));
+    TikiLib::lib('idslog')->warning(
+        tr("No route found - full:%0 query:%1", $full, $_SERVER['QUERY_STRING']),
+        [
+            'component' => __FILE__,
+            'path' => $path,
+        ]
+    );
 
     // Route to the "no-route" URL, if found
     require_once('lib/init/initlib.php');

@@ -259,7 +259,10 @@ if (! empty($_REQUEST['generate_availability'])) {
         $nlg_availability = $nlgen->generateAvailability($busy_list, $ranges, NLGen\Grammars\Availability\AvailabilityGrammar::SPECIFIC, null);
         $smarty->assign('nlg_availability', $nlg_availability);
     } catch (Exception $e) {
-        TikiLib::lib('logs')->add_log('Calendar', tr("Availability generation error: ") . $e->getMessage());
+        TikiLib::lib('idslog')->error(tr('Unexpected error occurred'), [
+            'component' => __FILE__,
+            'exception' => tr("Availability generation error: ") . $e->getMessage()]
+        );
         Feedback::error($e->getMessage());
         $smarty->assign('nlg_availability', '');
     }

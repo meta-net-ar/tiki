@@ -45,7 +45,16 @@ class Search_GlobalSource_ArticleAttachmentSource implements Search_GlobalSource
                         $textual[] = $data[$name]->getValue();
                     }
                 } else {
-                    TikiLib::lib('logs')->add_log("ArticleAttachmentSource", tr("File %0, referenced from %1 %2 no longer exists.", $rel['itemId'], $objectType, $objectId));
+                    TikiLib::lib('idslog')->warning(
+                        tr('Referenced article %0 from %1 %2 no longer exists.', $rel['itemId'], $objectType, $objectId),
+                        [
+                            'component' => __CLASS__,
+                            'method' => __FUNCTION__,
+                            'object_type' => $objectType,
+                            'object_id' => $objectId,
+                            'article_id' => $rel['itemId'],
+                        ]
+                    );
                 }
             }
         }

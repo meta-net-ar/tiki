@@ -892,20 +892,18 @@ class TikiAccessLib extends TikiLib
     private function csrfPhpErrorLog($msg)
     {
         global $prefs;
-        $ticket = $this->ticket ?: ($_POST['ticket'] ?? '');
-        self::lib('log')->add_log('AccessLib', PHP_EOL
-            . '**** ' . tr('Start CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****' . PHP_EOL
-            . '  ' . $msg . PHP_EOL
-            . '  site_security_timeout' . tr('preference:') . $prefs['site_security_timeout']
-            . tr('seconds') . '(' . $prefs['site_security_timeout'] / 60 . ' minutes)' . PHP_EOL
-            . (isset($_SERVER['SCRIPT_NAME']) ? '  SCRIPT_NAME: ' . $_SERVER['SCRIPT_NAME'] . PHP_EOL : '')
-            . (isset($_SERVER['REQUEST_URI']) ? '  REQUEST_URI: ' . $_SERVER['REQUEST_URI'] . PHP_EOL : '')
-            . (isset($_SERVER['HTTP_ORIGIN']) ? '  HTTP_ORIGIN: ' . $_SERVER['HTTP_ORIGIN'] . PHP_EOL : '')
-            . (isset($_SERVER['HTTP_REFERER']) ? '  HTTP_REFERER: ' . $_SERVER['HTTP_REFERER'] . PHP_EOL : '')
-            . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] . PHP_EOL : '')
-            . '  ticket: ' . ($ticket !== '' ? $ticket : tr('empty')) . PHP_EOL
-            . '**** ' . tr('End CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****'
-        );
+        self::lib('idslog')->warning('CSRF validation failed.', [
+            'component' => __CLASS__,
+            'method' => __FUNCTION__,
+            'message' => $msg,
+            'server' => $_SERVER['SERVER_NAME'] ?? '',
+            'script' => $_SERVER['SCRIPT_NAME'] ?? '',
+            'request_uri' => $_SERVER['REQUEST_URI'] ?? '',
+            'origin' => $_SERVER['HTTP_ORIGIN'] ?? '',
+            'referer' => $_SERVER['HTTP_REFERER'] ?? '',
+            'request_method' => $_SERVER['REQUEST_METHOD'] ?? '',
+            'security_timeout' => $prefs['site_security_timeout'] ?? null,
+        ]);
     }
 
 

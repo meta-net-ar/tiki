@@ -39,7 +39,10 @@ set_error_handler(function (int $number, string $message, string $file, int $lin
     }
     $errorEnabled = (bool)($number & (int)ini_get('error_reporting'));
     if ($errorEnabled) {
-        TikiLib::lib('logs')->add_log('Mcp', "[MCP] $message on line $line of $file");
+        TikiLib::lib('idslog')->error(tr('Unexpected error occurred'),[
+            'component' => __FUNCTION__,
+            'exception' => "[MCP] $message on line $line of $file"
+        ]);
         if (in_array($number, [E_USER_ERROR, E_RECOVERABLE_ERROR])) {
             throw new ErrorException($message, 0, $number, $file, $line);
         }

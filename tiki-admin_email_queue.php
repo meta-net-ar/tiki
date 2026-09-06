@@ -121,7 +121,7 @@ $mailQueues = $emailQueuelib->listStalledEmailQueues($offset, $maxRecords, $sort
 $smarty->assign_by_ref('cant', $mailQueues['cant']);
 $smarty->assign_by_ref('total_cant', $mailQueues['total_cant']);
 $smarty->assign_by_ref('max_retries', $mailQueues['max_retries']);
-$tikilog = TikiLib::lib('logs');
+$logger = TikiLib::lib('idslog');
 foreach ($mailQueues['data'] as $key => $message) {
     try {
         if (empty($message['message'])) {
@@ -134,7 +134,10 @@ foreach ($mailQueues['data'] as $key => $message) {
         $message['unreadable'] = false;
 
         if ($mail instanceof __PHP_Incomplete_Class || $mail === false) {
-            $tikilog->add_log("TikiAdminEmailQueue", "tiki-admin_email_queue: unreadable mail queue entry for queue_id=" . ($message['queue_id'] ?? $message['messageId'] ?? 'unknown'));
+            $logger->warning('Unreadable mail queue entry.', [
+                'component' => __FILE__,
+                'queue_id' => $message['queue_id'] ?? $message['messageId'] ?? 'unknown',
+            ]);
             $message['date'] = '';
             $message['destination'] = tr('Unreadable mail queue item');
             $message['subject'] = tr('Unsupported queued email');
@@ -145,7 +148,11 @@ foreach ($mailQueues['data'] as $key => $message) {
         }
 
         if (! $mail instanceof \Symfony\Component\Mime\Email) {
-            $tikilog->add_log("TikiAdminEmailQueue", "tiki-admin_email_queue: unsupported mail queue entry for queue_id=" . ($message['queue_id'] ?? $message['messageId'] ?? 'unknown') . " class=" . get_class($mail));
+            $logger->warning('Unsupported mail queue entry.', [
+                'component' => __FILE__,
+                'queue_id' => $message['queue_id'] ?? $message['messageId'] ?? 'unknown',
+                'class' => get_class($mail),
+            ]);
             $message['date'] = '';
             $message['destination'] = tr('Unsupported mail queue item');
             $message['subject'] = tr('Unsupported queued email');
@@ -186,7 +193,11 @@ foreach ($mailQueues['data'] as $key => $message) {
         $message['body'] = $textBody . $htmlBody;
         $mailQueues['data'][$key] = $message;
     } catch (\Throwable $e) {
-        $tikilog->add_log("TikiAdminEmailQueue", "tiki-admin_email_queue: error processing queue_id=" . ($message['queue_id'] ?? $message['messageId'] ?? 'unknown') . ": " . $e->getMessage());
+        $logger->error(tr('Unable to process mail queue entry.'), [
+            'component' => __FILE__,
+            'queue_id' => $message['queue_id'] ?? $message['messageId'] ?? 'unknown',
+            'exception' => $e->getMessage(),
+        ]);
         Feedback::error('Mail queue error: ' . $e->getMessage());
     }
 }

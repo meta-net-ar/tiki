@@ -89,8 +89,11 @@ class TikiHybrid extends LogsLib
 
         //$this->hybridauth = new Hybridauth($confhybrid, $guzzle, null, $this->logger );
         } catch (\Throwable $e) {
-            TikiLib::lib('logs')->add_log('TikiHybrid', $e->getMessage());
-            Feedback::error('TikiHybrid construct error: ' . $e->getMessage());
+            TikiLib::lib('idslog')->error( tr('Unexpected error occurred'), [
+                'component' => __CLASS__,
+                'exception' => tr('TikiHybrid construct failed: ') . $e->getMessage(),
+            ]);
+            Feedback::error(tr('TikiHybrid construct error: ') . $e->getMessage());
         }
     }
 

@@ -15,14 +15,14 @@ class PeerTubeLib
     private $initialized = false;
     private $localClientCache = null;
     /**
-     * @var array|mixed|object|Container|\Symfony\Component\DependencyInjection\ContainerBuilder|TikiLib|null
+     * @var TikiLib
      */
-    private TikiLib $tikilog;
+    private TikiLib $logger;
 
     public function __construct($session_type = 0)
     {
         $this->sessionType = $session_type;
-        $this->tikilog = TikiLib::lib('logs');
+        $this->logger = TikiLib::lib('idslog');
     }
 
     public function testSetup()
@@ -123,7 +123,11 @@ class PeerTubeLib
                 }
                 $headers[] = 'Authorization: Bearer ' . $token;
             } catch (\Exception $e) {
-                $this->tikilog->add_log("Peertubelib", tr("Authentication error: %0", $e->getMessage()));
+                $this->logger->error(tr('Unexpected error occurred'), [
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                    'exception' => tr("Authentication error: %0", $e->getMessage())
+                ]);
                 throw new \Exception(tr("Failed to obtain access token: %0", $e->getMessage()));
             }
         }
@@ -138,7 +142,12 @@ class PeerTubeLib
                 rewind($verbose);
                 $verboseLog = stream_get_contents($verbose);
                 fclose($verbose);
-                $this->tikilog->add_log('Peertubelib', tr("cURL verbose log: %0", $verboseLog));
+                $this->logger->warning('cURL request failed.', [
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                    'error' => $error,
+                    'verbose' => $verboseLog,
+                ]);
             }
             throw new \Exception(tr("cURL error: %0", $error));
         }
@@ -150,7 +159,12 @@ class PeerTubeLib
             $verboseLog = stream_get_contents($verbose);
             fclose($verbose);
             if (! empty($verboseLog)) {
-                $this->tikilog->add_log('Peertubelib', tr("cURL verbose log: %0", $verboseLog));
+                $this->logger->warning(tr("cURL verbose log: %0", $verboseLog), [
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                    'http_code' => $httpCode,
+                    'url' => $url,
+                ]);
             }
         }
 
@@ -158,7 +172,12 @@ class PeerTubeLib
             $this->clearCachedToken();
             return $this->makeRequest($method, $url, $data, $auth, $rawBody);
         } elseif ($httpCode >= 400) {
-            $this->tikilog->add_log('Peertubelib', tr("HTTP error %0: %1", $httpCode, $response));
+            $this->logger->warning(tr("HTTP error %0: %1", $httpCode, $response), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'http_code' => $httpCode,
+                'url' => $url,
+            ]);
             $msg = "HTTP error $httpCode";
             $j = json_decode($response, true);
             if (is_array($j)) {
@@ -241,10 +260,16 @@ class PeerTubeLib
             $url .= '&search=' . rawurlencode($find);
         }
 
-        $this->tikilog->add_log('Peertubelib', tr("[PeerTube/listVideos] URL: %0", $url));
+        $this->logger->info(tr("[PeerTube/listVideos] URL: %0", $url), [
+            'component' => __CLASS__,
+            'method' => __FUNCTION__
+        ]);
 
         $response = $this->makeRequest('GET', $url);
-        $this->tikilog->add_log('Peertubelib', tr("[PeerTube/listVideos] Response: %0", substr($response, 0, 1000)));
+        $this->logger->info(tr("[PeerTube/listVideos] Response: %0", substr($response, 0, 1000)), [
+            'component' => __CLASS__,
+            'method' => __FUNCTION__
+        ]);
         return json_decode($response);
     }
 
@@ -292,7 +317,11 @@ class PeerTubeLib
 
             throw new \Exception("HTTP error $httpCode. Response: $response");
         } catch (\Exception $e) {
-            $this->tikilog->add_log("Peertubelib", tr("PeerTube deleteVideo error: %0 | UUID: %1 | URL: %2", $e->getMessage(), $uuid, $deleteUrl));
+            $this->logger->error(tr('Unexpected error occurred'), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'exception' => tr("PeerTube deleteVideo error: %0 | UUID: %1 | URL: %2", $e->getMessage(), $uuid, $deleteUrl)
+            ]);
             throw new \Exception(tr("Failed to delete video: %0", $e->getMessage()));
         }
     }

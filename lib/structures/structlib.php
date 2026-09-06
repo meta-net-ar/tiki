@@ -13,13 +13,13 @@ class StructLib extends TikiLib
 {
     public $displayLanguageOrder;
 
-    private Tikilib $tikilog;
+    private Tikilib $logger;
 
     public function __construct()
     {
         global $prefs;
         parent::__construct();
-        $this->tikilog = TikiLib::lib('logs');
+        $this->logger = TikiLib::lib('idslog');
         $this->displayLanguageOrder = [];
     }
     public function s_export_structure_tree($structure_id, $level = 0)
@@ -1020,7 +1020,11 @@ class StructLib extends TikiLib
     public function get_navigation_info($page_ref_id)
     {
         if (! $page_ref_id || ! is_numeric($page_ref_id)) {
-            $this->tikilog->add_log('StructLib NavigationInfos', tr("Invalid page_ref_id: %0", $page_ref_id));
+            $this->logger->warning(tr("Invalid page_ref_id: %0", $page_ref_id),[
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'page_ref_id' => $page_ref_id
+            ]);
             return null;
         }
         return [
@@ -1061,7 +1065,12 @@ class StructLib extends TikiLib
             }
         } else {
             // Log the error or handle it gracefully
-            $this->tikilog->add_log('StructLib NeighborInfo', tr("Method not found: %0", $fn));
+            $this->logger->warning(tr("Method not found: %0", $fn), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'page_ref_id' => $page_ref_id,
+                'fn' => $fn
+            ]);
             return null;
         }
     }

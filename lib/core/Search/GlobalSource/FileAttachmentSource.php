@@ -56,7 +56,16 @@ class Search_GlobalSource_FileAttachmentSource implements Search_GlobalSource_In
                         }
                     }
                 } else {
-                    TikiLib::lib('logs')->add_log('FileAttachmentSource', tr("File %0, referenced from %1 %2 no longer exists.", $rel['itemId'], $objectType, $objectId));
+                    TikiLib::lib('idslog')->warning(
+                        tr('Referenced file %0 from %1 %2 no longer exists.', $rel['itemId'], $objectType, $objectId),
+                        [
+                            'component' => __CLASS__,
+                            'method' => __FUNCTION__,
+                            'object_type' => $objectType,
+                            'object_id' => $objectId,
+                            'file_id' => $rel['itemId'],
+                        ]
+                    );
                 }
             }
         }
