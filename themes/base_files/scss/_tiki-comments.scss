@@ -77,11 +77,6 @@ dl.note-list {
     margin: .5em;
 }
 
-#note-editor-comment {
-    padding: 0;
-    z-index: 2;
-}
-
 // moved to _tiki-selectors.scss
 //.note-list .postbody-title {
 //    background: @panel-bg;/*#ccc*/
@@ -109,7 +104,6 @@ dl.note-list {
     padding: 2px;
 }
 
-#note-editor-comment,
 .note-list .postbody-title {
     padding: .5em;
 }

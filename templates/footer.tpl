@@ -21,7 +21,11 @@
 {/foreach}
 
 {if $prefs.feature_inline_comments eq 'y' && $tiki_p_post_comments eq 'y'}
-    <a id="note-editor-comment" class="alert alert-info" style="display:none;" href="#" role="button">{tr}Add Comment{/tr}</a>
+    {* the popover needs an element to anchor on: this one is moved onto the text selection *}
+    <span id="note-editor-anchor" class="position-absolute pe-none" aria-hidden="true"></span>
+    <div hidden>
+        <a id="note-editor-comment" class="btn btn-primary btn-sm" href="#" role="button">{tr}Add Comment{/tr}</a>
+    </div>
 {/if}
 {if isset($force_fill_action)}
     {include file="tiki-tracker_force_fill.tpl"}
