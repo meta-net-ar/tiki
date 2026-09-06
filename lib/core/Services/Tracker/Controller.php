@@ -3499,32 +3499,20 @@ class Services_Tracker_Controller
         require_once $tikipath . '/lib/cypht/integration/classes.php';
 
         $config = new Tiki_Hm_Site_Config_File([]); // @phpstan-ignore class.notFound
-        $environment->define_default_constants($config);
-        $session = (new Hm_Session_Setup($config))->setup_session(); // @phpstan-ignore class.notFound
 
-        $module_exec = new Hm_Module_Exec($config); // @phpstan-ignore class.notFound
-        $module_exec->session = $session;
-        $module_exec->load_module_set_files(['core', 'imap', 'tiki'], ['core', 'imap', 'tiki']);
-        $request = new Hm_Request($module_exec->filters, $config); // @phpstan-ignore class.notFound
+        $dispatch = new Hm_Dispatch($config, false); // @phpstan-ignore class.notFound
 
-        $request->post = [
+        $dispatch->load_required_module_sets(['imap']);
+
+        $res = $dispatch->process_output_modules_with_handler(['filter_message_headers', 'filter_message_body', 'filter_message_struct'], 'tiki_message_content', request_post: [
             'imap_msg_uid' => $input->uid->int(),
             'list_path' => $input->listPath->text(),
-        ];
-
-        $module_exec->request = $request;
-        $handler_output = $module_exec->run_handler_module([], [], 'tiki_message_content', [], $session);
-
-        $headers_output = $module_exec->run_output_module($handler_output[0], [], 'filter_message_headers', [], $session, $request->format, $module_exec->get_current_language());
-
-        $body_output = $module_exec->run_output_module($handler_output[0], [], 'filter_message_body', [], $session, $request->format, $module_exec->get_current_language());
-
-        $msg_struct_output = $module_exec->run_output_module($handler_output[0], [], 'filter_message_struct', [], $session, $request->format, $module_exec->get_current_language());
+        ]);
 
         return [
-            'headers' => $headers_output[0]['msg_headers'],
-            'body' => $body_output[0]['msg_text'],
-            'msg_parts' => $msg_struct_output[0]['msg_parts'],
+            'headers' => $res['filter_message_headers']['msg_headers'],
+            'body' => $res['filter_message_body']['msg_text'],
+            'msg_parts' => $res['filter_message_struct']['msg_parts'],
         ];
     }
 }
