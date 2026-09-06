@@ -482,7 +482,8 @@ class BlogLib extends TikiDb_Bridge
         $related_max,
         $use_excerpt,
         $created = 0,
-        $lastModif = 0
+        $lastModif = 0,
+        $slug = null
     ) {
 
         //TODO: all the display parameters can be one single array parameter
@@ -492,11 +493,27 @@ class BlogLib extends TikiDb_Bridge
         if ($lastModif == 0) {
             $lastModif = $tikilib->now;
         }
+        
+        $slug = $slug ?? $title;
+        $slug = TikiLib::lib('slugmanager')->generate($prefs['wiki_url_scheme'], $slug);
+
+        if(!empty($slug) && strlen($slug) > 160) {
+            throw new Exception(tr('You have exceeded the number of characters allowed (160 max) for the blog slug field'), 5);
+        }
+
+        if ($slug) {
+            $query = "select `blogId` from `tiki_blogs` where `blogSlug`=?";
+            $result = $this->query($query, [$slug]);
+            $res = $result->fetchRow();
+            if ($res && $res['blogId'] != $blogId) {
+                throw new Exception(tr('The slug is already used by another blog'), 4);
+            }
+        }
 
         if ($blogId) {
-            $query = "update `tiki_blogs` set `title`=? ,`description`=?,`user`=?,`public`=?,`lastModif`=?,`maxPosts`=?,`heading`=?,`use_title`=?,`use_title_in_post`=?,`use_description`=?,`use_breadcrumbs`=?,`use_author`=?,`add_date`=?,`use_find`=?,`allow_comments`=?,`allow_post_categorization`=?,`show_avatar`=?,`always_owner`=?, `post_heading`=?, `show_related`=?, `related_max`=?, `use_excerpt`=? where `blogId`=?";
+            $query = "update `tiki_blogs` set `title`=? ,`description`=?,`user`=?,`public`=?,`lastModif`=?,`maxPosts`=?,`heading`=?,`use_title`=?,`use_title_in_post`=?,`use_description`=?,`use_breadcrumbs`=?,`use_author`=?,`add_date`=?,`use_find`=?,`allow_comments`=?,`allow_post_categorization`=?,`show_avatar`=?,`always_owner`=?, `post_heading`=?, `show_related`=?, `related_max`=?, `use_excerpt`=?, `blogSlug`=? where `blogId`=?";
 
-            $result = $this->query($query, [$title, $description, $user, $public, $lastModif, $maxPosts, $heading, $use_title, $use_title_in_post, $use_description, $use_breadcrumbs, $use_author, $add_date, $use_find, $allow_comments, $allow_post_categorization, $show_avatar, $alwaysOwner, $post_heading, $show_related, $related_max, $use_excerpt, $blogId]);
+            $result = $this->query($query, [$title, $description, $user, $public, $lastModif, $maxPosts, $heading, $use_title, $use_title_in_post, $use_description, $use_breadcrumbs, $use_author, $add_date, $use_find, $allow_comments, $allow_post_categorization, $show_avatar, $alwaysOwner, $post_heading, $show_related, $related_max, $use_excerpt, $slug, $blogId]);
 
             $tikilib->object_post_save(['type' => 'blog', 'object' => $blogId], ['content' => $heading]);
             $query2 = "UPDATE `tiki_objects` SET `name`=? ,`description`=? WHERE `itemId`=? AND `type`='blog'";
@@ -506,10 +523,10 @@ class BlogLib extends TikiDb_Bridge
                 $created = $tikilib->now;
             }
 
-            $query = "insert into `tiki_blogs`(`created`,`lastModif`,`title`,`description`,`user`,`public`,`posts`,`maxPosts`,`hits`,`heading`,`use_title`,`use_title_in_post`,`use_description`,`use_breadcrumbs`,`use_author`,`add_date`,`use_find`,`allow_comments`,`allow_post_categorization`,`show_avatar`,`always_owner`,`post_heading`, `show_related`, `related_max`, `use_excerpt`) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            $query = "insert into `tiki_blogs`(`created`,`lastModif`,`title`,`description`,`user`,`public`,`posts`,`maxPosts`,`hits`,`heading`,`use_title`,`use_title_in_post`,`use_description`,`use_breadcrumbs`,`use_author`,`add_date`,`use_find`,`allow_comments`,`allow_post_categorization`,`show_avatar`,`always_owner`,`post_heading`, `show_related`, `related_max`, `use_excerpt`,`blogSlug`) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 
-            $result = $this->query($query, [$created, $lastModif, $title, $description, $user, $public, 0, (int) $maxPosts, 0, $heading, $use_title, $use_title_in_post, $use_description, $use_breadcrumbs, $use_author, $add_date, $use_find, $allow_comments, $allow_post_categorization, $show_avatar, $alwaysOwner, $post_heading, $show_related, $related_max, $use_excerpt]);
+            $result = $this->query($query, [$created, $lastModif, $title, $description, $user, $public, 0, (int) $maxPosts, 0, $heading, $use_title, $use_title_in_post, $use_description, $use_breadcrumbs, $use_author, $add_date, $use_find, $allow_comments, $allow_post_categorization, $show_avatar, $alwaysOwner, $post_heading, $show_related, $related_max, $use_excerpt, $slug]);
 
             $blogId = $this->lastInsertId();
 

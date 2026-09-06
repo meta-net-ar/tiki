@@ -35,6 +35,12 @@
                 </div>
             </div>
             <div class="mb-3 row">
+                <label class="col-sm-3 col-form-label" for="blog-slug">{tr}Slug{/tr}</label>
+                <div class="col-sm-9">
+                    <input type="text" maxlength="160" name="slug" id="blog-slug" class="form-control" value="{$slug|escape}">
+                </div>
+            </div>
+            <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="blog-desc">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
                     <textarea class="wikiedit form-control" maxlength="{$MAX_BLOG_DESCRIPTION_LENGTH}" name="description" id="blog-desc" rows="10">{$description|escape}</textarea>

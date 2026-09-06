@@ -354,6 +354,7 @@ CREATE TABLE `tiki_blog_posts_images` (
 DROP TABLE IF EXISTS `tiki_blogs`;
 CREATE TABLE `tiki_blogs` (
   `blogId` int(8) NOT NULL auto_increment,
+  `blogSlug` varchar(160) default NULL,
   `created` int(14) default NULL,
   `lastModif` int(14) default NULL,
   `title` varchar(200) default NULL,
