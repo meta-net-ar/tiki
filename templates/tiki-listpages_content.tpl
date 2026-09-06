@@ -376,6 +376,11 @@
                                                 {icon name='copy' _menu_text='y' _menu_icon='y' alt="{tr}Duplicate{/tr}"}
                                             </a>
                                         </action>
+                                        <action>
+                                            <a href="tiki-rename_page.php?page={$listpages[changes].pageName|escape:"url"}">
+                                                {icon name='edit' _menu_text='y' _menu_icon='y' alt="{tr}Change Slug{/tr}"}
+                                            </a>
+                                        </action>
                                     {/if}
                                     {if $prefs.feature_history eq 'y' and $listpages[changes].perms.tiki_p_wiki_view_history eq 'y'}
                                         <action>
