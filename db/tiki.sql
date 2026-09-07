@@ -1924,6 +1924,15 @@ CREATE TABLE `tiki_page_footnotes` (
   PRIMARY KEY (`user`(150),`pageName`(100))
 ) ENGINE=MyISAM;
 
+DROP TABLE IF EXISTS `tiki_wiki_recycle_bin`;
+CREATE TABLE `tiki_wiki_recycle_bin` (
+  `pageName` VARCHAR(160) NOT NULL,
+  `deletedAt` INT(14) NOT NULL,
+  `deletedBy` VARCHAR(200) NOT NULL DEFAULT '',
+  `comment` MEDIUMTEXT NULL,
+  PRIMARY KEY (`pageName`)
+) ENGINE=MyISAM;
+
 DROP TABLE IF EXISTS `tiki_pages`;
 CREATE TABLE `tiki_pages` (
   `page_id` int(14) NOT NULL auto_increment,

@@ -239,6 +239,7 @@ ALTER TABLE `tiki_webmail_contacts_fields` ENGINE=InnoDB;
 ALTER TABLE `tiki_webmail_contacts_groups` ENGINE=InnoDB;
 ALTER TABLE `tiki_webservice` ENGINE=InnoDB;
 ALTER TABLE `tiki_webservice_template` ENGINE=InnoDB;
+ALTER TABLE `tiki_wiki_recycle_bin` ENGINE=InnoDB;
 ALTER TABLE `tiki_wiki_attachments` ENGINE=InnoDB;
 ALTER TABLE `tiki_workspace_templates` ENGINE=InnoDB;
 ALTER TABLE `tiki_zones` ENGINE=InnoDB;

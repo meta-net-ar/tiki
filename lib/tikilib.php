@@ -3722,6 +3722,7 @@ class TikiLib extends TikiDb_Bridge
             return false;
         }
         global $user, $prefs;
+        $this->movePageToRecycleBin($page, $comment);
         if ($prefs['feature_actionlog'] == 'y' && isset($page_info['data'])) {
             $params = 'del=' . strlen($page_info['data']);
         } else {
@@ -3755,7 +3756,6 @@ class TikiLib extends TikiDb_Bridge
             $contributionlib = TikiLib::lib('contribution');
             $contributionlib->remove_page($page);
         }
-        $this->table('tiki_history')->deleteMultiple(['pageName' => $page]);
         $this->table('tiki_links')->deleteMultiple(['fromPage' => $page]);
         $logslib = TikiLib::lib('logs');
         $removedActionId = $logslib->add_action('Removed', $page, 'wiki page', $params);
@@ -3786,6 +3786,77 @@ class TikiLib extends TikiDb_Bridge
 
         $wikilib->remove_footnote('', $page);
         $this->refresh_index('wiki page', $page);
+
+        return true;
+    }
+
+    /**
+     * Store a page in the recycle bin and ensure the latest revision exists in history.
+     *
+     * @param string $page
+     * @param string $comment
+     * @return void
+     */
+    public function movePageToRecycleBin($page, $comment = '')
+    {
+        global $user;
+
+        $this->replicate_page_to_history($page);
+
+        $table = $this->table('tiki_wiki_recycle_bin');
+        $table->delete(['pageName' => $page]);
+        $table->insert([
+            'pageName' => $page,
+            'deletedAt' => $this->now,
+            'deletedBy' => $user ?: 'admin',
+            'comment' => $comment,
+        ]);
+    }
+
+    /**
+     * Restore a page previously deleted into the recycle bin.
+     *
+     * @param string $page
+     * @return bool
+     */
+    public function restorePageFromRecycleBin($page)
+    {
+        global $user;
+
+        if ($this->page_exists($page)) {
+            return false;
+        }
+
+        $inRecycleBin = $this->table('tiki_wiki_recycle_bin')->fetchCount(['pageName' => $page]);
+        if (! $inRecycleBin) {
+            return false;
+        }
+
+        $latestVersion = $this->table('tiki_history')->fetchOne('version', ['pageName' => $page], ['version' => 'DESC']);
+        if (! $latestVersion) {
+            return false;
+        }
+
+        $restored = $this->create_page(
+            $page,
+            0,
+            '',
+            $this->now,
+            tr('Restored from recycle bin'),
+            $user ?: 'admin',
+            $this->get_ip_address()
+        );
+
+        if (! $restored) {
+            return false;
+        }
+
+        $this->restore_page_from_history($page, $latestVersion);
+        $this->table('tiki_wiki_recycle_bin')->delete(['pageName' => $page]);
+        $this->refresh_index('wiki page', $page);
+
+        $logslib = TikiLib::lib('logs');
+        $logslib->add_action('Restored', $page, 'wiki page', tr('Restored from recycle bin'));
 
         return true;
     }

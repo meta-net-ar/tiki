@@ -337,8 +337,11 @@ class Services_Wiki_Controller
 
 
     /**
-     * Remove pages action, either all versions (from tiki-listpages.php checkbox action) or last version
-     * (page remove button or remove action for an individual page in page listing)
+     * Remove pages action.
+     *
+     * This action now always removes the page from live wiki listings and moves it
+     * to the recycle bin (including all versions for restore purposes).
+     * Version-level deletion remains available in history management only.
      *
      * @param $input
      * @return array
@@ -360,22 +363,9 @@ class Services_Wiki_Controller
                 return array_pop($pageName);
             }, $pages);
             if (count($util->items) > 0) {
-                $v = $input['version'];
-                if (count($util->items) == 1) {
-                    $versions = TikiLib::lib('hist')->get_nb_history($util->items[0]);
-                    $one = $versions == 1;
-                } else {
-                    $one = false;
-                }
-                $pdesc = count($util->items) === 1 ? tr('page') : tr('pages');
-                if ($one) {
-                    $vdesc = tr('the only version of');
-                } elseif ($v === 'all') {
-                    $vdesc = tr('all versions of');
-                } elseif ($v === 'last') {
-                    $vdesc = tr('the last version of');
-                }
-                $msg = tr('Delete %0 the following %1?', $vdesc, $pdesc);
+                $msg = count($util->items) === 1
+                    ? tr('Move the following page to the recycle bin?')
+                    : tr('Move the following pages to the recycle bin?');
                 $included_by = [];
                 $wikilib = TikiLib::lib('wiki');
                 foreach ($util->items as $page) {
@@ -389,9 +379,8 @@ class Services_Wiki_Controller
                     'confirmAction' => $input['action'],
                     'confirmController' => 'wiki',
                     'customMsg' => $msg,
-                    'confirmButton' => tra('Delete'),
+                    'confirmButton' => tra('Move to recycle bin'),
                     'items' => $util->items,
-                    'extra' => ['version' => $v, 'one' => $one],
                     'modal' => '1',
                     'included_by' => $included_by,
                 ];
@@ -412,34 +401,18 @@ class Services_Wiki_Controller
             $util->items = array_map(function ($pageName) {
                 return array_pop($pageName);
             }, $pages);
-            //delete page
-            //checkbox in popup where user can change from all to last and vice versa
-            $all = ! empty($input['all']) && $input['all'] === 'on';
-            $last = ! empty($input['last']) && $input['last'] === 'on';
-            //only use default when not overriden by checkbox
-            $all = $all || ($util->extra['version'] === 'all' && ! $last);
-            $last = $last || ($util->extra['version'] === 'last' && ! $all);
             $error = false;
             foreach ($util->items as $page) {
                 $result = false;
                 //get page info before deletion in case this was the page the user was on
                 //used later to redirect to the tiki index page
                 $allinfo = TikiLib::lib('tiki')->get_page_info($page, false, true);
-                $history = false;
-                if ($all || $util->extra['one']) {
-                    $result = TikiLib::lib('tiki')->remove_all_versions($page);
-                } elseif ($last) {
-                    $result = TikiLib::lib('wiki')->remove_last_version($page);
-                } elseif (! empty($util->extra['version']) && is_numeric($util->extra['version'])) {
-                    $result = TikiLib::lib('hist')->remove_version($page, $util->extra['version']);
-                    $history = true;
-                }
+                $result = TikiLib::lib('tiki')->remove_all_versions($page);
                 if (! $result) {
                     $error = true;
-                    $versionText = $history ? tr('Version') . ' ' : '';
                     $feedback = [
                         'tpl' => 'action',
-                        'mes' => tr('An error occurred. %0%1 could not be deleted.', $versionText, $page),
+                        'mes' => tr('An error occurred. %0 could not be moved to the recycle bin.', $page),
                     ];
                     Feedback::error($feedback);
                 }
@@ -450,22 +423,10 @@ class Services_Wiki_Controller
             $cachelib->invalidateAll('structure');
             //prepare feedback
             if (! $error) {
-                if ($all || $util->extra['one']) {
-                    $vdesc = tr('All versions');
-                    $verb = 'have';
-                    $noversionsleft = true;
-                } elseif ($last) {
-                    $vdesc = tr('The last version');
-                    $verb = 'has';
-                } else {
-                    //must be a version number
-                    $vdesc = tr('Version %0', $util->extra['version']);
-                    $verb = 'has';
-                }
                 if (count($util->items) === 1) {
-                    $msg = tr('%0 of the following page %1 been deleted:', $vdesc, $verb);
+                    $msg = tr('The following page has been moved to the recycle bin:');
                 } else {
-                    $msg = tr('%0 of the following pages %1 been deleted:', $vdesc, $verb);
+                    $msg = tr('The following pages have been moved to the recycle bin:');
                 }
                 $feedback = [
                     'tpl' => 'action',
@@ -475,7 +436,7 @@ class Services_Wiki_Controller
                 Feedback::success($feedback);
                 // Create a Semantic Alias (301 redirect) if this option was selected by user.
                 $createredirect = ! empty($input['create_redirect']) && $input['create_redirect'] === 'y';
-                if ($createredirect && $noversionsleft) {
+                if ($createredirect) {
                     $destinationPage = $input['destpage'];
                     if ($destinationPage == "") {
                         $msg = tr('Redirection page not specified. 301 redirect not created.');
@@ -552,13 +513,75 @@ class Services_Wiki_Controller
             }
             //return to page
             if (
-                count($util->items) === 1 && ($all || $util->extra['one'])
+                count($util->items) === 1
                 && strpos($_SERVER['HTTP_REFERER'] ?? '', $allinfo['pageName']) !== false
             ) {
                 //go to tiki index if the page the user was on has been deleted - avoids no page found error.
                 global $prefs, $base_url;
                 return Services_Utilities::redirect($base_url . $prefs['tikiIndex']);
             }
+            return Services_Utilities::refresh();
+        }
+    }
+
+    /**
+     * Restore wiki pages from recycle bin.
+     *
+     * @param $input
+     * @return array
+     * @throws Exception
+     * @throws Services_Exception
+     */
+    public function action_undelete_pages($input)
+    {
+        $util = new Services_Utilities();
+        $perms = Perms::get();
+
+        if (! $perms->edit) {
+            throw new Services_Exception_Denied();
+        }
+
+        if ($util->notConfirmPost()) {
+            $util->setVars($input, $this->filters, 'checked');
+            if (count($util->items) === 0) {
+                Services_Utilities::modalException(tra('No pages were selected. Please select one or more pages.'));
+            }
+
+            return [
+                'title' => tra('Please confirm'),
+                'confirmAction' => $input['action'],
+                'confirmController' => 'wiki',
+                'customMsg' => count($util->items) === 1
+                    ? tr('Restore the following page from the recycle bin?')
+                    : tr('Restore the following pages from the recycle bin?'),
+                'confirmButton' => tra('Restore'),
+                'items' => $util->items,
+                'modal' => '1',
+            ];
+        } elseif ($util->checkCsrf()) {
+            $util->setVars($input, $this->filters, 'items');
+            $error = false;
+
+            foreach ($util->items as $page) {
+                if (! TikiLib::lib('tiki')->restorePageFromRecycleBin($page)) {
+                    $error = true;
+                    Feedback::error([
+                        'tpl' => 'action',
+                        'mes' => tr('An error occurred. %0 could not be restored.', $page),
+                    ]);
+                }
+            }
+
+            if (! $error) {
+                Feedback::success([
+                    'tpl' => 'action',
+                    'mes' => count($util->items) === 1
+                        ? tr('The following page has been restored from the recycle bin:')
+                        : tr('The following pages have been restored from the recycle bin:'),
+                    'items' => $util->items,
+                ]);
+            }
+
             return Services_Utilities::refresh();
         }
     }

@@ -7,6 +7,7 @@
     </div>
     <div class="t_navbar mb-4 clearfix">
         {button _icon_name='admin_wiki' _text="{tr}Pages{/tr}" _type="link" _class='btn btn-link' _script='tiki-listpages.php' _title="{tr}List wiki pages{/tr}"}
+        {button _icon_name='recycle' _text="{tr}Recycle Bin{/tr}" _type="link" _class='btn btn-link' _script='tiki-wiki_recycle_bin.php' _title="{tr}Wiki recycle bin — restore deleted pages{/tr}"}
         {if $prefs.feature_wiki_structure eq "y" and $tiki_p_view eq "y"}
             {button _icon_name='structure' _text="{tr}Structures{/tr}" _type="link" _class='btn btn-link' _script='tiki-admin_structures.php' _title="{tr}List structures{/tr}"}
         {/if}
