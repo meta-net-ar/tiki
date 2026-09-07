@@ -62,9 +62,9 @@ $section = Sections::SECTION_WIKI_PAGE;
 Sections::setCurrentSection($section);
 
 
-global $prefs;
 global $tikiroot, $base_url;
-$homePage = $prefs['wikiHomePage'];
+$config = include __DIR__ . '/urls.config.cache.php';
+$homePage = $config['homePageURL'];
 $homeSlug = TikiLib::lib('wiki')->get_slug_by_page($homePage);
 $requestSlug = $_GET['page'];
 
