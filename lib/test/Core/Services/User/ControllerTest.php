@@ -97,6 +97,28 @@ class ServicesUserControllerTest extends TestCase
         // Response consistency
         $this->assertEquals('Africa/Lubumbashi', $result['effectiveTimezone']);
     }
+
+    public function testTimezoneNeverActionDisablesSyncForUser(): void
+    {
+        global $prefs, $tikilib;
+
+        $tikilib->set_user_preference('testuser', 'user_localtimezonesync', 'y');
+
+        $input = new JitFilter([
+            'timezone_action' => 'never',
+        ]);
+
+        $result = (new ServicesUserController())->actionLocalTimezoneSync($input);
+
+        $this->assertSame([], $result);
+        $this->assertSame(
+            'n',
+            $tikilib->get_user_preference('testuser', 'user_localtimezonesync'),
+            'The timezone synchronization notification should be disabled for the user'
+        );
+        $this->assertSame('n', $prefs['user_localtimezonesync']);
+    }
+
     public function testFunctionallyEquivalentTimezonesAreNotDifferent(): void
     {
         global $tikilib, $prefs;
