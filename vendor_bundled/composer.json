@@ -534,11 +534,18 @@
             "type": "composer",
             "url": "https://composer.tiki.org",
             "canonical": false,
+            "_comment": [
+                "-------------------------------------------------------------",
+                "IMPORTANT: php-sieve-manager is tempotarily preferred from composer.tiki.org",
+                "until the github repo issue is resolved.",
+                "-------------------------------------------------------------"
+            ],
             "only": [
                 "openannotation/annotator",
                 "jquery/jquery-sheet",
                 "umakantp/smartylint",
-                "bower-asset/wodo.texteditor"
+                "bower-asset/wodo.texteditor",
+                "henrique-borba/php-sieve-manager"
             ]
         }
     }
