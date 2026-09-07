@@ -233,31 +233,40 @@
     <link rel="alternate" type="application/x-wiki" title="{tr}Edit this page!{/tr}" href="tiki-editpage.php?page={$page|escape:url}">
 {/if}
 {* --- Firefox RSS icons --- *}
+{* Escape feed titles after applying defaults so translated and custom values are both safe. *}
 {if $prefs.feature_wiki eq 'y' and $prefs.feed_wiki eq 'y' and $tiki_p_view eq 'y'}
-    <link rel="alternate" type="application/rss+xml" title='{$prefs.feed_wiki_title|escape|default:"{tr}RSS Wiki{/tr}"}' href="tiki-wiki_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
+    {$rssWikiDefault = "{tr}RSS Wiki{/tr}"}
+    <link rel="alternate" type="application/rss+xml" title="{$prefs.feed_wiki_title|default:$rssWikiDefault|escape:'attr'}" href="tiki-wiki_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
 {/if}
 {if $prefs.feature_blogs eq 'y' and $prefs.feed_blogs eq 'y' and $tiki_p_read_blog eq 'y'}
-    <link rel="alternate" type="application/rss+xml" title='{$prefs.feed_blogs_title|escape|default:"{tr}RSS Blogs{/tr}"}' href="tiki-blogs_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
+    {$rssBlogsDefault = "{tr}RSS Blogs{/tr}"}
+    <link rel="alternate" type="application/rss+xml" title="{$prefs.feed_blogs_title|default:$rssBlogsDefault|escape:'attr'}" href="tiki-blogs_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
 {/if}
 {if $prefs.feature_articles eq 'y' and $prefs.feed_articles eq 'y' and $tiki_p_read_article eq 'y'}
-    <link rel="alternate" type="application/rss+xml" title='{$prefs.feed_articles_title|escape|default:"{tr}RSS Articles{/tr}"}' href="tiki-articles_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
+    {$rssArticlesDefault = "{tr}RSS Articles{/tr}"}
+    <link rel="alternate" type="application/rss+xml" title="{$prefs.feed_articles_title|default:$rssArticlesDefault|escape:'attr'}" href="tiki-articles_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
 {/if}
 {if $prefs.feature_file_galleries eq 'y' and $prefs.feed_file_galleries eq 'y' and $tiki_p_view_file_gallery eq 'y'}
-    <link rel="alternate" type="application/rss+xml" title='{$prefs.feed_file_galleries_title|escape|default:"{tr}RSS File Galleries{/tr}"}' href="tiki-file_galleries_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
+    {$rssFileGalleriesDefault = "{tr}RSS File Galleries{/tr}"}
+    <link rel="alternate" type="application/rss+xml" title="{$prefs.feed_file_galleries_title|default:$rssFileGalleriesDefault|escape:'attr'}" href="tiki-file_galleries_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
 {/if}
 {if $prefs.feature_forums eq 'y' and $prefs.feed_forums eq 'y' and $tiki_p_forum_read eq 'y'}
-    <link rel="alternate" type="application/rss+xml" title='{$prefs.feed_forums_title|escape|default:"{tr}RSS Forums{/tr}"}' href="tiki-forums_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
+    {$rssForumsDefault = "{tr}RSS Forums{/tr}"}
+    <link rel="alternate" type="application/rss+xml" title="{$prefs.feed_forums_title|default:$rssForumsDefault|escape:'attr'}" href="tiki-forums_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
 {/if}
 {if $prefs.feature_directory eq 'y' and $prefs.feed_directories eq 'y' and $tiki_p_view_directory eq 'y'}
-    <link rel="alternate" type="application/rss+xml" title='{$prefs.feed_directories_title|escape|default:"{tr}RSS Directories{/tr}"}' href="tiki-directories_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
+    {$rssDirectoriesDefault = "{tr}RSS Directories{/tr}"}
+    <link rel="alternate" type="application/rss+xml" title="{$prefs.feed_directories_title|default:$rssDirectoriesDefault|escape:'attr'}" href="tiki-directories_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
 {/if}
 {if $prefs.feature_calendar eq 'y' and $prefs.feed_calendar eq 'y' and $tiki_p_view_calendar eq 'y'}
-    <link rel="alternate" type="application/rss+xml" title='{$prefs.feed_calendar_title|escape|default:"{tr}RSS Calendars{/tr}"}' href="tiki-calendars_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
+    {$rssCalendarsDefault = "{tr}RSS Calendars{/tr}"}
+    <link rel="alternate" type="application/rss+xml" title="{$prefs.feed_calendar_title|default:$rssCalendarsDefault|escape:'attr'}" href="tiki-calendars_rss.php?ver={$prefs.feed_default_version|escape:'url'}">
 {/if}
 {if $prefs.feature_trackers eq 'y' and $prefs.feed_tracker eq 'y'}
+    {$rssTrackerDefault = "{tr}RSS Tracker{/tr}"}
     {foreach from=$rsslist_trackers item="tracker"}
         <link rel="alternate" type="application/rss+xml"
-            title='{$prefs.feed_tracker_title|cat:" - "|cat:$tracker.name|escape|default:"{tr}RSS Tracker{/tr}"}'
+            title="{$prefs.feed_tracker_title|cat:" - "|cat:$tracker.name|default:$rssTrackerDefault|escape:'attr'}"
             href="tiki-tracker_rss.php?ver={$prefs.feed_default_version|escape:'url'}&trackerId={$tracker.trackerId}">
     {/foreach}
 {/if}

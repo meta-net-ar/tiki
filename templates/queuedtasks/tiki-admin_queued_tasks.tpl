@@ -63,19 +63,19 @@
                         var statusBadge = '';
                         switch (job.status) {
                             case 'Pending':
-                                statusBadge = '<span class="badge bg-warning">{tr}Pending{/tr}</span>';
+                                statusBadge = '<span class="badge bg-warning">' + {{"{tr}Pending{/tr}"|escape|json_encode}} + '</span>';
                                 break;
                             case 'InProgress':
-                                statusBadge = '<span class="badge bg-warning">{tr}Running{/tr}</span>';
+                                statusBadge = '<span class="badge bg-warning">' + {{"{tr}Running{/tr}"|escape|json_encode}} + '</span>';
                                 break;
                             case 'Failed':
-                                statusBadge = '<span class="badge bg-danger">{tr}Failed{/tr}</span>';
+                                statusBadge = '<span class="badge bg-danger">' + {{"{tr}Failed{/tr}"|escape|json_encode}} + '</span>';
                                 break;
                             case 'Completed':
-                                statusBadge = '<span class="badge bg-success">{tr}Done{/tr}</span>';
+                                statusBadge = '<span class="badge bg-success">' + {{"{tr}Done{/tr}"|escape|json_encode}} + '</span>';
                                 break;
                         }
-                        var result = job.result ? job.result.replace(/(?:\r\n|\r|\n)/g, '<br>') : '<em>{tr}No output available yet{/tr}</em>';
+                        var result = job.result ? job.result.replace(/(?:\r\n|\r|\n)/g, '<br>') : '<em>' + {{"{tr}No output available yet{/tr}"|escape|json_encode}} + '</em>';
                         rows += '<tr>' +
                             '<td>' + job.id + '</td>' +
                             '<td>' + job.type + '</td>' +

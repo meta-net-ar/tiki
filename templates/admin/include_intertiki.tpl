@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div class="tiki-form-group row">
-                        <label class="col-sm-4 col-form-label">{tr}Server host{/tr}{help desc='{tr}The full URL of the master servers primary Tiki (ex: https://tiki.org). Even if your Tiki is not at the top level of your web directory, you will still use the site\'s URL per the ex. above.{/tr}'}</label>
+                        <label class="col-sm-4 col-form-label">{tr}Server host{/tr}{help desc='{tr}The full URL of the master servers primary Tiki (ex: https://tiki.org). Even if your Tiki is not at the top level of your web directory, you will still use the site's URL per the ex. above.{/tr}'}</label>
                         <div class="col-sm-8">
                             <input type="text" name="new[host]" value="" class="form-control">
                         </div>
