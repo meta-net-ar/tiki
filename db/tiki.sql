@@ -2008,7 +2008,7 @@ CREATE TABLE `tiki_preferences` (
 ) ENGINE=MyISAM;
 
 INSERT INTO `tiki_preferences` (`name`, `value`)
-SELECT 'auth_token_secret', LOWER(HEX(RANDOM_BYTES(32)));
+SELECT 'auth_token_secret', SHA2(CONCAT(UUID(), RAND()), 256);
 
 DROP TABLE IF EXISTS `tiki_private_messages`;
 CREATE TABLE `tiki_private_messages` (
