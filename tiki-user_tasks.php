@@ -17,6 +17,7 @@ $inputConfiguration = [
         'update_percentage'         => 'bool',         //post
         'action'                    => 'word',         //post
         'reload'                    => 'bool',         //post
+        'search'                    => 'bool',         //post
         'show_trash'                => 'bool',         //post
         'show_completed'            => 'bool',         //post
         'show_private'              => 'bool',         //post
@@ -89,6 +90,20 @@ $access->check_feature('feature_tasks', '', 'community');
 $access->check_user($user);
 $access->check_permission('tiki_p_tasks');
 
+$redirectToTaskList = function (bool $keepOffset = false) use ($access) {
+    $query = [];
+    if (! empty($_REQUEST['find'])) {
+        $query['find'] = $_REQUEST['find'];
+    }
+    if ($keepOffset && ! empty($_REQUEST['offset'])) {
+        $query['offset'] = $_REQUEST['offset'];
+    }
+    if (! empty($_REQUEST['sort_mode'])) {
+        $query['sort_mode'] = $_REQUEST['sort_mode'];
+    }
+    $access->redirect('tiki-user_tasks.php' . (! empty($query) ? '?' . http_build_query($query) : ''));
+};
+
 if (isset($tiki_p_tasks_admin) && $tiki_p_tasks_admin == 'y') {
     $task_admin = true;
 } else {
@@ -149,6 +164,7 @@ if (isset($_REQUEST['update_percentage']) && isset($_REQUEST['task_perc'])) {
         }
         $tasklib->update_task_percentage($task, $user, $perc);
     }
+    $redirectToTaskList(true);
 }
 if (isset($_REQUEST['update_tasks']) && isset($_REQUEST['task'])) {
     if (($_REQUEST['action'] == 'move_marked_to_trash')) {
@@ -223,6 +239,7 @@ if (isset($_REQUEST['update_tasks']) && isset($_REQUEST['task'])) {
             $tasklib->waiting_task($task, $user);
         }
     }
+    $redirectToTaskList(true);
 }
 if (isset($_REQUEST['reload'])) {
     if (isset($_REQUEST['show_trash'])) {
@@ -264,10 +281,20 @@ if (isset($_REQUEST['reload'])) {
         $access->checkCsrf();
         $tikilib->set_user_preference($user, 'tasks_maxRecords', $_REQUEST['tasks_maxRecords']);
     }
+    $redirectToTaskList(false);
+}
+if (isset($_REQUEST['tasks_maxRecords'])) {
+    $access->checkCsrf();
+    $tikilib->set_user_preference($user, 'tasks_maxRecords', $_REQUEST['tasks_maxRecords']);
+    $redirectToTaskList(false);
+}
+if (isset($_REQUEST['search']) || (isset($_POST['find']) && ! isset($_POST['save']) && ! isset($_POST['preview']) && ! isset($_POST['update_tasks']) && ! isset($_POST['update_percentage']))) {
+    $redirectToTaskList(false);
 }
 if ($task_admin and isset($_REQUEST["admin_mode"])) {
     $admin_mode = true;
     $_SESSION['admin_mode'] = true;
+    $_SESSION['show_admin'] = true;
 }
 if ($task_admin and isset($_REQUEST["admin_mode_off"])) {
     $admin_mode = false;
@@ -278,6 +305,12 @@ if ($_SESSION['admin_mode'] and $task_admin) {
     $smarty->assign('admin_mode', $admin_mode);
 } else {
     $admin_mode = false;
+}
+if (empty($_SESSION['show_private']) && empty($_SESSION['show_received']) && empty($_SESSION['show_submitted']) && empty($_SESSION['show_shared']) && empty($_SESSION['show_admin'])) {
+    $_SESSION['show_private'] = true;
+    $_SESSION['show_received'] = true;
+    $_SESSION['show_submitted'] = true;
+    $_SESSION['show_shared'] = true;
 }
 if ($_SESSION['show_trash']) {
     $smarty->assign('show_trash', true);
