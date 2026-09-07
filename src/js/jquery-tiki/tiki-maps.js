@@ -369,10 +369,10 @@ import { defaults as defaultControls } from "ol/control";
 
                 if (!fillColor) {
                     if (feature.get("stroke-color")) {
-                        // if stroke-color is supplied then color is for the fill
+                        // if stroke-color is supplied then `color` is for the fill
                         fillColor = feature.get("color");
                     } else {
-                        fillColor = feature.get("fillColor");
+                        fillColor = feature.get("fillColor") ?? feature.get("fill-color");
                     }
                 }
 
@@ -405,19 +405,24 @@ import { defaults as defaultControls } from "ol/control";
                         case "longdashdot":
                             return [10, 5, 1, 5];
                         default:
-                            return null;
+                            if (lineDash.length) {
+                                // array of up to 4 integers
+                                return JSON.parse(lineDash);
+                            } else {
+                                return null;
+                            }
                     }
                 }
 
                 const stroke = {
                     color: color,
                     width: feature.get("stroke-width") ?? 2,
-                    lineDash: getLineDash(feature.get("linedash") ?? feature.get("stroke-dashstyle")),
-                    lineCap: feature.get("linecap") ?? "round",
-                    lineJoin: feature.get("linejoin") ?? "round",
-                    lineDashOffset: feature.get("linedashoffset") ?? 0,
-                    miterLimit: feature.get("miterlimit") ?? 10,
-                    offset: feature.get("offset") ?? 0,
+                    lineDash: getLineDash(feature.get("stroke-line-dash") ?? feature.get("stroke-dashstyle")),
+                    lineCap: feature.get("stroke-line-cap") ?? "round",
+                    lineJoin: feature.get("stroke-line-join") ?? "round",
+                    lineDashOffset: feature.get("stroke-line-dash-offset") ?? 0,
+                    miterLimit: feature.get("stroke-miter-limit") ?? 10,
+                    offset: feature.get("stroke-offset") ?? 0,
                 };
 
                 if (intent === "vectors") {
@@ -1140,7 +1145,9 @@ import { defaults as defaultControls } from "ol/control";
                     .appendTo($(".ol-viewport", container));
 
                 container.displayFeatureInfo = function (pixel, evt) {
-                    $mapBootstrapTooltipDummy.tooltip("hide");
+                    if ($mapBootstrapTooltipDummy.data("init")) {
+                        $mapBootstrapTooltipDummy.tooltip("hide");
+                    }
                     let feature, layer;
                     const both = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
                         return [feature, layer];
@@ -1188,7 +1195,8 @@ import { defaults as defaultControls } from "ol/control";
                                 title: feature.get("content"),
                                 container: "body",
                             })
-                            .tooltip("show");
+                            .tooltip("show")
+                            .data("init", true);
                     }
                 };
 
