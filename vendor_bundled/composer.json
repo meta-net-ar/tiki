@@ -403,7 +403,7 @@
                 "alternative": "No alternatives for the moment, A lot of work would be needed to migrate away from Exchange integration.",
                 "reviewed": "2026-07-13",
                 "reviewer": "Joseph Kausi",
-                "impact": "Exchange integration completely non-functional."   
+                "impact": "Exchange integration completely non-functional."
             }
         }
     },
@@ -553,11 +553,18 @@
             "type": "composer",
             "url": "https://composer.tiki.org",
             "canonical": false,
+            "_comment": [
+                "-------------------------------------------------------------",
+                "IMPORTANT: php-sieve-manager is tempotarily preferred from composer.tiki.org",
+                "until the github repo issue is resolved.",
+                "-------------------------------------------------------------"
+            ],
             "only": [
                 "avianey/jqdoublescroll",
                 "bower-asset/wodo.texteditor",
                 "codemirror/codemirror",
                 "css-tricks/anythingslider-themes",
+                "henrique-borba/php-sieve-manager",
                 "itsjavi/bootstrap-colorpicker",
                 "jquery-plugins/anythingslider",
                 "jquery-plugins/async",
