@@ -236,6 +236,7 @@ class File
         }
 
         (new Manipulator\ImageTransformer($this))->run(['width' => $resizex, 'height' => $resizey]);
+
         (new Manipulator\MetadataExtractor($this))->run();
 
         $saveHandler = new SaveHandler($this);

@@ -74,6 +74,11 @@ $inputConfiguration = [
         'fgal_show_slideshow'          => 'bool',              //post
         'image_max_size_x'             => 'int',               //post
         'image_max_size_y'             => 'int',               //post
+        'image_compression_enabled'    => 'word',              //post
+        'image_compression_preset_type' => 'word',              //post
+        'image_compression_quality'    => 'int',               //post
+        'image_compression_save_original' => 'word',           //post
+        'image_compression_max_size_mb' => 'float',            //post
         'viewitem'                     => 'bool',              //post
         'backlinkPerms'                => 'bool',              //post
         'fgal_list_backlinks'          => 'string',            //post
@@ -754,6 +759,9 @@ if (isset($_REQUEST['edit']) && $access->checkCsrf()) {
         'quota',
         'image_max_size_x',
         'image_max_size_y',
+        'image_compression_preset_type',
+        'image_compression_quality',
+        'image_compression_max_size_mb',
         'wiki_syntax',
         'icon_fileId',
         'ocr_langs',
@@ -776,6 +784,10 @@ if (isset($_REQUEST['edit']) && $access->checkCsrf()) {
         $$t = (isset($_REQUEST[$t]) && $_REQUEST[$t] == 'on') ? 'y' : 'n';
         $smarty->assign($t, $$t);
     }
+    $imageCompressionEnabled = isset($_REQUEST['image_compression_enabled']) ? 'y' : 'n';
+    $imageCompressionSaveOriginal = isset($_REQUEST['image_compression_save_original']) ? 'y' : 'n';
+    $smarty->assign('image_compression_enabled', $imageCompressionEnabled);
+    $smarty->assign('image_compression_save_original', $imageCompressionSaveOriginal);
     $_REQUEST['archives'] = $_REQUEST['archives'] ?? 0;
     $_REQUEST['user'] = $_REQUEST['user'] ?? ($gal_info['user'] ?? $user);
     $_REQUEST['sortorder'] = $_REQUEST['sortorder'] ?? 'created';
@@ -810,6 +822,10 @@ if (isset($_REQUEST['edit']) && $access->checkCsrf()) {
         if (! is_array($old_gal_info)) {
             $old_gal_info = $filegallib->get_file_gallery();
         }
+
+        $_REQUEST['image_compression_preset_type'] = $_REQUEST['image_compression_preset_type'] ?? ($old_gal_info['image_compression_preset_type'] ?? 'slider');
+        $_REQUEST['image_compression_quality'] = $_REQUEST['image_compression_quality'] ?? ($old_gal_info['image_compression_quality'] ?? 65);
+        $_REQUEST['image_compression_max_size_mb'] = $_REQUEST['image_compression_max_size_mb'] ?? ($old_gal_info['image_compression_max_size_mb'] ?? 2);
 
         if ($prefs['ocr_enable'] === 'y') {
             // first validate length of OCR languages, then save if they conform.
@@ -864,6 +880,11 @@ if (isset($_REQUEST['edit']) && $access->checkCsrf()) {
             'quota' => $_REQUEST['quota'],
             'image_max_size_x' => $_REQUEST['image_max_size_x'],
             'image_max_size_y' => $_REQUEST['image_max_size_y'],
+            'image_compression_enabled' => $imageCompressionEnabled,
+            'image_compression_preset_type' => $_REQUEST['image_compression_preset_type'],
+            'image_compression_quality' => $_REQUEST['image_compression_quality'],
+            'image_compression_save_original' => $imageCompressionSaveOriginal,
+            'image_compression_max_size_mb' => $_REQUEST['image_compression_max_size_mb'],
             'backlinkPerms' => isset($_REQUEST['backlinkPerms']) ? 'y' : 'n',
             'show_backlinks' => $_REQUEST['fgal_list_backlinks'],
             'wiki_syntax' => $_REQUEST['wiki_syntax'],

@@ -1,0 +1,13 @@
+{
+  "name": "@tiki/image-compressor",
+  "version": "1.0.0",
+  "description": "Media compression module for images",
+  "main": "imageCompressor.js",
+  "type": "module",
+  "dependencies": {
+    "browser-image-compression": "^2.0.2"
+  },
+  "exports": {
+    ".": "./imageCompressor.js"
+  }
+}

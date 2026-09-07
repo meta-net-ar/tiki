@@ -187,7 +187,29 @@
             {remarksbox title="Note"}
                 {tr _0='<em>' _1='</em>'}Changing these settings %0will not affect%1 existing file galleries. These changes %0will apply only%1 to new file galleries.{/tr}
             {/remarksbox}
+            <fieldset>
+                <legend class="h3">{tr}Image Compression{/tr}{help url="Image-Compression"}</legend>
+                <div class="form-text mb-3">
+                    {tr}Configure automatic image compression during upload and display sizing to improve page load times and reduce bandwidth usage.{/tr}
+                </div>
 
+                {preference name='fgal_image_compression_enabled'}
+                <div class="adminoptionboxchild" id="fgal_image_compression_enabled_childcontainer">
+                    <div class="adminoptionbox">
+                        <legend class="h5">{tr}Upload Processing{/tr}</legend>
+                        {preference name='fgal_image_compression_quality'}
+                        {preference name='fgal_image_compression_max_size_mb'}
+                        {preference name='fgal_image_max_size_x'}
+                        {preference name='fgal_image_max_size_y'}
+                    </div>
+                    {preference name='fgal_image_compression_preset_type'}
+                    <small class="form-text mb-2">{tr}Users will see predefined compression levels (High Quality, Balanced, Compressed) or a quality slider.{/tr}</small>
+
+                    {preference name='fgal_image_compression_save_original'}
+                </div>
+            </fieldset>
+
+            <legend class="h3">{tr}Display Settings{/tr}</legend>
             {preference name=fgal_default_view}
             {preference name=fgal_sortField}
             <div class="adminoptionboxchild" id="fgal_sortField_childcontainer">
@@ -199,8 +221,6 @@
             {preference name='fgal_show_thumbactions'}
             {preference name='fgal_thumb_max_size'}
             {preference name='fgal_browse_name_max_length'}
-            {preference name='fgal_image_max_size_x'}
-            {preference name='fgal_image_max_size_y'}
             {preference name='maxRowsGalleries'}
             {preference name='fgal_list_ratio_hits'}
             {preference name='fgal_display_properties'}

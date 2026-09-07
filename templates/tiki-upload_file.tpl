@@ -208,59 +208,9 @@
                     {/if}
                 {/if}
             </div>
-            <div class="col-sm-12">
-                <div class="form-check">
-                    <label for="imagesize" class="form-check-label">
-                        <input class="form-check-input" type="checkbox" id="imagesize" name="imagesize" checked="checked" value="yes" />
-                        {tr}Use the gallery's default resize settings for images{/tr}
-                        <span id="imageResizeInfo">
-    {if isset($gal_info.image_max_size_x) && isset($gal_info.image_max_size_y)}
-        {tr _0=$gal_info.image_max_size_x _1=$gal_info.image_max_size_y}(%0px x %1px){/tr}
-    {else}
-        {tr}(No resize){/tr}
-    {/if}
-</span>
-                    </label>
-                </div>
-            </div>
 
-            <div id="customsize" style="display:none">
-                <div class="mb-3 row">
-                    <label for="image_max_size_x" class="col-sm-4 text-end">{tr}Maximum width of images{/tr}</label>
-                    <div class="col-sm-8">
-                        <div class="input-group col-sm-4">
-                            <input type="number" name="image_max_size_x" id="image_max_size_x"
-                                   value="{if isset($gal_info["image_max_size_x"])}{$gal_info["image_max_size_x"]}{else}0{/if}"
-                                   class="form-control text-end">
-                            <span class="input-group-text"> {tr}pixel{/tr}</span>
-                        </div>
-                        <span class="form-text">{tr}If an image is wider than this, it will be resized. Attention: In this case, the original image will be lost. (0=unlimited){/tr}</span>
-                    </div>
-
-                </div>
-                <div class="mb-3 row">
-                    <label for="image_max_size_y" class="col-sm-4 text-end">{tr}Maximum height of images in gallery{/tr}</label>
-                    <div class="col-sm-8">
-                        <div class="input-group col-sm-4">
-                            <input type="number" name="image_max_size_y" id="image_max_size_y"  value="{if isset($gal_info["image_max_size_y"])}{$gal_info["image_max_size_y"]}{else}0{/if}"  class="form-control text-end">
-                            <span class="input-group-text"> {tr}pixel{/tr}</span>
-                        </div>
-                        <span class="form-text">{tr}If an image is higher than this, it will be resized. Attention: In this case, the original image will be lost. (0=unlimited){/tr}</span>
-                    </div>
-                </div>
-            </div>
             {if $simpleMode neq 'y'}
-                <div class="fgal_file_c2">
-                    {if !$editFileId and $tiki_p_batch_upload_files eq 'y'}
-                        <div class="col-sm-12">
-                            <div class="form-check mb-3">
-                                <label for="isbatch" class="form-check-label">
-                                    <input type="checkbox" id="isbatch" name="isbatch[]" class="form-check-input">
-                                    {tr}Unzip zip files{/tr}
-                                </label>
-                            </div>
-                        </div>
-                    {/if}
+                <div class="fgal_file_c2">                
                     {if $prefs.fgal_delete_after eq 'y'}
                         <div class="mb-3 row">
                             <label for="deleteAfter" class="col-md-4 col-form-label">{tr}File can be deleted after{/tr}</label>
@@ -417,9 +367,166 @@
                 {/if}
                 <input type="hidden" name="galleryId[]" value="{$galleryId}">
             {/if}
-            {if $prefs.elementplus_upload eq 'y' && ! $editFileId}
+
+            {if !$editFileId and $tiki_p_batch_upload_files eq 'y'}
+                <div class="col-sm-12">
+                    <div class="form-check mb-3">
+                        <label for="isbatch" class="form-check-label">
+                            <input type="checkbox" id="isbatch" name="isbatch[]" class="form-check-input">
+                                {tr}Unzip zip files{/tr}
+                        </label>
+                    </div>
+                </div>
+            {/if}
+            <script>
+                var currentGalInfo = {$gal_info|@json_encode nofilter};
+            </script>
+
+            {* Image Compression Controls *}
+                <div class="mb-3 row d-none" id="image_compression_controls">
+                    <label class="col-md-4 col-form-label">{tr}Image Compression{/tr}</label>
+                    <div class="col-md-8">
+                        {* Default Preset Summary *}
+                        <div id="compression_default_summary">
+                            <div class="border rounded p-3 bg-light mb-3">
+                                <strong>{tr}Current Settings:{/tr}</strong>
+                                <ul class="mb-2">
+                                    <li>
+                                        {tr}Max width (X):{/tr}
+                                        <span id="default_max_size_x" data-default="{$gal_info.image_max_size_x}">
+                                            {$gal_info.image_max_size_x} px
+                                        </span>
+                                    </li>
+                                    <li>
+                                        {tr}Max height (Y):{/tr}
+                                        <span id="default_max_size_y" data-default="{$gal_info.image_max_size_y}">
+                                            {$gal_info.image_max_size_y} px
+                                        </span>
+                                    </li>
+                                    <li>
+                                        {tr}Compress files larger than:{/tr}
+                                        <span data-default="{$gal_info.image_compression_max_size_mb}" id="default_min_file">
+                                            {$gal_info.image_compression_max_size_mb} MB
+                                        </span>
+                                    </li>
+                                    <li>{tr}Save original:{/tr}
+                                       <span id="default_save_original">
+                                           {if $gal_info.image_compression_save_original eq 'y'}{tr}Yes{/tr}{else}{tr}No{/tr}{/if}
+                                       </span>
+                                    </li>
+                                </ul>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="customize-compression-toggle">
+                                    <i class="fas fa-cog"></i> {tr}Customize{/tr}
+                                </button>
+                            </div>
+                        </div>
+
+                        {* Custom Controls (hidden by default) *}
+                        <div id="compression_custom_controls" class="d-none">
+                            {* Compression type: preset levels or slider *}
+                            {if $gal_info.image_compression_preset_type eq 'levels'}
+                                <div class="mb-2 row">
+                                    <label class="col-md-4 col-form-label">{tr}Compression Level{/tr}</label>
+                                    <div class="col-md-8">
+                                        <div class="btn-group w-100" role="group">
+                                           <input type="radio" class="btn-check" name="compression_preset_main"
+                                                id="compression_high_main" value="high" checked>
+                                            <label class="btn btn-outline-success btn-sm" for="compression_high_main">
+                                                <i class="fas fa-star"></i> {tr}High Quality{/tr}
+                                            </label>
+
+                                            <input type="radio" class="btn-check" name="compression_preset_main"
+                                                id="compression_balanced_main" value="balanced">
+                                            <label class="btn btn-outline-primary btn-sm" for="compression_balanced_main">
+                                                <i class="fas fa-balance-scale"></i> {tr}Balanced{/tr}
+                                            </label>
+
+                                            <input type="radio" class="btn-check" name="compression_preset_main"
+                                               id="compression_compressed_main" value="compressed">
+                                            <label class="btn btn-outline-warning btn-sm" for="compression_compressed_main">
+                                               <i class="fas fa-compress"></i> {tr}Compressed{/tr}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="mb-2 row">
+                                    <label for="compression_quality_main" class="col-md-4 col-form-label">{tr}Compression Quality{/tr}</label>
+                                    <div class="col-md-8">
+                                        <div class="d-flex align-items-center">
+                                            <input type="range" class="form-range me-3" id="compression_quality_main"
+                                                name="compression_quality" min="10" max="100"
+                                                value="{$gal_info.image_compression_quality}">
+                                            <span class="quality-display badge bg-primary"
+                                                id="quality_display_main">{$gal_info.image_compression_quality}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {/if}
+
+                            <div class="mb-2 row">
+                                <label for="compression_max_dimension_x_main" class="col-md-4 col-form-label">{tr}Max Image Width (X){/tr}</label>
+                                <div class="col-md-8">
+                                    <input type="number" id="compression_max_dimension_x_main" name="compression_max_dimension_x" class="form-control"
+                                        value="{$gal_info.image_max_size_x}">
+                                    <small id="compression_max_dimension_x_msg" class="text-success small"></small>
+                                    <small class="form-text text-muted d-block">{tr}Maximum width in pixels. Images wider than this will be resized.{/tr}</small>
+                                </div>
+                            </div>
+
+                            <div class="mb-2 row">
+                                <label for="compression_max_dimension_y_main" class="col-md-4 col-form-label">{tr}Max Image Height (Y){/tr}</label>
+                                <div class="col-md-8">
+                                    <input type="number" id="compression_max_dimension_y_main" name="compression_max_dimension_y" class="form-control"
+                                        value="{$gal_info.image_max_size_y}">
+                                    <small id="compression_max_dimension_y_msg" class="text-success small"></small>
+                                    <small class="form-text text-muted d-block">{tr}Maximum height in pixels. Images taller than this will be resized.{/tr}</small>
+                                </div>
+                            </div>
+
+                            <div class="mb-2 row">
+                                <label class="col-md-4 col-form-label">{tr}Min File Size to Compress{/tr}</label>
+                                <div class="col-md-8">
+                                    <input type="number" name="compression_max_size" class="form-control"
+                                        value="{$gal_info.image_compression_max_size_mb}" min="1" step="0.5">
+                                    <small class="form-text text-muted d-block">{tr}Only compress images larger than this size (MB).{/tr}</small>
+                                </div>
+                            </div>
+
+                            <div class="mb-1 row">
+                                <div class="col-md-4"></div>
+                                <div class="col-md-8">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="compression_save_original_main"
+                                            name="compression_save_original" value="y"
+                                            {if $gal_info.image_compression_save_original eq 'y'}checked{/if}>
+                                        <label for="compression_save_original_main" class="form-check-label">{tr}Save original file{/tr}</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                id="compression-back-to-default">
+                                <i class="fas fa-arrow-left"></i> {tr}Use default compression settings{/tr}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {if $prefs.elementplus_upload eq 'y'}
                 <div class="mb-3 row">
-                    <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_size_x)}{$gal_info.image_max_size_x}{/if}" max-height="{if isset($gal_info.image_max_size_y)}{$gal_info.image_max_size_y}{/if}" />
+                    <tiki-el-file-gal-uploader
+                        id="uploader"
+                        accept="{$allowedMimeTypes}"
+                        max-size="{$max_upload_size}"
+                        max-files="{$max_file_uploads}"
+                        compression_enabled="{if isset($gal_info.image_compression_enabled) && $gal_info.image_compression_enabled eq 'y'}true{else}false{/if}"
+                        compression_preset_type="{if isset($gal_info.image_compression_preset_type)}{$gal_info.image_compression_preset_type}{/if}"
+                        compression_quality="{if isset($gal_info.image_compression_quality)}{$gal_info.image_compression_quality}{/if}"
+                        compression_max_dimension_x="{if isset($gal_info.image_max_size_x)}{$gal_info.image_max_size_x}{/if}"
+                        compression_max_dimension_y="{if isset($gal_info.image_max_size_y)}{$gal_info.image_max_size_y}{/if}"
+                        compression_max_size_mb="{if isset($gal_info.image_compression_max_size_mb)}{$gal_info.image_compression_max_size_mb}{/if}"
+                        compression_save_original="{if isset($gal_info.image_compression_save_original)}{$gal_info.image_compression_save_original}{/if}"
+                    />
                 </div>
             {/if}
             {if !$editFileId}
@@ -481,26 +588,55 @@
 {if ! $editFileId and $prefs.elementplus_upload neq 'y'}
     {jq notonready=true}
     {literal}
-        $('#file_0').ajaxForm({target: '#progress_0', forceSync: true});
+        function initAjaxForm(formId, progressId) {
+            var ajaxConfig = {target: '#' + progressId, forceSync: true};
+            if (typeof window.tikiCompressBeforeAjaxSubmit === 'function') {
+                ajaxConfig.beforeSubmit = window.tikiCompressBeforeAjaxSubmit;
+            }
+            $('#' + formId).ajaxForm(ajaxConfig);
+        }
+        
+        initAjaxForm('file_0', 'progress_0');
         var nb_upload = 1;
         function add_upload_file() {
-            var clone = $('#form form').eq(0).clone().resetForm().attr('id', 'file_' + nb_upload).ajaxForm({target: '#progress_' + nb_upload, forceSync: true});
+            var clone = $('#form form').eq(0).clone().resetForm().attr('id', 'file_' + nb_upload);
             $(clone[0].submission).val(parseInt($(clone[0].submission).val(), 10) + parseInt(nb_upload, 10));
             clone.insertAfter($('#form form').eq(-1));
             document.getElementById('progress').innerHTML += "<div id='progress_"+nb_upload+"'></div>";
+            initAjaxForm('file_' + nb_upload, 'progress_' + nb_upload);
             nb_upload += 1;
         }
         function upload_files(){
             var totalSubmissions = $("#form form").length;
             $("#form form").append($('<input />', {type: 'hidden', name: 'totalSubmissions', value: totalSubmissions}));
-            $("#form form").each(function(n) {
+            $("#form form").each(async function(n) {
                 if ($(this).find('input[name="userfile\\[\\]"]').val() != '') {
-        var $progress = $('#progress_'+n).html(`{/literal}{icon name='spinner' iclass='fa-spin' _menu_text='y' _menu_icon='y' ititle="{tr}Uploading file...{/tr}"}{literal}`);
+                    const $form = $(this);
+                    const $fileInput = $form.find('input[name="userfile\\[\\]"]');
+                    const originalFiles = $fileInput[0].files;
+
+                    if(typeof window.tikiGetCompressionSettings === "function"){
+                        const pressets = window.tikiGetCompressionSettings();
+                        if(pressets?.isInitialized && pressets?.current?.saveOriginal !== "y") {
+                            try {
+                                const dataTransfer = await window.tikiCompressFileList($fileInput[0].files, pressets.current);
+                                $fileInput[0].files = dataTransfer.files;
+                            } catch (err) {
+                                console.error('[Upload] Compression failed:', err);
+                                show('form');
+                                $("#form").showError(tr("File compression error:") + " " + err.message);
+                                return;
+                            }
+                        }
+                    }
+
+                    var $progress = $('#progress_'+n).html(`{/literal}{icon name='spinner' iclass='fa-spin' _menu_text='y' _menu_icon='y' ititle="{tr}Uploading file...{/tr}"}{literal}`);
                     $( document ).on('ajaxError', function(event, jqxhr, ajaxSettings, thrownError ) {
                         $progress.hide();
                         show('form');
                         $("#form").showError(tr("File upload error:") + " " + thrownError)
                     });
+
                     $(this).trigger("submit");
                     this.reset();
                 } else {
@@ -581,23 +717,23 @@
     {/if}
 {/if}
 {jq}
-var defaultx= $("#image_max_size_x").attr('value');
-var defaulty= $("#image_max_size_y").attr('value');
+var defaultDimX = $("#image_max_dimension_x").attr('value');
+var defaultDimY = $("#image_max_dimension_y").attr('value');
 
 $("#imagesize").on("click", function () {
     if ($(this).prop("checked")) {
         $("#customsize").css("display", "none");
         //resetting size to default
-        $("#image_max_size_x").attr('value',defaultx);
-        $("#image_max_size_y").attr('value',defaulty);
-        $("element-plus-ui#uploader").attr('max-width', defaultx);
-        $("element-plus-ui#uploader").attr('max-height', defaulty);
+        $("#image_max_dimension_x").attr('value', defaultDimX);
+        $("#image_max_dimension_y").attr('value', defaultDimY);
+        $("element-plus-ui#uploader").attr('max-width', defaultDimX);
+        $("element-plus-ui#uploader").attr('max-height', defaultDimY);
     } else {
         $("#customsize").css("display", "");
-        $("#image_max_size_x").on("change", function () {
+        $("#image_max_dimension_x").on("change", function () {
             $("element-plus-ui#uploader").attr('max-width', $(this).val());
         });
-        $("#image_max_size_y").on("change", function () {
+        $("#image_max_dimension_y").on("change", function () {
             $("element-plus-ui#uploader").attr('max-height', $(this).val());
         });
     }
@@ -647,28 +783,117 @@ $("#galleryId").on("change", function(){
         data: { galleryId },
         dataType: 'json',
         success: function (data) {
-            if (data.canUpload) {
-                $("#gallery_type").attr('value', data.type);
+            if (data.canUpload && data.gal_info) {
+                // Store complete gal_info object
+                currentGalInfo = data.gal_info;
+                // Update gallery type
+                $("#gallery_type").attr('value', currentGalInfo.type);
 
-                $("#image_max_size_x").attr('value', data.image_max_size_x);
-                $("#image_max_size_y").attr('value', data.image_max_size_y);
-                if (data.image_max_size_x) {
-                    $("#imageResizeInfo").html(data.image_max_size_x + 'px X ' + data.image_max_size_y + 'px');
+                // Update image dimensions display
+                const hasMaxWidth = Number(currentGalInfo.image_max_size_x) > 0;
+                const hasMaxHeight = Number(currentGalInfo.image_max_size_y) > 0;
+
+                if (hasMaxWidth && hasMaxHeight) {
+                    $("#imageResizeInfo").html(currentGalInfo.image_max_size_x + 'px (width) × ' + currentGalInfo.image_max_size_y + 'px (height)');
+                } else if (hasMaxWidth) {
+                    $("#imageResizeInfo").html(currentGalInfo.image_max_size_x + 'px (width)');
+                } else if (hasMaxHeight) {
+                    $("#imageResizeInfo").html(currentGalInfo.image_max_size_y + 'px (height)');
                 } else {
                     $("#imageResizeInfo").html('(No resize)');
                 }
+
+                // Update compression settings from gallery info
+                if (currentGalInfo.image_compression_enabled === 'y') {
+                    $("#image_compression_controls").removeClass('d-none');
+
+                    // Update default summary display
+                    if (currentGalInfo.image_max_size_x !== undefined) {
+                        const maxWidthText = hasMaxWidth ? currentGalInfo.image_max_size_x + ' px' : tr('No resize');
+                        $("#default_max_size_x").text(maxWidthText).attr('data-default', currentGalInfo.image_max_size_x);
+                    }
+                    if (currentGalInfo.image_max_size_y !== undefined) {
+                        const maxHeightText = hasMaxHeight ? currentGalInfo.image_max_size_y + ' px' : tr('No resize');
+                        $("#default_max_size_y").text(maxHeightText).attr('data-default', currentGalInfo.image_max_size_y);
+                    }
+                    if (currentGalInfo.image_compression_max_size_mb) {
+                        $("#default_min_file").text(currentGalInfo.image_compression_max_size_mb + ' MB').attr('data-default', currentGalInfo.image_compression_max_size_mb);
+                    }
+                    if (currentGalInfo.image_compression_save_original !== undefined) {
+                        const saveOrigText = currentGalInfo.image_compression_save_original === 'y' ? tr("Yes") : tr("No");
+                        $("#default_save_original").text(saveOrigText);
+                    }
+
+                    // Update custom controls
+                    if (currentGalInfo.image_compression_preset_type === 'levels') {
+                        $('input[name="compression_preset_main"]').prop('checked', false);
+                        $('input[name="compression_preset_main"][value="high"]').prop('checked', true);
+                    } else if (currentGalInfo.image_compression_quality) {
+                        $("#compression_quality_main").val(currentGalInfo.image_compression_quality);
+                        $("#quality_display_main").text(currentGalInfo.image_compression_quality + '%');
+                    }
+
+                    if (currentGalInfo.image_max_size_x !== undefined) {
+                        $("#compression_max_dimension_x_main").val(currentGalInfo.image_max_size_x);
+                    }
+                    if (currentGalInfo.image_max_size_y !== undefined) {
+                        $("#compression_max_dimension_y_main").val(currentGalInfo.image_max_size_y);
+                    }
+                    if (currentGalInfo.image_compression_max_size_mb) {
+                        $('input[name="compression_max_size"]').val(currentGalInfo.image_compression_max_size_mb);
+                    }
+                    if (currentGalInfo.image_compression_save_original !== undefined) {
+                        $("#compression_save_original_main").prop('checked', currentGalInfo.image_compression_save_original === 'y');
+                    }
+
+                     // === UPDATE WEB COMPONENT ===
+                    var uploader = document.getElementById('uploader');
+                    if (uploader) {
+                        uploader.setAttribute('compression_enabled', 
+                        currentGalInfo.image_compression_enabled === 'y' ? 'true' : 'false');
+                        uploader.setAttribute('compression_preset_type', 
+                        currentGalInfo.image_compression_preset_type || '');
+                        uploader.setAttribute('compression_quality', 
+                        currentGalInfo.image_compression_quality || '');
+                        uploader.setAttribute('compression_max_dimension_x', 
+                        currentGalInfo.image_max_size_x || '');
+                        uploader.setAttribute('compression_max_dimension_y', 
+                        currentGalInfo.image_max_size_y || '');
+                        uploader.setAttribute('compression_max_size_mb', 
+                        currentGalInfo.image_compression_max_size_mb || '');
+                        uploader.setAttribute('compression_save_original', 
+                        currentGalInfo.image_compression_save_original || '');
+                    }
+                } else {
+                    $("#image_compression_controls").addClass('d-none');
+                }
             } else {
+                currentGalInfo = {};
                 $("#gallery_type").attr('value', '');
-                $("#image_max_size_x").attr('value','');
-                $("#image_max_size_y").attr('value',"");
                 $("#imageResizeInfo").html('');
-                defaultx='';
-                efaulty='';
+                $("#image_compression_controls").addClass('d-none');
             }
         },
         error: function (e) {
             console.log(e);
         }
     });
+});
+
+// Show/hide compression controls based on selected file type
+$("#userfile").on("change", function () {
+    const compressionSection = $("#image_compression_controls");
+    const files = this.files;
+    
+    // Check if any image file is selected
+    const hasImageFile = files && files.length > 0 && Array.from(files).some(file => {
+        return file.type.startsWith('image/');
+    });
+    
+    if (hasImageFile) {
+        compressionSection.removeClass('d-none');
+    } else {
+        compressionSection.addClass('d-none');
+    }
 });
 {/jq}

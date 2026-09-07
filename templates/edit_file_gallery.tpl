@@ -352,30 +352,91 @@ if ($(this).val() != '') {
                         </div>
                     {/if}
                 {/if}
+                {* Compression Settings *}
+                <hr class="my-4">
+                <h3>{tr}Image Compression{/tr}</h3>
+
                 <div class="tiki-form-group row">
-                    <label for="image_max_size_x" class="col-sm-4 col-form-label">{tr}Maximum width of images in gallery{/tr}</label>
+                    <label class="col-sm-4">{tr}Enable image compression{/tr}</label>
                     <div class="col-sm-8">
-                        <div class="form-control-plaintext">
-                            <div class="input-group col-sm-4">
-                                <input type="number" name="image_max_size_x" id="image_max_size_x" value="{$gal_info.image_max_size_x|escape}" class="form-control text-end">
-                                <span class="input-group-text">{tr}pixels{/tr}</span>
-                            </div>
-                            <span class="form-text">{tr}If an image is wider than this, it will be resized.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr} (0={tr}unlimited{/tr})</span>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="image_compression_enabled" id="image_compression_enabled" value="y" {if $gal_info.image_compression_enabled eq 'y'}checked="checked"{/if}>
+                            <span class="form-text">{tr}Automatically compress images uploaded to this gallery{/tr}</span>
                         </div>
                     </div>
                 </div>
+
                 <div class="tiki-form-group row">
-                    <label for="image_max_size_y" class="col-sm-4 col-form-label">{tr}Maximum height of images in gallery{/tr}</label>
+                    <label for="image_compression_preset_type" class="col-sm-4 col-form-label">{tr}Compression preset{/tr}</label>
+                    <div class="col-sm-8">
+                        <select name="image_compression_preset_type" id="image_compression_preset_type" class="form-control">
+                            <option value="slider" {if $gal_info.image_compression_preset_type eq 'slider'}selected="selected"{/if}>{tr}Slider (0 - 100% quality){/tr}</option>
+                            <option value="levels" {if $gal_info.image_compression_preset_type eq 'levels'}selected="selected"{/if}>{tr}Levels (High, Medium, Low quality){/tr}</option>
+                        </select>
+                        <span class="form-text">{tr}Choose how compression quality will be seen in the gallery (Levels or Slider){/tr}</span>
+                    </div>
+                </div>
+
+                <div class="tiki-form-group row">
+                    <label for="image_compression_quality" class="col-sm-4 col-form-label">{tr}Compression quality{/tr}</label>
+                    <div class="col-sm-8">
+                        <div class="input-group col-sm-4">
+                            <input type="number" name="image_compression_quality" id="image_compression_quality" value="{$gal_info.image_compression_quality|default:85|escape}" min="1" max="100" class="form-control text-end">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <span class="form-text">{tr}Quality level for compressed images (1-100, higher = better quality){/tr}</span>
+                    </div>
+                </div>
+
+                <div class="tiki-form-group row">
+                    <label for="image_compression_max_size_mb" class="col-sm-4 col-form-label">{tr}Maximum file size for compression{/tr}</label>
+                    <div class="col-sm-8">
+                        <div class="input-group col-sm-4">
+                            <input type="number" name="image_compression_max_size_mb" id="image_compression_max_size_mb" value="{$gal_info.image_compression_max_size_mb|default:1|escape}" min="0.1" step="0.1" class="form-control text-end">
+                            <span class="input-group-text">{tr}MB{/tr}</span>
+                        </div>
+                        <span class="form-text">{tr}Files larger than this size will be compressed{/tr}</span>
+                    </div>
+                </div>
+
+                <div class="tiki-form-group row">
+                    <label for="image_max_size_x" class="col-sm-4 col-form-label">{tr}Maximum image width in gallery{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-control-plaintext">
                             <div class="input-group col-sm-4">
-                                <input type="number" name="image_max_size_y" id="image_max_size_y" value="{$gal_info.image_max_size_y|escape}" class="form-control text-end">
+                                <input type="number" name="image_max_size_x" id="image_max_size_x" value="{$gal_info.image_max_size_x|default:0|escape}" min="0" class="form-control text-end">
                                 <span class="input-group-text">{tr}pixels{/tr}</span>
                             </div>
-                            <span class="form-text">{tr}If an image is higher than this, it will be resized.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr} (0={tr}unlimited{/tr})</span>
+                            <span class="form-text">{tr}Set to 0 to disable width-based resizing. Values from 1 to 99 will use 100 pixels internally. If an image is wider than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr}</span>
                         </div>
                     </div>
                 </div>
+
+                <div class="tiki-form-group row">
+                    <label for="image_max_size_y" class="col-sm-4 col-form-label">{tr}Maximum image height in gallery{/tr}</label>
+                    <div class="col-sm-8">
+                        <div class="form-control-plaintext">
+                            <div class="input-group col-sm-4">
+                                <input type="number" name="image_max_size_y" id="image_max_size_y" value="{$gal_info.image_max_size_y|default:0|escape}" min="0" class="form-control text-end">
+                                <span class="input-group-text">{tr}pixels{/tr}</span>
+                            </div>
+                            <span class="form-text">{tr}Set to 0 to disable height-based resizing. Values from 1 to 99 will use 100 pixels internally. If an image is taller than this, it will be resized proportionally.{/tr} {tr}Attention: In this case, the original image will be lost.{/tr}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tiki-form-group row">
+                    <label class="col-sm-4">{tr}Keep original image{/tr}</label>
+                    <div class="col-sm-8">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="image_compression_save_original" id="image_compression_save_original" value="y" {if $gal_info.image_compression_save_original eq 'y'}checked="checked"{/if}>
+                            <span class="form-text">{tr}Save the original uncompressed image alongside the compressed version{/tr}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
                 <div class="tiki-form-group row">
                     <label for="wiki_syntax" class="col-sm-4 col-form-label">{tr}Wiki markup to enter when image selected from "file gallery manager"{/tr}</label>
                     <div class="col-sm-8">
