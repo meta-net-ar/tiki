@@ -339,10 +339,15 @@ import { defaults as defaultControls } from "ol/control";
 
             const getFeatureColor = (feature) => {
                 // Try feature property first
-                const color = feature.get("color");
+                let color = feature.get("stroke-color");
                 if (color) {
                     return color;
                 }
+                color = feature.get("color");
+                if (color) {
+                    return color;
+                }
+
                 // Try coords lookup from container-level storage (set by colorpicker)
                 const key = getFeatureColorKey(feature);
                 if (key && container.featureColors && container.featureColors[key]) {
@@ -363,7 +368,12 @@ import { defaults as defaultControls } from "ol/control";
                 }
 
                 if (!fillColor) {
-                    fillColor = feature.get("fillColor");
+                    if (feature.get("stroke-color")) {
+                        // if stroke-color is supplied then `color` is for the fill
+                        fillColor = feature.get("color");
+                    } else {
+                        fillColor = feature.get("fillColor") ?? feature.get("fill-color");
+                    }
                 }
 
                 if (!fillColor) {
@@ -374,10 +384,51 @@ import { defaults as defaultControls } from "ol/control";
 
                 const intent = feature.get("intent");
 
+                const fill = {
+                    color: fillColor,
+                };
+
+                function getLineDash(lineDash) {
+                    if (typeof lineDash !== "string") {
+                        return lineDash;
+                    }
+                    // map ol2 values to ol3+
+                    switch (lineDash) {
+                        case "dot":
+                            return [1, 3];
+                        case "dash":
+                            return [5, 5];
+                        case "dashdot":
+                            return [5, 5, 1, 5];
+                        case "longdash":
+                            return [10, 5];
+                        case "longdashdot":
+                            return [10, 5, 1, 5];
+                        default:
+                            if (lineDash.length) {
+                                // array of up to 4 integers
+                                return JSON.parse(lineDash);
+                            } else {
+                                return null;
+                            }
+                    }
+                }
+
+                const stroke = {
+                    color: color,
+                    width: feature.get("stroke-width") ?? 2,
+                    lineDash: getLineDash(feature.get("stroke-line-dash") ?? feature.get("stroke-dashstyle")),
+                    lineCap: feature.get("stroke-line-cap") ?? "round",
+                    lineJoin: feature.get("stroke-line-join") ?? "round",
+                    lineDashOffset: feature.get("stroke-line-dash-offset") ?? 0,
+                    miterLimit: feature.get("stroke-miter-limit") ?? 10,
+                    offset: feature.get("stroke-offset") ?? 0,
+                };
+
                 if (intent === "vectors") {
                     coloredStyle = new ol.style.Style({
-                        fill: new ol.style.Fill({ color: fillColor }),
-                        stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                        fill: new ol.style.Fill(fill),
+                        stroke: new ol.style.Stroke(stroke),
                     });
                 } else if (intent === "marker") {
                     coloredStyle = new ol.style.Style({
@@ -391,8 +442,8 @@ import { defaults as defaultControls } from "ol/control";
                     coloredStyle = new ol.style.Style({
                         image: new ol.style.Circle({
                             radius: 12,
-                            fill: new ol.style.Fill({ color: fillColor }),
-                            stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                            fill: new ol.style.Fill(fill),
+                            stroke: new ol.style.Stroke(stroke),
                         }),
                     });
                 }
@@ -1094,7 +1145,9 @@ import { defaults as defaultControls } from "ol/control";
                     .appendTo($(".ol-viewport", container));
 
                 container.displayFeatureInfo = function (pixel, evt) {
-                    $mapBootstrapTooltipDummy.tooltip("hide");
+                    if ($mapBootstrapTooltipDummy.data("init")) {
+                        $mapBootstrapTooltipDummy.tooltip("hide");
+                    }
                     let feature, layer;
                     const both = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
                         return [feature, layer];
@@ -1142,7 +1195,8 @@ import { defaults as defaultControls } from "ol/control";
                                 title: feature.get("content"),
                                 container: "body",
                             })
-                            .tooltip("show");
+                            .tooltip("show")
+                            .data("init", true);
                     }
                 };
 
