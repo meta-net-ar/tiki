@@ -693,8 +693,8 @@ class Services_File_Controller
         }
 
         $files = $result['data'];
-        if (! $input->metadata->int()) {
-            // These fields can be huge, so send them only when asked
+        if ($input->omit_metadata->int()) {
+            // slimmer result: these fields can be huge
             $files = array_map(function ($file) {
                 unset($file['metadata'], $file['search_data'], $file['ocr_data']);
                 return $file;

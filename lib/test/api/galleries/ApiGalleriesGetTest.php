@@ -202,7 +202,7 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         $this->assertTrue($foundDefault, 'Default test file should be in the list');
     }
 
-    public function testApiGetGalleryFilesOmitsExtractedContentByDefault()
+    public function testApiGetGalleryFilesKeepsExtractedContentByDefault()
     {
         $galleryId = static::$defaultGalleries['default']['galleryId'];
         $response = $this->makeApiRequest(
@@ -217,22 +217,19 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         $this->assertNotEmpty($body['result'], 'The gallery should list at least one file');
 
         foreach ($body['result'] as $file) {
-            $this->assertArrayNotHasKey('metadata', $file);
-            $this->assertArrayNotHasKey('search_data', $file);
-            $this->assertArrayNotHasKey('ocr_data', $file);
-            $this->assertArrayHasKey('fileId', $file, 'The regular fields should still be present');
-            $this->assertArrayHasKey('filename', $file, 'The regular fields should still be present');
+            $this->assertArrayHasKey('metadata', $file);
+            $this->assertArrayHasKey('search_data', $file);
         }
     }
 
-    public function testApiGetGalleryFilesIncludesExtractedContentOnRequest()
+    public function testApiGetGalleryFilesOmitsExtractedContentWhenRequested()
     {
         $galleryId = static::$defaultGalleries['default']['galleryId'];
         $response = $this->makeApiRequest(
             'GET',
             "/galleries/{$galleryId}/list_files",
             'Admins',
-            ['metadata' => 1]
+            ['omit_metadata' => 1]
         );
 
         $this->assertResponseStatus(200, $response);
@@ -241,8 +238,11 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         $this->assertNotEmpty($body['result'], 'The gallery should list at least one file');
 
         foreach ($body['result'] as $file) {
-            $this->assertArrayHasKey('metadata', $file);
-            $this->assertArrayHasKey('search_data', $file);
+            $this->assertArrayNotHasKey('metadata', $file);
+            $this->assertArrayNotHasKey('search_data', $file);
+            $this->assertArrayNotHasKey('ocr_data', $file);
+            $this->assertArrayHasKey('fileId', $file, 'The regular fields should still be present');
+            $this->assertArrayHasKey('filename', $file, 'The regular fields should still be present');
         }
     }
 
