@@ -759,27 +759,41 @@ class WikiLib extends TikiLib
 
                 $headerlib->add_js(implode("\n", $headerlib->getJsFromHTML($content)));
 
+                foreach ($headerlib->getJsModulesFromHTML($content) as $jsModule) {
+                    $headerlib->add_js_module($jsModule);
+                }
+
                 // now remove all the js from the source
                 $content = $headerlib->removeJsFromHtml($content);
+                $content = $headerlib->removeJsModulesFromHTML($content);
 
                 $canBeRefreshed = true;
             } else {
                 $jsFile1 = $headerlib->getJsFilesWithScriptTags();
                 $js1 = $headerlib->getJs();
+                $jsModule1 = $headerlib->js_modules;
                 $info['outputType'] = $tikilib->getOne("SELECT `outputType` FROM `tiki_output` WHERE `entityId` = ? AND `objectType` = ? AND `version` = ?", [$info['pageName'], 'wikiPage', $info['version']]);
                 $content = (new WikiLibOutput($info, $info['data'], $parse_options))->parsedValue;
 
                 // get any JS added to headerlib during parse_data and add to the bottom of the data to cache
                 $jsFile2 = $headerlib->getJsFilesWithScriptTags();
                 $js2 = $headerlib->getJs();
+                $jsModule2 = $headerlib->js_modules;
 
                 $jsFile = array_diff($jsFile2, $jsFile1);
                 $js = array_diff($js2, $js1);
 
+                $jsModuleOutput = '';
+                foreach ($jsModule2 as $rank => $scripts) {
+                    foreach (array_diff($scripts, $jsModule1[$rank] ?? []) as $script) {
+                        $jsModuleOutput .= $headerlib->wrap_js($script, true);
+                    }
+                }
+
                 $jsFile = implode("\n", $jsFile);
                 $js = $headerlib->wrap_js(implode("\n", $js));
 
-                $this->update_cache($page, $content . $jsFile . $js);
+                $this->update_cache($page, $content . $jsFile . $js . $jsModuleOutput);
             }
         } else {
             $content = (new WikiLibOutput($info, $info['data'], $parse_options, $info['version']))->parsedValue;

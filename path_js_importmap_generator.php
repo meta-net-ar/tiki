@@ -90,6 +90,9 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "bootstrap" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/bootstrap/dist/js/bootstrap.esm.min.js",
                 "chartjs" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/chart.js/dist/chart.js",
                 "clipboard" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/clipboard/dist/clipboard.min.js",
+                // converse.js 14+ ships ESM-only (no UMD/global build); ConverseJS.php imports
+                // this bare specifier and assigns it to window.converse for the classic plugin files.
+                "converse.js" => $tikiUrl . CONVERSEJS_DIST_PATH . "/converse.min.js",
                 "dompurify" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/dompurify/dist/purify.es.mjs",
                 "driver.js" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/driver.js/dist/driver.js.mjs",
                 "fieldslinker" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/fieldslinker/dist/fieldsLinker.js",

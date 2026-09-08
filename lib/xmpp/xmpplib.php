@@ -10,6 +10,7 @@ use Fabiang\Xmpp\Protocol\Message;
 use Fabiang\Xmpp\Protocol\Invitation;
 use Fabiang\Xmpp\Util\JID;
 use Tiki\Lib\Auth\Tokens;
+use Tiki\Lib\Xmpp\TikiXmppExternalPrebind;
 
 require_once __DIR__ . '/ConverseJS.php';
 require_once __DIR__ . '/TikiXmppChat.php';
@@ -17,6 +18,9 @@ require_once __DIR__ . '/TikiXmppPrebind.php';
 
 class XMPPLib extends TikiLib
 {
+    private const MAX_READ_CURSORS = 200;
+    private const MAX_READ_CURSOR_JID_LENGTH = 320;
+
     private $server_host = '';
     private $server_http_bind = '';
     private $restapi = null;
@@ -256,7 +260,12 @@ class XMPPLib extends TikiLib
             return $roomName;
         }
 
-        return $roomName . '@' . $mucDomain;
+        // Normalize human-readable room names into valid JID nodes.
+        $node = mb_strtolower(trim($roomName));
+        $node = preg_replace('/[^a-z0-9._-]+/u', '-', $node);
+        $node = trim($node, '-');
+
+        return $node . '@' . $mucDomain;
     }
 
     public function checkXmppSessionToken(string $user, string $token): bool
@@ -287,6 +296,15 @@ class XMPPLib extends TikiLib
         return $this->getJidInfoForUser($username)['jid'];
     }
 
+    public function getWidgetJidForUser(string $username): string
+    {
+        $jidInfo = $this->getJidInfoForUser($username);
+        if ($jidInfo['isExternal']) {
+            return $jidInfo['jid'];
+        }
+        return $jidInfo['localJid'] ?? '';
+    }
+
     /**
      * Sync user's Tiki groups -> XMPP MUC affiliations (member).
      * Minimal: ensure room exists and set affiliation member.
@@ -298,7 +316,7 @@ class XMPPLib extends TikiLib
             return;
         }
 
-        $jid = $this->getEffectiveJidForUser($u);
+        $jid = $this->getWidgetJidForUser($u);
         if (! $jid) {
             return;
         }
@@ -404,9 +422,9 @@ class XMPPLib extends TikiLib
             'realName',
         ]);
 
-        $u_jid = $user_preferences[$user]['xmpp_jid'] ?: $user;
-        $u_password = $user_preferences[$user]['xmpp_password'] ?: '';
-        $u_nickname = $user_preferences[$user]['realName'] ?: $user;
+        $u_jid = ($user_preferences[$user]['xmpp_jid'] ?? '') ?: $user;
+        $u_password = ($user_preferences[$user]['xmpp_password'] ?? '') ?: '';
+        $u_nickname = ($user_preferences[$user]['realName'] ?? '') ?: $user;
         $u_httpBind = $user_preferences[$user]['xmpp_custom_server_http_bind'] ?? '';
         $u_endpoint = $user_preferences[$user]['xmpp_custom_server_endpoint'] ?? '';
 
@@ -416,10 +434,10 @@ class XMPPLib extends TikiLib
             'http_bind'       => $this->server_http_bind,
             'websocket_url'   => $prefs['xmpp_ws_url'] ?? '',
             'custom_endpoint' => false,
-            'jid'       => $prefs['xmpp_server_host'] ? JID::buildJid($u_jid, $prefs['xmpp_server_host']) : '',
-            'password'  => $u_password,
-            'username'  => $u_jid,
-            'nickname'  => $u_nickname,
+            'jid'             => $prefs['xmpp_server_host'] ? JID::buildJid($u_jid, $prefs['xmpp_server_host']) : '',
+            'password'        => $u_password,
+            'username'        => $u_jid,
+            'nickname'        => $u_nickname,
         ];
 
         $jid_parts = JID::parseJid($u_jid);
@@ -642,6 +660,9 @@ class XMPPLib extends TikiLib
             $xmpp_prebind_class = 'TikiXmppPrebind';
         } else {
             if (empty($xmpp['password'])) {
+                $xmpp['password'] = $this->getExternalPassword($user) ?? '';
+            }
+            if (empty($xmpp['password'])) {
                 return [];
             }
         }
@@ -664,6 +685,254 @@ class XMPPLib extends TikiLib
         }
 
         return $result;
+    }
+
+    public function canPrebindExternal(string $username, array $connection): bool
+    {
+        return class_exists('XmppPrebind')
+            && ! empty($connection['custom_endpoint'])
+            && strtolower((string) parse_url($connection['http_bind'] ?? '', PHP_URL_SCHEME)) === 'https'
+            && $this->hasExternalPassword($username);
+    }
+
+    public function prebindExternal(string $username): array
+    {
+        global $user;
+
+        if ($username === '' || $username !== $user) {
+            throw new RuntimeException('Authentication required', 403);
+        }
+        $jid = $this->getJidInfoForUser($username);
+        $connection = $this->get_user_connection_info($username);
+        if (! $jid['isExternal'] || ! $this->canPrebindExternal($username, $connection)) {
+            throw new RuntimeException('External BOSH prebinding is not available', 400);
+        }
+        require_once __DIR__ . '/TikiXmppExternalPrebind.php';
+        $client = new TikiXmppExternalPrebind(
+            $connection['domain'],
+            $connection['http_bind'],
+            'tiki-' . bin2hex(random_bytes(12)),
+            true,
+            false
+        );
+        $password = $this->getExternalPassword($username);
+        if ($password === null || $password === '') {
+            throw new RuntimeException('External XMPP credentials are unavailable', 400);
+        }
+        $client->connect($connection['username'], $password);
+        $client->auth();
+        $session = $client->getSessionInfo();
+        return ['jid' => $session['jid'], 'sid' => $session['sid'], 'rid' => $session['rid']];
+    }
+
+    private const EXTERNAL_PASSWORD_PREF_KEY = 'xmpp_external_password_enc';
+
+    private function getExternalPasswordKey(): string
+    {
+        global $prefs;
+        $secret = trim($prefs['xmpp_shared_secret'] ?? '');
+        if ($secret === '') {
+            throw new Exception('xmpp_shared_secret is not configured.');
+        }
+        return hash('sha256', 'xmpp_external_password:' . $secret, true);
+    }
+
+    private function encryptExternalPassword(string $cleartext): string
+    {
+        $key = $this->getExternalPasswordKey();
+        if (function_exists('sodium_crypto_secretbox')) {
+            $nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+            $ciphertext = sodium_crypto_secretbox($cleartext, $nonce, $key);
+            return 'v2s:' . base64_encode($nonce . $ciphertext);
+        }
+
+        $iv = random_bytes(openssl_cipher_iv_length('aes-256-gcm'));
+        $tag = '';
+        $ciphertext = openssl_encrypt($cleartext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+        if ($ciphertext === false) {
+            throw new Exception('Unable to encrypt the external XMPP password.');
+        }
+        return 'v2g:' . base64_encode($iv . $tag . $ciphertext);
+    }
+
+    private function decryptExternalPassword(string $stored): ?string
+    {
+        try {
+            $key = $this->getExternalPasswordKey();
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        if (str_starts_with($stored, 'v2s:')) {
+            if (! function_exists('sodium_crypto_secretbox_open')) {
+                return null;
+            }
+            $raw = base64_decode(substr($stored, 4), true);
+            if ($raw === false || strlen($raw) <= SODIUM_CRYPTO_SECRETBOX_NONCEBYTES) {
+                return null;
+            }
+            $nonce = substr($raw, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+            $ciphertext = substr($raw, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+            $cleartext = sodium_crypto_secretbox_open($ciphertext, $nonce, $key);
+            return $cleartext !== false ? $cleartext : null;
+        }
+
+        if (str_starts_with($stored, 'v2g:')) {
+            $raw = base64_decode(substr($stored, 4), true);
+            $ivLen = openssl_cipher_iv_length('aes-256-gcm');
+            if ($raw === false || strlen($raw) <= $ivLen + 16) {
+                return null;
+            }
+            $iv = substr($raw, 0, $ivLen);
+            $tag = substr($raw, $ivLen, 16);
+            $ciphertext = substr($raw, $ivLen + 16);
+            $cleartext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+            return $cleartext !== false ? $cleartext : null;
+        }
+
+        // Backward compatibility for passwords stored by the initial AES-CTR
+        // implementation. Successful legacy values are migrated on read.
+        $raw = base64_decode($stored, true);
+        if ($raw === false) {
+            return null;
+        }
+
+        $ivLen = openssl_cipher_iv_length('aes-256-ctr');
+        $iv = substr($raw, 0, $ivLen);
+        $ciphertext = substr($raw, $ivLen);
+        $cleartext = openssl_decrypt($ciphertext, 'aes-256-ctr', $key, OPENSSL_RAW_DATA, $iv);
+        return $cleartext !== false ? $cleartext : null;
+    }
+
+    public function saveExternalPassword(string $username, string $password): bool
+    {
+        global $user;
+        if ($username === '' || $username !== $user || $password === '') {
+            return false;
+        }
+
+        try {
+            $encrypted = $this->encryptExternalPassword($password);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        $this->set_user_preference($username, self::EXTERNAL_PASSWORD_PREF_KEY, $encrypted);
+        return true;
+    }
+
+    public function clearExternalPassword(string $username): void
+    {
+        $this->set_user_preference($username, self::EXTERNAL_PASSWORD_PREF_KEY, '');
+    }
+
+    public function hasExternalPassword(string $username): bool
+    {
+        $stored = trim((string) TikiLib::lib('tiki')->get_user_preference($username, self::EXTERNAL_PASSWORD_PREF_KEY, ''));
+        return $stored !== '';
+    }
+
+    public function getExternalPassword(string $username): ?string
+    {
+        global $user;
+        if ($username === '' || $username !== $user) {
+            return null;
+        }
+
+        $stored = trim((string) TikiLib::lib('tiki')->get_user_preference($username, self::EXTERNAL_PASSWORD_PREF_KEY, ''));
+        if ($stored === '') {
+            return null;
+        }
+
+        $cleartext = $this->decryptExternalPassword($stored);
+        if ($cleartext !== null && ! str_starts_with($stored, 'v2')) {
+            try {
+                $this->set_user_preference($username, self::EXTERNAL_PASSWORD_PREF_KEY, $this->encryptExternalPassword($cleartext));
+            } catch (\Throwable $e) {
+                // Keep the valid legacy value if migration is temporarily unavailable.
+            }
+        }
+        return $cleartext;
+    }
+
+    public function getReadCursors(string $username): array
+    {
+        $raw = TikiLib::lib('tiki')->get_user_preference($username, 'xmpp_read_cursors', '{}');
+        $decoded = json_decode((string) $raw, true);
+        return is_array($decoded) ? $this->normalizeReadCursors($decoded) : [];
+    }
+
+    /**
+     * Return the 1-to-1 JIDs this user has ever read a message from/to,
+     * excluding MUC rooms (which are already covered by getXmppRoomsForUser).
+     */
+    public function getKnownDmPartners(string $username): array
+    {
+        global $prefs;
+        $mucDomain = strtolower((string) ($prefs['xmpp_muc_component_domain'] ?: 'conference.' . $this->server_host));
+
+        $ownJids = array_map('strtolower', array_filter([
+            $this->getLocalJidForLogin($username),
+            $this->getJidInfoForUser($username)['externalJid'] ?? null,
+        ]));
+
+        $partners = [];
+        foreach (array_keys($this->getReadCursors($username)) as $jid) {
+            $bareJid = strtolower(explode('/', $jid)[0]);
+            $domain = strtolower((string) (explode('@', $jid)[1] ?? ''));
+            if ($domain === '' || $domain === $mucDomain || in_array($bareJid, $ownJids, true)) {
+                continue;
+            }
+            if (preg_match('/(^|\.)(conference|room|rooms|muc|chat)(\.|$)/', $domain)) {
+                continue;
+            }
+            $partners[] = $jid;
+        }
+        return $partners;
+    }
+
+    public function saveReadCursors(string $username, array $cursors): array
+    {
+        $existing = $this->getReadCursors($username);
+        foreach ($this->normalizeReadCursors($cursors) as $jid => $time) {
+            if (empty($existing[$jid]) || strtotime($time) > strtotime($existing[$jid])) {
+                $existing[$jid] = $time;
+            }
+        }
+        $existing = $this->normalizeReadCursors($existing);
+        $this->set_user_preference($username, 'xmpp_read_cursors', json_encode($existing));
+        return $existing;
+    }
+
+    private function normalizeReadCursors(array $cursors): array
+    {
+        $normalized = [];
+        foreach ($cursors as $jid => $time) {
+            if (! is_string($jid) || ! is_string($time)) {
+                continue;
+            }
+
+            $jid = trim($jid);
+            if (
+                $jid === ''
+                || strlen($jid) > self::MAX_READ_CURSOR_JID_LENGTH
+                || ! preg_match('/^[^\s@\/]+@[^\s@\/]+(?:\/[^\s]+)?$/', $jid)
+            ) {
+                continue;
+            }
+
+            $timestamp = strtotime($time);
+            if ($timestamp === false) {
+                continue;
+            }
+            $normalized[$jid] = date(DATE_ATOM, $timestamp);
+        }
+
+        uasort($normalized, function ($a, $b) {
+            return strtotime($b) <=> strtotime($a);
+        });
+
+        return array_slice($normalized, 0, self::MAX_READ_CURSORS, true);
     }
 
     /**
@@ -692,39 +961,37 @@ class XMPPLib extends TikiLib
         $params = array_merge([
             'view_mode' => 'overlayed',
             'room' => '',
-            'show_controlbox_by_default' => 'y',
+            'show_controlbox_by_default' => 'n',
             'show_occupants_by_default' => 'y',
+            'auto_open' => 'n',
         ], $params);
+
+        // A site-wide XMPP module has no embedded chat container, but it can
+        // still be promoted to fullscreen from the chat menu. The plugin uses
+        // the same cookie with its configured default before the colon; an
+        // empty default therefore unambiguously belongs to the global module.
+        $onXmppPage = ($params['on_xmpp_page'] ?? 'n') === 'y';
+        if (! $onXmppPage && ! empty($_COOKIE['tiki_xmpp_view_mode'])) {
+            [$cookieDefault, $cookieChoice] = array_pad(
+                explode(':', $_COOKIE['tiki_xmpp_view_mode'], 2),
+                2,
+                ''
+            );
+            if ($cookieDefault === '' && in_array($cookieChoice, ['overlayed', 'fullscreen'], true)) {
+                $params['view_mode'] = $cookieChoice;
+            }
+        }
 
         $xmppclient = new ConverseJS();
         $xmppclient->set_auth($params);
 
         $nickname = $xmpp['nickname'] ?? $user;
-        $usesExternalJid = false;
-
-        if (! empty($user)) {
-            $jidInfo = $this->getJidInfoForUser($user);
-            $usesExternalJid = $jidInfo['isExternal'];
-        }
-
-        // Auto-join only if user is logged in
-        if (! empty($user)) {
-            $allowedRooms = $xmpplib->getXmppRoomsForUser($user);
-            $allowedFullJids = array_map(fn($r) => $xmpplib->buildRoomJid($r), $allowedRooms);
-
-            $joinRooms = [];
-
-            if (! empty($params['room'])) {
-                $requestedRoom = $xmpplib->buildRoomJid($params['room']);
-
-                if (in_array($requestedRoom, $allowedFullJids, true)) {
-                    $joinRooms[] = $requestedRoom;
-                }
-            }
-
-            if ($joinRooms) {
-                $xmppclient->set_auto_join_rooms(implode(',', $joinRooms));
-            }
+        if ($onXmppPage) {
+            $params['auto_open'] = 'y';
+            // Dedicated XMPP pages (for example Community) expose the room and
+            // the control box, while the site-wide module remains a closed
+            // support button on ordinary pages.
+            $params['show_controlbox_by_default'] = 'y';
         }
 
         $renderOptions = [
@@ -733,19 +1000,12 @@ class XMPPLib extends TikiLib
             'view_mode'                  => $params['view_mode'],
             'show_controlbox_by_default' => $params['show_controlbox_by_default'] === 'y',
             'show_occupants_by_default'  => $params['show_occupants_by_default'] === 'y',
-            'dm_target'                  => $params['dm_target'] ?? '',
+            'dm_target'                  => $xmppclient->get_option('dm_target') ?: ($params['dm_target'] ?? ''),
+            'anon_room'                  => $xmppclient->get_option('anon_room') ?: '',
             'anonymous'                  => $params['anonymous'] ?? '',
+            'auto_open'                  => $params['auto_open'],
+            'anonymous_auto_open'        => $params['auto_open'],
         ];
-
-        if (! $usesExternalJid || ! empty($xmpp['custom_endpoint'])) {
-            if (! empty($xmpp['http_bind'])) {
-                $renderOptions['bosh_service_url'] = $xmpp['http_bind'];
-            }
-
-            if (! empty($xmpp['websocket_url'])) {
-                $renderOptions['websocket_url'] = $xmpp['websocket_url'];
-            }
-        }
 
         $xmppclient->set_options($renderOptions);
 
@@ -979,7 +1239,7 @@ class XMPPLib extends TikiLib
     }
 
     /** Create/configure the room (persistent + logging) if necessary */
-    public function ensureRoomExists(string $roomJid): bool
+    public function ensureRoomExists(string $roomJid, array $config = []): bool
     {
         $client = $this->getAdminXmppClient();
         if (! $client) {
@@ -992,7 +1252,7 @@ class XMPPLib extends TikiLib
 
             if (class_exists('\Tiki\Xmpp\MucConfigure')) {
                 require_once __DIR__ . '/MucConfigure.php';
-                $cfg = new \Tiki\Xmpp\MucConfigure($roomJid);
+                $cfg = new \Tiki\Xmpp\MucConfigure($roomJid, $config);
                 $client->send($cfg);
             }
 

@@ -58,7 +58,10 @@ class Tokens
 
     public function getToken($token)
     {
-        $data = $this->table->fetchFullRow(['token' => $token]);
+        $data = $this->db->query(
+            'SELECT * FROM tiki_auth_tokens WHERE BINARY token = BINARY ?',
+            [ $token ]
+        )->fetchRow();
 
         if (! $this->isTokenValid($data, $token)) {
             return null;
@@ -71,7 +74,7 @@ class Tokens
     {
         $data = $this->db->query(
             'SELECT * FROM tiki_auth_tokens
-                WHERE token = ?
+                WHERE BINARY token = BINARY ?
                 AND (timeout = -1 OR UNIX_TIMESTAMP(creation) + timeout >= UNIX_TIMESTAMP())
                 AND (hits = -1 OR hits > 0)',
             [ $token ]

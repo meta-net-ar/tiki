@@ -137,9 +137,13 @@
         "svgedit" : {
             "jspdf" : "4.2.1"
         },
-        "postcss" : "8.5.25"
+        "postcss" : "8.5.26",
+        "converse.js" : {
+            "@converse/log" : "0.0.1"
+        }
     },
     "overridesComment" : {
+        "converse.js": "converse.js's own package.json depends on '@converse/log' via 'file:src/log' - a self-referential path into its own package directory. npm's arborist can't resolve that link's target when converse.js is installed as a plain registry dependency (not inside its own monorepo), which crashes any 'npm install' with 'Cannot destructure property package of node.target'. It's also published standalone on the registry with matching content, so overriding it to the registry version sidesteps the broken self-link. (13.0.1 additionally needed a '@converse/headless' override for the same reason - 14.0.0 doesn't depend on that package at all, so it was dropped here rather than left as harmless dead weight.)",
         "dompurify": [
             "This override forces all packages to use DOMPurify v3.4.12 to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
             "Upgrading from v2 to v3 is safe for our project because we do not support Internet Explorer (IE).",
@@ -157,7 +161,7 @@
         ],
         "postcss": [
             "vue3-sfc-loader -> @vue/component-compiler-utils still pulls PostCSS 7.0.x (npm audit range <=8.5.17: parsing/XSS/sourceMappingURL issues).",
-            "Force PostCSS 8.5.25 everywhere (already used by Vite). Remove when upstream stops depending on PostCSS 7."
+            "Force PostCSS 8.5.26 everywhere (already used by Vite). Remove when upstream stops depending on PostCSS 7."
         ],
         "svelte": [
             "Svelte is pinned to 5.51.0 (and devalue to 5.8.1) for @event-calendar/core 4.x compatibility: Svelte >= 5.51.1 breaks calendar interactions (https://github.com/vkurko/calendar/issues/623). devalue is overridden separately so we can take the npm audit fix without upgrading Svelte. Upgrade path: @event-calendar/core 5.4.1+ then remove both svelte and devalue overrides."
