@@ -25,5 +25,10 @@
             "type": "composer",
             "url": "https://composer.tiki.org"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "Tiki\\Composer\\": "lib/core/Tiki/Composer/"
+        }
+    }
 }

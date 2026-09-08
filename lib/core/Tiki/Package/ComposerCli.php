@@ -531,7 +531,8 @@ class ComposerCli
             $composerJson,
             $package->getName(),
             $package->getRequiredVersion(),
-            $package->getScripts()
+            $package->getScripts(),
+            $package->getRepository()
         );
 
         $composerJson = $this->sanitizeEmptyArrays($composerJson);
@@ -596,7 +597,18 @@ class ComposerCli
 
         $this->cache->clear();
 
-        $fileContent = file_get_contents($this->getComposerConfigFilePath());
+        $composerJson = $this->getComposerConfigOrDefault();
+        if ($package->getRepository()) {
+            $repositories = &$composerJson['repositories'] ?? [];
+            foreach ($repositories as $key => $repository) {
+                if ($repository['url'] === $package->getRepository()['url']) {
+                    unset($repositories[$key]);
+                }
+            }
+        }
+
+        $fileContent = json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        file_put_contents($this->getComposerConfigFilePath(), $fileContent);
 
         return tr('= New composer.json file content') . ":\n\n"
         . $fileContent . "\n\n"
@@ -614,7 +626,7 @@ class ComposerCli
      * @param array $scripts
      * @return array
      */
-    public function addComposerPackageToJson($composerJson, $package, $version, $scripts = [])
+    public function addComposerPackageToJson($composerJson, $package, $version, $scripts = [], $repository = null)
     {
 
         $scriptsKeys = [
@@ -659,6 +671,13 @@ class ComposerCli
                 }
                 $composerJson['scripts'][$type] = array_unique($composerJson['scripts'][$type]);
             }
+        }
+
+        if (is_array($repository) && count($repository)) {
+            if (! isset($composerJson['repositories'])) {
+                $composerJson['repositories'] = [];
+            }
+            $composerJson['repositories'][] = $repository;
         }
 
         return $composerJson;

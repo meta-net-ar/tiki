@@ -93,6 +93,7 @@ class ConsoleApplicationBuilder
             'commands'  => [
                 new DevFixStyleCommand(),
                 new DevUnInstallCommand(),
+                new DevRunSignaturePDF(),
                 ],
             ],[
             'condition' => 'checkIsDbRunning',

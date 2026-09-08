@@ -1,0 +1,1 @@
+INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `icon`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42, 's', 'Signature PDF', 'file-pdf', 'tiki-signaturepdf.php', 29, 'feature_signaturepdf', '', '', 0);
