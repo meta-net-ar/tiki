@@ -1117,6 +1117,7 @@ class Services_User_Controller
                 $avatarName = $input->avatarName->text();
                 $avatarType = $input->avatarType->text();
                 TikiLib::lib('userprefs')->set_user_avatar($userwatch, $avatarType, $avatarLibName, $avatarName, null, null, null, false);
+                TikiLib::lib('userprefs')->remove_file_gallery_image($userwatch);
                 return true;
             }
             if (empty($_FILES['userfile']['name'])) {

@@ -122,6 +122,9 @@
                 <legend class="h3">{tr}Profile picture{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=user_use_gravatar}
+                    {preference name=user_dicebear_avatar}
+                    {preference name=user_default_avatar_style}
+                    {preference name=user_force_avatar_upload}
                     {preference name=user_store_file_gallery_picture}
                     {preference name=user_small_avatar_size}
                     {preference name=user_small_avatar_square_crop}

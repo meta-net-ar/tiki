@@ -25,6 +25,10 @@ vi.mock("@element-plus/icons-vue", () => {
 });
 
 describe("FileInput", () => {
+    beforeAll(() => {
+        globalThis.tr = vi.fn((text) => text);
+    });
+
     afterEach(() => {
         vi.clearAllMocks();
     });

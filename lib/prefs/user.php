@@ -377,6 +377,7 @@ function prefs_user_list($partial = false)
             'help' => 'http://gravatar.com',
             'type' => 'flag',
             'default' => 'n',
+            'conflicts' => ['user_dicebear_avatar']
         ],
         'user_multilike_config' => [
             'name' => tr('Configuration for multilike'),
@@ -403,11 +404,21 @@ function prefs_user_list($partial = false)
             'default' => 'n',
             'tags' => ['basic'],
         ],
+        'user_dicebear_avatar' => [
+            'name' => tr('Use DiceBear for user avatars'),
+            'description' => tr('Use DiceBear to generate user avatars.'),
+            'help' => 'https://doc.tiki.org/DiceBear',
+            'type' => 'flag',
+            'tags' => ['advanced'],
+            'default' => 'y',
+            'conflicts' => ['user_use_gravatar'],
+        ],
         'user_default_avatar_style' => [
             'name' => tr('Default avatar style'),
             'description' => tr('Default avatar style for users when registering.'),
-            'help' => 'https://www.dicebear.com/styles/',
+            'help' => 'https://doc.tiki.org/DiceBear',
             'type' => 'list',
+            'dependencies' => ['user_dicebear_avatar'],
             'tags' => ['advanced'],
             'default' => 'initials',
             'options' => [

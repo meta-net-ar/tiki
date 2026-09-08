@@ -227,6 +227,7 @@ class PreferencesLib
         }
 
         $info['available'] = true;
+        $info['in_conflict'] = false;
 
         /* FIXME: Dependencies are not enforced currently. TODO: Activate disabled code below to enforce dependencies
         // The value element is deprecated. Use either "configuredValue" or "effectiveValue"  instead.
@@ -239,7 +240,7 @@ class PreferencesLib
             if (isset($info['conflicts'])) {
                 $info['conflicts'] = $this->getConflicts($info['conflicts'], $info);
                 if (count($info['conflicts']['active']) && $info['type'] === 'flag' && $info['value'] != 'y') {
-                    $info['available'] = false;
+                    $info['in_conflict'] = true;
                 }
             }
             /* TODO: test
@@ -902,13 +903,13 @@ class PreferencesLib
                 $link = $info['adminurl'] ?? '';
                 if ($info['value'] == 'y') {
                     $active[] = [
-                        'name' => $key,
+                        'name' => $details,
                         'label' => $name,
                         'link' => $link,
                     ];
                 } else {
                     $inactive[] = [
-                        'name' => $key,
+                        'name' => $details,
                         'label' => $name,
                         'link' => $link,
                     ];
