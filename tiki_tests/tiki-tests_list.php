@@ -6,13 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('../tiki-setup.php');
 
+use Tiki\Lib\HtmlTidy\HtmlTidyLib;
+
 $access->check_feature('feature_tikitests');
 
 if ($tiki_p_admin_tikitests != 'y' and $tiki_p_play_tikitests != 'y') {
     Feedback::errorAndDie(tra('You do not have permission to do that'), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
-$smarty->assign('tidy', TikiLib::lib('htmltidy')->isTidyLoaded());
+$smarty->assign('tidy', (new HtmlTidyLib())->isTidyLoaded());
 $smarty->assign('http', extension_loaded("http"));
 $smarty->assign('curl', extension_loaded("curl"));
 

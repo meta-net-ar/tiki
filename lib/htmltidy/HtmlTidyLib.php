@@ -57,10 +57,13 @@ class HtmlTidyLib
         }
 
         $html_ = tidy_parse_string($html, $this->buildConfig($config), $encoding);
+        if (! $html_) {
+            return $html;
+        }
 
-        if ($this->isTidyReportingEnabled() && $html_) {
+        if ($this->isTidyReportingEnabled()) {
             tidy_diagnose($html_);
-            $errors = $this->parseTidyErrors(tidy_get_error_buffer($html_));
+            $errors = $this->parseTidyErrors(tidy_get_error_buffer($html_) ?: '');
             if (! empty($errors)) {
                 $this->dispatchErrors($errors, $context);
             }
@@ -71,18 +74,13 @@ class HtmlTidyLib
     }
 
     /**
-     * Validate HTML from internal Tiki sources (wiki plugins, parser output) and report errors.
-     * NEVER modifies the HTML — purely diagnostic.
-     *
-     * Dispatches errors to the error tracking service (GlitchTip/Sentry) when reporting is enabled,
-     * and always returns the parsed errors array so callers (e.g. preview mode) can surface them
-     * directly to the user.
+     * Validate HTML from internal Tiki sources (wiki plugins, parser output).
+     * NEVER modifies the HTML — purely diagnostic. Never dispatched to the error tracking service.
      *
      * @param string $html    HTML string to validate
-     * @param array $context  Context metadata for error reports (e.g. ['source' => 'Plugin: html'])
-     * @return array          Parsed error entries: [['level', 'line', 'column', 'message', 'snippet'], ...]
+     * @return array          Parsed error entries: [['level', 'line', 'column', 'message'], ...]
      */
-    public function reportErrors(string $html, array $context = []): array
+    public function reportErrors(string $html): array
     {
         if (! $this->tidyAvailable) {
             return [];
@@ -92,21 +90,16 @@ class HtmlTidyLib
         $wrapperLines = substr_count(self::DOCUMENT_WRAPPER, "\n") + 1;
 
         $html_ = tidy_parse_string($wrapped, [], 'utf8');
+        if (! $html_) {
+            return [];
+        }
+
         tidy_diagnose($html_);
-        $errors = $this->adjustLineNumbers(
-            $this->parseTidyErrors(tidy_get_error_buffer($html_)),
+
+        return $this->adjustLineNumbers(
+            $this->parseTidyErrors(tidy_get_error_buffer($html_) ?: ''),
             $wrapperLines
         );
-
-        if (! empty($errors)) {
-            $errors = $this->attachSnippets($errors, $html);
-        }
-
-        if (! empty($errors) && $this->isTidyReportingEnabled()) {
-            $this->dispatchErrors($errors, $context);
-        }
-
-        return $errors;
     }
 
     /**
@@ -120,6 +113,7 @@ class HtmlTidyLib
     /**
      * Returns true when all conditions are met: DSN configured, preference on,
      * Tidy extension loaded, and session not disabled by admin toggle.
+     * Gates dispatch to the error tracking service (cleanHtml() / external sources only).
      */
     public function isTidyReportingEnabled(): bool
     {
@@ -127,6 +121,19 @@ class HtmlTidyLib
 
         return ! empty($prefs['error_tracking_dsn'])
             && ($prefs['error_tracking_enabled_tidy'] ?? 'n') === 'y'
+            && $this->tidyAvailable
+            && ($_SESSION['tidy_html_reporting'] ?? 'y') !== 'n';
+    }
+
+    /**
+     * Returns true when preference on, Tidy extension loaded, and session not disabled
+     * by admin toggle. Does not require a DSN.
+     */
+    public function isTidyPreviewEnabled(): bool
+    {
+        global $prefs;
+
+        return ($prefs['error_tracking_enabled_tidy'] ?? 'n') === 'y'
             && $this->tidyAvailable
             && ($_SESSION['tidy_html_reporting'] ?? 'y') !== 'n';
     }
@@ -157,11 +164,14 @@ class HtmlTidyLib
 
     /**
      * Send each parsed error to the error tracking service as a message event.
-     * Includes a snippet so the message is readable without the original fragment.
      */
     private function dispatchErrors(array $errors, array|string $context): void
     {
         $errorTracking = \TikiLib::lib('errortracking');
+        if (! $errorTracking) {
+            return;
+        }
+
         $source = is_array($context) ? ($context['source'] ?? 'unknown') : (string) $context;
 
         foreach ($errors as $error) {
@@ -174,51 +184,8 @@ class HtmlTidyLib
                 $error['column']
             );
 
-            if (! empty($error['snippet'])) {
-                $message .= sprintf(' — near: "%s"', $error['snippet']);
-            }
-
             $errorTracking->captureMessage($message);
         }
-    }
-
-    private function attachSnippets(array $errors, string $html): array
-    {
-        $lines = explode("\n", $html);
-
-        foreach ($errors as &$error) {
-            $line = $lines[$error['line'] - 1] ?? '';
-            $error['snippet'] = $this->extractSnippet($line, $error['column']);
-        }
-
-        return $errors;
-    }
-
-    /**
-     * Extract a window of text centered on $column — lines can be long, and the
-     * error isn't always near the start.
-     */
-    private function extractSnippet(string $line, int $column, int $windowSize = 80): string
-    {
-        $line = trim($line);
-        if ($line === '') {
-            return '';
-        }
-
-        $columnIndex = $column - 1; // Tidy columns are 1-based, string offsets are 0-based
-        $halfWindow = (int) ($windowSize / 2);
-
-        $windowStart = max(0, $columnIndex - $halfWindow);
-        $snippet = substr($line, $windowStart, $windowSize);
-
-        if ($windowStart > 0) {
-            $snippet = '…' . $snippet;
-        }
-        if ($windowStart + $windowSize < strlen($line)) {
-            $snippet .= '…';
-        }
-
-        return $snippet;
     }
 
     /**

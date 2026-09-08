@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('../tiki-setup.php');
 
+use Tiki\Lib\HtmlTidy\HtmlTidyLib;
+
 if ($prefs['feature_tikitests'] != 'y') {
     Feedback::errorAndDie(tra('This feature is disabled') . ': feature_tikitests', \Laminas\Http\Response::STATUS_CODE_401);
 }
@@ -53,7 +55,7 @@ function get_url($url, $use_tidy = true)
     $referer = $url->getAttribute("referer");
 
     $result['data'] = $data;
-    $htmlTidyLib = TikiLib::lib('htmltidy');
+    $htmlTidyLib = new HtmlTidyLib();
 
     if ($htmlTidyLib->isTidyLoaded()) {
         $data = tidy_parse_string($data, [], 'utf8');

@@ -8,6 +8,7 @@
 use Mpdf\Mpdf;
 use Tiki\BruteForce\BruteForce;
 use Tiki\Lib\Auth\Tokens;
+use Tiki\Lib\HtmlTidy\HtmlTidyLib;
 use Tiki\Lib\Theme\ThemeLib;
 
 /**
@@ -1971,7 +1972,7 @@ function cleanHtml($html, $config = null, $encoding = 'utf8')
     if (is_array($config)) {
         $pdfConfig = array_merge($pdfConfig, $config);
     }
-    $htmlTidyLib = TikiLib::lib('htmltidy');
+    $htmlTidyLib = new HtmlTidyLib();
     return $htmlTidyLib->cleanHtml($html, $pdfConfig, $encoding, ['source' => 'pdf_generation']);
 }
 

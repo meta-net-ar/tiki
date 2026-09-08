@@ -4,6 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use SmartyTiki\BlockHandler\Remarksbox;
+use Tiki\Lib\HtmlTidy\HtmlTidyLib;
+
 /**
  * A text of markup, usually using Tiki's syntax ("wiki syntax"), which can be parsed
  *
@@ -563,29 +567,20 @@ if ( \$('#$id') ) {
             $plugin_result = $this->convert_plugin_output($output, $pluginFormat, $outputFormat);
 
             if (! empty($plugin_result) && is_string($plugin_result)) {
-                $htmlTidy = TikiLib::lib('htmltidy');
-                if ($htmlTidy->isTidyReportingEnabled()) {
-                    $tidyErrors = $htmlTidy->reportErrors($plugin_result, [
-                        'source'        => "Plugin: $name",
-                        'page'          => $this->option['page'] ?? null,
-                        'format'        => $pluginFormat,
-                        'output_format' => $outputFormat,
-                    ]);
+                $htmlTidy = new HtmlTidyLib();
+                if ($htmlTidy->isTidyPreviewEnabled()) {
+                    $tidyErrors = $htmlTidy->reportErrors($plugin_result);
                     if (! empty($tidyErrors) && ! empty($this->option['preview_mode'])) {
-                        $smarty  = TikiLib::lib('smarty');
-                        $repeat  = false;
-                        $items   = implode('', array_map(
+                        $items = implode('', array_map(
                             fn($e) => '<li>' . htmlspecialchars($e['message'])
                                 . ' <small>(line ' . (int) $e['line'] . ', col ' . (int) $e['column'] . ')</small>'
-                                . (! empty($e['snippet']) ? '<br><code>' . htmlspecialchars($e['snippet']) . '</code>' : '')
                                 . '</li>',
                             $tidyErrors
                         ));
-                        $box = smarty_block_remarksbox(
+                        $box = Remarksbox::render(
                             ['type' => 'warning', 'title' => tr('HTML markup errors in plugin: %0', $name)],
-                            '<ul>' . $items . '</ul>',
-                            $smarty->getEmptyInternalTemplate(),
-                            $repeat
+                            '<ul>' . $items . '</ul>'
+                                . '<pre><code>' . htmlspecialchars($plugin_result) . '</code></pre>'
                         );
                         $plugin_result = $box . $plugin_result;
                     }
