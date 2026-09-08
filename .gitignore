@@ -151,3 +151,5 @@ themes/**/*.css.map
 /generated_changelog.md
 # macOS filesystem info
 .DS_Store
+
+urls.config.cache.php
