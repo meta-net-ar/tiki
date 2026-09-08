@@ -689,7 +689,10 @@ $.fn.setupEventCalendar = function (
             eventResize: function (info) {
                 $.post($.service("calendar", "resize"), {
                     calitemId: info.event.id,
-                    delta: info.endDelta,
+                    delta: info.endDelta.seconds,
+                }).fail(function () {
+                    info.revert();
+                    showMessage(tr("The event could not be resized."), "error");
                 });
             },
             eventDrop: function (info) {
