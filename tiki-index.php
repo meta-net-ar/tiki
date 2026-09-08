@@ -63,7 +63,20 @@ Sections::setCurrentSection($section);
 
 
 global $tikiroot, $base_url;
-$config = include __DIR__ . '/urls.config.cache.php';
+$configFile = __DIR__ . '/urls.config.cache.php';
+if (! file_exists($configFile)) {
+    $defaultConfig = <<<CFG
+<?php
+
+return array (
+  'homePageURL' => '',
+  'fallbackURL' => '',
+);
+
+CFG;
+    file_put_contents($configFile, $defaultConfig);
+}
+$config = include $configFile;
 $homePage = $config['homePageURL'];
 $homeSlug = TikiLib::lib('wiki')->get_slug_by_page($homePage);
 $requestSlug = $_GET['page'];

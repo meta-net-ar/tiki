@@ -250,7 +250,20 @@ function tiki_route($path)
         '|.*|',
         'tiki-index.php',
         function ($parts) {
-            $config = include __DIR__ . '/urls.config.cache.php';
+            $configFile = __DIR__ . '/urls.config.cache.php';
+            if (! file_exists($configFile)) {
+                $defaultConfig = <<<CFG
+<?php
+
+return array (
+  'homePageURL' => '',
+  'fallbackURL' => '',
+);
+
+CFG;
+                file_put_contents($configFile, $defaultConfig);
+            }
+            $config = include $configFile;
             global $tikiroot;
             $homePage = $config['homePageURL'] ?? 'HomePage';
             $homeSlug = TikiLib::lib('wiki')->get_slug_by_page($homePage);
