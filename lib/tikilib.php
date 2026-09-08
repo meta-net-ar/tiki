@@ -1679,6 +1679,9 @@ class TikiLib extends TikiDb_Bridge
         switch ($type) {
             case 'l':
                 if (str_starts_with($libname, 'dicebear')) {
+                    if ($prefs['user_dicebear_avatar'] !== 'y') {
+                        return '';
+                    }
                     $seed = $res['avatarName'];
                     if ($seed === 'admin') {
                         return '<i class="fa fa-user-tie fa-2xl admin-icon" title="' . tra("Administrator") . '"></i>';
@@ -4538,6 +4541,10 @@ class TikiLib extends TikiDb_Bridge
         }
 
         if ($definition && ! $definition['available'] && ! $forced_by_config) {
+            return false;
+        }
+
+        if ($definition && $definition['in_conflict']) {
             return false;
         }
 
