@@ -37,7 +37,10 @@ function transformContainerSelects(containerElement) {
             // the global preference for that select only.
             const allowCreate = $(this).data("allow-create") ?? selectPreferences.allowCreate;
             elementPlusUi.attr("allow-create", allowCreate);
-            elementPlusUi.attr("ordering", selectPreferences.ordering);
+            // This web component expects JSON text. Passing the boolean false
+            // to jQuery.attr triggers a jQuery Migrate warning and removes the
+            // attribute instead of conveying the configured value.
+            elementPlusUi.attr("ordering", String(selectPreferences.ordering));
 
             if ($(this).data("remote-source-url")) {
                 $(elementPlusUi).attr("remote-source-url", $(this).data("remote-source-url"));

@@ -10,13 +10,13 @@
 function module_xmpp_info()
 {
     return [
-        'description' => tra('Hold a chat session using XMPP (uses the ConverseJS client).'),
+        'description' => tra('Hold a chat session using XMPP (uses the ConverseJS client). Placed site-wide, this becomes a floating "chat with us" bubble: visitors who are not logged in get a direct, 1-1 conversation with the site admin (see the xmpp_anonymous_mode preference), logged-in users get their normal chat session.'),
         'name' => tra('XMPP'),
         'params' => [
             'show_controlbox_by_default' => [
                 'name' => tra('Show controlbox on load'),
                 'description' => tra('If controlbox should be shown after page load'),
-                'default' => 'y',
+                'default' => 'n',
                 'filter' => 'alpha',
             ],
         ],
@@ -32,5 +32,25 @@ function module_xmpp_info()
  */
 function module_xmpp($mod_reference, &$module_params)
 {
+    global $user, $prefs, $page;
+
+    if (($prefs['xmpp_chat_button'] ?? 'y') !== 'y') {
+        return;
+    }
+
+    // PluginXMPP owns the single Converse instance on dedicated chat pages.
+    // Checking the stored source also works when the parsed wiki body comes
+    // from cache, where an in-process static guard alone is not sufficient.
+    if (! empty($page)) {
+        $pageInfo = TikiLib::lib('tiki')->get_page_info($page);
+        if (! empty($pageInfo['data']) && preg_match('/\{xmpp\b/i', $pageInfo['data'])) {
+            return;
+        }
+    }
+
+    if (empty($user) && ! isset($module_params['anonymous'])) {
+        $module_params['anonymous'] = 'y';
+    }
+
     TikiLib::lib('xmpp')->render_xmpp_client($module_params);
 }

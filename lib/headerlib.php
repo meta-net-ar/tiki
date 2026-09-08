@@ -121,6 +121,9 @@ class HeaderLib
      */
     public $js_modules = [];
 
+    /** @var array External JS files to load as <script type="module" src="...">. */
+    public $js_module_files = [];
+
     /**
      * Do NOT manipulate this directly.  The only reason this is public is so PageCache.php has access to it.
      *
@@ -630,6 +633,16 @@ class HeaderLib
         return $this;
     }
 
+    /** Adds an external javascript file to load as a module. */
+    public function addJsfileModule($file, $rank = 0)
+    {
+        $this->throwIfJSFooterAlreadyOutput();
+        if (empty($this->js_module_files[$rank]) or ! in_array($file, $this->js_module_files[$rank])) {
+            $this->js_module_files[$rank][] = $file;
+        }
+        return $this;
+    }
+
     public function add_cssfile($file, $rank = 0)
     {
         $this->throwIfHeadersAlreadyOutput();
@@ -1059,6 +1072,11 @@ class HeaderLib
         return md5($hash);
     }
 
+    private function stripCacheBuster(string $file): string
+    {
+        return strtok($file, '?') ?: $file;
+    }
+
 
     /**
      * Output script tags for all javascript files being used.
@@ -1110,6 +1128,15 @@ class HeaderLib
             $output .= $b;
         }
 
+        if (count($this->js_module_files)) {
+            ksort($this->js_module_files);
+            foreach ($this->js_module_files as $rank => $files) {
+                foreach ($files as $file) {
+                    $output .= "\n" . '<script type="module" src="' . \SmartyTiki\Modifier\Escape::apply($file) . '"></script>';
+                }
+            }
+        }
+
         // we get one sorted array with script tags
         $js_files = $this->getJsFilesWithScriptTags();
 
@@ -1155,6 +1182,7 @@ class HeaderLib
         $this->js_modules = [];
         if ($clear_js_files) {
             $this->jsfiles = [];
+            $this->js_module_files = [];
         }
         return $this;
     }
@@ -1308,6 +1336,17 @@ class HeaderLib
         return $html;
     }
 
+    public function getJsModulesFromHTML($html)
+    {
+        preg_match_all('/<script[^>]*type=[\'"]?module[\'"]?[^>]*>\s*?(.*)(?:\s*<\/script>)/Umis', $html, $jsarr);
+        return array_filter($jsarr[1] ?? []);
+    }
+
+    public function removeJsModulesFromHTML($html)
+    {
+        return preg_replace('/<script[^>]*type=[\'"]?module[\'"]?[^>]*>\s*?(.*)(?:\s*<\/script>)/Umis', '', $html);
+    }
+
     public function get_all_css_content()
     {
         $files = $this->collect_css_files();
@@ -1378,6 +1417,7 @@ class HeaderLib
         foreach ($files as $originalFile) {
             /* This does not use the same cachelib-based caching strategy as get_minified_css_single() since I could not see any improvement.
             I tested on Windows 8 with an HDD and a filesystem-based Tiki\Lib\Cache\Lib\Base. Tiki\Cache\FileSystem::getCached() may be inefficient. The strategy may still improve performance for other setups, such as those using Tiki\Lib\Cache\Lib\Memcache. Chealer 2018-08-31 */
+            $originalFile = $this->stripCacheBuster($originalFile);
             $fileContentsHash = md5_file($originalFile);
             $minimalFilePath = $publicDirectory . "minified_$fileContentsHash.css";
             if (! file_exists($minimalFilePath)) {
@@ -1412,11 +1452,7 @@ class HeaderLib
 
             foreach ($files as $originalFile) {
                 // remove cache-buster parameters from the end of the filename
-                $pos = strpos($originalFile, '?');
-                if ($pos !== false) {
-                    $originalFile = substr($originalFile, 0, $pos);
-                }
-                $minifier->add($originalFile);
+                $minifier->add($this->stripCacheBuster($originalFile));
             }
 
             $minifier->minify($minimalFilePath);
