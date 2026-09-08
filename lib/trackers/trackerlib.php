@@ -6343,6 +6343,11 @@ class TrackerLib extends TikiLib
             return tr('Field not specified');
         }
 
+        if (! is_array($field)) {
+            // Field no longer exists (e.g. deleted since it was referenced in item history)
+            return '';
+        }
+
         // preset $item = array('itemId' => value). Either from param or empty
         $item = $params['item'] ?? [];
 
