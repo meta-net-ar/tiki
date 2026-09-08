@@ -2,6 +2,8 @@
 
 require_once __DIR__ . '/tiki-setup.php';
 
+$access->check_feature('xmpp_feature');
+
 $prefslib = TikiLib::lib('prefs');
 $db = TikiDb::get();
 

@@ -2,6 +2,8 @@
 
 require_once 'tiki-setup.php';
 
+$access->check_feature('xmpp_feature');
+
 header('Content-Type: application/json; charset=utf-8');
 
 if (empty($user)) {

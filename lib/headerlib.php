@@ -1132,7 +1132,7 @@ class HeaderLib
             ksort($this->js_module_files);
             foreach ($this->js_module_files as $rank => $files) {
                 foreach ($files as $file) {
-                    $output .= "\n" . '<script type="module" src="' . \SmartyTiki\Modifier\Escape::apply($file) . '"></script>';
+                    $output .= "\n" . '<script type="module" src="' . smarty_modifier_escape($file) . '"></script>';
                 }
             }
         }
