@@ -22,11 +22,17 @@ $data = [
 $filters = new \Expose\FilterCollection(); // @phpstan-ignore class.notFound (depends on enygma/expose, installed through packages)
 $filters->load();
 
+if (! empty($prefs['ids_log_to_file'])) {
+    $filepath = $prefs['ids_log_to_file'];
+} else {
+    $filepath = 'ids.log';
+}
+
 if (! empty($prefs['ids_custom_rules_file']) && file_exists($prefs['ids_custom_rules_file'])) {
     $filters->load($prefs['ids_custom_rules_file']);
 }
 
-$logger = TikiLib::lib('idslog');
+$logger = new \IDS_log($filepath);
 
 $manager = new \Expose\Manager($filters, $logger);
 $manager->run($data);

@@ -300,7 +300,7 @@ class Tracker_Field_BigBlueButton extends \Tracker\Field\AbstractItemField imple
 
             return $allRecordings;
         } catch (Exception $e) {
-            TikiLib::lib('idslog')->error(tr('BigBlueButton Tracker failed'), [
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('BigBlueButton Tracker failed'), [
                 'component' => __CLASS__,
                 'method' => __FUNCTION__,
                 'exception' => 'BigBlueButton Tracker Field Error: ' . $e->getMessage()]);
@@ -413,7 +413,7 @@ class Tracker_Field_BigBlueButton extends \Tracker\Field\AbstractItemField imple
                 ],
             ];
         } catch (Exception $e) {
-            TikiLib::lib('idslog')->error(tr('BigBlueButton Metadata fetch failed'), [
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('BigBlueButton Metadata fetch failed'), [
                 'component' => __CLASS__,
                 'method' => __FUNCTION__,
                 'exception' => 'BBB Metadata Fetch Error: %0" ' . $e->getMessage()]);

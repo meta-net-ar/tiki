@@ -150,7 +150,7 @@ function custom_error_handler($number, $message, $file, $line): void
             throw $exception;
         }
 
-        TikiLib::lib('idslog')->error(tr('Unexpected error occurred'), [
+        (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('Unexpected error occurred'), [
             'component' => __FILE__,
             'method' => __FUNCTION__,
             'error_number' => $number,

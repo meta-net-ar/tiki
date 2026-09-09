@@ -9,17 +9,20 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
+
+use Tiki\Lib\Logs\Tiki_Monolog;
+
 class StructLib extends TikiLib
 {
     public $displayLanguageOrder;
 
-    private Tikilib $logger;
+    private Tiki_Monolog $logger;
 
     public function __construct()
     {
         global $prefs;
         parent::__construct();
-        $this->logger = TikiLib::lib('idslog');
+        $this->logger = new Tiki_Monolog();
         $this->displayLanguageOrder = [];
     }
     public function s_export_structure_tree($structure_id, $level = 0)

@@ -45,7 +45,7 @@ class Search_GlobalSource_ArticleAttachmentSource implements Search_GlobalSource
                         $textual[] = $data[$name]->getValue();
                     }
                 } else {
-                    TikiLib::lib('idslog')->warning(
+                    (new \Tiki\Lib\Logs\Tiki_Monolog())->warning(
                         tr('Referenced article %0 from %1 %2 no longer exists.', $rel['itemId'], $objectType, $objectId),
                         [
                             'component' => __CLASS__,

@@ -11,6 +11,7 @@ use ZBateson\MailMimeParser\MailMimeParser;
 use Symfony\Component\Mime\Address;
 use Tiki\Lib\Diff\DiffUtils;
 use Tiki\Sections;
+use Tiki\Lib\Logs\Tiki_Monolog;
 
 /**
  *
@@ -372,7 +373,7 @@ class Comments extends TikiLib
         global $prefs, $user;
 
         $info = $this->get_forum($forumId);
-        $logger = TikiLib::lib('idslog');
+        $logger = new Tiki_Monolog();
         // for any reason my sybase test machine adds a space to
         // the inbound_imap_server field in the table.
         $info["inbound_imap_server"] = trim($info["inbound_imap_server"]);
@@ -459,10 +460,10 @@ class Comments extends TikiLib
                 $source_imap->deleteMessages($imap, [$uid]);
                 $email = $original_email_fixed;
                 $logger->warning(tr("Could not parse email address; using it as-is."), [
-                        'component' => __CLASS__,
-                        'method' => __FUNCTION__,
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
                     'email' => $original_email_fixed,
-                        'exception' => $e->getMessage(),
+                    'exception' => $e->getMessage(),
                 ]);
                 continue;
             }

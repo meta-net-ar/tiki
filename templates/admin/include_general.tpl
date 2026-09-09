@@ -119,10 +119,17 @@
                 </div>
                 {preference name=log_mail}
                 {preference name=log_sql}
-                {preference name=log_failed_logins}
-                {preference name=log_file_path}
                 <div class="adminoptionboxchild" id="log_sql_childcontainer">
                     {preference name=log_sql_perf_min}
+                </div>
+                {preference name=log_failed_logins}
+                {preference name=log_file_path}
+                {preference name=log_tiki_enabled}
+                <div class="adminoptionboxchild" id="log_tiki_enabled_childcontainer">
+                    {preference name=log_tiki_destination}
+                    <div class="adminoptionboxchild log_tiki_destination_childcontainer file">
+                        {preference name=log_tiki_file}
+                    </div>
                 </div>
             </fieldset>
             <fieldset>

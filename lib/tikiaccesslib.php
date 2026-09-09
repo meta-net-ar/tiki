@@ -892,17 +892,19 @@ class TikiAccessLib extends TikiLib
     private function csrfPhpErrorLog($msg)
     {
         global $prefs;
-        self::lib('idslog')->warning('CSRF validation failed.', [
+        $ticket = $this->ticket ?: ($_POST['ticket'] ?? '');
+        (new \Tiki\Lib\Logs\Tiki_Monolog())->warning('CSRF validation failed.', [
             'component' => __CLASS__,
             'method' => __FUNCTION__,
             'message' => $msg,
+            'security_timeout' => tr('preference:') . $prefs['site_security_timeout'] ?? null,
+            'ticket'=> ($ticket !== '' ? $ticket : tr('empty')),
             'server' => $_SERVER['SERVER_NAME'] ?? '',
             'script' => $_SERVER['SCRIPT_NAME'] ?? '',
             'request_uri' => $_SERVER['REQUEST_URI'] ?? '',
             'origin' => $_SERVER['HTTP_ORIGIN'] ?? '',
             'referer' => $_SERVER['HTTP_REFERER'] ?? '',
             'request_method' => $_SERVER['REQUEST_METHOD'] ?? '',
-            'security_timeout' => $prefs['site_security_timeout'] ?? null,
         ]);
     }
 

@@ -3,7 +3,6 @@
 namespace Tiki\Package\Extension\Api;
 
 use Tiki\Package\Extension\Api;
-use TikiLib;
 
 class Search extends Api
 {
@@ -15,7 +14,7 @@ class Search extends Api
             try {
                 self::$sources[] = new $source->class();
             } catch (\Exception $e) {
-                TikiLib::lib('idslog')->error(tr('Unexpected error occurred'), [
+                (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('Unexpected error occurred'), [
                     'component' => __CLASS__,
                     'method' => __FUNCTION__,
                     'package' => $package,

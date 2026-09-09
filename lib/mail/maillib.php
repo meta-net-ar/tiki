@@ -35,6 +35,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
+use Tiki\Lib\Logs\Tiki_Monolog;
 use Tiki\Lib\mail\FileTransport;
 use Tiki\Lib\openpgp\OpenPGPTransport;
 
@@ -159,7 +160,7 @@ function tiki_mail_setup()
             }
             $tiki_maillib__mailer_default_transport = new Mailer($resolvedTransport);
         } catch (\Throwable  $e) {
-            TikiLib::lib('idslog')->error(tr('Error creating mail transport'), [
+            (new Tiki_Monolog())->error(tr('Error creating mail transport'), [
                 'component' => __FILE__,
                 'method' => __FUNCTION__,
                 'exception' => tr("Error creating mail transport: ") . $e->getMessage()
@@ -198,7 +199,7 @@ function tiki_get_admin_mail($fromName = null)
         try {
             $mail->from(new Address($prefs['sender_email'], $fromName ?: $prefs['sender_name']));
         } catch (Throwable $e) {
-            TikiLib::lib('idslog')->error(tr('Mailer configuration failed.'), [
+            (new Tiki_Monolog())->error(tr('Mailer configuration failed.'), [
                 'component' => __FUNCTION__,
                 'exception' => $e->getMessage(),
             ]);
@@ -228,7 +229,7 @@ function tiki_send_admin_mail($email, $recipientName, $subject, $textBody)
 function tiki_send_email($email)
 {
     global $prefs;
-    $logger = TikiLib::lib('idslog');
+    $logger = new Tiki_Monolog();
     if (! empty($prefs['mailer_redirect'])) {
         $email->to($prefs['mailer_redirect']);
         $email->getHeaders()->remove('Cc');

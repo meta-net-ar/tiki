@@ -69,7 +69,11 @@ class ZoteroLib extends TikiDb_Bridge
 
             return false;
         } catch (Exception $e) {
-            TikiLib::lib('logs')->add_log('Zotero', tr("Zotero get_references error: ") . $e->getMessage());
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr("Zotero get_references error: "), [
+                'component' => __CLASS__,
+                'method' => __METHOD__,
+                'exception' => $e->getMessage()
+            ]);
             return false;
         }
     }

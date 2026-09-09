@@ -56,7 +56,7 @@ class Search_GlobalSource_FileAttachmentSource implements Search_GlobalSource_In
                         }
                     }
                 } else {
-                    TikiLib::lib('idslog')->warning(
+                    (new \Tiki\Lib\Logs\Tiki_Monolog())->warning(
                         tr('Referenced file %0 from %1 %2 no longer exists.', $rel['itemId'], $objectType, $objectId),
                         [
                             'component' => __CLASS__,

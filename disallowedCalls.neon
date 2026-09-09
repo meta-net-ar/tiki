@@ -1,6 +1,11 @@
 parameters:
-	disallowedFunctionCalls:
-	    -
-	        function: 'error_log()'
-	        message: 'do not use error_log() in the script'
-	        errorTip: "Replace by Built-in 'TikiLib::lib('idslog')'"
+    disallowedFunctionCalls:
+        -
+            function: 'error_log()'
+            message: 'Do not use error_log() in the script'
+            errorTip:
+                - 'Use the Tiki\Lib\Logs\Tiki_Monolog class instead.'
+                - 'Available methods:'
+                - '- error() for errors and exceptions'
+                - '- warning() for warnings and recoverable issues'
+                - '- info() for informational messages'

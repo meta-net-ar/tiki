@@ -225,7 +225,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
             $access->output_serialized(['type' => 'success', 'results' => $references]);
         }
     } catch (Exception $e) {
-        TikiLib::lib('idslog')->error(tr('Unexpected error occurred'), [
+        (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('Unexpected error occurred'), [
             'component' => __FILE__,
             'exception' => tr("Zotero error: ") . $e->getMessage()
         ]);

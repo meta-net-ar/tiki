@@ -10,7 +10,7 @@ namespace Tiki\Mcp\Tools;
 use Mcp\Capability\Attribute\McpTool;
 use Mcp\Exception\ToolCallException;
 use Mcp\Schema\ToolAnnotations;
-use TikiLib;
+use Tiki\Lib\Logs\Tiki_Monolog;
 
 /**
  * MCP tools for wiki page operations.
@@ -35,13 +35,13 @@ class WikiTools
     private string $user;
     private string $ip;
 
-    private TikiLib $logger;
+    private Tiki_Monolog $logger;
 
     public function __construct(string $user, string $ip = '')
     {
         $this->user = $user;
         $this->ip = $ip;
-        $this->logger = TikiLib::lib('idslog');
+        $this->logger = new Tiki_Monolog();
     }
 
     // ──────────────────────────────────────────────────────────────────────
@@ -451,7 +451,7 @@ class WikiTools
      *
      * TikiLib methods sometimes echo directly -- this prevents that
      * from corrupting the JSON-RPC response body. Captured output
-    * is redirected to the IDS log for debugging.
+     * is redirected to tiki_monolog for debugging.
      *
      * @template T
      * @param callable(): T $fn

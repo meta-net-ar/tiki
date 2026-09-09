@@ -49,7 +49,7 @@ class OAuthLib extends TikiDb_Bridge
         try {
             return $client->send();
         } catch (\Exception $e) {
-            TikiLib::lib('idslog')->error(tr('OAuth request failed.'), [
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('OAuth request failed.'), [
                 'component' => __CLASS__,
                 'method' => __FUNCTION__,
                 'provider' => $provider_key,
@@ -79,7 +79,7 @@ class OAuthLib extends TikiDb_Bridge
             header('Location: ' . $authUrl);
             exit;
         } catch (\Exception $e) {
-            TikiLib::lib('idslog')->error(tr('OAuth request token failed.'), [
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('OAuth request token failed.'), [
                 'component' => __CLASS__,
                 'method' => __FUNCTION__,
                 'provider' => $provider_key,
@@ -127,7 +127,7 @@ class OAuthLib extends TikiDb_Bridge
             unset($_SESSION['OAUTH_REQUEST_' . $provider_key], $_SESSION['OAUTH_STATE_' . $provider_key]);
             return true;
         } catch (\Exception $e) {
-            TikiLib::lib('idslog')->error(tr('OAuth access request failed.'), [
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('OAuth access request failed.'), [
                 'component' => __CLASS__,
                 'method' => __FUNCTION__,
                 'provider' => $provider_key,

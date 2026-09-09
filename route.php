@@ -388,7 +388,7 @@ if (is_null($base) || is_null($path)) {
     header('HTTP/1.0 500 Internal Server Error');
     header('Content-Type: text/plain; charset=utf-8');
 
-    echo tr("Request could not be understood. Verify routing file.");
+    echo "Request could not be understood. Verify routing file.";
     exit;
 }
 
@@ -399,7 +399,7 @@ if ($inclusion) {
     $_SERVER['SCRIPT_NAME'] = $base . basename($inclusion);
     include __DIR__ . '/' . $inclusion;
 } else {
-    TikiLib::lib('idslog')->warning(
+    (new \Tiki\Lib\Logs\Tiki_Monolog())->warning(
         tr("No route found - full:%0 query:%1", $full, $_SERVER['QUERY_STRING']),
         [
             'component' => __FILE__,
@@ -418,7 +418,7 @@ if ($inclusion) {
         header('HTTP/1.0 404 Not Found');
         header('Content-Type: text/plain; charset=utf-8');
 
-        echo tr("No route found. Please see https://dev.tiki.org/URL+Rewriting+Revamp");
+        echo "No route found. Please see http://dev.tiki.org/URL+Rewriting+Revamp";
     } else {
         header('Location: ' . $noroute_url);
     }

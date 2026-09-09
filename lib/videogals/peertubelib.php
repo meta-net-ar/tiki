@@ -7,7 +7,7 @@
 
 namespace Tiki\Videogals;
 
-use TikiLib;
+use Tiki\Lib\Logs\Tiki_Monolog;
 
 class PeerTubeLib
 {
@@ -15,14 +15,14 @@ class PeerTubeLib
     private $initialized = false;
     private $localClientCache = null;
     /**
-     * @var TikiLib
+     * @var Tiki_Monolog
      */
-    private TikiLib $logger;
+    private Tiki_Monolog $logger;
 
     public function __construct($session_type = 0)
     {
         $this->sessionType = $session_type;
-        $this->logger = TikiLib::lib('idslog');
+        $this->logger = new Tiki_Monolog();
     }
 
     public function testSetup()

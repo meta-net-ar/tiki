@@ -22,6 +22,7 @@ $inputConfiguration = [
 
 require_once('tiki-setup.php');
 
+use Tiki\Lib\Logs\Tiki_Monolog;
 use Tiki\Sections;
 
 $section = Sections::SECTION_ADMIN;
@@ -121,7 +122,7 @@ $mailQueues = $emailQueuelib->listStalledEmailQueues($offset, $maxRecords, $sort
 $smarty->assign_by_ref('cant', $mailQueues['cant']);
 $smarty->assign_by_ref('total_cant', $mailQueues['total_cant']);
 $smarty->assign_by_ref('max_retries', $mailQueues['max_retries']);
-$logger = TikiLib::lib('idslog');
+$app_logger = new \Tiki\Lib\Logs\Tiki_Monolog();
 foreach ($mailQueues['data'] as $key => $message) {
     try {
         if (empty($message['message'])) {
@@ -134,7 +135,7 @@ foreach ($mailQueues['data'] as $key => $message) {
         $message['unreadable'] = false;
 
         if ($mail instanceof __PHP_Incomplete_Class || $mail === false) {
-            $logger->warning('Unreadable mail queue entry.', [
+            $app_logger->warning('Unreadable mail queue entry.', [
                 'component' => __FILE__,
                 'queue_id' => $message['queue_id'] ?? $message['messageId'] ?? 'unknown',
             ]);
@@ -148,7 +149,7 @@ foreach ($mailQueues['data'] as $key => $message) {
         }
 
         if (! $mail instanceof \Symfony\Component\Mime\Email) {
-            $logger->warning('Unsupported mail queue entry.', [
+            $app_logger->warning('Unsupported mail queue entry.', [
                 'component' => __FILE__,
                 'queue_id' => $message['queue_id'] ?? $message['messageId'] ?? 'unknown',
                 'class' => get_class($mail),
@@ -193,7 +194,7 @@ foreach ($mailQueues['data'] as $key => $message) {
         $message['body'] = $textBody . $htmlBody;
         $mailQueues['data'][$key] = $message;
     } catch (\Throwable $e) {
-        $logger->error(tr('Unable to process mail queue entry.'), [
+        $app_logger->error(tr('Unable to process mail queue entry.'), [
             'component' => __FILE__,
             'queue_id' => $message['queue_id'] ?? $message['messageId'] ?? 'unknown',
             'exception' => $e->getMessage(),

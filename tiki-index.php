@@ -296,10 +296,8 @@ if (empty($info)) {
                 $access->redirect($infoForSlug['pageSlug'], '', 301);
                 exit;
             } else {
-                TikiLib::lib('idslog')->warning(tr("Avoiding redirect loop: %0", $infoForSlug['pageSlug']), [
+                (new \Tiki\Lib\Logs\Tiki_Monolog())->warning(tr("Avoiding redirect loop: %0", $infoForSlug['pageSlug']), [
                     'component' => __FILE__,
-                    'originalPageRequested' => $originalPageRequested,
-                    'degeneratedSlug' => $degeneratedSlug,
                     'infoForSlug' => $infoForSlug,
                 ]);
             }

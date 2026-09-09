@@ -39,7 +39,7 @@ set_error_handler(function (int $number, string $message, string $file, int $lin
     }
     $errorEnabled = (bool)($number & (int)ini_get('error_reporting'));
     if ($errorEnabled) {
-        TikiLib::lib('idslog')->error(tr('Unexpected error occurred'),[
+        (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('Unexpected error occurred'),[
             'component' => __FUNCTION__,
             'exception' => "[MCP] $message on line $line of $file"
         ]);

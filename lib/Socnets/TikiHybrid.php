@@ -7,6 +7,7 @@
 //author : aris002@yahoo.co.uk
 namespace Tiki\Lib\Socnets;
 
+use Tiki\Lib\Logs\Tiki_Monolog;
 use Tiki\Lib\Socnets\Util;
 use Tiki\Lib\Socnets\PrefsGen;
 use Hybridauth\Logger\LoggerInterface;
@@ -89,7 +90,7 @@ class TikiHybrid extends LogsLib
 
         //$this->hybridauth = new Hybridauth($confhybrid, $guzzle, null, $this->logger );
         } catch (\Throwable $e) {
-            TikiLib::lib('idslog')->error( tr('Unexpected error occurred'), [
+            (new Tiki_Monolog())->error( tr('Unexpected error occurred'), [
                 'component' => __CLASS__,
                 'exception' => tr('TikiHybrid construct failed: ') . $e->getMessage(),
             ]);
