@@ -21,8 +21,6 @@ required:
   - reference_url
   - is_reference
   - hash
-  - search_data
-  - metadata
   - lastModif
   - last_user
   - lockedby
@@ -102,9 +100,11 @@ properties:
   search_data:
     type: string
     nullable: true
+    description: Extracted text used for indexing. Omitted when `omit_metadata=1`.
   metadata:
     type: string
     nullable: true
+    description: Embedded file metadata such as EXIF. Omitted when `omit_metadata=1`.
   lastModif:
     type: integer
     nullable: true
@@ -141,6 +141,7 @@ properties:
   ocr_data:
     type: string
     nullable: true
+    description: Text recovered by OCR. Omitted when `omit_metadata=1`.
   visible:
     type: string
     nullable: true

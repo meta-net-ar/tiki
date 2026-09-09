@@ -4635,10 +4635,12 @@ class TikiLib extends TikiDb_Bridge
         $preferences->insertOrUpdate(['value' => is_array($value) ? serialize($value) : $value], ['name' => $name]);
 
         if (isset($prefs)) {
+            // PHP 8.5 deprecates null as an array offset; normalize to ''.
+            $userKey = $user ?? '';
             if (isset($user_overrider_prefs) && in_array($name, $user_overrider_prefs)) {
                 $prefs['site_' . $name] = $value;
-            } elseif (isset($user_preferences[$user][$name])) {
-                $prefs[$name] = $user_preferences[$user][$name];
+            } elseif (isset($user_preferences[$userKey][$name])) {
+                $prefs[$name] = $user_preferences[$userKey][$name];
             } else {
                 $prefs[$name] = $value;
             }

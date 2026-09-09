@@ -1370,47 +1370,65 @@ class WikiLib extends TikiLib
     {
         global $user, $tikilib;
 
-        $query = 'update `tiki_pages` set `flag`=?, `lockedby`=? where `pageName`=?';
-        $result = $this->query($query, ['L', $user, $page]);
-
-        if (! empty($user)) {
-            $info = $tikilib->get_page_info($page);
-
-            $query = 'update `tiki_pages` set `user`=?, `comment`=?, `version`=? where `pageName`=?';
-            $this->query($query, [$user, tra('Page locked'), $info['version'] + 1, $page]);
-
-            $query = 'insert into `tiki_history`(`pageName`, `version`, `lastModif`, `user`, `ip`, `comment`, `data`, `description`)' .
-                ' values(?,?,?,?,?,?,?,?)';
-            $this->query(
-                $query,
-                [
-                    $page,
-                    (int) $info['version'] + 1,
-                    (int) $info['lastModif'],
-                    $user,
-                    $info['ip'],
-                    tra('Page locked'),
-                    $info['data'],
-                    $info['description']
-                ]
-            );
+        // Missing page: a history row here collides with the (pageName, version) key on retry
+        $info = $tikilib->get_page_info($page);
+        if (! $info) {
+            return false;
         }
 
-        return $result;
+        try {
+            $this->beginTransaction();
+
+            $query = 'update `tiki_pages` set `flag`=?, `lockedby`=? where `pageName`=?';
+            $result = $this->query($query, ['L', $user, $page]);
+
+            if (! empty($user)) {
+                $query = 'update `tiki_pages` set `user`=?, `comment`=?, `version`=? where `pageName`=?';
+                $this->query($query, [$user, tra('Page locked'), $info['version'] + 1, $page]);
+
+                $query = 'insert into `tiki_history`(`pageName`, `version`, `lastModif`, `user`, `ip`, `comment`, `data`, `description`)' .
+                    ' values(?,?,?,?,?,?,?,?)';
+                $this->query(
+                    $query,
+                    [
+                        $page,
+                        (int) $info['version'] + 1,
+                        (int) $info['lastModif'],
+                        $user,
+                        $info['ip'],
+                        tra('Page locked'),
+                        $info['data'],
+                        $info['description']
+                    ]
+                );
+            }
+
+            $this->commit();
+
+            // Result object, not bool: tiki-admin_polls.php reads numRows() off it
+            return $result;
+        } catch (Exception $e) {
+            $this->rollBack();
+            return false;
+        }
     }
 
     public function unlock_page($page)
     {
         global $user;
         $tikilib = TikiLib::lib('tiki');
+
+        $info = $tikilib->get_page_info($page);
+        if (! $info) {
+            return false;
+        }
+
         try {
             $this->beginTransaction();
             $query = "update `tiki_pages` set `flag`='' where `pageName`=?";
             $this->query($query, [$page]);
 
             if (isset($user)) {
-                $info = $tikilib->get_page_info($page);
-
                 $query = "update `tiki_pages` set `user`=?, `comment`=?, `version`=? where `pageName`=?";
                 $this->query($query, [$user, tra('Page unlocked'), $info['version'] + 1, $page]);
 

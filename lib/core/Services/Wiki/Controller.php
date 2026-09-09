@@ -781,7 +781,7 @@ class Services_Wiki_Controller
             $pages = array_map(function ($pageName) {
                 return ['pageName' => $pageName];
             }, $util->items);
-            $pages = Perms::simpleFilter('wiki page', 'pageName', 'view', $pages);
+            $pages = Perms::simpleFilter('wiki page', 'pageName', 'lock', $pages);
             $util->items = array_map(function ($pageName) {
                 return array_pop($pageName);
             }, $pages);
@@ -811,13 +811,19 @@ class Services_Wiki_Controller
         //after confirm submit - perform action
         } elseif ($util->checkCsrf()) {
             $util->setVars($input, $this->filters, 'items');
+            if (empty($util->items)) {
+                throw new Services_Exception(tr('No pages were selected. Please select one or more pages.'), 400);
+            }
             $pages = array_map(function ($pageName) {
                 return ['pageName' => $pageName];
             }, $util->items);
-            $pages = Perms::simpleFilter('wiki page', 'pageName', 'view', $pages);
+            $pages = Perms::simpleFilter('wiki page', 'pageName', 'lock', $pages);
             $util->items = array_map(function ($pageName) {
                 return array_pop($pageName);
             }, $pages);
+            if (empty($util->items)) {
+                throw new Services_Exception(tr('You do not have permission to lock the selected pages.'), 403);
+            }
             $errorpages = [];
             foreach ($util->items as $page) {
                 $res = TikiLib::lib('wiki')->lock_page($page);
@@ -908,17 +914,24 @@ class Services_Wiki_Controller
             //after confirm submit - perform action
         } elseif ($util->checkCsrf()) {
             $util->setVars($input, $this->filters, 'items');
+            if (empty($util->items)) {
+                throw new Services_Exception(tr('No pages were selected. Please select one or more pages.'), 400);
+            }
             $admin = Perms::get()->admin_wiki;
             global $user;
             foreach ($util->items as $key => $page) {
                 $pinfo = TikiLib::lib('tiki')->get_page_info($page);
                 if (
+                    ! $pinfo ||
                     ! ($pinfo['flag'] == 'L' &&
                     ($admin || ($user == $pinfo['lockedby']) ||
                     (! $pinfo['lockedby'] && $user == $pinfo['user'])))
                 ) {
                     unset($util->items[$key]);
                 }
+            }
+            if (empty($util->items)) {
+                throw new Services_Exception(tr('The selected pages are not locked, or you do not have permission to unlock them.'), 403);
             }
             $errorpages = [];
             foreach ($util->items as $page) {

@@ -1942,8 +1942,8 @@ class CategLib extends ObjectLib
 
         if ($prefs['feature_user_watches'] == 'y') {
             include_once('lib/notifications/notificationemaillib.php');
-            $foo = parse_url($_SERVER["REQUEST_URI"]);
-            $machine = $this->httpPrefix(true) . dirname($foo["path"]);
+            $foo = parse_url($_SERVER["REQUEST_URI"] ?? "");
+            $machine = $this->httpPrefix(true) . dirname($foo["path"] ?? "");
             $values['event'] = "category_changed";
             sendCategoryEmailNotification($values);
         }

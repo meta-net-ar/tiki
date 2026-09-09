@@ -246,6 +246,166 @@ class ApiWikiPostTest extends ApiBaseWikiTest
         $this->assertFalse((bool) $wikilib->is_locked($pageName), 'Page should be unlocked after unlock operation');
     }
 
+    public function testApiLockNonexistentPageIsReportedAsError()
+    {
+        $pageName = 'ApiLockMissing_' . uniqid();
+
+        $response = $this->makeApiRequest('POST', '/wiki/lock', 'Admins', [
+            'items' => [$pageName],
+        ], 'application/x-www-form-urlencoded');
+
+        $this->assertResponseStatus(200, $response);
+        $body = $this->getResponseBody($response);
+
+        $feedbackMes = $body['feedback']['action'][0]['mes'] ?? '';
+        $this->assertContains(
+            'The following page was not locked due to an error:',
+            $feedbackMes,
+            'A page that does not exist should be reported as an error, not as locked'
+        );
+
+        $history = TikiLib::lib('tiki')->fetchAll(
+            'SELECT historyId FROM tiki_history WHERE pageName = ?',
+            [$pageName]
+        );
+        $this->assertCount(0, $history, 'No history row should be written for a page that does not exist');
+    }
+
+    /** Repeating this used to hit the tiki_history unique key and return Tiki's HTML error page. */
+    public function testApiLockNonexistentPageTwiceStaysJson()
+    {
+        $pageName = 'ApiLockMissingTwice_' . uniqid();
+        $payload  = ['items' => [$pageName]];
+
+        $first = $this->makeApiRequest('POST', '/wiki/lock', 'Admins', $payload, 'application/x-www-form-urlencoded');
+        $this->assertIsArray($this->getResponseBody($first), 'First call should return JSON');
+
+        $second = $this->makeApiRequest('POST', '/wiki/lock', 'Admins', $payload, 'application/x-www-form-urlencoded');
+        $body = $this->getResponseBody($second);
+
+        $this->assertIsArray($body, 'Repeating the call should still return JSON, not an HTML error page');
+        $feedbackMes = $body['feedback']['action'][0]['mes'] ?? '';
+        $this->assertContains(
+            'The following page was not locked due to an error:',
+            $feedbackMes,
+            'The repeated call should report the same error as the first'
+        );
+    }
+
+    public function testApiLockMultiplePages()
+    {
+        $uid = uniqid();
+        $first  = 'ApiLockMultiA_' . $uid;
+        $second = 'ApiLockMultiB_' . $uid;
+        static::createWikiPage($first, 'Page for multi lock test');
+        static::createWikiPage($second, 'Page for multi lock test');
+
+        $response = $this->makeApiRequest('POST', '/wiki/lock', 'Admins', [
+            'items' => [$first, $second],
+        ], 'application/x-www-form-urlencoded');
+
+        $this->assertResponseStatus(200, $response);
+        $body = $this->getResponseBody($response);
+        $this->assertValidRefreshFeedbackResponse($body);
+
+        $feedbackItems = $body['feedback']['action'][0]['items'] ?? [];
+        $this->assertContains($first, $feedbackItems, 'Both pages should be listed as locked');
+        $this->assertContains($second, $feedbackItems, 'Both pages should be listed as locked');
+
+        $wikilib = TikiLib::lib('wiki');
+        $this->assertTrue((bool) $wikilib->is_locked($first), 'First page should be locked');
+        $this->assertTrue((bool) $wikilib->is_locked($second), 'Second page should be locked');
+    }
+
+    public function testApiLockWithoutItemsReturnsError()
+    {
+        $response = $this->makeApiRequest('POST', '/wiki/lock', 'Admins', [], 'application/x-www-form-urlencoded');
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 400, 'No pages were selected.');
+    }
+
+    public function testApiUnlockWithoutItemsReturnsError()
+    {
+        $response = $this->makeApiRequest('POST', '/wiki/unlock', 'Admins', [], 'application/x-www-form-urlencoded');
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 400, 'No pages were selected.');
+    }
+
+    public function testApiUnlockNonexistentPageIsRefused()
+    {
+        $pageName = 'ApiUnlockMissing_' . uniqid();
+
+        $response = $this->makeApiRequest('POST', '/wiki/unlock', 'Admins', [
+            'items' => [$pageName],
+        ], 'application/x-www-form-urlencoded');
+
+        $body = $this->getResponseBody($response);
+        $this->assertValidErrorResponse($body, 403, 'not locked');
+
+        $history = TikiLib::lib('tiki')->fetchAll(
+            'SELECT historyId FROM tiki_history WHERE pageName = ?',
+            [$pageName]
+        );
+        $this->assertCount(0, $history, 'No history row should be written for a page that does not exist');
+    }
+
+    public function testApiLockPageRequiresLockPermission()
+    {
+        $pageName = 'ApiLockPerm_' . uniqid();
+        static::createWikiPage($pageName, 'Page for lock permission test');
+
+        $userlib = TikiLib::lib('user');
+        $wikilib = TikiLib::lib('wiki');
+        $hadLock = (bool) $userlib->group_has_permission('Anonymous', 'tiki_p_lock');
+
+        try {
+            $userlib->remove_permission_from_group('tiki_p_lock', 'Anonymous');
+
+            $response = $this->makeApiRequest('POST', '/wiki/lock', null, [
+                'items' => [$pageName],
+            ], 'application/x-www-form-urlencoded');
+
+            $this->assertValidErrorResponse($this->getResponseBody($response), 403);
+            $this->assertFalse((bool) $wikilib->is_locked($pageName), 'View permission alone must not lock a page');
+
+            $userlib->assign_permission_to_group('tiki_p_lock', 'Anonymous');
+
+            $response = $this->makeApiRequest('POST', '/wiki/lock', null, [
+                'items' => [$pageName],
+            ], 'application/x-www-form-urlencoded');
+
+            $this->assertResponseStatus(200, $response);
+            $this->assertTrue((bool) $wikilib->is_locked($pageName), 'tiki_p_lock should allow locking');
+        } finally {
+            if (! $hadLock) {
+                $userlib->remove_permission_from_group('tiki_p_lock', 'Anonymous');
+            }
+        }
+    }
+
+    public function testApiUnlockPageWithoutPermissionIsRefused()
+    {
+        $pageName = 'ApiUnlockPerm_' . uniqid();
+        static::createWikiPage($pageName, 'Page for unlock permission test');
+
+        // Lock it as admin so the page has an owner Anonymous cannot claim
+        $this->makeApiRequest('POST', '/wiki/lock', 'Admins', [
+            'items' => [$pageName],
+        ], 'application/x-www-form-urlencoded');
+
+        $wikilib = TikiLib::lib('wiki');
+        $this->assertTrue((bool) $wikilib->is_locked($pageName), 'Page should be locked before the test');
+
+        $response = $this->makeApiRequest('POST', '/wiki/unlock', null, [
+            'items' => [$pageName],
+        ], 'application/x-www-form-urlencoded');
+
+        $this->assertValidErrorResponse($this->getResponseBody($response), 403);
+        $this->assertTrue((bool) $wikilib->is_locked($pageName), 'Anonymous must not be able to unlock a page');
+    }
+
     public function testApiLockPageWithFeatureDisabled()
     {
         // Temporarily disable feature_wiki_usrlock

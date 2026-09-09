@@ -1,27 +1,45 @@
 ---
 post:
-  description: Unlock pages
+  description: |
+    Unlock one or more wiki pages.
+
+    Send one `items[]` entry per page: `items[]=FirstPage&items[]=SecondPage`.
+    Only pages that are currently locked and that the caller may unlock are
+    considered.
   requestBody:
     required: true
     content:
       application/x-www-form-urlencoded:
         schema:
           type: object
+          required:
+            - items[]
           properties:
             items[]:
               type: array
-              description: The array of page names to unlock
+              description: Names of the pages to unlock
+              minItems: 1
               items:
                 type: string
+        encoding:
+          items[]:
+            style: form
+            explode: true
   responses:
     '200':
-      description: unlock pages response
+      description: Feedback listing the pages unlocked, and any that could not be
       content:
         application/json:
           schema:
             $ref: schemas-RefreshFeedbackResponse.yaml
+    '400':
+      description: No pages selected
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
     '403':
-      description: forbidden
+      description: Forbidden, or no selected page is locked and unlockable by the caller
       content:
         application/json:
           schema:
