@@ -388,22 +388,24 @@ import { defaults as defaultControls } from "ol/control";
                     color: fillColor,
                 };
 
-                function getLineDash(lineDash) {
+                function getLineDash(lineDash, width) {
                     if (typeof lineDash !== "string") {
                         return lineDash;
                     }
                     // map ol2 values to ol3+
+                    width = width || 1;
+
                     switch (lineDash) {
                         case "dot":
-                            return [1, 3];
+                            return [1, 2 * width];
                         case "dash":
-                            return [5, 5];
+                            return [width, 2 * width];
                         case "dashdot":
-                            return [5, 5, 1, 5];
+                            return [width, 2 * width, 1, 2 * width];
                         case "longdash":
-                            return [10, 5];
+                            return [2 * width, 2 * width];
                         case "longdashdot":
-                            return [10, 5, 1, 5];
+                            return [2 * width, 2 * width, 1, 2 * width];
                         default:
                             if (lineDash.length) {
                                 // array of up to 4 integers
@@ -414,10 +416,11 @@ import { defaults as defaultControls } from "ol/control";
                     }
                 }
 
+                const width = parseInt(feature.get("stroke-width") || feature.get("width")) ?? 2;
                 const stroke = {
                     color: color,
-                    width: feature.get("stroke-width") ?? 2,
-                    lineDash: getLineDash(feature.get("stroke-line-dash") ?? feature.get("stroke-dashstyle")),
+                    width: width,
+                    lineDash: getLineDash(feature.get("stroke-line-dash") ?? feature.get("stroke-dashstyle"), width),
                     lineCap: feature.get("stroke-line-cap") ?? "round",
                     lineJoin: feature.get("stroke-line-join") ?? "round",
                     lineDashOffset: feature.get("stroke-line-dash-offset") ?? 0,
