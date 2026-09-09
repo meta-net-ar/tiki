@@ -22,7 +22,7 @@ customElements.define(
                 },
                 { immediate: true, deep: true }
             );
-            return () => h(Select, { ...internalState, emitValueChange }, ctx.slots);
+            return () => h(Select, { ...internalState, emitValueChange, _expose: ctx.expose }, ctx.slots);
         },
         {
             styles: [styles],

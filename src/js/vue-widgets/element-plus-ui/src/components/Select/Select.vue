@@ -10,13 +10,18 @@ const { normalize, parseValue } = usePropParsers()
 
 defineOptions({ inheritAttrs: false })
 
-const props = defineProps(['options', 'placeholder', 'emitValueChange', 'value', 'multiple', 'isInvalid', 'max', 'clearable', 'collapseTags', 'filterable', 'allowCreate', 'maxCollapseTags', 'ordering', 'group', 'language', 'size', 'remoteSourceUrl']);
+const props = defineProps(['_expose', 'options', 'placeholder', 'emitValueChange', 'value', 'multiple', 'isInvalid', 'max', 'clearable', 'collapseTags', 'filterable', 'allowCreate', 'maxCollapseTags', 'ordering', 'group', 'language', 'size', 'remoteSourceUrl']);
 
 const modelValue = ref(parseValue(props.value));
+const setValue = (value) => {
+    modelValue.value = parseValue(value);
+};
 
 watch(() => props.value, (newValue) => {
     modelValue.value = parseValue(newValue);
 });
+
+props._expose?.({ setValue });
 
 const isInvalid = computed(() => normalize(props.isInvalid, false));
 const normalizeBooleanAttribute = (value) => {

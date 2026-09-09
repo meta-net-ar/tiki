@@ -294,9 +294,10 @@
     }
 
     function ext_select() {
+        if ($('#select_exts').prop('selectedIndex') === 0) return;
         var value = $('#select_exts option:selected').val();
         var text = $('#select_exts option:selected').html();
-        $('#select_exts option:nth-child(1)').attr('selected', true);
+        $('#select_exts').prop('selectedIndex', 0).trigger('change');
         ext_add(value, htmlspecialchars(text), '');
     }
 

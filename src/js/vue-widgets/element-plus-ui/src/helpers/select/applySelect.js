@@ -58,10 +58,11 @@ export function syncSelectOptions(elementPlusSelect, select) {
     $(elementPlusSelect).attr("options", JSON.stringify(options));
 
     const $select = $(select);
-    if ($select.prop("multiple")) {
-        $(elementPlusSelect).attr("value", JSON.stringify($select.val() || []));
+    const value = $select.prop("multiple") ? JSON.stringify($select.val() || []) : $select.val();
+    if (typeof elementPlusSelect.setValue === "function") {
+        elementPlusSelect.setValue(value);
     } else {
-        $(elementPlusSelect).attr("value", $select.val());
+        $(elementPlusSelect).attr("value", value);
     }
 
     if (options.some((option) => option.group)) {
