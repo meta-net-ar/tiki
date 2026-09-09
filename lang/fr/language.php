@@ -25471,5 +25471,6 @@ $lang_current = array(
 "Reference hash:" => "Hachage de référence:",
 "Search and select what you are looking for from the options that appear." => "Recherchez et sélectionnez ce que vous cherchez parmi les options qui apparaissent.",
 "Your active .htaccess does not match the reference _htaccess shipped with Tiki." => "Votre .htaccess actif ne correspond pas au _htaccess de référence fourni avec Tiki.",
+"Tiki Share" => "Partage Tiki",
 );
 $lang = array_replace($lang, $lang_current);
