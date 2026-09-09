@@ -28,6 +28,18 @@ class Services_Edit_Utilities
         $content = $input->content->wikicontent();
         $index = $input->index->int();
         $params = $input->asArray('params');
+        if (array_filter($params, 'is_array')) {
+            $scalarParams = array_map(function ($value) {
+                return is_array($value) ? '' : $value;
+            }, $params);
+            $pluginInfo = $parserlib->plugin_info($type, $scalarParams);
+            foreach ($params as $key => $value) {
+                if (is_array($value)) {
+                    $separator = $pluginInfo['params'][$key]['separator'] ?? '|';
+                    $params[$key] = implode($separator, array_filter($value, 'is_scalar'));
+                }
+            }
+        }
         $appendParams = $input->appendParams->int();
         // Checking permission from plugin
         $is_allowed = $parserlib->check_permission_from_plugin_params($params);
