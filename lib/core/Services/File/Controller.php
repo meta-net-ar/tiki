@@ -689,13 +689,22 @@ class Services_File_Controller
 
         $result = $fileGallery->list_files($offset, $maxRecords, $sort_mode, $find, $galleryId);
 
+        $files = $result['data'];
+        if ($input->omit_metadata->int()) {
+            // slimmer result: these fields can be huge
+            $files = array_map(function ($file) {
+                unset($file['metadata'], $file['search_data'], $file['ocr_data']);
+                return $file;
+            }, $files);
+        }
+
         return [
             'title' => tr('List files'),
             'galleryId' => $galleryId,
             'offset' => $offset,
             'maxRecords' => $maxRecords,
             'count' => $result['count'],
-            'result' => $result['data'],
+            'result' => $files,
         ];
     }
 
