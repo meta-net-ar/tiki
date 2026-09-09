@@ -222,8 +222,9 @@ form[name=editpageform] .mb-3 .tab-content .alert-warning {
 }
 
 // cookie settings module
-.box-cookiesettings {
+.modules .module.box-cookiesettings {
     position: fixed;
+    padding: 1rem;
 }
 
 .box-cookiesettings.none {
