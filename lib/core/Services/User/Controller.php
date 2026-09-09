@@ -1159,9 +1159,7 @@ class Services_User_Controller
         $action = $input->timezone_action->text();
 
         if ($action === 'never') {
-            if ($tikilib->set_preference('user_localtimezonesync', 'n')) {
-                $tikilib->set_user_preference($user, 'localtimezonesync', 'n');
-            }
+            $tikilib->set_user_preference($user, 'user_localtimezonesync', 'n');
             $access->redirect($_SERVER['HTTP_REFERER']);
             return [];
         }
