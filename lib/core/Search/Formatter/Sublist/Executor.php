@@ -245,29 +245,24 @@ class Executor
         $offset = $this->paginationOffset;
         $max = $this->paginationMax;
 
-        $paginate = function ($fullList) use ($key, $offset, $max) {
-            return [
-                $key => array_slice($fullList, $offset, $max),
-                $key . '_count' => count($fullList),
-                $key . '_offset' => $offset,
-                $key . '_max' => $max,
-            ];
-        };
-
         foreach ($this->data as $i => $row) {
             if (empty($row)) {
                 continue;
             }
             if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
                 foreach ($row as $j => $_) {
-                    foreach ($paginate($this->data[$i][$j][$key] ?? []) as $infoKey => $value) {
-                        $this->data[$i][$j][$infoKey] = $value;
-                    }
+                    $fullList = $this->data[$i][$j][$key] ?? [];
+                    $this->data[$i][$j][$key] = array_slice($fullList, $offset, $max);
+                    $this->data[$i][$j][$key . '_count'] = count($fullList);
+                    $this->data[$i][$j][$key . '_offset'] = $offset;
+                    $this->data[$i][$j][$key . '_max'] = $max;
                 }
             } else {
-                foreach ($paginate($this->data[$i][$key] ?? []) as $infoKey => $value) {
-                    $this->data[$i][$infoKey] = $value;
-                }
+                $fullList = $this->data[$i][$key] ?? [];
+                $this->data[$i][$key] = array_slice($fullList, $offset, $max);
+                $this->data[$i][$key . '_count'] = count($fullList);
+                $this->data[$i][$key . '_offset'] = $offset;
+                $this->data[$i][$key . '_max'] = $max;
             }
         }
     }
