@@ -16,7 +16,13 @@ function module_most_commented_info()
         'params' => [
             'objectType' => [
                 'name' => tra('Object Type'),
-                'description' => tra('Type of objects to consider.') . ' ' . tra('Possible values: wiki (Wiki pages), blog (blog posts), article (articles).') . ' ' . tra('Default:') . ' wiki'
+                'description' => tra('Type of objects to consider.'),
+                'options' => [
+                    ['text' => tra('Default: Wiki pages'), 'value' => ''],
+                    ['text' => tra('Wiki pages'), 'value' => 'wiki'],
+                    ['text' => tra('Blog posts'), 'value' => 'blog'],
+                    ['text' => tra('Articles'), 'value' => 'article'],
+                ],
             ],
             'objectLanguageFilter' => [
                 'name' => tra('Language Filter'),

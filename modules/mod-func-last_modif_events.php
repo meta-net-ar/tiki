@@ -27,6 +27,11 @@ function module_last_modif_events_info()
             'nodate' => [
                 'name' => tra('Hide Date'),
                 'description' => tra('If set to "y", it will hide date.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ]
         ],
         'common_params' => ['nonums', 'rows']

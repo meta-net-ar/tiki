@@ -16,8 +16,14 @@ function module_switch_lang_info()
         'params' => [
             'mode' => [
                 'name' => tra('Display mode'),
-                'description' => tra('Changes how the list of languages is displayed. Possible values are droplist, flags and words. Defaults to droplist.'),
+                'description' => tra('Changes how the list of languages is displayed.'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Drop list'), 'value' => ''],
+                    ['text' => tra('Drop list'), 'value' => 'droplist'],
+                    ['text' => tra('Flags'), 'value' => 'flags'],
+                    ['text' => tra('Words'), 'value' => 'words'],
+                ],
             ],
         ],
     ];

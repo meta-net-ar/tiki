@@ -16,8 +16,13 @@ function module_search_wiki_page_info()
         'params' => [
             'exact' => [
                 'name' => tra('Exact Match'),
-                'description' => tra('Exact match checkbox checked by default if set to "y".') . " " . tr('Default: "n".'),
-                'filter' => 'alpha'
+                'description' => tra('Exact match checkbox checked by default if set to "y".'),
+                'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
     ];

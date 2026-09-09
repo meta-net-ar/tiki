@@ -16,11 +16,21 @@ function module_blog_last_comments_info()
         'params' => [
             'nodate' => [
                 'name' => tra('No date'),
-                'description' => tra('If set to "y", the date of comments is not displayed in the module box.') . " " . tra('Default: "n".')
+                'description' => tra('If set to "y", the date of comments is not displayed in the module box.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'moretooltips' => [
                 'name' => tra('Verbose tooltips'),
-                'description' => tra('If set to "y", blog post title is only visible as a tooltip and not displayed.') . " " . tra('Default: "n"') . " " . tra('Options: "y,n"')
+                'description' => tra('If set to "y", blog post title is only visible as a tooltip and not displayed.') . " " . tra('Options: "y,n"'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ]
         ],
         'common_params' => ['nonums', 'rows']

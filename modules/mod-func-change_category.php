@@ -27,11 +27,21 @@ function module_change_category_info()
             ],
             'path' => [
                 'name' => tra('Display path'),
-                'description' => tra('Unless set to "n", display relative category paths in the category tree rather than category names.') . " " . tra('Paths are relative to the root category, which is not displayed.') . " " . tra('Example value:') . ' "n". ' . tra('Not set by default.'),
+                'description' => tra('Display relative category paths in the category tree rather than category names.') . " " . tra('Paths are relative to the root category, which is not displayed.'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'multiple' => [
                 'name' => tra('Multiple categories'),
-                'description' => tra('If set to "n", only allows categorizing in one category (from those displayed).') . " " . tra('Not set by default.'),
+                'description' => tra('Allow categorizing in more than one category (from those displayed).'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'categorize' => [
                 'name' => tra('Categorize'),
@@ -39,24 +49,49 @@ function module_change_category_info()
             ],
             'shy' => [
                 'name' => tra('Shy'),
-                'description' => tra('If set to "y", the module is not shown on pages which are not already categorized.') . " " . tra('Not set by default.'),
+                'description' => tra('If set to "y", the module is not shown on pages which are not already categorized.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'detail' => [
                 'name' => tra('Detailed'),
-                'description' => tra('If set to "y", shows a list of categories in which the object is. If deletion is not disabled, it is done with the list.') . " " . tra('Not set by default.'),
+                'description' => tra('If set to "y", shows a list of categories in which the object is. If deletion is not disabled, it is done with the list.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'del' => [
                 'name' => tra('Unassign'),
-                'description' => tra('If set to "n", the detailed list of categories will not offer to unassign a category.') . " " . tra('Not set by default.'),
+                'description' => tra('The detailed list of categories offers to unassign a category.'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
                 'depends' => 'detail'
             ],
             'add' => [
                 'name' => tra('Assign'),
-                'description' => tra('If set to "y", allow to assign new categories.') . " " . tra('Example values: y, n.') . " " . tra('Default value: y.'),
+                'description' => tra('If set to "y", allow to assign new categories.'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'group' => [
                 'name' => tra('Group filter'),
-                'description' => tra('Very particular filter option. If set to "y", only categories with a name matching one of the user\'s groups are shown, and descendants of these matching categories.') . " " . tra('Example values: y, n.') . " " . tra('Default value: n.'),
+                'description' => tra('Very particular filter option. If set to "y", only categories with a name matching one of the user\'s groups are shown, and descendants of these matching categories.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'imgUrlNotIn' => [
                 'name' => tra('Image URL not in category'),

@@ -42,7 +42,12 @@ function module_menupage_info()
             ],
             'menu_type' => [
                 'name' => tra('Menu style'),
-                'description' => tra('Display the page as a menu (horiz / vert)'),
+                'description' => tra('Display the page as a menu.'),
+                'options' => [
+                    ['text' => tra('Default: Horizontal'), 'value' => ''],
+                    ['text' => tra('Horizontal'), 'value' => 'horiz'],
+                    ['text' => tra('Vertical'), 'value' => 'vert'],
+                ],
                 'filter' => 'alpha',
                 'required' => false,
             ],

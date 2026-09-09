@@ -15,23 +15,43 @@ function module_poweredby_info()
         'params' => [
             'tiki' => [
                 'name' => tra('Tiki'),
-                'description' => tra('Shows "Powered by Tiki Wiki CMS Groupware" message') . ' (y/n)',
+                'description' => tra('Shows "Powered by Tiki Wiki CMS Groupware" message'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'version' => [
                 'name' => tra('Version'),
-                'description' => tra('Tiki version info') . ' (y/n)',
+                'description' => tra('Tiki version info'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'credits' => [
                 'name' => tra('Credits'),
-                'description' => tra('Shows theme credits (contents of credits.tpl)') . ' (y/n)',
+                'description' => tra('Shows theme credits (contents of credits.tpl)'),
                 'filter' => 'alpha',
-                        ],
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+            ],
             'icons' => [
                 'name' => tra('Icons'),
-                'description' => tra('Shows various "powered by" icons') . ' (y/n)',
+                'description' => tra('Shows various "powered by" icons'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
     ];

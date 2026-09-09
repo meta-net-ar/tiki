@@ -104,37 +104,12 @@
                                                 </option>
                                             {/foreach}
                                         </select>
-                                    {elseif isset($name) and $name eq 'type' and $assign_info.name eq 'Menu'}
-                                        <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" class="form-control">
-                                            <option value="horiz" {if isset($param.value) && $param.value eq 'horiz'}selected="selected"{/if}>horiz</option>
-                                            <option value="vert" {if isset($param.value) && $param.value eq 'vert'}selected="selected"{/if}>vert</option>
-                                        </select>
-                                    {elseif isset($name) and $name eq 'device'}
-                                        <select multiple="multiple" id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}][]" class="form-control">
-                                            <option value="HIDE_ALL" {if isset($param.value) && in_array("HIDE_ALL", $param.value)}selected="selected"{/if}>Hidden on all</option>
-                                            <option value="HIDE_XS" {if isset($param.value) && in_array("HIDE_XS", $param.value)}selected="selected"{/if}>Hidden only on xs (<576px)</option>
-                                            <option value="HIDE_SM" {if isset($param.value) && in_array("HIDE_SM", $param.value)}selected="selected"{/if}>Hidden only on sm (576px–767px)</option>
-                                            <option value="HIDE_MD" {if isset($param.value) && in_array("HIDE_MD", $param.value)}selected="selected"{/if}>Hidden only on md (768px–991px)</option>
-                                            <option value="HIDE_LG" {if isset($param.value) && in_array("HIDE_LG", $param.value)}selected="selected"{/if}>Hidden only on lg (992px–1199px)</option>
-                                            <option value="HIDE_XL" {if isset($param.value) && in_array("HIDE_XL", $param.value)}selected="selected"{/if}>Hidden only on xl (1200px–1399px)</option>
-                                            <option value="HIDE_XXL" {if isset($param.value) && in_array("HIDE_XXL", $param.value)}selected="selected"{/if}>Hidden only on xxl (≥1400px)</option>
-                                            <option value="SHOW_ALL" {if isset($param.value) && in_array("SHOW_ALL", $param.value)}selected="selected"{/if}>Visible on all</option>
-                                            <option value="SHOW_XS" {if isset($param.value) && in_array("SHOW_XS", $param.value)}selected="selected"{/if}>Visible only on xs (<576px)</option>
-                                            <option value="SHOW_SM" {if isset($param.value) && in_array("SHOW_SM", $param.value)}selected="selected"{/if}>Visible only on sm (576px–767px)</option>
-                                            <option value="SHOW_MD" {if isset($param.value) && in_array("SHOW_MD", $param.value)}selected="selected"{/if}>Visible only on md (768px–991px)</option>
-                                            <option value="SHOW_LG" {if isset($param.value) && in_array("SHOW_LG", $param.value)}selected="selected"{/if}>Visible only on lg (992px–1199px)</option>
-                                            <option value="SHOW_XL" {if isset($param.value) && in_array("SHOW_XL", $param.value)}selected="selected"{/if}>Visible only on xl (1200px–1399px)</option>
-                                            <option value="SHOW_XXL" {if isset($param.value) && in_array("SHOW_XXL", $param.value)}selected="selected"{/if}>Visible only on xxl (≥1400px)</option>
-                                            <option value="SHOW_PRINT" {if isset($param.value) && in_array("SHOW_PRINT", $param.value)}selected="selected"{/if}>Print only (Hide on screen)</option>
-                                            <option value="SHOW_SCREEN" {if isset($param.value) && in_array("SHOW_SCREEN", $param.value)}selected="selected"{/if}>Screen only (Hide on print)</option>
-                                        </select>
-
                                     {elseif $param.type eq 'textarea'}
                                         <textarea type="text" id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]"{if !empty($param.filter)} class="{$param.filter} form-control"{else} class="{$param.filter} form-control"{/if}>{$param.value|escape}</textarea>
-                                    {elseif $param.type eq 'select' and isset($param.options) and is_array($param.options)}
+                                    {elseif $param.type eq 'select' or ! empty($param.options)}
                                         <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]{if isset($param.separator)}[]{/if}" class="form-control" {if isset($param.separator)}multiple="multiple"{/if}>
-                                            {foreach from=$param.options key=optionKey item=optionValue}
-                                                <option value="{$optionKey|escape}" {if (is_array($param.value) and in_array($optionKey, $param.value)) or $param.value eq $optionKey}selected="selected"{/if}>{$optionValue|escape}</option>
+                                            {foreach from=$param.options item=option}
+                                                <option value="{$option.value|escape}" {if (is_array($param.value) and in_array($option.value, $param.value)) or $param.value eq $option.value}selected="selected"{/if}>{$option.text|escape}</option>
                                             {/foreach}
                                         </select>
                                     {else}

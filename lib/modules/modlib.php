@@ -947,19 +947,34 @@ class ModLib extends TikiLib
                 ],
                 'nobox' => [
                     'name' => tra('No Box'),
-                    'description' => 'y|n ' . tra('Show only the content'),
+                    'description' => tra('Show only the content'),
                     'section' => 'appearance',
+                    'options' => [
+                        ['text' => tra('Default: No'), 'value' => ''],
+                        ['text' => tra('Yes'), 'value' => 'y'],
+                        ['text' => tra('No'), 'value' => 'n'],
+                    ],
                 ],
                 'decorations' => [
                     'name' => tra('Backgrounds and Borders (if specified by the theme)'),
-                    'description' => 'y|n ' . tra('Default: "y". "n": show only title and content.'),
+                    'description' => tra('"n": show only title and content.'),
                     'section' => 'appearance',
+                    'options' => [
+                        ['text' => tra('Default: Yes'), 'value' => ''],
+                        ['text' => tra('Yes'), 'value' => 'y'],
+                        ['text' => tra('No'), 'value' => 'n'],
+                    ],
                 ],
                 'notitle' => [
                     'name' => tra('No Title'),
-                    'description' => 'y|n ' . tra('Hide module title'),
+                    'description' => tra('Hide module title'),
                     'filter' => 'alpha',
                     'section' => 'appearance',
+                    'options' => [
+                        ['text' => tra('Default: No'), 'value' => ''],
+                        ['text' => tra('Yes'), 'value' => 'y'],
+                        ['text' => tra('No'), 'value' => 'n'],
+                    ],
                 ],
                 'device' => [
                     'name' => tra('Display on device'),
@@ -969,6 +984,24 @@ class ModLib extends TikiLib
                     'separator' => ';',
                     'advanced' => true,
                     'set_value_as_array' => true,
+                    'options' => [
+                        ['text' => tra('Hidden on all'), 'value' => 'HIDE_ALL'],
+                        ['text' => tra('Hidden only on xs (<576px)'), 'value' => 'HIDE_XS'],
+                        ['text' => tra('Hidden only on sm (576px–767px)'), 'value' => 'HIDE_SM'],
+                        ['text' => tra('Hidden only on md (768px–991px)'), 'value' => 'HIDE_MD'],
+                        ['text' => tra('Hidden only on lg (992px–1199px)'), 'value' => 'HIDE_LG'],
+                        ['text' => tra('Hidden only on xl (1200px–1399px)'), 'value' => 'HIDE_XL'],
+                        ['text' => tra('Hidden only on xxl (≥1400px)'), 'value' => 'HIDE_XXL'],
+                        ['text' => tra('Visible on all'), 'value' => 'SHOW_ALL'],
+                        ['text' => tra('Visible only on xs (<576px)'), 'value' => 'SHOW_XS'],
+                        ['text' => tra('Visible only on sm (576px–767px)'), 'value' => 'SHOW_SM'],
+                        ['text' => tra('Visible only on md (768px–991px)'), 'value' => 'SHOW_MD'],
+                        ['text' => tra('Visible only on lg (992px–1199px)'), 'value' => 'SHOW_LG'],
+                        ['text' => tra('Visible only on xl (1200px–1399px)'), 'value' => 'SHOW_XL'],
+                        ['text' => tra('Visible only on xxl (≥1400px)'), 'value' => 'SHOW_XXL'],
+                        ['text' => tra('Print only (Hide on screen)'), 'value' => 'SHOW_PRINT'],
+                        ['text' => tra('Screen only (Hide on print)'), 'value' => 'SHOW_SCREEN'],
+                    ],
                 ],
                 'category' => [
                     'name' => tra('Category'),
@@ -988,9 +1021,14 @@ class ModLib extends TikiLib
                 ],
                 'subtree' => [
                     'name' => tra('Category subtrees'),
-                    'description' => tra('Consider child categories of the categories listed in "category" and "no category" to be part of those categories. (0 or 1)'),
+                    'description' => tra('Consider child categories of the categories listed in "category" and "no category" to be part of those categories.'),
                     'section' => 'visibility',
                     'filter' => 'int',
+                    'options' => [
+                        ['text' => tra('Default: No'), 'value' => ''],
+                        ['text' => tra('Yes'), 'value' => '1'],
+                        ['text' => tra('No'), 'value' => '0'],
+                    ],
                 ],
                 'perspective' => [
                     'name' => tra('Perspective'),
@@ -1009,10 +1047,34 @@ class ModLib extends TikiLib
                 ],
                 'section' => [
                     'name' => tra('Section'),
-                    'description' => tra('Module is displayed only in the specified sections. Separate multiple sections by semi-colons. Choose from: blogs; calendar; categories; cms (for "articles"); contacts; directory; faqs; featured_links; file_galleries; forums; gmaps; html_pages; maps; mytiki; newsletters; poll; quizzes; surveys; trackers; user_messages; webmail; wiki page'),
+                    'description' => tra('Module is displayed only in the specified sections.'),
                     'separator' => ';',
                     'filter' => 'striptags',
                     'section' => 'visibility',
+                    'options' => [
+                        ['text' => tra('Blogs'), 'value' => 'blogs'],
+                        ['text' => tra('Calendar'), 'value' => 'calendar'],
+                        ['text' => tra('Categories'), 'value' => 'categories'],
+                        ['text' => tra('Articles'), 'value' => 'cms'],
+                        ['text' => tra('Contacts'), 'value' => 'contacts'],
+                        ['text' => tra('Directory'), 'value' => 'directory'],
+                        ['text' => tra('FAQs'), 'value' => 'faqs'],
+                        ['text' => tra('Featured links'), 'value' => 'featured_links'],
+                        ['text' => tra('File galleries'), 'value' => 'file_galleries'],
+                        ['text' => tra('Forums'), 'value' => 'forums'],
+                        ['text' => tra('Google Maps'), 'value' => 'gmaps'],
+                        ['text' => tra('HTML pages'), 'value' => 'html_pages'],
+                        ['text' => tra('Maps'), 'value' => 'maps'],
+                        ['text' => tra('My Tiki'), 'value' => 'mytiki'],
+                        ['text' => tra('Newsletters'), 'value' => 'newsletters'],
+                        ['text' => tra('Polls'), 'value' => 'poll'],
+                        ['text' => tra('Quizzes'), 'value' => 'quizzes'],
+                        ['text' => tra('Surveys'), 'value' => 'surveys'],
+                        ['text' => tra('Trackers'), 'value' => 'trackers'],
+                        ['text' => tra('User messages'), 'value' => 'user_messages'],
+                        ['text' => tra('Webmail'), 'value' => 'webmail'],
+                        ['text' => tra('Wiki pages'), 'value' => 'wiki page'],
+                    ],
                 ],
                 'page' => [
                     'name' => tra('Page Filter'),
@@ -1039,21 +1101,37 @@ class ModLib extends TikiLib
                 ],
                 'creator' => [
                     'name' => tra('Creator'),
-                    'description' => tra('Module only available based on the relationship of the user with the wiki page. Either only creators (y) or only non-creators (n) will see the module.'),
+                    'description' => tra('Module only available based on the relationship of the user with the wiki page.'),
                     'filter' => 'alpha',
                     'section' => 'visibility',
+                    'options' => [
+                        ['text' => tra('Default: Everyone'), 'value' => ''],
+                        ['text' => tra('Only creators'), 'value' => 'y'],
+                        ['text' => tra('Only non-creators'), 'value' => 'n'],
+                    ],
                 ],
                 'contributor' => [
                     'name' => tra('Contributor'),
-                    'description' => tra('Module only available based on the relationship of the user with the wiki page. Either only contributors (y) or only non-contributors (n) will see the module.'),
+                    'description' => tra('Module only available based on the relationship of the user with the wiki page.'),
                     'filter' => 'alpha',
                     'section' => 'visibility',
+                    'options' => [
+                        ['text' => tra('Default: Everyone'), 'value' => ''],
+                        ['text' => tra('Only contributors'), 'value' => 'y'],
+                        ['text' => tra('Only non-contributors'), 'value' => 'n'],
+                    ],
                 ],
                 'flip' => [
                     'name' => tra('Flip'),
-                    'description' => tra('y|yc|n Users can open and close the module. "y": module initially open. "yc": module initially closed. "n": module always open (default).'),
+                    'description' => tra('Users can open and close the module.'),
                     'filter' => 'alpha',
                     'section' => 'appearance',
+                    'options' => [
+                        ['text' => tra('Default: Module always open'), 'value' => ''],
+                        ['text' => tra('Module initially open'), 'value' => 'y'],
+                        ['text' => tra('Module initially closed'), 'value' => 'yc'],
+                        ['text' => tra('Module always open'), 'value' => 'n'],
+                    ],
                 ],
                 'style' => [
                     'name' => tra('Style'),
@@ -1076,9 +1154,14 @@ class ModLib extends TikiLib
         if (($prefs['cookie_consent_feature'] ?? null) === 'y' && $prefs['cookie_consent_disable'] !== 'y') {
             $info['params']['cookie_consent'] = [
                 'name' => tra('Cookie Consent'),
-                'description' => 'n|y ' . tra('Show only if consent to accept cookies has been granted.'),
+                'description' => tra('Show only if consent to accept cookies has been granted.'),
                 'filter' => 'alpha',
                 'section' => 'visibility',
+                'options' => [
+                    ['text' => tra('Default: Always shown'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ];
         }
 
@@ -1086,8 +1169,13 @@ class ModLib extends TikiLib
         $common_params = [
             'nonums' => [
                 'name' => tra('No Numbers'),
-                'description' => tra('If set to "y", the module will not number list items.'),
+                'description' => tra('Do not number list items.'),
                 'section' => 'appearance',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'rows' => [
                 'name' => tra('Rows'),
@@ -1439,7 +1527,9 @@ class ModLib extends TikiLib
 
                     // Init dynamic parameter options with current values
                     if (isset($inner['options']) && empty($inner['options'])) {
-                        $inner['options'] = array_combine($inner['value'], $inner['value']);
+                        $inner['options'] = array_map(function ($value) {
+                            return ['text' => $value, 'value' => $value];
+                        }, (array) $inner['value']);
                     }
                 } else {
                     $inner['value'] = $module_params[$name];

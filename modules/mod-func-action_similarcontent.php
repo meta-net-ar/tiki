@@ -16,13 +16,22 @@ function module_action_similarcontent_info()
         'params' => [
             'contentType' => [
                 'name' => tra('Similar Content Filter'),
-                'description' => tra('Display only similar content of type specified') . " " . tra('Default: "All Content Type".') . " " . tra('Options: "article, wiki page, blog post".')
+                'description' => tra('Display only similar content of type specified'),
+                'options' => [
+                    ['text' => tra('Default: All content types'), 'value' => ''],
+                    ['text' => tra('Article'), 'value' => 'article'],
+                    ['text' => tra('Wiki page'), 'value' => 'wiki page'],
+                    ['text' => tra('Blog post'), 'value' => 'blog post'],
+                ],
             ],
             'broaden' => [
                 'name' => tra('Broaden FreeTag Search'),
-                'description' => tra('Find similar content that contains one of the Tags or All of the Tags') .
-                                                            " " . tra('Default: "n - needs to contain all of the Tags".') .
-                                                            " " . tra('Options: "n - Needs to contain All Tags / y - Needs to contain one of the Tags".')
+                'description' => tra('Find similar content that contains one of the Tags or All of the Tags'),
+                'options' => [
+                    ['text' => tra('Default: Needs to contain all tags'), 'value' => ''],
+                    ['text' => tra('Needs to contain all tags'), 'value' => 'n'],
+                    ['text' => tra('Needs to contain one of the tags'), 'value' => 'y'],
+                ],
             ],
         ],
         'common_params' => ['nonums', 'rows']

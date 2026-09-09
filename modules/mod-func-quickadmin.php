@@ -16,11 +16,15 @@ function module_quickadmin_info()
         'params' => [
             'mode' => [
                 'name' => tra('Mode'),
-                'description' => tra('Display mode: module or header. Leave empty for module mode'),
+                'description' => tra('Display mode'),
+                'options' => [
+                    ['text' => tra('Default: Module'), 'value' => ''],
+                    ['text' => tra('Header'), 'value' => 'header'],
+                ],
             ],
             'display' => [
                 'name' => tra('Display'),
-                'description' => tra('Shown: Display shortcuts or preferences history or both (both / shortcuts / history)'),
+                'description' => tra('Display shortcuts, preferences history, or both.'),
                 'filter' => 'alpha',
                 'default' => 'both',
                 'since' => '21',

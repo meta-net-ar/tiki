@@ -38,9 +38,13 @@ function module_last_podcasts_info()
             'verbose' => [
                 'required' => false,
                 'name' => tra('Verbose'),
-                'description' => 'y|n ' . tra('Display description of podcast below player if "y", and on title mouseover if "n".'),
+                'description' => tra('Where to display the description of the podcast.'),
                 'default' => 'y',
                 'filter' => 'striptags',
+                'options' => [
+                    ['text' => tra('Below the player'), 'value' => 'y'],
+                    ['text' => tra('On title mouseover'), 'value' => 'n'],
+                ],
             ]
         ]
     ];

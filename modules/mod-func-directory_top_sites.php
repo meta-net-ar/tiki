@@ -16,8 +16,13 @@ function module_directory_top_sites_info()
         'params' => [
             'desc' => [
                 'name' => tra('Show description'),
-                'description' => tra('If set to "y", the description of the directory site appears.') . " " . tr('Default: "n".'),
+                'description' => tra('If set to "y", the description of the directory site appears.'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'maxdesc' => [
                 'name' => tra('Maximum length of description'),

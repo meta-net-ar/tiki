@@ -47,23 +47,43 @@ function module_upcoming_events_info()
             ],
             'showDescription' => [
                 'name' => tra('Show description'),
-                'description' => tra('If set to "y", event descriptions are displayed.') . " " . tra('Default:') . ' "n"',
-                'filter' => 'word'
+                'description' => tra('If set to "y", event descriptions are displayed.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showEnd' => [
                 'name' => tra('Show end date and time'),
-                'description' => tra('If set to "y", event end dates and times are displayed, when appropriate.') . " " . tra('Default:') . ' "n"',
-                'filter' => 'word'
+                'description' => tra('If set to "y", event end dates and times are displayed, when appropriate.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showColor' => [
                 'name' => tra('Use custom calendar background colors'),
-                'description' => tra('If set to "y", events are displayed with their calendar\'s custom background color (if one is set).') . " " . tra('Default:') . ' "n"',
-                'filter' => 'word'
+                'description' => tra('If set to "y", events are displayed with their calendar\'s custom background color (if one is set).'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'tooltip_infos' => [
                 'name' => tra('Show information in tooltips'),
-                'description' => tra('If set to "n", event tooltips will not display event information.') . " " . tra('Default:') . ' "y"',
-                'filter' => 'word'
+                'description' => tra('If set to "n", event tooltips will not display event information.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'date_format' => [
                 'name' => tra('Date format'),
@@ -78,8 +98,13 @@ function module_upcoming_events_info()
             ],
             'showaction' => [
                 'name' => tra('Show action'),
-                'description' => 'y|n',
-                'filter' => 'word'
+                'description' => tra('Show the action links.'),
+                'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ]
         ],
         'common_params' => ['nonums', 'rows']

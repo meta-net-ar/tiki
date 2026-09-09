@@ -32,16 +32,31 @@ function module_login_box_info()
             ],
             'mode' => [
                 'name' => tra('Mode'),
-                'description' => tra('Display mode: module, header or popup. Leave empty for module mode'),
+                'description' => tra('Display mode'),
+                'options' => [
+                    ['text' => tra('Default: Module'), 'value' => ''],
+                    ['text' => tra('Header'), 'value' => 'header'],
+                    ['text' => tra('Popup'), 'value' => 'popup'],
+                ],
             ],
             'show_two_factor_auth' => [
                 'name' => tra('2FA'),
                 'description' => tra('Display two-factor authentication code input.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'register' => [
                 'name' => tra('Show Register'),
-                'description' => tra('Show the register link') . ' (y/n)',
+                'description' => tra('Show the register link'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'register_page' => [
                 'name' => tra('Register Page'),
@@ -51,28 +66,53 @@ function module_login_box_info()
             ],
             'forgot' => [
                 'name' => tra('Show I Forgot'),
-                'description' => tra('Show the "I forgot my password" link') . ' (y/n)',
+                'description' => tra('Show the "I forgot my password" link'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'remember' => [
                 'name' => tra('Show Remember me'),
-                'description' => tra('Show the "Remember me" checkbox') . ' (y/n)',
+                'description' => tra('Show the "Remember me" checkbox'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'allowNone' => [
                 'name' => tra('Allow None'),
-                'description' => tra('Show a non-selectable placeholder in the Switch User dropdown. Set to "n" to hide it entirely.') . ' (y/n)',
+                'description' => tra('Show a non-selectable placeholder in the Switch User dropdown.'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_user_avatar' => [
                 'name' => tra('Show user avatar'),
-                'description' => tra('Show the user avatar when in popup mode') . ' (y/n)',
+                'description' => tra('Show the user avatar when in popup mode'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_user_name' => [
                 'name' => tra('Show user name'),
-                'description' => tra('Show the user name when in popup mode') . ' (y/n)',
+                'description' => tra('Show the user name when in popup mode'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'groups' => [
                 'name' => tra('Groups for switch user listing'),
@@ -85,8 +125,13 @@ function module_login_box_info()
             ],
             'start_session' => [
                 'name' => tra('Start Session'),
-                'description' => tra('If the preference "silent_session" is enabled start the session when the login form is shown to avoid CSRF errors.') . ' (y/n)',
+                'description' => tra('If the preference "silent_session" is enabled start the session when the login form is shown to avoid CSRF errors.'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ]
     ];

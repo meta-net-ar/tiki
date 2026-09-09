@@ -22,7 +22,11 @@ function module_months_links_info()
         'params' => [
             'feature' => [
                 'name' => tra('Object Type'),
-                'description' => tra('Type of objects to link to.') . ' ' . tra('Possible values:') . ' ' . tra('"blogs" for blog posts, "cms" for published articles.'),
+                'description' => tra('Type of objects to link to.'),
+                'options' => [
+                    ['text' => tra('Blog posts'), 'value' => 'blogs'],
+                    ['text' => tra('Published articles'), 'value' => 'cms'],
+                ],
                 'required' => true
             ],
             'id' => [

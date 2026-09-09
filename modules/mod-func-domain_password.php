@@ -20,15 +20,30 @@ function module_domain_password_info()
             ],
             'use_currentuser' => [
                 'name' => tra('Use current user'),
-                'description' => tra('Use the currently logged-in user. The username is not editable. (y/n) Default: y'),
+                'description' => tra('Use the currently logged-in user. The username is not editable.'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'can_update' => [
                 'name' => tra('Can Update'),
-                'description' => tra('If "y" the user can update the values, otherwise the display is read-only (y/n). Default: n'),
+                'description' => tra('The user can update the values, otherwise the display is read-only.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'show_domain_prompt' => [
                 'name' => tra('Show domain prompt'),
-                'description' => tra('If "y" the word "domain" is shown before the domain. Otherwise the domain name takes the full row (y/n). Default: y'),
+                'description' => tra('The word "domain" is shown before the domain. Otherwise the domain name takes the full row.'),
+                'options' => [
+                    ['text' => tra('Default: Yes'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
         'common_params' => ['nonums', 'rows']

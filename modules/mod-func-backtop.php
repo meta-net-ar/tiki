@@ -26,7 +26,6 @@ function module_backtop_info()
                 'filter' => 'text',
                 'default' => 'right',
                 'options' => [
-                    ['text' => '', 'value' => ''],
                     ['text' => tra('Left'), 'value' => 'left'],
                     ['text' => tra('Right'), 'value' => 'right'],
                 ],

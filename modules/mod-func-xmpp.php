@@ -18,6 +18,10 @@ function module_xmpp_info()
                 'description' => tra('If controlbox should be shown after page load'),
                 'default' => 'n',
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
         'prefs' => ['xmpp_feature'],

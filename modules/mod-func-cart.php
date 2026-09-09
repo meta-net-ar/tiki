@@ -16,21 +16,33 @@ function module_cart_info()
         'params' => [
             'ajax' => [
                 'name' => tra('Use AJAX'),
-                'description' => tra('Use AJAX services for managing the cart') . ' (y/n)',
+                'description' => tra('Use AJAX services for managing the cart'),
                 'filter' => 'alpha',
                 'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showItems' => [
                 'name' => tra('Show Items'),
-                'description' => tra('Shows the items in the cart as they are added') . ' (y/n)',
+                'description' => tra('Shows the items in the cart as they are added'),
                 'filter' => 'alpha',
                 'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'showCount' => [
                 'name' => tra('Show Item Count'),
-                'description' => tra('Shows the number of items in the cart') . ' (y/n)',
+                'description' => tra('Shows the number of items in the cart'),
                 'filter' => 'alpha',
                 'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'checkoutURL' => [
                 'name' => tra('Checkout URL'),
@@ -46,9 +58,13 @@ function module_cart_info()
             ],
             'showWeight' => [
                 'name' => tra('Show Total Weight'),
-                'description' => tra('Shows the weight of the items in the cart') . ' (y/n)',
+                'description' => tra('Shows the weight of the items in the cart'),
                 'filter' => 'alpha',
                 'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'weightUnit' => [
                 'name' => tra('Weight Unit'),
@@ -58,9 +74,13 @@ function module_cart_info()
             ],
             'showItemButtons' => [
                 'name' => tra('Show Item Buttons'),
-                'description' => tra('Shows add, remove and delete buttons on items') . ' (y/n)',
+                'description' => tra('Shows add, remove and delete buttons on items'),
                 'filter' => 'alpha',
                 'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
         ],
     ];

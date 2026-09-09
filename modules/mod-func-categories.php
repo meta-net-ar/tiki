@@ -22,8 +22,13 @@ function module_categories_info()
             ],
             'deep' => [
                 'name' => tra('Deep'),
-                'description' => tra('Show subcategories objects when accessing a linked category. Possible values: on (default), off.'),
+                'description' => tra('Show subcategories objects when accessing a linked category.'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: On'), 'value' => ''],
+                    ['text' => tra('On'), 'value' => 'on'],
+                    ['text' => tra('Off'), 'value' => 'off'],
+                ],
             ],
             'categId' => [
                 'name' => tra('Category ID'),
@@ -39,18 +44,33 @@ function module_categories_info()
             ],
             'selflink' => [
                 'name' => tra('Category links to a page named as the category'),
-                'description' => 'y|n .' . tra('If y, category links to a page named as the category'),
+                'description' => tra('Category links to a page named as the category'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'hideEmpty' => [
                 'name' => tra('Hide Empty'),
-                'description' => 'y|n .' . tra('If y, only categories with child objects will be shown.'),
+                'description' => tra('Only categories with child objects will be shown.'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'onlyChildren' => [
                 'name' => tra('Only Children'),
-                'description' => 'y|n .' . tra('If y, only direct child categories will be shown. Default: n'),
+                'description' => tra('Only direct child categories will be shown.'),
                 'filter' => 'alpha',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'customURL' => [
                 'name' => tra('Custom URL'),

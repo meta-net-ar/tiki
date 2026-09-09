@@ -23,15 +23,31 @@ function module_who_is_there_info()
         'params' => [
             'content' => [
                 'name' => tra('List Type'),
-                'description' => tra('Display the number of users logged in, the list of users logged in, or both.') . " " . tra('Possible values: "count", "list" or "both". Default value: "both"')
+                'description' => tra('Display the number of users logged in, the list of users logged in, or both.'),
+                'options' => [
+                    ['text' => tra('Default: Both'), 'value' => ''],
+                    ['text' => tra('Count'), 'value' => 'count'],
+                    ['text' => tra('List'), 'value' => 'list'],
+                    ['text' => tra('Both'), 'value' => 'both'],
+                ],
             ],
             'cluster' => [
                 'name' => tra('Cluster Mode'),
-                'description' => tra('If set to "1", separate users based on which host/server they logged on.')
+                'description' => tra('Separate users based on which host/server they logged on.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ],
             ],
             'silent' => [
                 'name' => tra('Silent Mode'),
-                'description' => tra('If set to "1" hides the module, which allows another "who is there" module to include users that should not see it.')
+                'description' => tra('Hide the module, which allows another "who is there" module to include users that should not see it.'),
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => '1'],
+                    ['text' => tra('No'), 'value' => '0'],
+                ],
             ],
         ]
     ];

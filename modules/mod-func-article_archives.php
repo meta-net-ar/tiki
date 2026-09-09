@@ -16,8 +16,13 @@ function module_article_archives_info()
         'params' => [
             'more' => [
                 'name' => tra('More'),
-                'description' => tra('If set to "y", displays a button labelled "More..." that links to a paginated view of the selected articles.') . " " . tra('Default: "n".'),
+                'description' => tra('If set to "y", displays a button labelled "More..." that links to a paginated view of the selected articles.'),
                 'filter' => 'word',
+                'options' => [
+                    ['text' => tra('Default: No'), 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'categId' => [
                 'name' => tra('Category filter'),

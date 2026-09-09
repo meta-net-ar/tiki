@@ -35,7 +35,6 @@ function module_list_info()
                 'filter' => 'digits',
                 'default' => '1',
                 'options' => [
-                    ['text' => tra(''), 'value' => ''],
                     ['text' => tra('Yes'), 'value' => '1'],
                     ['text' => tra('No'), 'value' => '0'],
                 ],

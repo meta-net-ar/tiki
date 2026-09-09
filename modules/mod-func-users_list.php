@@ -16,52 +16,80 @@ function module_users_list_info()
         'params' => [
             'login' => [
                 'name' => tra('Login'),
-                'description' => tra('Show the user name.') . ' ' . tra('Possible values:') . ' ' . tra('y|n'),
+                'description' => tra('Show the user name.'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'y'
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'realName' => [
                 'name' => tra('Real Name'),
-                'description' => tra('Show the user real name.') . ' ' . tra('Possible values:') . ' ' . tra('y|n'),
+                'description' => tra('Show the user real name.'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'n'
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'lastLogin' => [
                 'name' => tra('Last Login'),
-                'description' => tra('Show the last login date.') . ' ' . tra('Possible values:') . ' ' . tra('y|n'),
+                'description' => tra('Show the last login date.'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'n'
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'groups' => [
                 'name' => tra('Groups'),
-                'description' => tra('Show the direct and included groups a user belongs to.') . ' ' . tra('Possible values:') . ' ' . tra('y|n'),
+                'description' => tra('Show the direct and included groups a user belongs to.'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'n'
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'avatar' => [
                 'name' => tra('Profile picture'),
-                'description' => tra('Show the user profile picture.') . ' ' . tra('Possible values:') . ' ' . tra('y|n'),
+                'description' => tra('Show the user profile picture.'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'n'
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'userPage' => [
                 'name' => tra('User Page'),
-                'description' => tra('Show a link to the userPage.') . ' ' . tra('Possible values:') . ' ' . tra('y|n'),
+                'description' => tra('Show a link to the userPage.'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'n'
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'log' => [
                 'name' => tra('Log'),
-                'description' => tra('Show a link to the user logs(feature actionlog must be activated).') . ' ' . tra('Possible values:') . ' ' . tra('y|n'),
+                'description' => tra('Show a link to the user logs(feature actionlog must be activated).'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'n'
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'group' => [
                 'name' => tra('Group'),
@@ -72,10 +100,14 @@ function module_users_list_info()
             ],
             'includedGroups' => [
                 'name' => tra('Included Groups'),
-                'description' => tra('Show only the users of the group group and of a group including group.') . ' ' . tra('Possible values:') . ' ' . tra('y|n'),
+                'description' => tra('Show only the users of the group group and of a group including group.'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'n'
+                'default' => 'n',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'initial' => [
                 'name' => tra('initial'),
@@ -86,18 +118,27 @@ function module_users_list_info()
             ],
             'heading' => [
                 'name' => tra('heading'),
-                'description' => tra('Show the table heading.') . ' ' . tra('Possible values:') . ' ' . tra('y|n'),
+                'description' => tra('Show the table heading.'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'y'
+                'default' => 'y',
+                'options' => [
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
             ],
             'sort_mode' => [
                 'name' => tra('Sort Mode'),
-                'description' => tra('Sort users in ascending or descending order using these values: ') .
-                    'login_asc, login_desc, email_asc, email_desc.',
+                'description' => tra('Sort users in ascending or descending order.'),
                 'filter' => 'word',
                 'required' => false,
-                'default' => 'login_asc'
+                'default' => 'login_asc',
+                'options' => [
+                    ['text' => tra('Login, ascending'), 'value' => 'login_asc'],
+                    ['text' => tra('Login, descending'), 'value' => 'login_desc'],
+                    ['text' => tra('Email, ascending'), 'value' => 'email_asc'],
+                    ['text' => tra('Email, descending'), 'value' => 'email_desc'],
+                ],
             ],
         ],
         'common_params' => ['nonums', 'rows']
