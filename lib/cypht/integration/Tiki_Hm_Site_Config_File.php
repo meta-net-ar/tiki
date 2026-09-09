@@ -32,6 +32,12 @@ class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
         $this->set('output_class', 'Tiki_Hm_Output_HTTP');
         $this->set('cookie_path', ini_get('session.cookie_path'));
         $this->set('sieve_client_factory', 'Tiki_Hm_Sieve_Client_Factory');
+        $this->set('extra_ajax_request_data', "hm_session_prefix:$session_prefix");
+
+        // override to use TikiLib service lib for ajax endpoint
+        TikiLib::setExternalContext(true);
+        $this->set('custom_ajax_request_endpoint', TikiLib::lib('service')->getUrl(['controller' => 'cypht', 'action' => 'ajax']));
+
         if ($user && (empty($_SESSION[$session_prefix]['user_data']) || count($_SESSION[$session_prefix]['user_data']) == 2)) {
             $user_config = new Tiki_Hm_User_Config($this);
             $user_config->load($user);

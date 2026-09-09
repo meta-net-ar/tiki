@@ -89,11 +89,5 @@ class PatchCypht
         $css = file_get_contents($cypht . 'site.css');
         $css = str_replace('url("./fonts/bootstrap-icons', 'url("../../' . BOOTSTRAP_ICONS_FONT_PATH . '/fonts/bootstrap-icons', $css);
         file_put_contents($cypht . 'site.css', $css);
-
-        // js custom pacthes
-        $js = file_get_contents($cypht . 'site.js');
-        $js = preg_replace('/(xhr.open\(\'POST\', )(.*)\)/', '$1\'tiki-ajax_services.php?controller=cypht&action=ajax&\'+(window.location.next?.substring(1) || window.location.search.substring(1)))', $js);
-        $js = str_replace("var ajax = new Hm_Ajax_Request", "var ajax = new tiki_Hm_Ajax_Request", $js);
-        file_put_contents($cypht . 'site.js', $js);
     }
 }
