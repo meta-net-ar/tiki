@@ -79,6 +79,9 @@
                 {preference name=wikiplugin_div}
                 {preference name=wikiplugin_dl}
                 {preference name=wikiplugin_fade}
+                <div class="adminoptionboxchild" id="wikiplugin_fade_childcontainer">
+                    {preference name=wikiplugin_fade_default_expanded}
+                </div>
                 {preference name=wikiplugin_mermaid}
                 {preference name=wikiplugin_fancylist}
                 {preference name=wikiplugin_fancytable}

@@ -141,6 +141,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(__dirname, "tiki-toast-ui/toast-index.js"),
         "@tiki/modules/search": resolve(__dirname, "@tiki/modules/search.js"),
+        "@tiki/plugins/fade": resolve(__dirname, "@tiki/plugins/fade.js"),
         "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
         "wysiwyg-summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
     });
