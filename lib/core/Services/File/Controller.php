@@ -86,6 +86,7 @@ class Services_File_Controller
             'requireTitle'          => $input->requireTitle->text(),
             'changeFileNameOnUpload' => $input->changeFileNameOnUpload->int(),
             'directoryPattern'      => $input->directoryPattern->text(),
+            'subdirectoryBehavior'  => $this->normalizeSubdirectoryBehavior($input->subdirectoryBehavior->word()),
         ];
 
         if ($input->uploadInModal->int()) {
@@ -170,7 +171,8 @@ class Services_File_Controller
             $title = $name;
         }
 
-        if ($directory = $input->directory->text()) {
+        $subdirectoryBehavior = $this->normalizeSubdirectoryBehavior($input->subdirectoryBehavior->word());
+        if ($subdirectoryBehavior === 'subgalleries' && ($directory = $input->directory->text())) {
             $gal_info = $this->utilities->findOrCreateDirectoryHierarchy($gal_info['galleryId'], $directory);
         }
 
@@ -1037,6 +1039,15 @@ class Services_File_Controller
         }
 
         return $message;
+    }
+
+    private function normalizeSubdirectoryBehavior(?string $behavior): string
+    {
+        if (in_array($behavior, ['subgalleries', 'flat', 'skip'], true)) {
+            return $behavior;
+        }
+
+        return 'subgalleries';
     }
 
     private function buildFailedUploadErrorMessage()

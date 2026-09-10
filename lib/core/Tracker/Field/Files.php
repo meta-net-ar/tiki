@@ -41,6 +41,17 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                         'parentkey' => 'tracker_id',
                         'sort_order' => 'position_nasc',
                     ],
+                    'subdirectoryBehavior' => [
+                        'name' => tr('Dropped folder behavior'),
+                        'description' => tr('How to handle files inside folders dropped onto the upload area.'),
+                        'filter' => 'word',
+                        'default' => 'subgalleries',
+                        'options' => [
+                            'subgalleries' => tr('Attach files from subfolders in matching sub-galleries'),
+                            'flat' => tr('Attach all files from all subfolders as a flat list in the field gallery'),
+                            'skip' => tr('Do not traverse nested subfolders; attach only the dropped files'),
+                        ],
+                    ],
                     'filter' => [
                         'name' => tr('MIME Type Filter'),
                         'description' => tr('Mask for accepted MIME types in the field'),
@@ -390,6 +401,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             'gallerySearch' => $gallery_list,
             'requireTitle' => $this->getOption('requireTitle'),
             'directoryPattern' => $directoryPattern,
+            'subdirectoryBehavior' => $this->getOption('subdirectoryBehavior') ?: 'subgalleries',
             'fileGalleryPerTrackerItem' => $this->trackerField->getOption('fileGalleryPerTrackerItem'),
 
         ];
