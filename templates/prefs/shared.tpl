@@ -39,20 +39,20 @@
 <div class="d-inline-flex flex-column">
     {if !empty($p.conflicts)}
         {foreach from=$p.conflicts.active item=conflict}
-            <div class="alert alert-danger pref_conflict d-inline-block alert-sm">
+            <div class="alert alert-danger pref_conflict d-none alert-sm" data-conflict="{$conflict.name|escape}" data-preference="{$p.preference|escape}">
                 {if isset($conflict.message)}
                     {$conflict.message} <br/>
                 {else}
-                    {tr}Conflict:{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a> {tr}must be disabled first.{/tr}
+                    {tr}Conflict: this preference is incompatible with{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a>. {tr} Please disable one!{/tr}
                 {/if}
             </div>
         {/foreach}
         {foreach from=$p.conflicts.inactive item=conflict}
-            <div class="alert alert-warning pref_conflict d-inline-block alert-sm">
+            <div class="alert alert-warning pref_conflict d-none alert-sm" data-conflict="{$conflict.name|escape}" data-preference="{$p.preference|escape}">
                 {if isset($conflict.message)}
                     {$conflict.message} <br/>
                 {else}
-                    {tr}Incompatibility detected with:{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a>
+                    {tr}This preference is incompatible with{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a>. {tr}Please disable one!{/tr}
                 {/if}
             </div>
         {/foreach}

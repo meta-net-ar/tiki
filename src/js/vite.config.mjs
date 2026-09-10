@@ -9,6 +9,7 @@ import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import postcssRootToHost from "./postcssRootToHost";
+import diceBearStyles from "./avatar-generator/styles.constant.js";
 /*
 
 Overarching principles:
@@ -144,6 +145,12 @@ export default defineConfig(({ command, mode }) => {
         "@tiki/plugins/fade": resolve(__dirname, "@tiki/plugins/fade.js"),
         "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
         "wysiwyg-summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
+        "@dicebear/core": resolve(import.meta.dirname, "../../node_modules/@dicebear/core/lib/index.js"),
+        ...[...diceBearStyles].reduce((acc, style) => {
+            const packageName = style.name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+            acc[`@dicebear/${style.name}`] = resolve(import.meta.dirname, `../../node_modules/@dicebear/${packageName}/lib/index.js`);
+            return acc;
+        }, {}),
     });
     return {
         base: "/public/generated/js", //This must NOT have a trailing slash
@@ -316,10 +323,6 @@ export default defineConfig(({ command, mode }) => {
 
                     /* BEGIN common_externals section
                     These should all ALSO be in rollupOptions / external */
-                    {
-                        src: "node_modules/@dicebear/*", //Both @@dicebear/core and @dicebear/collection.  They do not have a normal dist structure
-                        dest: "vendor_dist/@dicebear",
-                    },
                     {
                         src: "node_modules/@lottiefiles/dotlottie-wc/dist/*.js",
                         dest: "vendor_dist/@lottiefiles/dotlottie-wc/dist",
@@ -742,8 +745,19 @@ export default defineConfig(({ command, mode }) => {
             },
             server: {
                 deps: {
-                    inline: [/element-plus/],
+                    inline: [/element-plus/, /@dicebear/],
                 },
+            },
+            alias: {
+                ...Object.fromEntries(
+                    diceBearStyles.map(({ name }) => [
+                        `@dicebear/${name}`,
+                        resolve(
+                            import.meta.dirname,
+                            `../../node_modules/@dicebear/${name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`
+                        ),
+                    ])
+                ),
             },
         },
     };
