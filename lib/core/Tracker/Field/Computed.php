@@ -12,6 +12,8 @@
  */
 class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
 {
+    private mixed $computedValue = null;
+
     public static function getManagedTypesInfo(): array
     {
         return [
@@ -61,6 +63,7 @@ class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
     {
         $ins_id = $this->getInsertId();
         $data = [];
+        $value = null;
 
         if (isset($requestData[$ins_id])) {
             $value = $requestData[$ins_id];
@@ -90,6 +93,16 @@ class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
         $data['value'] = $value;
 
         return $data;
+    }
+
+    public function getValue($default = ''): mixed
+    {
+        if ($this->computedValue === null) {
+            $data = $this->getFieldData();
+            $this->computedValue = $data['value'] ?? null;
+        }
+
+        return $this->computedValue === null ? $default : $this->computedValue;
     }
 
     public function renderOutput($context = [])
@@ -146,11 +159,22 @@ class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
         // Replace #1, #2, etc., with corresponding values from the $values array
         $formula = preg_replace_callback('/#([0-9]+)/', function ($matches) use ($values) {
             $fieldId = $matches[1];
-            return $values[$fieldId] ?? 0;
+            $value = $values[$fieldId] ?? 0;
+
+            $value = is_string($value) ? trim($value) : $value;
+            if ($value === '' || $value === null) {
+                return 0;
+            }
+
+            // Values saved on a comma-decimal locale must be normalised, the whitelist below rejects commas.
+            $value = str_replace(',', '.', (string) $value);
+
+            return is_numeric($value) ? $value : 0;
         }, $formula);
 
-        // Check if the formula contains only allowed characters
-        if (! preg_match('/^[0-9+\-*/(). ]+$/', $formula)) {
+        // Check if the formula contains only allowed characters.
+        // The "~" delimiter keeps the division operator usable without escaping it.
+        if (! preg_match('~^[0-9+\-*/(). ]+$~', $formula)) {
             return null;
         }
 

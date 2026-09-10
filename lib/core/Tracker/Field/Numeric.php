@@ -113,9 +113,11 @@ class Tracker_Field_Numeric extends \Tracker\Field\AbstractItemField implements 
 
     public function renderInnerOutput($context = [])
     {
+        $numberFormat = new \SmartyTiki\Modifier\NumberFormat();
         $decimals = $this->getOption('decimals');
-        $dec_point = $this->getOption('dec_point');
-        $thousands = $this->getOption('thousands');
+        // "c", "d" and "s" are documented shorthands for comma, dot and space. See NumberFormat::separator()
+        $dec_point = $numberFormat->separator($this->getOption('dec_point'));
+        $thousands = $numberFormat->separator($this->getOption('thousands'));
         $prepend = $this->getOption('prepend');
         $append = $this->getOption('append');
         if (! is_numeric($this->getValue())) {
