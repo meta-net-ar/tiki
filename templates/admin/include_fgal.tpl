@@ -410,7 +410,6 @@
                     {preference name='h5p_enable_lrs_content_types'}
                     {preference name='h5p_custom_js_files'}
                     {preference name='h5p_custom_css_files'}
-
                     {remarksbox type="info" title="{tr}H5P Info{/tr}"}
                         {tr}Service URL to purge unused libraries can be found here. Can be used in a cron task{/tr}<br>
                         <a href="{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}" class="btn btn-link">

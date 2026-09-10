@@ -36,6 +36,12 @@ function wikiplugin_h5p($data, $params)
     static $instance = 0;
     $instance++;
 
+    if (! H5P_H5PTiki::guardWithFeedback()) {
+        return Perms::get()->admin
+            ? '<div class="alert alert-danger">H5P storage not ready. See Admin feedback.</div>'
+            : '<div class="alert alert-warning">Interactive content unavailable.</div>';
+    }
+
     // temporary issue in 17.x with annotatorjs 1.2 (we hope)
     if ($prefs['comments_inline_annotator'] === 'y') {
         if ($instance === 1) {

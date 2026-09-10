@@ -19,6 +19,12 @@ class Services_H5P_Controller
         if (! function_exists('curl_init')) {
             throw new Services_Exception_NotAvailable(tr('H5P requires the CURL extension to be installed in PHP'));
         }
+        if (! H5P_H5PTiki::guardWithFeedback()) {
+            list(, $absPath,) = H5P_H5PTiki::ensureStorageReady(false);
+            throw new Services_Exception_NotAvailable(
+                tr('H5P storage not ready. Directory not writable: %0', $absPath)
+            );
+        }
     }
 
     /**

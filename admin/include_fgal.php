@@ -140,4 +140,11 @@ foreach ($usedTypes as $type) {
 
 $smarty->assign_by_ref('missingHandlers', $missingHandlers);
 $smarty->assign('vnd_ms_files_exist', $vnd_ms_files_exist);
+// H5P storage status
+list($okH5P, $h5pAbs, $whyH5P) = H5P_H5PTiki::ensureStorageReady(false);
+if ($prefs['feature_h5p'] === 'y' && ! $okH5P) {
+    Feedback::warning(
+        tr('H5P directory is missing or not writable: %0 (%1). Run %2 and/or adjust ownership and permissions.', '<code>' . htmlspecialchars($h5pAbs) . '</code>', $whyH5P, '<code>sh setup.sh -n fix</code>')
+    );
+}
 include_once('fgal_listing_conf.php');
