@@ -559,11 +559,18 @@ if ($prefs['rating_advanced'] == 'y' && $prefs['rating_recalculation'] == 'rando
 
 // using jquery-migrate-1.3.0.js plugin for tiki 11, still required in tiki 12 LTS to support some 3rd party plugins
 
-if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'google') {
-    $headerlib->add_jsfile_cdn("$url_scheme://ajax.googleapis.com/ajax/libs/jquery/$headerlib->jquery_version/jquery.min.js");
-    // goggle is not hosting migrate so load from local
-    $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-migrate/dist/jquery-migrate.min.js", true);
-} elseif (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
+// jQuery 4 also ships an ES module build (dist-module/jquery.module.js), but Tiki still
+// loads the classic one here: module scripts are deferred, so every classic script runs
+// first, and anything classic using $ at load time would break if jQuery were only
+// reachable as a module. jQuery also stays on the global window object for the many
+// plugins that expect it there. The headerlib refactor lifts that ordering constraint,
+// and jQuery 4's own exports map is meant to give import and require the same copy, so
+// the switch should not need a shim on our side.
+// See https://github.com/jquery/jquery/wiki/jQuery-4-exports-explainer
+
+// Google's CDN has no jQuery 4.x (its newest is 3.7.1), so 'google' falls through to
+// the local copies below instead of 404ing, as jquery-migrate already had to.
+if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
     $headerlib->add_jsfile_cdn("$url_scheme://code.jquery.com/jquery-$headerlib->jquery_version.min.js");
     $headerlib->add_jsfile_cdn("$url_scheme://code.jquery.com/jquery-migrate-$headerlib->jquerymigrate_version.min.js");
 } else {

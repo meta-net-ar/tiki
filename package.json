@@ -140,10 +140,17 @@
         "postcss" : "8.5.26",
         "converse.js" : {
             "@converse/log" : "0.0.1"
+        },
+        "timeago" : {
+            "jquery" : "4.0.0"
         }
     },
     "overridesComment" : {
         "converse.js": "converse.js's own package.json depends on '@converse/log' via 'file:src/log' - a self-referential path into its own package directory. npm's arborist can't resolve that link's target when converse.js is installed as a plain registry dependency (not inside its own monorepo), which crashes any 'npm install' with 'Cannot destructure property package of node.target'. It's also published standalone on the registry with matching content, so overriding it to the registry version sidesteps the broken self-link. (13.0.1 additionally needed a '@converse/headless' override for the same reason - 14.0.0 doesn't depend on that package at all, so it was dropped here rather than left as harmless dead weight.)",
+        "timeago": [
+            "timeago@1.6.7 (unmaintained since 2019) caps jquery at <4.0, a range written before jQuery 4 existed. Without this override npm keeps jQuery 3.7.1 at the top level to satisfy it.",
+            "Scoped to timeago deliberately: a global jquery override makes npm nest jquery-migrate and jquery-validation under src/js/common-externals/node_modules, breaking the paths viteStaticCopy copies from."
+        ],
         "dompurify": [
             "This override forces all packages to use DOMPurify v3.4.12 to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
             "Upgrading from v2 to v3 is safe for our project because we do not support Internet Explorer (IE).",

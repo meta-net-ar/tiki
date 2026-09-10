@@ -150,9 +150,9 @@ class HeaderLib
     public $forceJsRankLate = false;
 
 
-    public $jquery_version = '3.7.1';
+    public $jquery_version = '4.0.0';
     public $jqueryui_version = '1.14.2';
-    public $jquerymigrate_version = '3.6.0';
+    public $jquerymigrate_version = '4.0.2';
 
     private ?string $outputHeadersWasStartedBy = null;
     private ?string $outputStaticJSFooterWasStartedBy = null;
