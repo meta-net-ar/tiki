@@ -15,6 +15,7 @@ class RSSLib extends TikiDb_Bridge
     private static mixed $cachelib = null;
     private static string $cache_feed_key = 'rss_feed';
     private static string $cache_meta_Key = 'rss_feed_meta';
+    private static array $rssModuleColumns = [];
 
     public function __construct()
     {
@@ -374,10 +375,22 @@ class RSSLib extends TikiDb_Bridge
     }
 
     /* replace rss feed in db */
-    public function replace_rss_module($rssId, $name, $description, $url, $refresh, $showTitle, $showPubDate, $noUpdate = false)
-    {
+    public function replace_rss_module(
+        $rssId,
+        $name,
+        $description,
+        $url,
+        $refreshMinutes,
+        $showTitle,
+        $showPubDate,
+        $noUpdate = false,
+        $showDesc = 'n',
+        $showImage = 'n',
+        $displayMode = 'list'
+    ) {
         //if ($this->rss_module_name_exists($name)) return false; // TODO: Check the name
-        $refresh = 60 * $refresh;
+        $refresh = 60 * $refreshMinutes;
+        $displayMode = in_array($displayMode, ['list', 'cards'], true) ? $displayMode : 'list';
 
         $data = [
             'name' => $name,
@@ -387,6 +400,17 @@ class RSSLib extends TikiDb_Bridge
             'showTitle' => $showTitle,
             'showPubDate' => $showPubDate,
         ];
+
+        $optionalData = [
+            'showDesc' => $showDesc,
+            'showImage' => $showImage,
+            'displayMode' => $displayMode,
+        ];
+        foreach ($optionalData as $field => $value) {
+            if ($this->rssModuleColumnExists($field)) {
+                $data[$field] = $value;
+            }
+        }
 
         if ($rssId) {
             $this->modules->update($data, ['rssId' => (int) $rssId,]);
@@ -481,9 +505,35 @@ class RSSLib extends TikiDb_Bridge
         return $this->modules->fetchOne('showPubDate', ['rssId' => $rssId]);
     }
 
-    public function get_feed_items($feeds, $count = 10)
+    private function rssModuleColumnExists(string $column): bool
+    {
+        if (empty(self::$rssModuleColumns)) {
+            $result = $this->fetchAll('SHOW COLUMNS FROM `tiki_rss_modules`', [], -1, -1, TikiDb::ERR_NONE);
+            if (is_array($result)) {
+                self::$rssModuleColumns = array_fill_keys(array_column($result, 'Field'), true);
+            }
+        }
+
+        return isset(self::$rssModuleColumns[$column]);
+    }
+
+    public function get_feed_items($feeds, $count = 10, $sortBy = 'publication_date', $sortOrder = 'DESC')
     {
         $feeds = (array) $feeds;
+        $allowedSortFields = [
+            'title',
+            'publication_date',
+            'author',
+        ];
+
+        if (! in_array($sortBy, $allowedSortFields, true)) {
+            $sortBy = 'publication_date';
+        }
+
+        $sortOrder = strtoupper((string) $sortOrder);
+        if (! in_array($sortOrder, ['ASC', 'DESC'], true)) {
+            $sortOrder = 'DESC';
+        }
 
         $this->update_feeds($feeds);
 
@@ -492,7 +542,7 @@ class RSSLib extends TikiDb_Bridge
             ['rssId' => $this->items->in($feeds),],
             $count,
             0,
-            ['publication_date' => 'DESC']
+            [$sortBy => $sortOrder]
         );
     }
 
@@ -1009,16 +1059,21 @@ class RSSLib extends TikiDb_Bridge
         $categories = $entry->getCategories();
         $link = $entry->getLink() ?: '';
         $description = $entry->getDescription() ?: '';
+        $content = $entry->getContent() ?: $description;
         $data = $filter->filter(
             [
                 'title' => $entry->getTitle(),
                 'url' => $link,
                 'description' => $description,
-                'content' => $entry->getContent(),
+                'content' => $content,
                 'author' => $authors ? implode(', ', $authors->getValues()) : '',
                 'categories' => $categories ? json_encode($categories->getValues()) : json_encode([]),
             ]
         );
+        if (empty($data['content']) && $description !== '') {
+            $data['content'] = TikiFilter::get('purifier')->filter($description);
+        }
+        $data['raw_description'] = $description;
         $data['guid'] = $guid;
         if (method_exists($entry, 'getDateModified') && $updateDate = $entry->getDateModified()) {
             $data['publication_date'] = $updateDate->getTimestamp();

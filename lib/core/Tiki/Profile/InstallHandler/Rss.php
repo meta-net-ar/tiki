@@ -17,9 +17,12 @@ class Tiki_Profile_InstallHandler_Rss extends Tiki_Profile_InstallHandler
 
         $defaults = [
             'description' => null,
-            'refresh' => 30,
+            'refresh' => 30, // minutes, matches the External Feeds admin refresh rate options
             'show_title' => 'n',
             'show_publication_date' => 'n',
+            'show_description' => 'n',
+            'show_image' => 'n',
+            'display_mode' => 'list',
             'article_generator' => null,
         ];
 
@@ -47,7 +50,19 @@ class Tiki_Profile_InstallHandler_Rss extends Tiki_Profile_InstallHandler
 
         $this->replaceReferences($data);
 
-        $id = $rsslib->replace_rss_module(0, $data['name'], $data['description'], $data['url'], $data['refresh'], $data['show_title'], $data['show_publication_date'], true);
+        $id = $rsslib->replace_rss_module(
+            0,
+            $data['name'],
+            $data['description'],
+            $data['url'],
+            $data['refresh'],
+            $data['show_title'],
+            $data['show_publication_date'],
+            true,
+            $data['show_description'],
+            $data['show_image'],
+            $data['display_mode']
+        );
 
         if ($data['article_generator']) {
             $rsslib->set_article_generator($id, $data['article_generator']);
@@ -74,6 +89,9 @@ class Tiki_Profile_InstallHandler_Rss extends Tiki_Profile_InstallHandler
             'refresh' => $info['refresh'],
             'show_title' => $info['showTitle'],
             'show_publication_date' => $info['showPubDate'],
+            'show_description' => $info['showDesc'] ?? 'n',
+            'show_image' => $info['showImage'] ?? 'n',
+            'display_mode' => $info['displayMode'] ?? 'list',
         ];
 
         $out = array_filter($out);

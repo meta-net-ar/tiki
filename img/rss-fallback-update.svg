@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">RSS fallback update image</title>
+  <desc id="desc">Generic update illustration for feed items without an image.</desc>
+  <rect width="640" height="360" fill="#fff7ed"/>
+  <rect x="84" y="62" width="472" height="236" rx="18" fill="#fff" opacity=".93"/>
+  <circle cx="194" cy="178" r="74" fill="#f59e0b" opacity=".16"/>
+  <path d="M194 118a60 60 0 1 0 56 38h-34l52-48 52 48h-32a96 96 0 1 1-94-74z" fill="#f59e0b" opacity=".78"/>
+  <rect x="346" y="112" width="132" height="16" rx="8" fill="#92400e" opacity=".74"/>
+  <rect x="346" y="150" width="176" height="12" rx="6" fill="#92400e" opacity=".36"/>
+  <rect x="346" y="180" width="144" height="12" rx="6" fill="#92400e" opacity=".28"/>
+  <rect x="116" y="262" width="408" height="10" rx="5" fill="#f59e0b" opacity=".18"/>
+</svg>

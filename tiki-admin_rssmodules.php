@@ -8,6 +8,34 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+$inputConfiguration = [
+    [
+        'staticKeyFilters' => [
+            'rssId'            => 'int',
+            'offset'           => 'int',
+            'maxRecords'       => 'int',
+            'sort_mode'        => 'alnumdash',
+            'find'             => 'text',
+            'view'             => 'int',
+            'refresh'          => 'int',
+            'refresh_all'      => 'alpha',
+            'clear'            => 'int',
+            'remove'           => 'int',
+            'article'          => 'int',
+            'name'             => 'text',
+            'description'      => 'text',
+            'url'              => 'url',
+            'refreshMinutes'   => 'int',
+            'showTitle'        => 'bool',
+            'showPubDate'      => 'bool',
+            'showDesc'         => 'bool',
+            'showImage'        => 'bool',
+            'displayMode'      => 'alpha',
+            'save'             => 'alpha',
+            'cookietab'        => 'int',
+        ],
+    ],
+];
 require_once('tiki-setup.php');
 /** @var RSSLib $rsslib */
 $rsslib = TikiLib::lib('rss');
@@ -17,7 +45,8 @@ $auto_query_args = [
     'offset',
     'maxRecords',
     'sort_mode',
-    'find'
+    'find',
+    'cookietab'
 ];
 
 $access->check_permission('tiki_p_admin_rssmodules');
@@ -54,6 +83,9 @@ if (isset($_REQUEST["rssId"])) {
     $info["refresh"] = 1800;
     $info["showTitle"] = 'n';
     $info["showPubDate"] = 'n';
+    $info["showDesc"] = 'n';
+    $info["showImage"] = 'n';
+    $info["displayMode"] = 'list';
 }
 if (! isset($_REQUEST["save"])) {
     $smarty->assign('name', $info["name"]);
@@ -62,6 +94,9 @@ if (! isset($_REQUEST["save"])) {
     $smarty->assign('refreshSeconds', $info["refresh"]);
     $smarty->assign('showTitle', $info["showTitle"]);
     $smarty->assign('showPubDate', $info["showPubDate"]);
+    $smarty->assign('showDesc', $info["showDesc"] ?? 'n');
+    $smarty->assign('showImage', $info["showImage"] ?? 'n');
+    $smarty->assign('displayMode', $info["displayMode"] ?? 'list');
 }
 
 if ((isset($_REQUEST["refresh_all"]) || ! empty($_REQUEST["refresh"])) && $access->checkCsrf()) {
@@ -179,20 +214,36 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     if (empty($_REQUEST["name"]) || empty($_REQUEST["url"])) {
         Feedback::error(tr("The name or URL is empty, the external feed has not been created"));
     } else {
-        if (isset($_REQUEST['showTitle']) == 'on') {
+        if (! empty($_REQUEST['showTitle'])) {
             $smarty->assign('showTitle', 'y');
             $info["showTitle"] = 'y';
         } else {
             $smarty->assign('showTitle', 'n');
             $info["showTitle"] = 'n';
         }
-        if (isset($_REQUEST['showPubDate']) == 'on') {
+        if (! empty($_REQUEST['showPubDate'])) {
             $smarty->assign('showPubDate', 'y');
             $info["showPubDate"] = 'y';
         } else {
             $smarty->assign('showPubDate', 'n');
             $info["showPubDate"] = 'n';
         }
+        if (! empty($_REQUEST['showDesc'])) {
+            $smarty->assign('showDesc', 'y');
+            $info["showDesc"] = 'y';
+        } else {
+            $smarty->assign('showDesc', 'n');
+            $info["showDesc"] = 'n';
+        }
+        if (! empty($_REQUEST['showImage'])) {
+            $smarty->assign('showImage', 'y');
+            $info["showImage"] = 'y';
+        } else {
+            $smarty->assign('showImage', 'n');
+            $info["showImage"] = 'n';
+        }
+        $info["displayMode"] = in_array($_REQUEST["displayMode"] ?? 'list', ['list', 'cards'], true) ? $_REQUEST["displayMode"] : 'list';
+        $smarty->assign('displayMode', $info["displayMode"]);
         $result = $rsslib->replace_rss_module(
             $_REQUEST["rssId"],
             $_REQUEST["name"],
@@ -200,7 +251,11 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
             $_REQUEST["url"],
             $_REQUEST["refreshMinutes"],
             $info["showTitle"],
-            $info["showPubDate"]
+            $info["showPubDate"],
+            false,
+            $info["showDesc"],
+            $info["showImage"],
+            $info["displayMode"]
         );
         $smarty->assign('rssId', 0);
         $smarty->assign('name', '');
@@ -209,6 +264,9 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
         $smarty->assign('refreshSeconds', 900);
         $smarty->assign('showTitle', 'n');
         $smarty->assign('showPubDate', 'n');
+        $smarty->assign('showDesc', 'n');
+        $smarty->assign('showImage', 'n');
+        $smarty->assign('displayMode', 'list');
         $cookietab = 1;
         if (is_numeric($result)) {
             if (! empty($_REQUEST["rssId"])) {
