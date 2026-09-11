@@ -54,7 +54,7 @@ function wikiplugin_param_info()
                 'separator' => '|',
                 'description' => tra('Filter for the values.  Multiple values can be separated by a pipe | character.' .
                     'If empty then "text" is used".'),
-                'since' => '27.6',
+                'since' => '27.9',
                 'filter' => 'word',
                 'default' => 'text',
                 'advanced' => true,
