@@ -26,7 +26,7 @@ class ToolbarNewReport extends ToolbarUtilityItem
         $smarty = TikiLib::lib('smarty');
 
         $params = ['controller' => 'report', 'action' => 'wizard', 'modal' => 1];
-        $icon = smarty_function_icon(['name' => 'chart-bar'], $smarty->getEmptyInternalTemplate());
+        $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'chart-bar'], $smarty->getEmptyInternalTemplate());
         $url = $servicelib->getUrl($params);
         $label = tra('New Report');
 
