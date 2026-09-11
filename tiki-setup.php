@@ -712,7 +712,7 @@ for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
         nav[indexCurrentNav].classList.add("sm-navbar");
         nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
         const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
-        
+
         // Enable navigation on parent menu items with children
         // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
         // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
@@ -768,7 +768,7 @@ if ($prefs['feature_shadowbox'] == 'y') {
     max-width: 90vw;
     max-height: 90vh;
 }
-.gnext.disabled, 
+.gnext.disabled,
 .gprev.disabled{
     display: none !important;
 }
@@ -998,6 +998,7 @@ $("#top").on("annotationCreated", function (e, annotation) {
 });
 
 $headerlib->add_jsfile('lib/jquery_tiki/pluginedit.js');
+$headerlib->add_js_module('import "@jquery-tiki/coverpage-form";');
 
 if ($prefs['feature_machine_learning'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-machine_learning.js');

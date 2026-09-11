@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Search\Query\Aggregation\QueryFacade as AggregationFacade;
+
 function wikiplugin_customsearch_info()
 {
     return [
@@ -264,6 +266,8 @@ function wikiplugin_customsearch($data, $params)
     $facets = new Search_Query_FacetWikiBuilder();
     $facets->apply($matches);
 
+    $aggFacade = (new AggregationFacade())->applyWikiMarkup($matches);
+
     $cachelib = TikiLib::lib('cache');
     $cachelib->cacheItem(
         $definitionKey,
@@ -273,6 +277,7 @@ function wikiplugin_customsearch($data, $params)
                 'data' => $data,
                 'builder' => $builder,
                 'facets' => $facets,
+                'aggFacade' => $aggFacade,
                 'tsret' => $tsret,
             ]
         ),

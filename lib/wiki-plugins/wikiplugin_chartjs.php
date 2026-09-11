@@ -154,6 +154,8 @@ function wikiplugin_chartjs($data, $params)
     }
 
     $script = '
+    var existingChart_' . $params['id'] . ' = Chart.getChart("' . $params['id'] . '");
+    if (existingChart_' . $params['id'] . ') { existingChart_' . $params['id'] . '.destroy(); }
     var chartjs_' . $params['id'] . ' = new Chart("' . $params['id'] . '", {
         type: "' . $params['type'] . '",
         data: ' . json_encode($data) . ',
@@ -164,13 +166,15 @@ function wikiplugin_chartjs($data, $params)
     $canvas = '<canvas id="' . $params['id'] . '" width="' . $params['width'] . '" height="' . $params['height'] . '"></canvas>';
 
     if (! $to_PDF) {
-        TikiLib::lib('header')->add_js_module(
-            '
-            import { Chart, registerables } from "chartjs";
-            Chart.register(...registerables);
-            setTimeout(function () {' . $script . '}, 500);
-         '
-        );
+        $headerlib = TikiLib::lib('header');
+        $headerlib->add_js_module('import { Chart, registerables } from "chartjs"; if (! window.Chart) { Chart.register(...registerables); window.Chart = Chart; }');
+        $headerlib->add_jq_onready('
+            (function tikiChartInit_' . $params['id'] . '() {
+                if (typeof window.Chart === "undefined") { return setTimeout(tikiChartInit_' . $params['id'] . ', 50); }
+                ' . $script . '
+            })();
+        ');
+
         return '<div class="tiki-chartjs">' . $canvas . '</div>';
     }
 

@@ -16,15 +16,26 @@ class Search_Formatter_ArrayBuilder
         foreach ($matches as $m) {
             $name = $m->getName();
             $arguments = $m->getArguments();
+            $entry = $parser->parse($arguments);
+
+            // Body-bearing chunks ({name args}body{/name}) expose the
+            // raw body text under the conventional "_body" key. The
+            // unified-reporting templates (chartjs_full and friends)
+            // rely on this so report authors can drop a full Chart.js
+            // (or other library) options blob inside
+            $body = $m->getBody();
+            if (is_string($body) && $body !== '') {
+                $entry['_body'] = $body;
+            }
 
             if (isset($data[$name])) {
                 if (! is_int(key($data[$name]))) {
                     $data[$name] = [$data[$name]];
                 }
 
-                $data[$name][] = $parser->parse($arguments);
+                $data[$name][] = $entry;
             } else {
-                $data[$name] = $parser->parse($arguments);
+                $data[$name] = $entry;
             }
         }
 
