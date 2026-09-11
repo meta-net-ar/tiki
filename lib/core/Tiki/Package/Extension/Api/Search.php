@@ -14,7 +14,13 @@ class Search extends Api
             try {
                 self::$sources[] = new $source->class();
             } catch (\Exception $e) {
-                error_log($e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (exception logging in search extension)
+                (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('Unexpected error occurred'), [
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                    'package' => $package,
+                    'source' => $source,
+                    'exception' => $e->getMessage(),
+                ]);
             }
         }
     }

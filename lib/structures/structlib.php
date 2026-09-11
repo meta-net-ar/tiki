@@ -9,15 +9,20 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
+
+use Tiki\Lib\Logs\Tiki_Monolog;
+
 class StructLib extends TikiLib
 {
     public $displayLanguageOrder;
+
+    private Tiki_Monolog $logger;
 
     public function __construct()
     {
         global $prefs;
         parent::__construct();
-
+        $this->logger = new Tiki_Monolog();
         $this->displayLanguageOrder = [];
     }
     public function s_export_structure_tree($structure_id, $level = 0)
@@ -1018,7 +1023,11 @@ class StructLib extends TikiLib
     public function get_navigation_info($page_ref_id)
     {
         if (! $page_ref_id || ! is_numeric($page_ref_id)) {
-            error_log("Invalid page_ref_id: " . $page_ref_id); // @phpstan-ignore disallowedFunctions.errorLog (invalid structure data warning)
+            $this->logger->warning(tr("Invalid page_ref_id: %0", $page_ref_id),[
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'page_ref_id' => $page_ref_id
+            ]);
             return null;
         }
         return [
@@ -1059,7 +1068,12 @@ class StructLib extends TikiLib
             }
         } else {
             // Log the error or handle it gracefully
-            error_log("Method not found: $fn"); // @phpstan-ignore disallowedFunctions.errorLog (invalid structure data warning)
+            $this->logger->warning(tr("Method not found: %0", $fn), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'page_ref_id' => $page_ref_id,
+                'fn' => $fn
+            ]);
             return null;
         }
     }

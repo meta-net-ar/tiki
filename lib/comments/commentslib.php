@@ -11,6 +11,7 @@ use ZBateson\MailMimeParser\MailMimeParser;
 use Symfony\Component\Mime\Address;
 use Tiki\Lib\Diff\DiffUtils;
 use Tiki\Sections;
+use Tiki\Lib\Logs\Tiki_Monolog;
 
 /**
  *
@@ -372,7 +373,7 @@ class Comments extends TikiLib
         global $prefs, $user;
 
         $info = $this->get_forum($forumId);
-
+        $logger = new Tiki_Monolog();
         // for any reason my sybase test machine adds a space to
         // the inbound_imap_server field in the table.
         $info["inbound_imap_server"] = trim($info["inbound_imap_server"]);
@@ -406,7 +407,10 @@ class Comments extends TikiLib
             $xTikiHeader = $parsedMessage->getHeaderValue('X-Tiki');
             if ($xTikiHeader === 'yes') {
                 $source_imap->deleteMessages($imap, [$uid]);
-                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid came from Tiki (X-Tiki=yes)"); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
+                $logger->info(tr("[MAIL-IMPORT][SKIP] Message UID=%0 came from Tiki (X-Tiki=yes)", $uid),[
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                ]);
                 continue;
             }
             // If the connection is done, or the mail has an error, or whatever,
@@ -414,7 +418,10 @@ class Comments extends TikiLib
             // and continue on. --rlpowell
             if (! count($parsedMessage->getAllHeaders())) {
                 $source_imap->deleteMessages($imap, [$uid]);
-                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid has no headers."); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
+                $logger->info(tr("[MAIL-IMPORT][SKIP] Message UID=%0 has no headers.", $uid),[
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                ]);
                 continue;
             }
 
@@ -452,7 +459,12 @@ class Comments extends TikiLib
                 //this should be an admin option, but I don't know how to put it there yet.
                 $source_imap->deleteMessages($imap, [$uid]);
                 $email = $original_email_fixed;
-                error_log("Could not parse email address '$original_email_fixed', using as-is."); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
+                $logger->warning(tr("Could not parse email address; using it as-is."), [
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                    'email' => $original_email_fixed,
+                    'exception' => $e->getMessage(),
+                ]);
                 continue;
             }
             $userName = $this->table('users_users')->fetchOne('login', ['email' => $email]);
@@ -684,7 +696,11 @@ class Comments extends TikiLib
                 // mark the message to be deleted and keep processing
                 $source_imap->deleteMessages($imap, [$uid]);
             } catch (Exception $e) {
-                error_log("[MAIL-IMPORT][ERROR] Failed to post email UID=$uid: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
+                $logger->error(tr('Adding email %0 to the forum failed', $title),[
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                    'exception' => tr('[MAIL-IMPORT][ERROR] Failed to post email UID=%0: %1', $uid, $e->getMessage()),
+                ]);
                 Feedback::error(tr('Adding email %0 to the forum failed due to "%1"', $title, $e->getMessage()));
             }
             $importedCount++;

@@ -88,7 +88,11 @@ class SocialNetworksLib extends LogsLib
         try {
             return $oauthlib->request_token('twitter');
         } catch (\Exception $e) {
-            error_log("Twitter OAuth error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (Twitter OAuth exception reporting)
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('Twitter OAuth request failed.'), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'exception' => $e->getMessage(),
+            ]);
             return false;
         }
     }
@@ -116,7 +120,11 @@ class SocialNetworksLib extends LogsLib
                 return true;
             }
         } catch (\Exception $e) {
-            error_log("Twitter OAuth error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (Twitter OAuth exception reporting)
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('Twitter OAuth access failed.'), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'exception' => $e->getMessage(),
+            ]);
         }
         return false;
     }

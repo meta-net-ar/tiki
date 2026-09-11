@@ -55,10 +55,17 @@ function upgrade_20260430_remove_unsupported_mail_queue_entries_tiki($installer)
             $installer->query('DELETE FROM tiki_mail_queue WHERE messageId = ?', [$messageId]);
         }
 
-        error_log(sprintf( // @phpstan-ignore disallowedFunctions.errorLog (upgrade script — logs removed entry count to system log for traceability)
-            'Tiki upgrade: Removed %d unsupported mail queue entries. These were serialized in old Laminas/Zend format.',
-            count($incompatibleIds)
-        ));
+        (new \Tiki\Lib\Logs\Tiki_Monolog())->info(
+            sprintf(
+                'Tiki upgrade: Removed %d unsupported mail queue entries. These were serialized in old Laminas/Zend format.',
+                count($incompatibleIds)
+            ),
+            [
+                'component' => __FILE__,
+                'method' => __FUNCTION__,
+                'serialized_format' => 'Laminas/Zend',
+            ]
+        );
     }
 
     return true;

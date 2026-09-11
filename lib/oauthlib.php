@@ -49,7 +49,12 @@ class OAuthLib extends TikiDb_Bridge
         try {
             return $client->send();
         } catch (\Exception $e) {
-            error_log("OAuth request failed for $provider_key: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (OAuth exception reporting)
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('OAuth request failed.'), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'provider' => $provider_key,
+                'exception' => $e->getMessage(),
+            ]);
             return null;
         }
     }
@@ -74,7 +79,12 @@ class OAuthLib extends TikiDb_Bridge
             header('Location: ' . $authUrl);
             exit;
         } catch (\Exception $e) {
-            error_log("OAuth request_token error for $provider_key: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (OAuth exception reporting)
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('OAuth request token failed.'), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'provider' => $provider_key,
+                'exception' => $e->getMessage(),
+            ]);
             return false;
         }
     }
@@ -117,7 +127,12 @@ class OAuthLib extends TikiDb_Bridge
             unset($_SESSION['OAUTH_REQUEST_' . $provider_key], $_SESSION['OAUTH_STATE_' . $provider_key]);
             return true;
         } catch (\Exception $e) {
-            error_log("OAuth request_access error for $provider_key: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (OAuth exception reporting)
+            (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('OAuth access request failed.'), [
+                'component' => __CLASS__,
+                'method' => __FUNCTION__,
+                'provider' => $provider_key,
+                'exception' => $e->getMessage(),
+            ]);
             return false;
         }
     }

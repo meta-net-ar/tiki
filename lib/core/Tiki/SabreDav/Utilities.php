@@ -109,7 +109,11 @@ class Utilities
             try {
                 $parsed = VObject\Reader::read($availability);
             } catch (\Exception $e) {
-                TikiLib::lib('log')->add_log('error', tr('Failed parsing availability component: %0', $e->getMessage()));
+                (new \Tiki\Lib\Logs\Tiki_Monolog())->error(tr('Unexpected error occurred'), [
+                    'component' => __CLASS__,
+                    'method' => __FUNCTION__,
+                    'exception' => tr('Failed parsing availability component: %0', $e->getMessage())
+                ]);
             }
         }
         return $parsed;

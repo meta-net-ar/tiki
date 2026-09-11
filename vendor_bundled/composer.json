@@ -298,12 +298,12 @@
         "phpcsstandards/phpcsutils": "~1.0",
         "phpstan/phpstan": "~2.1",
         "phpstan/phpstan-deprecation-rules": "~2.0",
-        "spaze/phpstan-disallowed-calls": "~4.12",
         "phpunit/phpunit": "~10.5",
         "rector/rector": "~2.0",
         "sebastian/diff": "~5.1",
         "squizlabs/php_codesniffer": "~4.0",
         "smarty/smarty-lint" : "~0.3",
+        "spaze/phpstan-disallowed-calls": "~4.12",
         "stevegrunwell/phpunit-markup-assertions": "~2.0",
         "symfony/browser-kit": "~6.4",
         "symfony/http-client": "~6.4"

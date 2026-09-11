@@ -6,7 +6,7 @@
 includes:
   - phpstan-tikiPaths.neon
   - vendor_bundled/vendor/spaze/phpstan-disallowed-calls/extension.neon
-
+  - disallowedCalls.neon
 parameters:
   #customRulesetUsed: true
   level: 0
@@ -48,7 +48,3 @@ parameters:
       function: 'var_dump()'
       message: 'Remove debug code before committing'
       errorIdentifier: 'disallowedFunctions.varDump'
-    -
-      function: 'error_log()'
-      message: 'Use a proper logger instead of error_log()'
-      errorIdentifier: 'disallowedFunctions.errorLog'

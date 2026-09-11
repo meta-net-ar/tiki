@@ -35,6 +35,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
+use Tiki\Lib\Logs\Tiki_Monolog;
 use Tiki\Lib\mail\FileTransport;
 use Tiki\Lib\openpgp\OpenPGPTransport;
 
@@ -159,7 +160,11 @@ function tiki_mail_setup()
             }
             $tiki_maillib__mailer_default_transport = new Mailer($resolvedTransport);
         } catch (\Throwable  $e) {
-            error_log("Error creating mail transport: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
+            (new Tiki_Monolog())->error(tr('Error creating mail transport'), [
+                'component' => __FILE__,
+                'method' => __FUNCTION__,
+                'exception' => tr("Error creating mail transport: ") . $e->getMessage()
+            ]);
             // Fallback to a basic sendmail transport or null transport if configuration fails
             $tiki_maillib__mailer_default_transport = new Mailer(Transport::fromDsn('null://null'));
         }
@@ -194,7 +199,10 @@ function tiki_get_admin_mail($fromName = null)
         try {
             $mail->from(new Address($prefs['sender_email'], $fromName ?: $prefs['sender_name']));
         } catch (Throwable $e) {
-            error_log("Mailer General Error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
+            (new Tiki_Monolog())->error(tr('Mailer configuration failed.'), [
+                'component' => __FUNCTION__,
+                'exception' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -221,7 +229,7 @@ function tiki_send_admin_mail($email, $recipientName, $subject, $textBody)
 function tiki_send_email($email)
 {
     global $prefs;
-
+    $logger = new Tiki_Monolog();
     if (! empty($prefs['mailer_redirect'])) {
         $email->to($prefs['mailer_redirect']);
         $email->getHeaders()->remove('Cc');
@@ -235,7 +243,11 @@ function tiki_send_email($email)
             $senderName = $prefs['sender_name'] ?? null;
             $envelope->setSender(new Address($prefs['sender_email'], $senderName));
         } catch (Throwable $e) {
-            error_log("Mailer Envelope Error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
+            $logger->error(tr('Unexpected error occurred'), [
+                'component' => __FILE__,
+                'method'    => __FUNCTION__,
+                'exception' => tr('Mailer General Error: ') . $e->getMessage()
+            ]);
             $envelope = null;
         }
     }
@@ -246,12 +258,20 @@ function tiki_send_email($email)
     try {
         $tiki_maillib__mailer_default_transport->send($email, $envelope);
     } catch (TransportExceptionInterface $e) {
-        error_log("Mailer Transport Error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
+        $logger->error(tr('Mailer Transport Error'), [
+            'component' => __FILE__,
+            'method' => __FUNCTION__,
+            'exception' => tr("Mailer Transport Error: ") . $e->getMessage()
+        ]);
     } catch (Throwable $e) {
         if (str_contains($e->getMessage(), 'An email must have a "From" or a "Sender" header')) {
             Feedback::error(tr('Unable to send email: sender email not configured.'));
         } else {
-            error_log("Mailer General Error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
+            $logger->error(tr('Unexpected error occurred'), [
+                'component' => __FILE__,
+                'method' => __FUNCTION__,
+                'exception' => tr("Mailer General Error: ") . $e->getMessage()
+            ]);
         }
     }
 }

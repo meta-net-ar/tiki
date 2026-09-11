@@ -399,7 +399,13 @@ if ($inclusion) {
     $_SERVER['SCRIPT_NAME'] = $base . basename($inclusion);
     include __DIR__ . '/' . $inclusion;
 } else {
-    error_log("No route found - full:$full query:{$_SERVER['QUERY_STRING']}"); // @phpstan-ignore disallowedFunctions.errorLog (unmatched route warning)
+    (new \Tiki\Lib\Logs\Tiki_Monolog())->warning(
+        tr("No route found - full:%0 query:%1", $full, $_SERVER['QUERY_STRING']),
+        [
+            'component' => __FILE__,
+            'path' => $path,
+        ]
+    );
 
     // Route to the "no-route" URL, if found
     require_once('lib/init/initlib.php');

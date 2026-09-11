@@ -296,7 +296,10 @@ if (empty($info)) {
                 $access->redirect($infoForSlug['pageSlug'], '', 301);
                 exit;
             } else {
-                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']); // @phpstan-ignore disallowedFunctions.errorLog (redirect loop detection warning)
+                (new \Tiki\Lib\Logs\Tiki_Monolog())->warning(tr("Avoiding redirect loop: %0", $infoForSlug['pageSlug']), [
+                    'component' => __FILE__,
+                    'infoForSlug' => $infoForSlug,
+                ]);
             }
         }
     }
