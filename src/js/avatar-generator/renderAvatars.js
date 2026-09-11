@@ -1,16 +1,30 @@
 import { createAvatar } from "@dicebear/core";
-import * as collections from "@dicebear/collection";
 import { AVATAR_RADIUS, AVATAR_SIZE } from "./avatarOptions.constant";
 
 export default function renderAvatars() {
-    $(".dicebear-avatar").each(function () {
-        const style = collections[$(this).data("style")];
-        const size = $(this).data("size") || "small";
-        if (!style) {
-            return;
-        }
-        const avatar = createAvatar(style, { seed: $(this).data("seed"), size: AVATAR_SIZE[size], radius: AVATAR_RADIUS });
-        const image = $("<img>").attr("src", avatar.toDataUri());
-        $(this).replaceWith(image);
-    });
+    const avatarElements = $(".dicebear-avatar").toArray();
+
+    return Promise.all(
+        avatarElements.map(async (element) => {
+            const avatarElement = $(element);
+            const style = avatarElement.data("style");
+            let collection;
+
+            try {
+                collection = await import(`@dicebear/${style}`);
+            } catch {
+                return;
+            }
+
+            const size = avatarElement.data("size") || "small";
+
+            if (!collection) {
+                return;
+            }
+
+            const avatar = createAvatar(collection, { seed: avatarElement.data("seed"), size: AVATAR_SIZE[size], radius: AVATAR_RADIUS });
+            const image = $("<img>").attr("src", avatar.toDataUri());
+            avatarElement.replaceWith(image);
+        })
+    );
 }

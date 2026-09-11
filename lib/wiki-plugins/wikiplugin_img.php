@@ -602,6 +602,8 @@ function wikiplugin_img($data, $params)
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
 
+    $pluginInfo = wikiplugin_img_info();
+
     $imgdata = [];
     $imgdata['galleryId'] = '';
     $imgdata['alt'] = '';
@@ -805,7 +807,7 @@ function wikiplugin_img($data, $params)
         }
     } else {
         if (! empty($imgdata['fileId'])) {
-            $src = smarty_modifier_sefurl($imgdata['fileId'], 'file');
+            $src = \SmartyTiki\Modifier\Sefurl::apply($imgdata['fileId'], 'file');
 
             if ($absolute_links) {
                 $src = TikiLib::tikiUrl($src);
@@ -1216,7 +1218,7 @@ function wikiplugin_img($data, $params)
             $replimg .= 'sizes="' . $sizes . '" ';
         }
         $imgdata['class'] .= ' regImage pluginImg' . $imgdata['fileId'];
-        if ($imgdata['responsive'] == 'y') {
+        if ($imgdata['responsive'] == 'y' && empty($width) && empty($height)) {
             $imgdata['class'] .= ' img-fluid';
         }
         if ($imgdata['featured'] == 'y') {
@@ -1397,7 +1399,7 @@ function wikiplugin_img($data, $params)
             }
 
             // Let tiki_popover() and $.tikiPopoverWhereToPlace() handle placement and initialization
-            $mouseover = ' ' . smarty_function_popup($popup_params, $smarty->getEmptyInternalTemplate());
+            $mouseover = ' ' . \SmartyTiki\FunctionHandler\Popup::render($popup_params, $smarty->getEmptyInternalTemplate());
         } else {
             if (! empty($imgdata['fileId']) && $imgdata['thumb'] != 'download' && empty($urldisp)) {
                 $link = $browse_full_image . '&display';
@@ -1531,13 +1533,13 @@ function wikiplugin_img($data, $params)
             if (! empty($titleonly)) {
                 $repl .= ' title="' . $titleonly . '"';
             }
-            $repl .= ">\r\t\t\t\t" . smarty_function_icon(['name' => 'view', 'iclass' => 'tips',
+            $repl .= ">\r\t\t\t\t" . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'view', 'iclass' => 'tips',
                     'ititle' => ':' . tra('Enlarge')], $smarty->getEmptyInternalTemplate()) . '</a>' . "\r\t\t\t</div>";
         }
         //Add metadata icon
         if ($imgdata['metadata'] == 'view') {
             $repl .= '<div style="float:right; margin-right:2px"><a href="#" id="' . $id_link
-                . '" class="tips" title=":' . tra('Metadata') . '">' . smarty_function_icon(['name' => 'tag'], $smarty->getEmptyInternalTemplate())
+                . '" class="tips" title=":' . tra('Metadata') . '">' . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'tag'], $smarty->getEmptyInternalTemplate())
                 . '</a></div>';
         }
         //Add description based on user setting (use $desconly from above) and close divs
@@ -1667,7 +1669,7 @@ function wikiplugin_img($data, $params)
                 . tr("Draw on the Image") . "\"" .
                 " class=\"editplugin pluginImgEdit{$imgdata['fileId']}\" data-fileid=\"{$imgdata['fileId']}\" " .
                 "data-galleryid=\"{$dbinfo['galleryId']}\"{$iconDisplayStyle} data-imgparams='$jsonParams'>" .
-                smarty_function_icon(['name' => 'edit', 'iclass' => 'tips', 'ititle' => ':' . tra('Edit')], $smarty->getEmptyInternalTemplate())
+                \SmartyTiki\FunctionHandler\Icon::render(['name' => 'edit', 'iclass' => 'tips', 'ititle' => ':' . tra('Edit')], $smarty->getEmptyInternalTemplate())
                 . '</a>';
         }
     }

@@ -527,7 +527,7 @@ window.customsearch_$id = customsearch$id;
     //get iconset icon if daterange is one of the fields
     if ($dr) {
         $smarty = TikiLib::lib('smarty');
-        $iconinsert = smarty_function_js_insert_icon(['type' => 'jscalendar', 'return' => 'y'], $smarty->getEmptyInternalTemplate());
+        $iconinsert = \SmartyTiki\FunctionHandler\JsInsertIcon::render(['type' => 'jscalendar', 'return' => 'y'], $smarty->getEmptyInternalTemplate());
     } else {
         $iconinsert = '';
     }
@@ -1024,6 +1024,12 @@ function cs_design_select($id, $fieldname, $fieldid, $arguments, $default, &$scr
                 }
             }
         } elseif ($field['type'] === 'u') { // User Selector (only when in dropdown list mode)
+            if ($default) {
+                $field['value'] = is_array($default)
+                    ? implode(',', array_filter($default, 'strlen'))
+                    : $default;
+                $handler = TikiLib::lib('trk')->get_field_handler($field);
+            }
             $html = $handler->renderInput([
                 'id' => $arguments['id'] ?? '',
                 'filter_render' => true,
@@ -1038,6 +1044,11 @@ $('#$fieldid').on('change', function() {
     });
 });
 ";
+            if ($default) {
+                $script .= "
+$('#$fieldid').trigger('change');
+";
+            }
             return $html;
         } elseif (in_array($field['type'], ['d','D','R','M'])) { // or types - dropdown, dropdown with other, radio button. multiselect
             $data = $handler->getFieldData();
@@ -1179,7 +1190,7 @@ function cs_design_daterange($id, $fieldname, $fieldid, $arguments, $default, &$
         $params['enddate'] = $startEmpty ? '' : TikiLib::lib('tiki')->now + 365 * 24 * 3600;
     }
 
-    $picker = '<div class="row col-sm-6">' . smarty_function_jscalendar($params, $smarty->getEmptyInternalTemplate()) . '</div>';
+    $picker = '<div class="row col-sm-6">' . \SmartyTiki\FunctionHandler\JsCalendar::render($params, $smarty->getEmptyInternalTemplate()) . '</div>';
 
     $script .= "
     $(document).on('change', 'input[name=\"$from_fieldname\"],input[name=\"$to_fieldname\"]', function() {

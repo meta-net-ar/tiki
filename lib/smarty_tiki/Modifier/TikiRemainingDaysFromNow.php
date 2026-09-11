@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class TikiRemainingDaysFromNow
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class TikiRemainingDaysFromNow implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tiki_remaining_days_from_now';
+    }
+
     /**
      * @param int $time future time to calculate number of day to go
      * @param string $format PHP date format for the displayed date set in $time.

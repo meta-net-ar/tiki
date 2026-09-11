@@ -1,6 +1,13 @@
 // Default values for necessary Bootstrap and Tiki CSS variables in case themes don't provide them
 :root {
     --tiki-page-content-top-margin: 1.25rem; // Equivalent to 20px that was hard-coded in Tiki at one time
+    --tiki-anchor-offset: 33vh;
+}
+
+// Prevent anchor targets from being covered by fixed/sticky headers,
+// including empty inline anchors created by the ANAME plugin.
+html {
+    scroll-padding-top: var(--tiki-anchor-offset);
 }
 
 .navbar-brand {
@@ -215,8 +222,9 @@ form[name=editpageform] .mb-3 .tab-content .alert-warning {
 }
 
 // cookie settings module
-.box-cookiesettings {
+.modules .module.box-cookiesettings {
     position: fixed;
+    padding: 1rem;
 }
 
 .box-cookiesettings.none {
@@ -643,7 +651,7 @@ blockquote {
 }
 
 
-// Enable Smartmenus dropdown-menu to display above fixed-top header
+// Enable Smartmenus dropdown-menu to display above sticky-top header
 ul.sm-vertical,
 ul.sm-horizontal {
     .dropdown-menu {

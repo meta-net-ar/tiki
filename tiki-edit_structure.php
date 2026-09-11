@@ -100,6 +100,12 @@ $alert_to_remove_extra_cats = [];
 
 // needed here for filtering later in the search results
 $subtree = $structlib->get_subtree($structure_info["page_ref_id"]);
+$structure_page_names = [];
+foreach ($subtree as $sub) {
+    if (! empty($sub['pageName']) && ! ($sub['last'] == true && $sub['first'] == false)) {
+        $structure_page_names[$sub['pageName']] = true;
+    }
+}
 
 // start security hardened section
 if ($editable === 'y') {
@@ -230,12 +236,6 @@ if ($editable === 'y') {
     );
 
     // Filter out pages already in the structure
-    $structure_page_names = [];
-    foreach ($subtree as $sub) {
-        if (isset($sub['pageName']) && ! empty($sub['pageName']) && ! ($sub['last'] == true && $sub['first'] == false)) {
-            $structure_page_names[$sub['pageName']] = true;
-        }
-    }
     $filtered_data = array_filter($listpages['data'], function ($item) use ($structure_page_names) {
         return ! isset($structure_page_names[$item['pageName']]);
     });
@@ -387,13 +387,17 @@ if ($prefs['feature_wiki_categorize_structure'] == 'y' && $all_editable == 'y') 
 include_once('tiki-section_options.php');
 
 $headerlib->add_js_module('import "@jquery-tiki/tiki-edit_structure";');
+$headerlib->add_js_config(
+    'jqueryTiki.structurePageNames = ' . json_encode(array_keys($structure_page_names)),
+    100
+);
 $structlib = TikiLib::lib('struct');
 
 $structure_id = $structure_info['structure_id'];
 if (! $structure_id) {
     $structure_id = $structure_info['page_ref_id'];
 }
-$smarty->assign('nodelist', $structlib->get_toc($structure_id, 'asc', false, false, '', 'admin', $page_info['page_ref_id'], 0, 0, 'struct', ''));
+$smarty->assign('nodelist', $structlib->get_toc((int) $_REQUEST['page_ref_id'], 'asc', false, false, '', 'admin', $page_info['page_ref_id'], 0, 0, 'struct', ''));
             // $page_ref_id,$order='asc',$showdesc=false,$numbering=true,$numberPrefix='',$type='plain',$page='',$maxdepth=0,$mindepth=0, $structurePageName=''
 $smarty->assign('structure_id', $structure_id);
 // disallow robots to index page:

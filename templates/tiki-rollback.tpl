@@ -8,7 +8,7 @@
         {ticket}
         <input type="hidden" name="page" value="{$page|escape}">
         <input type="hidden" name="version" value="{$version|escape}">
-        <label for="comment">{tr}Describe the reason for revert{/tr} {help url='Using+Wiki+Pages' desc="{tr}Enter some text to describe the reason for reverting{/tr}"}</label>
+        <label for="comment">{tr}Describe the reason for revert{/tr} {help url='Using-Wiki-Pages' desc="{tr}Enter some text to describe the reason for reverting{/tr}"}</label>
         <input class="form-control wikiedit" type="text" id="comment" name="comment" value="" maxlength="255">
     </div>
     <div align="center">

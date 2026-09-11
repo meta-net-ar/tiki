@@ -5,6 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Sections;
+
 tiki_setup_events();
 
 register_shutdown_function(function () {
@@ -104,6 +106,7 @@ function tiki_setup_events()
 
         $events->bind('tiki.trackeritem.create', $defer('trk', 'setup_wiki_fields'));
         $events->bind('tiki.trackeritem.update', $defer('trk', 'update_wiki_fields'));
+        $events->bind('tiki.trackeritem.update', $defer('trk', 'updateTikiObject'));
         $events->bind('tiki.trackeritem.delete', $defer('trk', 'delete_wiki_fields'));
 
         if ($prefs['userTracker'] == 'y') {
@@ -255,9 +258,11 @@ function tiki_setup_events()
 
     // If the parameter is supplied by the web server, Tiki will expose the object type and id as a response header
     if (! empty($_SERVER['TIKI_HEADER_REPORT_OBJECT']) && strtolower($_SERVER['TIKI_HEADER_REPORT_OBJECT']) != 'off') {
-        if (function_exists('current_object') && $object = current_object()) {
-            header("X-Current-Object: {$object['type']}:{$object['object']}");
-        }
+        Sections::onSectionChange(function ($section) {
+            if (function_exists('current_object') && $object = current_object()) {
+                header("X-Current-Object: {$object['type']}:{$object['object']}");
+            }
+        });
     }
 
     // If the parameter is supplied by the web server, Tiki will expose events as a response header

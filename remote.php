@@ -141,7 +141,7 @@ function validate($params)
         $user_details = $userlib->get_user_details($login);
         $user_info = $userlib->get_user_info($login);
         $ret['avatarData'] = new XML_RPC_Value($user_info['avatarData'], 'base64');
-        $ret['user_details'] = new XML_RPC_Value(serialize($user_details), 'string');
+        $ret['user_details'] = new XML_RPC_Value(json_encode($user_details), 'string');
 
         return new XML_RPC_Response(new XML_RPC_Value($ret, 'struct'));
     } else {

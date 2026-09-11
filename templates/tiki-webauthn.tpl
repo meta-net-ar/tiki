@@ -24,12 +24,14 @@
                         <td> {$devices[device].authenticator_name} </td>
                         <td> {$devices[device].device_name} </td>
                         <td> {$devices[device].sign_count} </td>
-                        <td> {$devices[device].created_at} </td>
-                        <td> {$devices[device].last_signin} </td>
+                        <td> {$devices[device].created_at|tiki_short_datetime} </td>
+                        <td> {$devices[device].last_signin|tiki_short_datetime} </td>
                         <td class="action">
                             {actions}
                                 <action>
-                                    <a href="tiki-webauthn.php?authenticator_id={$devices[device].id}&amp;action=remove" onclick="confirmPopup('{tr}Delete this passkey from this site? Note: the copy saved on your device will NOT be removed automatically. You must delete it from your device\'s passkey/password manager separately.{/tr}', '{ticket mode=get}')">
+                                    <a href="tiki-webauthn.php?authenticator_id={$devices[device].id}&amp;action=remove"
+                                        onclick="confirmPopup('{tr}Delete this passkey from this site?{/tr}', '{ticket mode=get}', '{tr}Note: the copy saved on your device will NOT be removed automatically. You must delete it from your device\'s passkey/password manager separately.{/tr}')"
+                                    >
                                         {icon name='delete' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                     </a>
                                 </action>

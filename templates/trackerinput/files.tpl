@@ -62,12 +62,12 @@
             {wikiplugin _name='vimeo' fromFieldId=$field.fieldId|escape fromItemId=$item.itemId|escape galleryId=$field.galleryId|escape}{/wikiplugin}
         {else}
             {if $field.options_map.uploadInModal neq 'n'}
-                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload changeFileNameOnUpload=$data.changeFileNameOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern}" class="btn btn-primary upload-files" role="button">
+                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload changeFileNameOnUpload=$data.changeFileNameOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern subdirectoryBehavior=$field.subdirectoryBehavior}" class="btn btn-primary upload-files" role="button">
                     {if $actual_limit !== 1}{tr}Upload Files{/tr}{else}{tr}Upload File{/tr}{/if}
                 </a>
             {else}
                 <div class="upload-files-inline-form">
-                    {service_inline controller=file action=uploader uploadInModal=0 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload directoryPattern=$field.directoryPattern}
+                    {service_inline controller=file action=uploader uploadInModal=0 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload directoryPattern=$field.directoryPattern subdirectoryBehavior=$field.subdirectoryBehavior}
                 </div>
             {/if}
         {/if}
@@ -127,10 +127,10 @@
     {else}
         {if !isset($show_modal_preview)}
             {if empty($field.canUpload)}
-                {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}" }
+                {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}"}
                 {/remarksbox}
             {else}
-                {remarksbox type="error" close="n" title="{tr}You do not have permission to create galleries in this gallery.{/tr}" }
+                {remarksbox type="error" close="n" title="{tr}You do not have permission to create galleries in this gallery.{/tr}"}
                 {/remarksbox}
             {/if}
         {/if}
@@ -154,10 +154,10 @@
                     <p class="mb-0 text-muted small">{tr}Review your recording before uploading{/tr}</p>
                 </div>
             </div>
-            
+
             {if $isAudio}
-                <audio 
-                    src="{$media_url|escape}" 
+                <audio
+                    src="{$media_url|escape}"
                     class="w-100 rounded-2 my-4"
                     controls
                     autoplay
@@ -165,27 +165,27 @@
                     playsinline
                 ></audio>
             {else}
-                <video 
+                <video
                     src="{$media_url|escape}"
-                    class="w-100 rounded-2 bg-dark my-4" 
-                    controls 
+                    class="w-100 rounded-2 bg-dark my-4"
+                    controls
                     autoplay
                     playsinline
                     crossorigin="anonymous"
                 ></video>
             {/if}
-            
+
             <div class="d-flex gap-3 mt-4">
-                <button 
-                    id="btn-upload-now" 
+                <button
+                    id="btn-upload-now"
                     class="btn btn-primary flex-fill d-flex align-items-center justify-content-center gap-2 fw-medium rounded-2"
                     style="min-height: 48px;"
                 >
                     {icon name='upload'}
                     <span>{tr}Upload{/tr}</span>
                 </button>
-                <button 
-                    id="close-preview" 
+                <button
+                    id="close-preview"
                     class="btn btn-outline-secondary flex-fill d-flex align-items-center justify-content-center gap-2 fw-medium rounded-2"
                     style="min-height: 48px;"
                 >
@@ -261,7 +261,7 @@
             }
 
             function attachFileCheckingOnElement(el) {
-                $("input[type=file]", el).change(function () {
+                $("input[type=file]", el).on('change', function () {
                     return checkFile($(this).val(), $(this).closest("form"));
                 });
                 $(el).on('drop', '.file-uploader', function (e) {
@@ -295,7 +295,7 @@
 
             attachFileCheckingOnElement($self.find('.upload-files-inline-form'));
 
-            $("a.upload-files").click(function () {
+            $("a.upload-files").on('click', function () {
                 $(document).one('tiki.modal.redraw', '.modal.fade', function () {
                     attachFileCheckingOnElement(this);
                 });
@@ -403,7 +403,7 @@
                 });
             });
 
-            $url.keypress(function (e) {
+            $url.on('keypress', function (e) {
                 if (e.which === 13) {
                     var $this = $(this);
                     var url = $this.val();

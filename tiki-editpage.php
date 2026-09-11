@@ -22,7 +22,10 @@ $inputConfiguration = [
         'page' => 'pagename',
         'returnto' => 'pagename',
         'watch' => 'digits',
-        'cancel_edit' => 'url'
+        'cancel_edit' => 'url',
+        'current_page_id' => 'int',
+        'add_child' => 'bool',
+        'insert_into_struct' => 'bool',
     ] ],
 ];
 require_once('tiki-setup.php');
@@ -215,6 +218,65 @@ $smarty->assign('page', $page);
 $info = $tikilib->get_page_info($page);
 $smarty->assign('quickedit', isset($_GET['quickedit']));
 
+if (
+    isset($_REQUEST['insert_into_struct'])
+    && ! empty($_REQUEST['current_page_id'])
+    && ! empty($page)
+    && $tikilib->page_exists($page)
+) {
+    $currentRefId = (int) $_REQUEST['current_page_id'];
+    $currentNodeInfo = $structlib->s_get_page_info($currentRefId);
+    $currentStructureInfo = $structlib->s_get_structure_info($currentRefId);
+
+    if (! empty($currentNodeInfo) && ! empty($currentStructureInfo)) {
+        if (
+            ($tiki_p_edit != 'y' && ! $tikilib->user_has_perm_on_object($user, $currentStructureInfo["pageName"], 'wiki page', 'tiki_p_edit'))
+            || ($tiki_p_edit_structures != 'y' && ! $tikilib->user_has_perm_on_object($user, $currentStructureInfo["pageName"], 'wiki page', 'tiki_p_edit_structures'))
+        ) {
+            Feedback::errorAndDie(tra("You do not have permission to edit this structure."), \Laminas\Http\Response::STATUS_CODE_401);
+        }
+
+        $alreadyInStructure = false;
+        $structurePages = $structlib->s_get_structure_pages($currentStructureInfo['page_ref_id']);
+        foreach ($structurePages as $structurePage) {
+            if (($structurePage['pageName'] ?? '') === $page) {
+                $alreadyInStructure = true;
+                break;
+            }
+        }
+
+        if (! $alreadyInStructure) {
+            $targetParentRefId = $currentRefId;
+            $afterRefId = null;
+
+            if (empty($_REQUEST['add_child'])) {
+                $targetParentRefId = (int) $currentNodeInfo['parent_id'];
+                $afterRefId = $currentRefId;
+            } else {
+                $subpages = $structlib->s_get_pages($currentRefId);
+                $max = count($subpages);
+                if ($max > 0) {
+                    $afterRefId = (int) $subpages[$max - 1]["page_ref_id"];
+                }
+            }
+
+            if ($targetParentRefId > 0) {
+                $structlib->s_create_page($targetParentRefId, $afterRefId, $page, '', $currentStructureInfo['structure_id']);
+                Feedback::success(tr('Page %0 was added to structure %1.', $page, $currentStructureInfo['pageName']));
+            }
+        } else {
+            Feedback::warning(tr('Page %0 is already part of this structure.', $page));
+        }
+
+        $url = \SmartyTiki\FunctionHandler\Sefurl::render([
+            'page' => $currentNodeInfo['pageName'],
+            'structure' => $currentStructureInfo['pageName'],
+            'page_ref_id' => $currentRefId,
+        ], $smarty->getEmptyInternalTemplate());
+        $access->redirect($url);
+    }
+}
+
 // 2010-01-26: Keep in active until translation refactoring is done.
 if ($editlib->isNewTranslationMode() || $editlib->isUpdateTranslationMode()) {
      $editlib->prepareTranslationData();
@@ -328,24 +390,8 @@ if (isset($_REQUEST['minor'])) {
     $_REQUEST['save'] = true;
 }
 
-if ($user && $prefs['feature_user_watches'] === 'y') {
-    $isFormSubmit = isset($jitRequest['edit']);
-    if ($tikilib->page_exists($page)) {
-        $currentlyWatching = (bool) $tikilib->user_watches($user, 'wiki_page_changed', $page, 'wiki page');
-        $default = $currentlyWatching;
-    } else {
-        // New pages get default watch checked for authors
-        $currentlyWatching = false;
-        $default = ($prefs['wiki_watch_author'] === 'y');
-    }
-
-    $requestedWatch = isset($_REQUEST['watch']) && $isFormSubmit;
-    $smarty->assign('show_watch', 'y');
-    $smarty->assign('watch_checked', ( ($default && ! $isFormSubmit) || $requestedWatch) ? 'y' : 'n');
-} else {
-    $currentlyWatching = false;
-    $requestedWatch = false;
-    $smarty->assign('show_watch_controls', 'n');
+if (! $tikilib->page_exists($page) && $user && $prefs['feature_user_watches'] === 'y' && $prefs['wiki_watch_author'] === 'y') {
+    $tikilib->add_user_watch($user, 'wiki_page_changed', $page, 'wiki page', $page, $wikilib->sefurl($page));
 }
 
 if (isset($_REQUEST['partial_save'])) {
@@ -391,9 +437,7 @@ if ($prefs['feature_warn_on_edit'] === 'y') {
         }
     }
     if ($editpageconflict === 'y' && ! isset($_REQUEST["conflictoverride"])) {
-        include_once('lib/smarty_tiki/modifier.userlink.php');
-        include_once('lib/smarty_tiki/modifier.username.php');
-        $msg = tr("This page is being edited by %0. Please check with the user before editing the page,    otherwise the changes will be stored as two separate versions in the history and you will have to manually merge them later.", smarty_modifier_username($semUser));
+        $msg = tr("This page is being edited by %0. Please check with the user before editing the page,    otherwise the changes will be stored as two separate versions in the history and you will have to manually merge them later.", \SmartyTiki\Modifier\Username::apply($semUser));
         $msg .= '<br /><br /><a href="tiki-editpage.php?page=';
         $msg .= urlencode($page);
         $msg .= '&conflictoverride=y">' . tra('Override lock and carry on with edit') . '</a>';
@@ -544,15 +588,6 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
         }
     }
 
-    // If the watch state is not the same
-    if ($requestedWatch !== $currentlyWatching) {
-        if ($requestedWatch) {
-            $tikilib->add_user_watch($user, 'wiki_page_changed', $page, 'wiki page', $page, $wikilib->sefurl($page));
-        } else {
-            $tikilib->remove_user_watch($user, 'wiki_page_changed', $page, 'wiki page');
-        }
-    }
-
     if (isset($_REQUEST["save"])) {                 // jb tiki 6 - this block of code seems to be redundant and unused - TOKIL
         unset($_REQUEST["save"]);
         if ($page_ref_id) {
@@ -635,7 +670,7 @@ if ($prefs['feature_wiki_attachments'] === 'y' && isset($_REQUEST["attach"]) && 
             if ($uploads) {
                 if (isset($_REQUEST['edit'])) {
                     foreach ($uploads as $upload) {
-                        $_REQUEST['edit'] .= '[' . smarty_modifier_sefurl($upload['fileId'], 'file') . '|' . $upload['name'] . ']';
+                        $_REQUEST['edit'] .= '[' . \SmartyTiki\Modifier\Sefurl::apply($upload['fileId'], 'file') . '|' . $upload['name'] . ']';
                     }
                 }
                 Feedback::success(tr('File uploaded'));
@@ -1417,15 +1452,6 @@ if (
         }
         /* Local reference handling */
 
-        // If the watch state is not the same
-        if ($requestedWatch !== $currentlyWatching) {
-            if ($requestedWatch) {
-                $tikilib->add_user_watch($user, 'wiki_page_changed', $page, 'wiki page', $page, $wikilib->sefurl($page));
-            } else {
-                $tikilib->remove_user_watch($user, 'wiki_page_changed', $page, 'wiki page');
-            }
-        }
-
         if (! empty($prefs['geo_locate_wiki']) && $prefs['geo_locate_wiki'] == 'y' && ! empty($_REQUEST['geolocation'])) {
             TikiLib::lib('geo')->set_coordinates('wiki page', $page, $_REQUEST['geolocation']);
         }
@@ -1465,7 +1491,7 @@ if (
                 $structure_info = $structlib->s_get_page_info($structure_info['parent_id']);
             }
             if ($structure_info) {
-                $url = smarty_function_sefurl([
+                $url = \SmartyTiki\FunctionHandler\Sefurl::render([
                     'page' => $page,
                     'structure' => $structure_info['pageName'],
                     'page_ref_id' => $page_ref_id,
@@ -1648,10 +1674,48 @@ if ($wikilib->contains_badchars($page) && ! $tikilib->page_exists($page)) {
 }
 
 $smarty->assign('showstructs', []);
-if ($structlib->page_is_in_structure($_REQUEST["page"])) {
-    $structs = $structlib->get_page_structures($_REQUEST["page"]);
-    $smarty->assign('showstructs', $structs);
+$smarty->assign('editableStructures', []);
+$smarty->assign('structuresToAdd', []);
+$smarty->assign('showStructuresTab', false);
+$smarty->assign('pageIsNew', ! $tikilib->page_exists($page));
+$smarty->assign('creationStructureInfo', null);
+if ($prefs['feature_wiki_structure'] === 'y' && strtolower($page) !== 'sandbox' && ! empty($page)) {
+    $showstructs = [];
+    if ($structlib->page_is_in_structure($page)) {
+        $showstructs = $structlib->get_page_structures($page);
+    }
+    $smarty->assign('showstructs', $showstructs);
+
+    if (! $tikilib->page_exists($page) && ! empty($_REQUEST['current_page_id'])) {
+        $creationStructureInfo = $structlib->s_get_structure_info((int) $_REQUEST['current_page_id']);
+        if (! empty($creationStructureInfo)) {
+            $smarty->assign('creationStructureInfo', $creationStructureInfo);
+        }
+    }
+
+    $pageStructureNames = array_fill_keys(array_column($showstructs, 'pageName'), true);
+    $editableStructures = [];
+    if ($tiki_p_edit_structures === 'y') {
+        $structuresList = $structlib->list_structures(0, -1, 'pageName_asc');
+        foreach ($structuresList['data'] ?? [] as $struct) {
+            if (($struct['edit_structure'] ?? 'n') !== 'y') {
+                continue;
+            }
+            $struct['in_structure'] = isset($pageStructureNames[$struct['pageName']]);
+            $editableStructures[] = $struct;
+        }
+    }
+    $smarty->assign('editableStructures', $editableStructures);
+    $smarty->assign(
+        'structuresToAdd',
+        array_values(array_filter($editableStructures, static fn ($struct) => empty($struct['in_structure'])))
+    );
+    $smarty->assign(
+        'showStructuresTab',
+        $tiki_p_edit_structures === 'y' || count($showstructs) > 0
+    );
 }
+
 // Flag for 'page bar' that currently 'Edit' mode active
 // so no need to show comments & attachments, but need
 // to show 'wiki quick help'
@@ -1737,15 +1801,15 @@ if ($need_lang) {
             $smarty = TikiLib::lib('smarty');
 
             $content .= "<form method='post' action='tiki-admin.php'>";
-            $content .= str_replace('"', "&quot;", smarty_function_preference(['name' => 'ajax_autosave'], $smarty->getEmptyInternalTemplate()));
-            $content .= str_replace('"', "&quot;", smarty_function_ticket([], $smarty->getEmptyInternalTemplate()));
+            $content .= str_replace('"', "&quot;", \SmartyTiki\FunctionHandler\Preference::render(['name' => 'ajax_autosave'], $smarty->getEmptyInternalTemplate()));
+            $content .= str_replace('"', "&quot;", \SmartyTiki\FunctionHandler\Ticket::render([], $smarty->getEmptyInternalTemplate()));
             $content .= "<input type='submit' class='btn btn-primary btn-sm' value='";
-            $content .= smarty_modifier_escape(tra('Apply')) . "'>";
+            $content .= \SmartyTiki\Modifier\Escape::apply(tra('Apply')) . "'>";
             $content .= '</form>';
         }
         $remrepeat = false;
         $smartyTemplate = $smarty->getEmptyInternalTemplate();
-        $remarksbox = str_replace('"', "'", smarty_block_remarksbox(['type' => 'warning', 'title' => 'Autosave', 'close' => 'y'], $content, $smartyTemplate, $remrepeat));
+        $remarksbox = str_replace('"', "'", \SmartyTiki\BlockHandler\Remarksbox::render(['type' => 'warning', 'title' => 'Autosave', 'close' => 'y'], $content, $smartyTemplate, $remrepeat));
 
         $smarty->assign('alert_content', $remarksbox);
     }

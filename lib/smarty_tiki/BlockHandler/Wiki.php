@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty plugin wiki
@@ -17,8 +18,13 @@ use Smarty\Template;
  * Usage: {wiki}wiki text here{/wiki}
  * {wiki isHtml="true" }html text as stored by the wysiwyg editor here{/wiki}
  */
-class Wiki extends Base
+class Wiki extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'wiki';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {

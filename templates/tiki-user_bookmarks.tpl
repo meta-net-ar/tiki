@@ -14,7 +14,7 @@
     {section name=ix loop=$folders}
         <tr>
             <td class="text"><a class="tips" title=":{tr}Folder in{/tr}" href="tiki-user_bookmarks.php?parentId={$folders[ix].folderId}">
-                {icon name='file-archive' }</a>&nbsp;{$folders[ix].name|escape} ({$folders[ix].urls})
+                {icon name='file-archive'}</a>&nbsp;{$folders[ix].name|escape} ({$folders[ix].urls})
             </td>
             <td class="action">
                 <a class="tips" title=":{tr}Edit{/tr}" href="tiki-user_bookmarks.php?parentId={$parentId}&amp;editfolder={$folders[ix].folderId}">

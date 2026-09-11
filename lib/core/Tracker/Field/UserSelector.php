@@ -293,6 +293,8 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
             } else {
                 $out = $this->getValue();
             }
+        } else {
+            $out = $this->getValue();
         }
 
         return $out;
@@ -351,7 +353,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
             if ($prefs['user_selector_realnames_tracker'] === 'y' && $this->getOption('showRealname')) {
                 $aname = [];
                 foreach ($value as $v) {
-                    $aname[] = smarty_modifier_username($v) . " (" . $v . ")"; // This is very important otherwise on next save the realName and not the username is saved in the db
+                    $aname[] = \SmartyTiki\Modifier\Username::apply($v) . " (" . $v . ")"; // This is very important otherwise on next save the realName and not the username is saved in the db
                 }
                 $name = implode(', ', $aname);
                 $realnames = 'y';
@@ -392,7 +394,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                             $selected_groups[] = $group;
                         }
                         if ($this->getOption('showRealname')) {
-                            $usrs = array_combine($usrs, array_map('smarty_modifier_username', $usrs));
+                            $usrs = array_combine($usrs, array_map('\SmartyTiki\Modifier\Username::apply', $usrs));
                         } else {
                             $usrs = array_combine($usrs, $usrs);
                         }
@@ -407,7 +409,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                 ]);
                 return $this->renderTemplate('trackerinput/userselector_grouped.tpl', $context, $templateData);
             } else {
-                return smarty_function_user_selector(
+                return \SmartyTiki\FunctionHandler\UserSelector::render(
                     [
                         'user' => $name,
                         'id'  => (! empty($context['id']) ? $context['id'] : 'user_selector_' . $this->getConfiguration('fieldId')),
@@ -434,7 +436,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
             }
         } else {
             if ($this->getOption('showRealname')) {
-                $out = implode(', ', array_map('smarty_modifier_username', $value));
+                $out = implode(', ', array_map('\SmartyTiki\Modifier\Username::apply', $value));
             } else {
                 $out = implode(', ', $value);
             }
@@ -494,7 +496,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                 });
             }
             if ($this->getOption('showRealname')) {
-                return implode(', ', array_map('smarty_modifier_username', $value));
+                return implode(', ', array_map('\SmartyTiki\Modifier\Username::apply', $value));
             } else {
                 return implode(', ', $value);
             }
@@ -550,7 +552,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
         $parsedValue = TikiLib::lib('trk')->parse_user_field($value);
 
         if ($this->getOption('showRealname')) {
-            $realName = implode(', ', array_map('smarty_modifier_username', $parsedValue));
+            $realName = implode(', ', array_map('\SmartyTiki\Modifier\Username::apply', $parsedValue));
         } else {
             $realName = implode(', ', $parsedValue);    // add the _text option even if not using showRealname so we don't need to check
         }
@@ -685,7 +687,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
             ->setPlainReplacement('username')
             ->setRenderTransform(function ($value) {
                 if ($value) {
-                    return implode(', ', array_map('smarty_modifier_userlink', TikiLib::lib('trk')->parse_user_field($value)));
+                    return implode(', ', array_map('\SmartyTiki\Modifier\UserLink::apply', TikiLib::lib('trk')->parse_user_field($value)));
                 }
             })
             ;
@@ -697,7 +699,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                 if ($value) {
                     $value = TikiLib::lib('trk')->parse_user_field($value);
                     foreach ($value as &$v) {
-                        $v = smarty_modifier_username($v, true, false, false);
+                        $v = \SmartyTiki\Modifier\Username::apply($v, true, false, false);
                     }
                     return implode(', ', $value);
                 }
@@ -714,7 +716,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                 if ($value) {
                     $value = TikiLib::lib('trk')->parse_user_field($value);
                     foreach ($value as &$v) {
-                        $v = smarty_function_object_link([
+                        $v = \SmartyTiki\FunctionHandler\ObjectLink::render([
                             'type' => 'trackeritem',
                             'id' => $extra['itemId'],
                             'title' => $v,
@@ -735,10 +737,10 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                 if ($value) {
                     $value = TikiLib::lib('trk')->parse_user_field($value);
                     foreach ($value as &$v) {
-                        $v = smarty_function_object_link([
+                        $v = \SmartyTiki\FunctionHandler\ObjectLink::render([
                             'type' => 'trackeritem',
                             'id' => $extra['itemId'],
-                            'title' => smarty_modifier_username($v, true, false, false),
+                            'title' => \SmartyTiki\Modifier\Username::apply($v, true, false, false),
                         ], $smarty->getEmptyInternalTemplate());
                     }
                     return implode(', ', $value);
@@ -796,12 +798,12 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                 }
                 $usrs = array_unique($usrs);
                 foreach ($usrs as $usr) {
-                    $users["$usr"] = $this->getOption('showRealname') ? smarty_modifier_username($usr) : $usr;
+                    $users["$usr"] = $this->getOption('showRealname') ? \SmartyTiki\Modifier\Username::apply($usr) : $usr;
                 }
             } else {
                 $usrs = $tikilib->list_users(0, -1, 'login_asc');
                 foreach ($usrs['data'] as $usr) {
-                    $users[$usr['login']] = $this->getOption('showRealname') ? smarty_modifier_username($usr['login']) : $usr['login'];
+                    $users[$usr['login']] = $this->getOption('showRealname') ? \SmartyTiki\Modifier\Username::apply($usr['login']) : $usr['login'];
                 }
             }
 

@@ -661,7 +661,7 @@ class WikiPlugin_Negotiator_Wiki
             );
 
             $button = '<a id="' . $id . '" class="editplugin tips"' . $iconDisplayStyle . '>' .
-                        smarty_function_icon(['name' => 'plugin', 'iclass' => 'tips',
+                        \SmartyTiki\FunctionHandler\Icon::render(['name' => 'plugin', 'iclass' => 'tips',
                         'ititle' => tra('Edit Plugin') . ':' . $this->name], $smarty->getEmptyInternalTemplate()) . '</a>'
             ;
 

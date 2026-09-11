@@ -9,13 +9,22 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * BootstrapModal handler
  * ----------------------
  */
-class BootstrapModal extends Base
+class BootstrapModal extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'bootstrap_modal';
+    }
+
     /**
      * Returns a string with the href and data attributes to make a bootstrap modal appear on a link
      * Note: Expects to be inside a "double quoted" href attribute in an html anchor
@@ -35,7 +44,7 @@ class BootstrapModal extends Base
             $size = '';
         }
         $params['modal'] = 1;
-        $href = smarty_function_service($params, $template);
-        return "$href\" data-tiki-bs-toggle=\"modal\" data-bs-backdrop=\"static\" data-bs-target=\".footer-modal.fade:not(.show):first$size\"";
+        $href = \SmartyTiki\FunctionHandler\Service::render($params, $template);
+        return "$href\" data-tiki-bs-toggle=\"modal\" data-bs-backdrop=\"static\" data-bs-target=\".footer-modal.fade:not(.show):first$size";
     }
 }

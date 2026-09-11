@@ -265,7 +265,7 @@
                         <div class="mb-3 row">
                             <label for="deleteAfter" class="col-md-4 col-form-label">{tr}File can be deleted after{/tr}</label>
                             <div class="col-md-8">
-                                {if $editFileId}
+                                {if $editFileId or $prefs.elementplus_upload eq 'y'}
                                     {html_select_duration prefix='deleteAfter' id="deleteAfter" default_value=$fileInfo.deleteAfter}
                                 {else}
                                     {html_select_duration prefix='deleteAfter[]' id="deleteAfter" default_unit=week}
@@ -348,7 +348,7 @@
                             <label for="filetype" class="col-md-4 col-form-label">{tr}File Type{/tr}</label>
                             <div class="col-md-8">
                                 <select id="filetype" class="form-select" name="filetype[]">
-                                    {if $fileInfo.filetype ne '' }
+                                    {if $fileInfo.filetype ne ''}
                                         <option value="{$fileInfo.filetype|escape}" selected="selected">{$fileInfo.filetype|truncate:60|escape}</option>
                                     {/if}
                                     <option value="" > {tr}No type{/tr} </option>
@@ -417,7 +417,7 @@
                 {/if}
                 <input type="hidden" name="galleryId[]" value="{$galleryId}">
             {/if}
-            {if $prefs.elementplus_upload eq 'y'}
+            {if $prefs.elementplus_upload eq 'y' && ! $editFileId}
                 <div class="mb-3 row">
                     <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_size_x)}{$gal_info.image_max_size_x}{/if}" max-height="{if isset($gal_info.image_max_size_y)}{$gal_info.image_max_size_y}{/if}" />
                 </div>

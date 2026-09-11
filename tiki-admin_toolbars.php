@@ -125,7 +125,7 @@ if ((isset($_REQUEST['reset']) && ! Sections::isCurrentSection(Sections::SECTION
     $prefName = 'toolbar_' . $section . $comments_suffix;
     $tikilib->delete_preference($prefName);
     $tikilib->set_preference($prefName . 'modified', 'n');
-    header('location: ?' . smarty_function_query(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
+    header('location: ?' . \SmartyTiki\FunctionHandler\Query::render(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
 }
 
 if (! empty($_REQUEST['save_tool']) && ! empty($_REQUEST['tool_name'])) {   // input from the tool edit form
@@ -139,7 +139,7 @@ if (! empty($_REQUEST['save_tool']) && ! empty($_REQUEST['tool_name'])) {   // i
         $_REQUEST['tool_plugin']
     );
 
-    header('location: ?' . smarty_function_query(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
+    header('location: ?' . \SmartyTiki\FunctionHandler\Query::render(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
 }
 
 $current = $tikilib->get_preference('toolbar_' . $section . $comments_suffix);

@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty plugin modules_list
@@ -30,8 +31,13 @@ use Smarty\Template;
  * \endcode
  *
  */
-class ModulesList extends Base
+class ModulesList extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'modules_list';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {

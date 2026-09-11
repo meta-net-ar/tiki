@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -16,8 +18,13 @@ namespace SmartyTiki\Modifier;
  * tiki-admin_security
  * -------------------------------------------------------------
  */
-class Truex
+class Truex implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'truex';
+    }
+
     public function handle($string)
     {
         if ((int) $string == 1) {

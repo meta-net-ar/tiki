@@ -30,7 +30,4 @@ post:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              feedback:
-                type: object
+            $ref: schemas-RefreshFeedbackResponse.yaml

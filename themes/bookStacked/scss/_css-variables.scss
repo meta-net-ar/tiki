@@ -100,10 +100,10 @@
 }
 
 :root {
-    --tiki-fixed-top-site-title-font-size: 1.8rem;          // Fixed-top position (Basic Bootstrap layout)
-    --tiki-fixed-top-site-title-font-weight: 700;
-    --tiki-fixed-top-site-subtitle-font-size: 1.4rem;
-    --tiki-fixed-top-site-subtitle-font-weight: 400;
+    --tiki-sticky-top-site-title-font-size: 1.8rem;          // Sticky-top position (social layout)
+    --tiki-sticky-top-site-title-font-weight: 700;
+    --tiki-sticky-top-site-subtitle-font-size: 1.4rem;
+    --tiki-sticky-top-site-subtitle-font-weight: 400;
 
     --tiki-site-title-font-size: 2rem;                      // Static position (Classic Tiki and Single Container layouts)
     --tiki-site-title-font-weight: 700;
@@ -130,8 +130,10 @@
 }
 
 // Improve appearance when two areas with same background color meet
-.navbar-wrapper:has(.tiki-admin-aside-nav-light) {
-    box-shadow: 5px 0 10px -5px #e3e1e1;
+@media (min-width: 992px) {
+    .navbar-wrapper:has(.tiki-admin-aside-nav-light, .tiki-admin-aside-nav-dark) {
+        box-shadow: 5px 0 10px -5px #e3e1e1;
+    }
 }
 
 // Dark navbar minus top nav

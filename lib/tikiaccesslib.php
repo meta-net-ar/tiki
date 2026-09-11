@@ -365,7 +365,10 @@ class TikiAccessLib extends TikiLib
         $key = str_pad(substr($key, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES), SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES);
         $nonce = random_bytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
 
-        return base64_encode($nonce . sodium_crypto_aead_xchacha20poly1305_ietf_encrypt($value, '', $nonce, $key));
+        # Perform url-safe base64 encoding.
+        $encoded = base64_encode($nonce . sodium_crypto_aead_xchacha20poly1305_ietf_encrypt($value, '', $nonce, $key));
+        $urlsafe = str_replace(['+', '/', '='], ['-', '_', ''], $encoded);
+        return $urlsafe;
     }
 
     /**
@@ -377,7 +380,15 @@ class TikiAccessLib extends TikiLib
     {
         $key = TikiLib::lib('tiki')->get_site_hash();
         $key = str_pad(substr($key, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES), SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES);
+
+        # Perform url-safe base64 decoding.
+        $value = str_replace(['-', '_'], ['+', '/'], $value);
+        $mod4 = strlen($value) % 4;
+        if ($mod4) {
+            $value .= substr('====', $mod4);
+        }
         $value = base64_decode($value);
+
         $nonce = substr($value, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
         $cipherText = substr($value, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
 
@@ -411,8 +422,7 @@ class TikiAccessLib extends TikiLib
         $cipherTicket = $this->encryptCsrfTicket($this->ticket);
 
         // you can set even if is the same value
-        $session_params = session_get_cookie_params();
-        setcookie(session_name() . '_CSRF', $cipherTicket, 0, $session_params['path'], $session_params['domain'], $session_params['secure'], true);
+        setcookie_obeySetCookieParams(session_name() . '_CSRF', $cipherTicket);
     }
 
 
@@ -874,8 +884,7 @@ class TikiAccessLib extends TikiLib
 
     /**
      * Utility to compose and write the error message from CSRF errors to the server php error log, adding on
-     * certain information regarding the environment. Broken into two pieces since the the GET and POST
-     * parameters have the potential to exceed the character limit.
+     * certain information regarding the environment. Request body content is omitted to avoid logging secrets.
      *
      * @param $msg  string      Description of the specific error which will be placed first ahead of
      *                     the environmental information
@@ -883,7 +892,9 @@ class TikiAccessLib extends TikiLib
     private function csrfPhpErrorLog($msg)
     {
         global $prefs;
-        error_log(PHP_EOL // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
+        $ticket = $this->ticket ?: ($_POST['ticket'] ?? '');
+        error_log( // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
+            PHP_EOL
             . '**** ' . tr('Start CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****' . PHP_EOL
             . '  ' . $msg . PHP_EOL
             . '  site_security_timeout' . tr('preference:') . $prefs['site_security_timeout']
@@ -892,13 +903,8 @@ class TikiAccessLib extends TikiLib
             . (isset($_SERVER['REQUEST_URI']) ? '  REQUEST_URI: ' . $_SERVER['REQUEST_URI'] . PHP_EOL : '')
             . (isset($_SERVER['HTTP_ORIGIN']) ? '  HTTP_ORIGIN: ' . $_SERVER['HTTP_ORIGIN'] . PHP_EOL : '')
             . (isset($_SERVER['HTTP_REFERER']) ? '  HTTP_REFERER: ' . $_SERVER['HTTP_REFERER'] . PHP_EOL : '')
-            . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] : '') . PHP_EOL);
-        $get = count($_GET) ? json_encode($_GET, JSON_PRETTY_PRINT) : tr('empty');
-        $post = count($_POST) ? json_encode($_POST, JSON_PRETTY_PRINT) : tr('empty');
-        error_log( // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
-            PHP_EOL
-            . '  $_GET: ' . $get . PHP_EOL
-            . '  $_POST: ' . $post . PHP_EOL
+            . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] . PHP_EOL : '')
+            . '  ticket: ' . ($ticket !== '' ? $ticket : tr('empty')) . PHP_EOL
             . '**** ' . tr('End CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****'
         );
     }
@@ -985,7 +991,13 @@ class TikiAccessLib extends TikiLib
                 && $tikiroot . $prefs['tikiIndex'] != $_SERVER['PHP_SELF']
                 && ( $page != $userlib->get_user_default_homepage($user) || $page === '' )
         ) {
-            $this->redirect($prefs['tikiIndex']);
+            // Append ?challenge=1 for auth errors so the login page can emit 401.
+            $redirectTarget = $prefs['tikiIndex'];
+            if (in_array($errortype, ['401', '403']) && ! $user) {
+                $separator = str_contains($redirectTarget, '?') ? '&' : '?';
+                $redirectTarget .= $separator . 'challenge=1';
+            }
+            $this->redirect($redirectTarget);
         }
 
         $detail = [
@@ -1193,7 +1205,12 @@ class TikiAccessLib extends TikiLib
      * @param int $code         HTTP code
      * @param string $msgtype   Type of message which determines styling (e.g., success, error, warning, etc.)
      */
-    public function redirect($url = '', $msg = '', $code = 302, $msgtype = '')
+    /**
+     * @param bool $allowExternal  Pass true only when the URL originates from a trusted source
+     *                             (admin-configured preference, inter-tiki setup, OAuth flow, etc.).
+     *                             Never pass true for URLs that are user-supplied at request time.
+     */
+    public function redirect($url = '', $msg = '', $code = 302, $msgtype = '', bool $allowExternal = false)
     {
         global $prefs;
 
@@ -1201,14 +1218,30 @@ class TikiAccessLib extends TikiLib
             return;
         }
 
-        // TODO: Validate URL
+        // Validate URL: reject absolute URLs pointing to a different host to prevent open redirects.
+        // $allowExternal must be explicitly set to true by callers that have already validated or
+        // trust the URL source (e.g. admin prefs, inter-tiki, OAuth). User-supplied URLs must
+        // always go through this check.
+        if (! $allowExternal && $url !== '') {
+            $parsed = parse_url($url);
+            if (! empty($parsed['host'])) {
+                $allowedHost = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+                // Strip port from allowed host for comparison
+                $allowedHost = strtolower(explode(':', $allowedHost)[0]);
+                $targetHost  = strtolower($parsed['host']);
+                if ($targetHost !== $allowedHost) {
+                    // Off-site redirect — fall back to the configured home page
+                    $url = $prefs['tikiIndex'];
+                }
+            }
+        }
         if ($url == '') {
             $url = $prefs['tikiIndex'];
         }
 
         if (trim($msg)) {
             $session = session_id();
-            if (empty($session)) {
+            if (empty($session) && empty($_SESSION['loginfrom'])) {
                 // Can happen if session_silent is enabled. But does any instance enable session_silent?
                 // Removing this case would allow removing the $msg parameters and just have callers using Feedback::add() before calling redirect(). Chealer 2017-08-16
                 $start = strpos($url, '?') ? '&' : '?';
@@ -1223,7 +1256,7 @@ class TikiAccessLib extends TikiLib
 
         session_write_close();
         if (headers_sent()) {
-            echo "<script>document.location.href='" . smarty_modifier_escape($url, 'javascript') . "';</script>\n";
+            echo "<script>document.location.href='" . \SmartyTiki\Modifier\Escape::apply($url, 'javascript') . "';</script>\n";
         } else {
             @ob_end_clean(); // clear output buffer
             if ($prefs['feature_obzip'] == 'y') {
@@ -1426,6 +1459,23 @@ class TikiAccessLib extends TikiLib
     public function is_xml_http_request()
     {
         return ! empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+    }
+
+    /**
+     * Instruct the client not to store the current response. Intended for HTML
+     * pages that expose a freshly generated secret (e.g. a new API token) so
+     * that it cannot be recovered from the browser cache or history.
+     *
+     * No-op for serialized (JSON/YAML/feed) API responses, which manage their
+     * own caching, and when headers have already been sent.
+     */
+    public function preventCaching()
+    {
+        if (headers_sent() || self::is_serializable_request()) {
+            return;
+        }
+
+        header('Cache-Control: no-store');
     }
 
     /**
@@ -1646,25 +1696,11 @@ class TikiAccessLib extends TikiLib
      */
     private function csrfSystemLog($csrfErrorId)
     {
-        global $prefs, $user;
+        global $prefs;
 
-        $tikilib = TikiLib::lib('tiki');
         $logslib = TikiLib::lib('logs');
 
-        $redactPass = function (&$item, $key) {
-            if (str_contains($key, 'pass')) {
-                $item = '** ' . tr('redacted') . ' **';
-            }
-        };
-
-        $get = count($_GET) ? $_GET : tr('empty');
-        if (is_array($get)) {
-            array_walk($get, $redactPass);
-        }
-        $post = count($_POST) ? $_POST : tr('empty');
-        if (is_array($post)) {
-            array_walk($post, $redactPass);
-        }
+        $ticket = $this->ticket ?: ($_POST['ticket'] ?? '');
 
         $logCsrf = [
             'serverName' => $_SERVER['SERVER_NAME'],
@@ -1677,9 +1713,7 @@ class TikiAccessLib extends TikiLib
             'httpOrigin' => $_SERVER['HTTP_ORIGIN'] ?? null,
             'httpReferer' => $_SERVER['HTTP_REFERER'],
             'requestMethod' => $_SERVER['REQUEST_METHOD'],
-            'queryString' => $_SERVER['QUERY_STRING'] ?? tr('empty'),
-            'get' => $get,
-            'post' => $post
+            'ticket' => $ticket !== '' ? $ticket : tr('empty'),
         ];
         $logslib->add_action('CSRF Error', 'system', 'system', $csrfErrorId, '', '', '', '', '', '', $logCsrf);
     }

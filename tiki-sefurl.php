@@ -115,7 +115,7 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
                     $pagealias = $trklib->get_trackeritem_pagealias($matches[1])
             ) {
                 $title = '';
-                $tpl_output = "./tiki-index.php?page=" . $pagealias;
+                $tpl_output = "./tiki-index.php?page={$pagealias}&itemId={$matches[1]}";
             }
         }
     }

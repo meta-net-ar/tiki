@@ -17,18 +17,21 @@ function prefs_page_list()
                 'none' => tra('Neither'),
             ],
             'default' => 'bottom',
+            'help' => 'Wiki-General-Preferences',
         ],
         'page_n_times_in_a_structure' => [
             'name' => tra('Pages can reoccur in structure'),
             'description' => tra('A page can be listed multiple times in a structure'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Structures',
         ],
         'page_content_fetch' => [
             'name' => tra('Fetch page content from incoming feeds'),
             'description' => tra('Page content from the source will be fetched before sending the content to the generators.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Incoming-Feeds',
             'packages_required' => ['j0k3r/php-readability' => 'Readability\Readability'],
         ],
     ];

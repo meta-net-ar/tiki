@@ -13,6 +13,7 @@ function capLock(e, el){
 }
 {/jq}
 {jq}
+var currentLoggedInUser = "{{$user|escape:'javascript'}}";
 $(document).ready(function () {
     var twoFAType = "{{$prefs.twoFactorAuthType}}";
     var is2FAEnabled = "{{$prefs.twoFactorAuth}}";
@@ -40,7 +41,7 @@ $(document).ready(function () {
             data: { username: username },
             success: async function (res) {
                 if (!res) {
-                    $(event.currentTarget).off('submit').submit();
+                    $(event.currentTarget).off('submit').trigger('submit');
                 } else {
                     if (twoFAType === '{{$TOTP_2FA}}') {
                         show2FactorInputElement(btn, event);
@@ -74,16 +75,6 @@ $(document).ready(function () {
         });
     }
 
-    function displayFeedback(type, message) {
-        const feedbackClass = type === "success" ? "alert-success" : "alert-danger";
-        $("#login_feeback_{{$module_logo_instance}}").html(
-            `<div class="alert ${feedbackClass} alert-dismissible">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>`
-        );
-    }
-
     function getTwoFactorSecretGoogle2FA(username) {
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -108,12 +99,21 @@ $(document).ready(function () {
 
     function validateUserCredentials(username, password) {
         return new Promise((resolve, reject) => {
+            const $form = $("#loginbox-{{$module_logo_instance}}");
+            const ticket = $form.find("input[name=ticket]").val() || "";
             $.ajax({
                 url: $.service("user", "ValidateUser"),
                 type: 'POST',
-                data: { username: username, password: password },
+                data: { username: username, password: password, ticket: ticket },
                 success: function (res) {
-                    resolve(res);
+                    if (res && typeof res === 'object') {
+                        if (res.ticket) {
+                            $form.find("input[name=ticket]").val(res.ticket);
+                        }
+                        resolve(!!res.valid);
+                    } else {
+                        resolve(!!res);
+                    }
                 },
                 error: function (req, status, error) {
                     displayFeedback("error", error);
@@ -161,7 +161,7 @@ $(document).ready(function () {
             let btnStep = parseInt(btn.attr('step'));
 
             if (isNormalLogin === 'y') {
-                $(this).off('submit').submit();
+                $(this).off('submit').trigger('submit');
                 return false;
             }
 
@@ -180,14 +180,14 @@ $(document).ready(function () {
 
                     // If step > 1, or no user screen, or 2FA is effectively "n", just submit
                     if (btnStep > 1 || isLoginScreen === 0 || (twoFASecret == 'n' && twoFAType === '{{$TOTP_2FA}}')) {
-                        $(this).off('submit').submit();
+                        $(this).off('submit').trigger('submit');
                         return false;
                     }
                     await handleEmail2FA(username, btn, event);
 
                 } else {
                     // No 2FA => submit directly
-                    $(this).off('submit').submit();
+                    $(this).off('submit').trigger('submit');
                 }
             } else {
                 // Missing user/pass
@@ -204,14 +204,66 @@ $(document).ready(function () {
         }
     });
 });
-$("#switchbox-{{$module_logo_instance}} .submit").on("click", function () {
-    if ($("#login-switchuser_{{$module_logo_instance}}").val()) {
-        confirmPopup('{tr}Switch user?{/tr}')
-        return true;
-    } else {
-        $("#login-switchuser_{{$module_logo_instance}}").trigger("focus");
+function displayFeedback(type, message) {
+    const feedbackClass = type === "success" ? "alert-success" : "alert-danger";
+    $("#login_feeback_{{$module_logo_instance}}").html(
+        `<div class="alert ${feedbackClass} alert-dismissible">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`
+    );
+}
+var switchUserSelector_{{$module_logo_instance}} = $("#login-switchuser_{{$module_logo_instance}}");
+
+function showSwitchConfirm_{{$module_logo_instance}}(message, $form) {
+    var $modal = $(".footer-modal:not(.show)").first();
+    if (! $modal.length) {
+        if (window.confirm(message)) {
+            $form.append('<input type="hidden" name="confirmForm" value="y">');
+            $form[0].submit();
+        }
+        return;
+    }
+    $modal.find(".modal-content").html(
+        '<div class="modal-header">' +
+        '<h5 class="modal-title">' + message + '</h5>' +
+        '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + tr("Close") + '"></button>' +
+        '</div>' +
+        '<div class="modal-footer">' +
+        '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' + tr("Cancel") + '</button>' +
+        '<button type="button" class="btn btn-primary lbox-confirm-ok">' + tr("OK") + '</button>' +
+        '</div>'
+    );
+    var bsModal = bootstrap.Modal.getOrCreateInstance($modal[0]);
+    $modal.find(".lbox-confirm-ok").one("click", function () {
+        bsModal.hide();
+        $form.append('<input type="hidden" name="confirmForm" value="y">');
+        $form[0].submit();
+    });
+    bsModal.show();
+}
+
+$("#switchbox-{{$module_logo_instance}} .submit").on("click", function (event) {
+    event.preventDefault();
+    var selectedUser = (switchUserSelector_{{$module_logo_instance}}.val() || '').trim();
+
+    if (! selectedUser) {
+        displayFeedback("error", tr("Please select a user to switch to."));
+        switchUserSelector_{{$module_logo_instance}}.trigger("focus");
         return false;
     }
+
+    var msg = tr("Switch user from \"%0\" to \"%1\"?")
+        .replace("%0", currentLoggedInUser)
+        .replace("%1", selectedUser);
+    showSwitchConfirm_{{$module_logo_instance}}(msg, $(this).closest("form"));
+    return false;
+});
+
+$("#revertbox-{{$module_logo_instance}} button[type=submit]").on("click", function (event) {
+    event.preventDefault();
+    showSwitchConfirm_{{$module_logo_instance}}(tr("Return to main user?"), $(this).closest("form"));
+    return false;
 });
 $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', function(event) {
     event.stopPropagation();
@@ -232,7 +284,7 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                 {button href="tiki-logout.php" _text="{tr}Log out{/tr}"}
             </div>
             {if !empty($login_module.can_revert)}
-                <form action="{$login_module.login_url|escape}" method="post">
+                <form action="{$login_module.login_url|escape}" method="post" id="revertbox-{$module_logo_instance}">
                     {ticket}
                     <fieldset>
                         <legend class="fs-5">{tr}Return to Main User{/tr}</legend>
@@ -243,7 +295,6 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                                 type="submit"
                                 class="btn btn-primary"
                                 name="actsu"
-                                onclick="confirmPopup('{tr}Return to main user?{/tr}')"
                             >
                                 {tr}Switch{/tr}
                             </button>
@@ -286,9 +337,20 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                             </label>
                             <input type="hidden" name="su" value="1" class="form-control" />
                             {if $prefs.feature_help eq 'y'}
-                                {help url="Switch+User" desc="{tr}Help{/tr}" desc="{tr}Switch User:{/tr}{tr}Select a username and click 'Switch'.<br>Useful for testing permissions.{/tr}"}
+                                {help url="Switch-User" desc="{tr}Help{/tr}" desc="{tr}Switch User:{/tr}{tr}Select a username and click 'Switch'.<br>Useful for testing permissions.{/tr}"}
                             {/if}
-                            {user_selector groupIds=$module_params.groups id="login-switchuser_"|cat:$module_logo_instance name='username' user='' editable=$login_module.can_switch_user class='form-control' allowNone=$module_params.allowNone}
+                            {user_selector
+                                groupIds=$module_params.groups
+                                id="login-switchuser_"|cat:$module_logo_instance
+                                name='username'
+                                user=''
+                                editable=$login_module.can_switch_user
+                                class='form-control'
+                                allowNone=$module_params.allowNone|default:'y'
+                                noneSelectable='n'
+                                noneLabel='Select user to switch to'
+                                exclude=$user
+                            }
                         </div>
                         <div class="text-center">
                             <button
@@ -309,6 +371,7 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                 {if isset($module_params.show_user_avatar) && $module_params.show_user_avatar eq 'y'}
                     <div class="dropdown-toggle login_link mod-login-avatar" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {$user|avatarize:n:n:n:n}
+                        {if isset($module_params.show_user_name) || $module_params.show_user_name eq 'y'}{$user|username:n:n:n}{/if}
                     </div>
                 {else}
                     <button type="button" class="dropdown-toggle login_link btn btn-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -382,7 +445,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {/if}
         {if !empty($error_login)}
             {remarksbox type='errors' title="{tr}Error{/tr}"}
-                {if $error_login == $PASSWORD_INCORRECT or $error_login == $USER_NOT_FOUND }{tr}Invalid username or password{/tr}
+                {if $error_login == $PASSWORD_INCORRECT or $error_login == $USER_NOT_FOUND}{tr}Invalid username or password{/tr}
                 {elseif $error_login == $TWO_FA_INCORRECT}{tr}Invalid two-factor authenticator code{/tr}
                 {else}{$error_login|escape}{/if}
             {/remarksbox}
@@ -411,7 +474,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             </label>
             {if !isset($loginuser) or $loginuser eq ''}
                     <input class="form-control" type="text" name="user" id="login-user_{$module_logo_instance}" {if !empty($error_login)} value="{$error_user|escape}"{elseif !empty($adminuser)} value="{$adminuser|escape}"{/if} {if $prefs.desactive_login_autocomplete neq 'y'}autocomplete="username"{/if} {if $prefs.login_placeholders_enable eq 'y'}placeholder="{tr}Username{/tr}"{/if}/>
-                {jq}if ($('#login-user_{{$module_logo_instance}}:visible').length) {if ($("#login-user_{{$module_logo_instance}}").offset().top < $(window).height()) {$('#login-user_{{$module_logo_instance}}')[0].focus();} }{/jq}
+                {jq}if ($('#login-user_{{$module_logo_instance}}:visible').length) { if ($("#login-user_{{$module_logo_instance}}").offset().top < $(window).height()) {$('#login-user_{{$module_logo_instance}}')[0].focus();} }{/jq}
             {else}
                 <input class="form-control" type="hidden" name="user" id="login-user_{$module_logo_instance}" value="{$loginuser|escape}" /><b>{$loginuser|escape}</b>
             {/if}
@@ -468,10 +531,10 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {if $prefs.twoFactorAuth eq 'y' and ((isset($module_params.show_two_factor_auth) and $module_params.show_two_factor_auth eq 'y') or ! empty($error_login))}
         <div id="two_factor_div" class="my-3 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
             <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor authentication code:{/tr}</label>
-            <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" id="login-2fa_{$module_logo_instance}">
+            <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" autofocus id="login-2fa_{$module_logo_instance}">
             {if $prefs.twoFactorAuthType eq $EMAIL_2FA}
                 <small class="text-muted">{tr}Please type the 6 digit security code sent to your email address{/tr}</small>
-                <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').submit()" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>
+                <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').trigger('submit')" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>
             {else}
                 <small class="text-muted">{tr}Please type the 6 digit security code (TOTP) provided by your authenticator application{/tr}</small>
             {/if}
@@ -600,6 +663,11 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             </div>
         {/if}
         {$close_tags}
+        </div>
+    {/if}
+    {if $mode eq "module" && ! empty($login_text_below_login_box)}
+        <div class="mt-3 textbelowlogin">
+            {$login_text_below_login_box}
         </div>
     {/if}
     {if $mode eq "header"}</div>{/if}

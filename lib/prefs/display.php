@@ -6,11 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_display_list()
 {
+    $dateAndTimeHelp = 'Date-and-time';
+
     return [
         'display_field_order' => [
             'name' => tra('Fields display order'),
             'description' => tra('The order date field inputs should be listed in.'),
             'type' => 'list',
+            'help' => $dateAndTimeHelp,
             'options' => [
                 'DMY' => tra('Day') . ' ' . tra('Month') . ' ' . tra('Year'),
                 'DYM' => tra('Day') . ' ' . tra('Year') . ' ' . tra('Month'),
@@ -28,6 +31,7 @@ function prefs_display_list()
                             tra('For example, use "-2" for the current year minus two, or "2010" for a specific year'),
             'units' => tra('year(s)'),
             'type' => 'text',
+            'help' => $dateAndTimeHelp,
             'size' => 6,
             'default' => '-20',
         ],
@@ -37,6 +41,7 @@ function prefs_display_list()
                             tra('For example, use "+2" for the current year plus two, or "2016" for a specific year'),
             'units' => tra('year(s)'),
             'type' => 'text',
+            'help' => $dateAndTimeHelp,
             'size' => 6,
             'default' => '+20',
         ],

@@ -224,7 +224,9 @@ Sections::onSectionChange(function ($section) use ($prefs) {
         return;
     }
 
-    TikiLib::lib('freetag')->assignCurrentObjectTagsToSmarty();
+    $freetaglib = TikiLib::lib('freetag');
+    $freetaglib->handleCurrentObjectTagRequest();
+    $freetaglib->assignCurrentObjectTagsToSmarty();
 });
 
 require_once('lib/setup/wiki.php');
@@ -262,11 +264,11 @@ if ($color_mode_table_exists) {
     $prefs['color_modes_names'] = [];
 }
 
+require_once('lib/setup/theme.php');
+
 if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
-
-require_once('lib/setup/theme.php');
 
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
 if (! TIKI_API) {
@@ -394,10 +396,6 @@ if ($prefs['feature_freetags'] == 'y') {
 }
 if ($prefs['feature_categories'] == 'y') {
     require_once('lib/setup/categories.php');
-    if ($prefs['feature_areas'] == 'y' &&  $prefs['categories_used_in_tpl'] == 'y') {
-        $areaslib = TikiLib::lib('areas');
-        $areaslib->HandleObjectCategories($objectCategoryIdsNoJail);
-    }
 }
 if ($prefs['feature_userlevels'] == 'y') {
     require_once('lib/setup/userlevels.php');
@@ -440,31 +438,32 @@ if ($prefs['pwa_feature'] == 'y') { //pwa test propose, pages to cache
     $smarty->assign('pagespwa', json_encode($pages));
 }
 
-$customRobots = null;
-if ($prefs['metatag_robotscustom'] == 'y') {
-    if (empty($object)) {
-        $object = current_object();
-    }
-    if ($object && $object['type'] == 'wiki page') {
-        $wikilib = TikiLib::lib('wiki');
-        $customRobots = $wikilib->getPageMetatagRobotscustom($object['object']);
-        if (! empty($customRobots)) {
-            $smarty->assign('metatag_robotscustom', $customRobots);
-            $headerlib->setXRobotsTag($customRobots);
-        }
-    }
-}
 
-// Apply robots directives from robots.txt as meta tags and X-Robots-Tag header.
-if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
-    $robotsFromTxt = $headerlib->getRobots();
-    if (! empty($robotsFromTxt)) {
-        $smarty->assign('metatag_robots', $robotsFromTxt);
-        if (empty($customRobots)) {
-            $headerlib->setXRobotsTag($robotsFromTxt);
+Sections::onSectionChange(function ($section) use ($prefs, $headerlib, $smarty) {
+    $customRobots = null;
+    if ($prefs['metatag_robotscustom'] == 'y') {
+        $object = current_object();
+        if ($object && $object['type'] == 'wiki page') {
+            $wikilib = TikiLib::lib('wiki');
+            $customRobots = $wikilib->getPageMetatagRobotscustom($object['object']);
+            if (! empty($customRobots)) {
+                $smarty->assign('metatag_robotscustom', $customRobots);
+                $headerlib->setXRobotsTag($customRobots);
+            }
         }
     }
-}
+
+    // Apply robots directives from robots.txt as meta tags and X-Robots-Tag header.
+    if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
+        $robotsFromTxt = $headerlib->getRobots();
+        if (! empty($robotsFromTxt)) {
+            $smarty->assign('metatag_robots', $robotsFromTxt);
+            if (empty($customRobots)) {
+                $headerlib->setXRobotsTag($robotsFromTxt);
+            }
+        }
+    }
+});
 
 if ($prefs['feature_antibot'] == 'y' && empty($user)) {
     $captchaType = CaptchaTypeResolver::getConfiguredType($prefs);
@@ -560,11 +559,18 @@ if ($prefs['rating_advanced'] == 'y' && $prefs['rating_recalculation'] == 'rando
 
 // using jquery-migrate-1.3.0.js plugin for tiki 11, still required in tiki 12 LTS to support some 3rd party plugins
 
-if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'google') {
-    $headerlib->add_jsfile_cdn("$url_scheme://ajax.googleapis.com/ajax/libs/jquery/$headerlib->jquery_version/jquery.min.js");
-    // goggle is not hosting migrate so load from local
-    $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-migrate/dist/jquery-migrate.min.js", true);
-} elseif (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
+// jQuery 4 also ships an ES module build (dist-module/jquery.module.js), but Tiki still
+// loads the classic one here: module scripts are deferred, so every classic script runs
+// first, and anything classic using $ at load time would break if jQuery were only
+// reachable as a module. jQuery also stays on the global window object for the many
+// plugins that expect it there. The headerlib refactor lifts that ordering constraint,
+// and jQuery 4's own exports map is meant to give import and require the same copy, so
+// the switch should not need a shim on our side.
+// See https://github.com/jquery/jquery/wiki/jQuery-4-exports-explainer
+
+// Google's CDN has no jQuery 4.x (its newest is 3.7.1), so 'google' falls through to
+// the local copies below instead of 404ing, as jquery-migrate already had to.
+if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
     $headerlib->add_jsfile_cdn("$url_scheme://code.jquery.com/jquery-$headerlib->jquery_version.min.js");
     $headerlib->add_jsfile_cdn("$url_scheme://code.jquery.com/jquery-migrate-$headerlib->jquerymigrate_version.min.js");
 } else {
@@ -612,13 +618,6 @@ if ($prefs['error_tracking_enabled_js'] == 'y' && ! empty($prefs['error_tracking
 $headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
 $headerlib->add_jsfile('lib/tiki-js.js'); //This depends on tiki-jquery.js in at least one place, so must load after - benoitg - 2023-11-21
 
-$zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
-$headerlib->add_js('var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . '";');    // Set the zoom option after searching for a location
-
-if ($prefs['geo_enabled'] === 'y') {
-    $headerlib->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js");
-}
-
 if ($prefs['feature_jquery_zoom'] === 'y') {
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/jquery-zoom/jquery.zoom.js')
         ->add_css('
@@ -660,9 +659,11 @@ if ($prefs['cookie_consent_feature'] == 'y') {
 // $url_scheme is 'http' or 'https' depending on request type condsidering already a reverse proxy
 // $https_mode is true / false depending on request type condsidering already a reverse proxy
 if ($prefs['feature_jquery_ui'] == 'y') {
-    if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'google') {
-        $headerlib->add_jsfile_cdn("$url_scheme://ajax.googleapis.com/ajax/libs/jqueryui/$headerlib->jqueryui_version/jquery-ui.min.js");
-    } elseif (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
+    // Google's CDN does not carry the jQuery UI version Tiki pins (its newest is
+    // 1.14.1), so 'google' falls through to the local copy below rather than 404ing.
+    // Same approach already used for jquery-migrate, which Google has never hosted,
+    // and for the jQuery UI theme CSS further down.
+    if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
         $headerlib->add_jsfile_cdn("$url_scheme://code.jquery.com/ui/$headerlib->jqueryui_version/jquery-ui.min.js");
     } else {
         if ($prefs['tiki_minify_javascript'] === 'y') {
@@ -697,37 +698,41 @@ if ($prefs['jquery_fitvidjs'] == 'y') {
         ->add_jq_onready("fitvids('article', $customSelectors);");
 }
 if ($prefs['jquery_smartmenus_enable'] == 'y') {
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/smartmenus/dist/css/smartmenus-only-layout.css');
-    $headerlib->add_js_module('import SmartMenus from "smartmenus";
-        const nav = document.querySelectorAll("nav");
-        let collapsible_behavior = jqueryTiki.smartmenus_collapsible_behavior == "default" ? false : true;
-        let noMouseoverBehavior = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseover";
-        let hideOnClick = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseout";
+    Sections::onSectionChange(function ($section) use ($headerlib) {
+        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/smartmenus/dist/css/smartmenus-only-layout.css', 10);
+        $headerlib->add_js_module(
+            'import SmartMenus from "smartmenus";
+const nav = document.querySelectorAll("nav");
+let collapsible_behavior = jqueryTiki.smartmenus_collapsible_behavior == "default" ? false : true;
+let noMouseoverBehavior = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseover";
+let hideOnClick = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseout";
 
-        for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
-            if (nav[indexCurrentNav].querySelector("div.collapse") !== null) {
-                nav[indexCurrentNav].classList.add("sm-navbar");
-                nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
-                const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
+for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
+    if (nav[indexCurrentNav].querySelector("div.collapse") !== null) {
+        nav[indexCurrentNav].classList.add("sm-navbar");
+        nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
+        const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
 
-                // Enable navigation on parent menu items with children
-                // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
-                // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
-                // Note: Relies on SmartMenus internal class that may change in future versions
-                nav[indexCurrentNav].addEventListener("click", function(e) {
-                    const link = e.target.closest("a.sm-sub-toggler");
-                    if (link && nav[indexCurrentNav].contains(link)) {
-                        const href = link.getAttribute("href");
-                        if (href && href !== "#" && href !== "") {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            window.location.href = href;
-                        }
-                    }
-                });
+        // Enable navigation on parent menu items with children
+        // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
+        // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
+        // Note: Relies on SmartMenus internal class that may change in future versions
+        nav[indexCurrentNav].addEventListener("click", function(e) {
+            const link = e.target.closest("a.sm-sub-toggler");
+            if (link && nav[indexCurrentNav].contains(link)) {
+                const href = link.getAttribute("href");
+                if (href && href !== "#" && href !== "") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = href;
+                }
             }
-        }
-    ');
+        });
+    }
+}
+'
+        );
+    });
 }
 
 if ($prefs['feature_jquery_tablesorter'] == 'y') {
@@ -749,7 +754,7 @@ if ($prefs['feature_jquery_tagcanvas'] == 'y') {
 }
 
 if ($prefs['feature_shadowbox'] == 'y') {
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/glightbox/dist/glightbox.min.css');
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/glightbox/dist/css/glightbox.min.css');
     $headerlib->add_css('
 .gcounter {
     position: absolute;
@@ -768,8 +773,8 @@ if ($prefs['feature_shadowbox'] == 'y') {
     display: none !important;
 }
 ');
-    $localPlyrCSS = NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.css';
-    $localPlyrJS = NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.min.js';
+    $localPlyrCSS = NODE_PUBLIC_DIST_PATH . '/plyr/dist/plyr.css';
+    $localPlyrJS = NODE_PUBLIC_DIST_PATH . '/plyr/dist/plyr.min.js';
     $headerlib->add_js_module(<<<JS
     import initGlightbox from "@tiki-glightbox";
     window.applyGlightbox = initGlightbox({
@@ -817,7 +822,7 @@ if ($prefs['feature_jquery_validation'] == 'y') {
 $headerlib->add_js_module('import "@jquery-tiki/asyncLoop";');
 
 $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/jquery.treetable.js');
-$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/jquery.treetable.css');
+$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/css/jquery.treetable.css');
 
 //This must always be loaded (early), as it's curently used by any Vue3 module using single-spa to make onDOMElementRemoved() available
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');
@@ -917,27 +922,29 @@ if ($prefs['feature_tasks'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-tasks.js');
 }
 
-if ($prefs['feature_inline_comments'] === 'y' && $prefs['comments_inline_annotator'] === 'y') {
-    if (empty($object)) {
-        $object = current_object();
-    }
-    $commentController = new Services_Comment_Controller();
+Sections::onSectionChange(function ($section) {
+    global $headerlib, $prefs, $user;
+    if ($prefs['feature_inline_comments'] === 'y' && $prefs['comments_inline_annotator'] === 'y') {
+        if (empty($object)) {
+            $object = current_object();
+        }
+        $commentController = new Services_Comment_Controller();
 
-    if (
-        $object &&
-        $commentController->isEnabled($object['type'], $object['object']) &&
-        $commentController->canView($object['type'], $object['object'])
-    ) {
-        $canPost = $commentController->canPost($object['type'], $object['object']);
-        // spoof a URI from type and id
-        $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
+        if (
+            $object &&
+            $commentController->isEnabled($object['type'], $object['object']) &&
+            $commentController->canView($object['type'], $object['object'])
+        ) {
+            $canPost = $commentController->canPost($object['type'], $object['object']);
+            // spoof a URI from type and id
+            $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
 
-        $headerlib
-            ->add_js_module('import moment from "moment"; window.moment = moment;')
-            ->add_jsfile('vendor_bundled/vendor/openannotation/annotator/annotator-full.min.js')
-            ->add_cssfile('vendor_bundled/vendor/openannotation/annotator/annotator.min.css')
-            // language=JavaScript
-            ->add_jq_onready('
+            $headerlib
+                ->add_js_module('import moment from "moment"; window.moment = moment;')
+                ->add_jsfile('vendor_bundled/vendor/openannotation/annotator/annotator-full.min.js')
+                ->add_cssfile('vendor_bundled/vendor/openannotation/annotator/annotator.min.css')
+                // language=JavaScript
+                ->add_jq_onready('
 var annotatorContent = $("#top").annotator({readOnly: ' . ($canPost ? 'false' : 'true') . '});
 annotatorContent.annotator("addPlugin", "Store", {
     prefix: "tiki-ajax_services.php?controller=annotation&action=",
@@ -970,10 +977,10 @@ annotatorContent.annotator("addPlugin", "Permissions", {
         return annotation.permissions[action];
     }
 });');
-        // handling for extra info
-        if ($prefs['comments_inline_annotator_with_info'] === 'y') {
-            $headerlib->add_jq_onready(
-                '// a little glue to show the author name and date
+            // handling for extra info
+            if ($prefs['comments_inline_annotator_with_info'] === 'y') {
+                $headerlib->add_jq_onready(
+                    '// a little glue to show the author name and date
 $(".annotator-outer.annotator-viewer").on("load", function (event, annotations) {
     $(this).find(".annotator-user").text(annotations[0].realName + " - " + annotations[0].commentDate);
 });
@@ -984,10 +991,11 @@ $("#top").on("annotationCreated", function (e, annotation) {
         momentDate.format(jqueryTiki.shortTimeFormat);
     annotation.realName = jqueryTiki.userRealName || jqueryTiki.username;
 });'
-            );
+                );
+            }
         }
     }
-}
+});
 
 $headerlib->add_jsfile('lib/jquery_tiki/pluginedit.js');
 $headerlib->add_js_module('import "@jquery-tiki/coverpage-form";');
@@ -1027,6 +1035,11 @@ if ($tiki_p_admin == 'y') {
 
 if ($prefs['wikiplugin_addtocart'] == 'y') {
     $headerlib->add_jsfile('lib/payment/cartlib.js');
+}
+
+if (! Sections::getCurrentSection()) {
+    // if nothing else has set the section, set it to global as not all files do
+    Sections::setCurrentSection(Sections::SECTION_GLOBAL);
 }
 
 //////////////////////////////////////////////////////////////////////////

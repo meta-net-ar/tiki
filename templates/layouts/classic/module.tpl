@@ -19,7 +19,7 @@
                     {if $module_notitle ne 'y' && !empty($module_title)}
                         <span class="moduletitle">{$module_title}</span>
                     {/if}
-                    {if $module_flip eq 'y' }
+                    {if $module_flip eq 'y'}
                         <div class="moduleflip" id="moduleflip-{$smarty.capture.name}">
                         {* Only show edit and delete options in module title if on tiki-admin_modules.php page *}
                             {if $smarty.server.SCRIPT_NAME == $url_path|cat:'tiki-admin_modules.php'}

@@ -78,6 +78,12 @@ $(function () {
                     }
                     $info.remove();
                     $wrap.find("input[type=text], textarea").val(data.value);
+                    // Notify field-specific JS handlers (e.g. SEC field toggle) about unlock.
+                    document.dispatchEvent(
+                        new CustomEvent("tiki:unlocked", {
+                            detail: { fieldId: parseInt($wrap.data("fieldId"), 10), value: data.value },
+                        })
+                    );
                 })
                 .fail(function () {
                     reDisable($wrap, $info, $wrap.data("networkError"));

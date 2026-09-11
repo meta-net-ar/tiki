@@ -194,7 +194,7 @@ class Services_File_FinderController
             if ($input->insertion_syntax->text()) {
                 $params['insertion_syntax'] = $input->insertion_syntax->text();
             }
-            $hashes = $input->hash->asArray();
+            $hashes = $input->asArray('hash');
             $fileInfos = [];
 
             foreach ($hashes as $hash) {
@@ -222,6 +222,12 @@ class Services_File_FinderController
                     ) {
                         $url .= '&display';
                     }
+                }
+
+                $cpath = $input->cpath->text();
+                $reqid = $input->reqid->text();
+                if ($cpath && $reqid) {
+                    setcookie('elfdl' . $reqid, '1', 0, urlencode($cpath));
                 }
 
                 TikiLib::lib('access')->redirect($url);
@@ -283,7 +289,7 @@ class Services_File_FinderController
             $id = $ar[1];
             if ($isgal) {
                 $visible = $this->isVisible($id, $data, $isgal);
-            } else if (isset($this->parentIds['files'][$id])) {
+            } elseif (isset($this->parentIds['files'][$id])) {
                 $visible = $this->isVisible($this->parentIds['files'][$id], $data, $isgal);
             }
         } else {
@@ -291,10 +297,12 @@ class Services_File_FinderController
             $id = $path;
         }
 
+        $fileInfo = null;
         if ($isgal) {
             $perms = TikiLib::lib('tiki')->get_perm_object($id, 'file gallery', TikiLib::lib('filegal')->get_file_gallery_info($id));
         } else {
-            $perms = TikiLib::lib('tiki')->get_perm_object($id, 'file', TikiLib::lib('filegal')->get_file($id));
+            $fileInfo = TikiLib::lib('filegal')->get_file($id);
+            $perms = TikiLib::lib('tiki')->get_perm_object($id, 'file', $fileInfo);
         }
 
         $perms = array_merge([
@@ -326,7 +334,10 @@ class Services_File_FinderController
                 if ($isgal) {
                     return $visible && ($perms['tiki_p_admin_file_galleries'] === 'y' || $perms['tiki_p_upload_files'] === 'y');
                 } else {
-                    return $visible && ($perms['tiki_p_edit_gallery_file'] === 'y' || $perms['tiki_p_remove_files'] === 'y');
+                    // Writable if renamable (edit_gallery_file) or deletable; the delete
+                    // check matches what _unlink() allows server-side (e.g. file owners).
+                    return $visible && ($perms['tiki_p_edit_gallery_file'] === 'y'
+                        || TikiLib::lib('filegal')->userCanRemoveFile($fileInfo, null, $perms));
                 }
             case 'locked':
             case 'hidden':

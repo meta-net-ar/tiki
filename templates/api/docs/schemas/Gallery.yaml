@@ -7,105 +7,160 @@ properties:
     type: string
   type:
     type: string
+    nullable: true
   direct:
     type: string
+    nullable: true
   template:
-    type: integer
+    type: string
+    nullable: true
   description:
     type: string
+    nullable: true
   created:
     type: integer
+    nullable: true
   visible:
     type: string
+    nullable: true
   lastModif:
     type: integer
+    nullable: true
   user:
     type: string
+    nullable: true
   hits:
     type: integer
+    nullable: true
   votes:
     type: integer
+    nullable: true
   points:
-    type: float
+    type: number
+    nullable: true
   maxRows:
     type: integer
+    nullable: true
   public:
     type: string
+    nullable: true
   show_id:
     type: string
+    nullable: true
   show_icon:
     type: string
+    nullable: true
   show_name:
     type: string
+    nullable: true
   show_size:
     type: string
+    nullable: true
   show_description:
     type: string
+    nullable: true
   max_desc:
     type: integer
+    nullable: true
   show_created:
     type: string
+    nullable: true
   show_hits:
     type: string
+    nullable: true
   show_lastDownload:
     type: string
+    nullable: true
   parentId:
     type: integer
+    nullable: true
   lockable:
     type: string
+    nullable: true
   show_lockedby:
     type: string
+    nullable: true
   archives:
     type: integer
+    nullable: true
   sort_mode:
     type: string
+    nullable: true
   show_modified:
     type: string
+    nullable: true
   show_author:
     type: string
+    nullable: true
   show_creator:
     type: string
+    nullable: true
   subgal_conf:
     type: string
+    nullable: true
   show_last_user:
     type: string
+    nullable: true
   show_comment:
     type: string
+    nullable: true
   show_files:
     type: string
+    nullable: true
   show_explorer:
     type: string
+    nullable: true
   show_path:
     type: string
+    nullable: true
   show_slideshow:
     type: string
+    nullable: true
   show_ocr_state:
     type: string
+    nullable: true
   default_view:
     type: string
+    nullable: true
   quota:
     type: integer
+    nullable: true
   size:
     type: integer
+    nullable: true
   wiki_syntax:
     type: string
+    nullable: true
   backlinkPerms:
     type: string
+    nullable: true
   show_backlinks:
     type: string
+    nullable: true
   show_deleteAfter:
     type: string
+    nullable: true
   show_checked:
     type: string
+    nullable: true
   show_share:
     type: string
+    nullable: true
   image_max_size_x:
     type: integer
+    nullable: true
   image_max_size_y:
     type: integer
+    nullable: true
   show_source:
     type: string
+    nullable: true
   icon_fileId:
     type: integer
+    nullable: true
   ocr_lang:
     type: string
+    nullable: true
+  display_name_generation:
+    type: string
+    nullable: true

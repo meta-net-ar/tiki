@@ -166,6 +166,13 @@
                         {preference name=zotero_group_id}
                         {preference name=zotero_style}
                     </div>
+                    {preference name=zotero_pandoc_enabled}
+                    <div class="adminoptionboxchild" id="zotero_pandoc_enabled_childcontainer">
+                        {preference name=zotero_pandoc_library}
+                        {preference name=zotero_pandoc_style}
+                        {preference name=zotero_pandoc_path}
+                        {preference name=zotero_pandoc_csl_archive_url}
+                    </div>
                     {preference name=webmonetization_enabled}
                     <div class="adminoptionboxchild" id="webmonetization_enabled_childcontainer">
                         {preference name=webmonetization_default_payment_pointer}
@@ -193,9 +200,6 @@
                     {preference name=elementplus_select_sortable}
                     {preference name=elementplus_upload}
                 </div>
-            </fieldset>
-            <fieldset class="mb-3 w-100 clearfix featurelist">
-                <legend class="h3"><h4 class="showhide_heading" id="Icons_and_Profile_Pictures">{tr}Icons and Profile Pictures{/tr} <a href="#Icons_and_Profile_Pictures" class="heading-link" aria-label="{tr}Icons and Profile Pictures{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>
             </fieldset>
             <fieldset class="mb-3 w-100 clearfix featurelist">
                 <legend class="h3"><h4 class="showhide_heading" id="jQuery_plugins_and_add-ons"> {tr}jQuery plugins and add-ons{/tr}  <a href="#jQuery_plugins_and_add" class="heading-link" aria-label="{tr}jQuery {/tr}">{icon name="link"}</a></h4></legend>

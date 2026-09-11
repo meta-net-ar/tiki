@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use Tiki\Package\VendorHelper;
 
 const AUDIO_ACCEPTED_FORMATS = ['mp3', 'ogg', 'wav', 'aac', 'flac', 'opus'];
@@ -150,7 +153,7 @@ function wikiplugin_mediaplayer($data, $params)
                     if (! empty($file['filetype']) && $file['fileId'] == $fileId) {
                         $extension = pathinfo($file['filename'], PATHINFO_EXTENSION);
                         $params['type'] = $file['filetype'];
-                        $sourceLink = smarty_modifier_sefurl($fileId, 'display');
+                        $sourceLink = \SmartyTiki\Modifier\Sefurl::apply($fileId, 'display');
                         $fileUrl = $access->absoluteUrl($sourceLink);
                         $params['src'] = $fileUrl;
                     } else {
@@ -159,16 +162,29 @@ function wikiplugin_mediaplayer($data, $params)
                     }
                 }
             } else {
-                // External link.
-                $headers = get_headers($sourceLink, 1);
-
-                // Check if the file exists on the remote server.
-                if ($headers === false || ! isset($headers['Content-Disposition'])) {
-                    Feedback::error(tr("PluginMediaPlayer: File %0 not found on the remote server.", $params['src']));
+                // get file Headers information
+                $headers = [];
+                $client = new Client();
+                try {
+                    $response = $client->head($sourceLink);
+                    $headers = $response->getHeaders();
+                } catch (ConnectException $e) {
+                    Feedback::error(tr('PluginMediaPlayer failed to reach the remote server: %0.', $e->getMessage()));
+                    return '';
+                } catch (RequestException $e) {
+                    if ($e->hasResponse() && $e->getResponse()->getStatusCode() === 404) {
+                        $message = tr('PluginMediaPlayer: File %0 not found on the remote server.', $params['src']);
+                    } elseif ($e->hasResponse()) {
+                        $message = tr('PluginMediaPlayer failed to reach the remote server: %0.', $e->getResponse()->getReasonPhrase());
+                    } else {
+                        $message = tr('PluginMediaPlayer failed to reach the remote server: %0.', $e->getMessage());
+                    }
+                    Feedback::error($message);
                     return '';
                 }
+
                 if (isset($headers['Content-Disposition'])) {
-                    $disposition = $headers['Content-Disposition'];
+                    $disposition = $headers['Content-Disposition'][0];
                     if (preg_match('/filename="(.+)"/', $disposition, $matches)) {
                         $filename = $matches[1];
                         $extension = pathinfo($filename, PATHINFO_EXTENSION);
@@ -255,7 +271,7 @@ function wikiplugin_mediaplayer($data, $params)
                     position: relative;
                     height: 900px;
                 }
-                
+
                 .iframe-container iframe {
                     border: 0;
                     height: 100%;
@@ -264,19 +280,19 @@ function wikiplugin_mediaplayer($data, $params)
                     top: 0;
                     width: 100%;
                 }
-                
+
                 @media (max-width: 767px) {
                     .iframe-container {
                         height: 500px;
-                    } 
+                    }
                 }
-                
+
                 @media (min-width: 768px) AND (max-width: 991px) {
                     .iframe-container {
                         height: 600px;
                     }
                 }
-                
+
                 @media (min-width: 992px) AND (max-width: 1209px){
                     .iframe-container {
                         height: 700px;
@@ -301,7 +317,7 @@ function wikiplugin_mediaplayer($data, $params)
             }
 
             if (! empty($fileId)) {
-                $sourceLink = smarty_modifier_sefurl($fileId, 'display');
+                $sourceLink = \SmartyTiki\Modifier\Sefurl::apply($fileId, 'display');
             } else {
                 global $base_url;
                 $sourceLink = $access->absoluteUrl($params['src']);
@@ -322,7 +338,7 @@ function wikiplugin_mediaplayer($data, $params)
 
             if (strtolower($params['type']) === 'txt') {
                 if (! empty($fileId)) {
-                    $sourceLink = smarty_modifier_sefurl($fileId, 'display');
+                    $sourceLink = \SmartyTiki\Modifier\Sefurl::apply($fileId, 'display');
 
                     $filegallib = TikiLib::lib('filegal');
                     $file = $filegallib->get_file_info($fileId);
@@ -360,7 +376,7 @@ function wikiplugin_mediaplayer($data, $params)
         } elseif ($params['type'] === 'pdf') {
             $js = '
 var found = false;
-$.each(navigator.plugins, function(i, plugins) { // navigator.plugins is unspecified according to https://developer.mozilla.org/fr/docs/Web/API/NavigatorPlugins/plugins . Something other in NavigatorPlugins may be standard. 
+$.each(navigator.plugins, function(i, plugins) { // navigator.plugins is unspecified according to https://developer.mozilla.org/fr/docs/Web/API/NavigatorPlugins/plugins . Something other in NavigatorPlugins may be standard.
     $.each(plugins, function(i, plugin) {
         if (plugin.type === "application/pdf") {
             found = true;

@@ -2,6 +2,7 @@
     This Tiki Wiki CMS Groupware file contains global design
     and layout properties. */
 @import "../../../node_modules/bootstrap/scss/functions";
+@import "../../../node_modules/bootstrap/scss/mixins";
 
 @import "../../default/scss/_variables.scss";
 
@@ -25,6 +26,7 @@
 @import "../scss/_tiki-forums";
 @import "../scss/_tiki-comments";
 @import "../scss/_tiki-file_galleries";
+@import "../scss/_tiki-pick_avatar";
 @import "../scss/_tiki-trackers";
 @import "../scss/_tiki-categories";
 @import "../scss/_tiki-search";

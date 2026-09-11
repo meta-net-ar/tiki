@@ -178,6 +178,7 @@ class Services_Search_Controller
             $filter = (! empty($filterData) && is_array($filterData)) ? $filterData : [];
             $format = $input->format->text() ?: '{title}';
             $use_permname = $input->use_permname->text();
+            $raw = $input->raw->int();
             $titleFilter = null;
             $highlightHelper = null;
 
@@ -214,12 +215,12 @@ class Services_Search_Controller
 
             $result = $query->search($lib->getIndex());
 
-            $result->applyTransform(function ($item) use ($format, $smarty, $titleFilter, $highlightHelper, $use_permname) {
+            $result->applyTransform(function ($item) use ($format, $smarty, $titleFilter, $highlightHelper, $use_permname, $raw) {
                 $transformed = [
                     'object_type' => $item['object_type'],
                     'object_id' => $use_permname != 'y' ? $item['object_id'] : (TikiLib::lib('trk')->get_field_info($item['object_id'])['permName'] ?? $item['object_id']),
                     'parent_id' => $item['gallery_id'] ?? $item['tracker_id'],
-                    'title' => preg_replace_callback('/\{([\w\.]+)\}/', function ($matches) use ($item, $format, $titleFilter, $highlightHelper) {
+                    'title' => preg_replace_callback('/\{([\w\.]+)\}/', function ($matches) use ($item, $format, $titleFilter, $highlightHelper, $raw) {
                         $key = $matches[1];
                         if (isset($item[$key])) {
                             // if this is a trackeritem we do not want only the name but also the trackerid listed when setting up a field
@@ -227,6 +228,12 @@ class Services_Search_Controller
                             // example: setup of trackerfield item-link: choose some fields from a list. currently this list show all fields of all trackers
                             if ($item['object_type'] == 'trackerfield') {
                                 return $item[$key] . ' (Tracker-' . $item['tracker_id'] . ', Field-' . $item['object_id'] . ')';
+                            } elseif ($raw) {
+                                // Caller explicitly asked for the exact stored value for this
+                                // token (e.g. an ItemLink's raw itemId), so skip the "_text"
+                                // rendered-label substitution below entirely.
+                                $value = $item[$key];
+                                return is_array($value) ? implode(',', $value) : $value;
                             } else {
                                 $value = $item[$key];
                                 if (is_array($value)) {
@@ -250,9 +257,10 @@ class Services_Search_Controller
                             return '';
                         }
                     }, $format),
+                    'link' => \SmartyTiki\FunctionHandler\ObjectLink::render(['type' => $item['object_type'], 'id' => $item['object_id']], $smarty->getEmptyInternalTemplate())
                 ];
                 if ($item['object_type'] == 'trackeritem') {
-                    $transformed['status_icon'] = smarty_function_tracker_item_status_icon(['item' => $item['object_id']], $smarty->getEmptyInternalTemplate());
+                    $transformed['status_icon'] = \SmartyTiki\FunctionHandler\TrackerItemStatusIcon::render(['item' => $item['object_id']], $smarty->getEmptyInternalTemplate());
 
                     try {
                         $popupContent = Services_Object_Controller::getTrackerItemPopupContent((int) $item['object_id']);
@@ -281,7 +289,7 @@ class Services_Search_Controller
     {
         global $smarty;
         return [
-            'selector' => smarty_function_object_selector($input->params->array(), $smarty->getEmptyInternalTemplate())
+            'selector' => \SmartyTiki\FunctionHandler\ObjectSelector::render($input->params->array(), $smarty->getEmptyInternalTemplate())
         ];
     }
 }

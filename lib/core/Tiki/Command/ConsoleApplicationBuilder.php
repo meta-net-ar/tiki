@@ -85,6 +85,7 @@ class ConsoleApplicationBuilder
                 new FixBOMandUnixCommand(),
                 new GetStringsCommand(),
                 new BuildIconsListCommand(),
+                new SmartyGenerateMappingCommand(),
                 ],
             ],[
             'condition' => 'checkIsDevMode',
@@ -118,7 +119,8 @@ class ConsoleApplicationBuilder
                 new PluginRefreshRunCommand(),
                 new PatchCommand(),
                 new UpdateCommand(),
-                new DatabaseEngineConvertCommand()
+                new DatabaseEngineConvertCommand(),
+                new TrackerConvertAttachmentsCommand()
                 ],
             ],[
             'condition' => 'checkTikiSetupComplete',
@@ -132,6 +134,8 @@ class ConsoleApplicationBuilder
                 new PreferencesDeleteCommand(),
                 new PreferencesExportCommand(),
                 new SBOMGenerateCommand(),
+                new ZoteroCslFindCommand(),
+                new ZoteroCslUpdateCommand(),
                 ],
             ],[
             'condition' => 'checkDatabaseUpToDate',
@@ -188,7 +192,6 @@ class ConsoleApplicationBuilder
                 new TrackerExportCommand(),
                 new TrackerImportCommand(),
                 new TrackerRecalcCommand(),
-                new TrackerConvertAttachmentsCommand(),
                 new SitemapGenerateCommand(),
                 new TikiInfoCommand(),
                 new TrackerClearCommand(),
@@ -201,6 +204,8 @@ class ConsoleApplicationBuilder
                 new UsersPasswordCommand(),
                 new UsersTemporaryCommand(),
                 new TokensClearCommand(),
+                new ApiTokensRevokeAllCommand(),
+                new TokensRotateSecretCommand(),
                 new McpTokenCreateCommand(),
                 new CookiesClearCommand(),
                 new StatsCommand(),
@@ -532,7 +537,7 @@ class ConsoleApplicationBuilder
      * Iterates over all commands in the list, and registers / doesn't register the commands in accordance with the result
      * of the check function and the action configured for the command group
      *
-     * @param boolean $returnLastInstance
+     * @param int $statusCode
      * @return Application
      */
     public function create($statusCode = 1100): Application
@@ -559,6 +564,7 @@ class ConsoleApplicationBuilder
         $console->setCatchExceptions(false);
 
         $commandCalled = $_SERVER['argv'][1] ?? false;
+        $stopAfterRequestedCommand = ! in_array($commandCalled, ['list', 'help'], true);
 
         /**
          * @var  $condition string  The name of the check method to be executed
@@ -622,7 +628,7 @@ class ConsoleApplicationBuilder
                 }
                 $console->add($command);
                 // If the command exactly matches one that was requested, stop processing further commands as they will not be used anyhow.
-                if ($commandCalled === $command->getName()) {
+                if ($stopAfterRequestedCommand && $commandCalled === $command->getName()) {
                     break 2;
                 }
             }

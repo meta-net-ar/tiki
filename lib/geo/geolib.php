@@ -97,7 +97,7 @@ class GeoLib
      */
     public function parse_coordinates($string)
     {
-        if (preg_match("/^(-?\d*(\.\d+)?),(-?\d*(\.\d+)?)(,(\d+))?$/", $string, $parts)) {
+        if (preg_match("/^(-?\d*(\.\d+)?)\s*?,\s*?(-?\d*(\.\d+)?)\s*?(,\s*?(\d+))?$/", $string, $parts)) {
             $coords = [
                 'lat' => $parts[3],
                 'lon' => $parts[1],
@@ -198,7 +198,7 @@ class GeoLib
     {
         global $prefs;
         $coords = $this->parse_coordinates($prefs['gmap_defaultx'] . ',' . $prefs['gmap_defaulty'] . ',' . $prefs['gmap_defaultz']);
-                $center = ' data-geo-center="' . smarty_modifier_escape($this->build_location_string($coords)) . '" ';
+                $center = ' data-geo-center="' . \SmartyTiki\Modifier\Escape::apply($this->build_location_string($coords)) . '" ';
         return $center;
     }
 }

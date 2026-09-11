@@ -6,9 +6,11 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\MailIn;
 
+use Exception;
 use Language;
 use TikiLib;
 use TikiMail;
+use Tiki\MailIn\Exception\MailInException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 class Account
@@ -29,13 +31,15 @@ class Account
     private $trackerId;
     private $preferences;
 
-    private static function getSource(array $acc)
+    /**
+     * @throws Exception
+     */
+    private static function getSource(array $acc): Source\Imap
     {
         if ($acc['protocol'] == 'imap') {
             return new Source\Imap($acc['host'], $acc['port'], $acc['username'], $acc['pass']);
-        } else {
-            return new Source\Pop3($acc['host'], $acc['port'], $acc['username'], $acc['pass']);
         }
+        throw new Exception(tr('Unsupported mail protocol:  %0', $acc['protocol']));
     }
 
     public function getPreferences()
@@ -54,6 +58,9 @@ class Account
         return $source->test();
     }
 
+    /**
+     * @throws Exception
+     */
     public static function fromDb(array $acc)
     {
         $account = new self();
@@ -71,7 +78,7 @@ class Account
 
             $account->actionFactory = $provider->getActionFactory($acc);
         } catch (ServiceNotFoundException $e) {
-            throw new Exception\MailInException("Action factory not found.");
+            throw new MailInException("Action factory not found.");
         }
 
         $account->accountAddress = $acc['account'];

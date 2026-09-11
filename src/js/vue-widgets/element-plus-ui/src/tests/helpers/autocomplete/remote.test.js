@@ -1,8 +1,16 @@
-import { describe, test, vi, expect } from "vitest";
+import { describe, test, vi, expect, afterEach, beforeEach } from "vitest";
 import { fetchSuggestions } from "../../../helpers/autocomplete/remote";
 
 describe("Autocomplete remote helper functions", () => {
     describe("fetchSuggestions", () => {
+        beforeEach(() => {
+            window.jqueryTiki = {};
+        });
+
+        afterEach(() => {
+            vi.clearAllMocks();
+        });
+
         test.each([
             ["foo", ["foo", "bar"], ["foo"]],
             ["foo", ["bar"], []],
@@ -36,7 +44,7 @@ describe("Autocomplete remote helper functions", () => {
 
                 fetchSuggestions(query, callback, sourceRemoteUrl, sourceList);
 
-                await window.happyDOM.waitUntilComplete();
+                await new Promise((resolve) => setTimeout(resolve, 0));
 
                 expect(callback).toHaveBeenCalledWith(expectedCallbackArg);
             }
@@ -53,21 +61,32 @@ describe("Autocomplete remote helper functions", () => {
             expect(callback).not.toHaveBeenCalled();
         });
 
-        test("the URL is correctly constructed with the query parameter and Fetch is instructed to only accept json response data", async () => {
-            const query = "foo";
-            const callback = vi.fn();
-            const sourceRemoteUrl = "https://foo/bar";
-            const sourceList = [];
+        test.each([
+            ["without a custom remote query key", undefined, "q"],
+            ["with a custom remote query key", "foo", "foo"],
+        ])(
+            "(%s), the URL is correctly constructed with the query parameter and Fetch is instructed to only accept json response data",
+            async (_, customRemoteQueryKey, expectedQueryKey) => {
+                const query = "foo";
+                const callback = vi.fn();
+                const sourceRemoteUrl = "https://foo/bar";
+                const sourceList = [];
 
-            vi.spyOn(window, "fetch").mockResolvedValueOnce({ json: vi.fn() });
+                vi.spyOn(window, "fetch").mockResolvedValueOnce({ json: vi.fn() });
 
-            fetchSuggestions(query, callback, sourceRemoteUrl, sourceList);
+                fetchSuggestions(query, callback, sourceRemoteUrl, sourceList, customRemoteQueryKey);
 
-            expect(window.fetch).toHaveBeenCalledWith(`${sourceRemoteUrl}?q=${query}`, {
-                headers: {
-                    Accept: "application/json",
-                },
-            });
-        });
+                await window.happyDOM.waitUntilComplete();
+
+                const expectedUrl = new URL(sourceRemoteUrl);
+                expectedUrl.searchParams.append(expectedQueryKey, query);
+
+                expect(window.fetch).toHaveBeenCalledWith(expectedUrl.href, {
+                    headers: {
+                        Accept: "application/json",
+                    },
+                });
+            }
+        );
     });
 });

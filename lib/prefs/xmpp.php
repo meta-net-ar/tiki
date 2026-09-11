@@ -6,13 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_xmpp_list()
 {
+    $xmppHelp = 'XMPP';
+
     return [
         'xmpp_feature' => [
             'name' => tra('XMPP client (ConverseJS)'),
             'description' => tra('Integration with Converse.js XMPP client.'),
             'type' => 'flag',
             'keywords' => 'xmpp jabber converse conversejs chat',
-            'help' => 'XMPP',
+            'help' => $xmppHelp,
             'tags' => ['basic'],
             'default' => 'n',
             'extensions' => [
@@ -28,6 +30,7 @@ function prefs_xmpp_list()
             'size' => 40,
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_client_port' => [
             'name' => tra('XMPP client port'),
@@ -37,6 +40,7 @@ function prefs_xmpp_list()
             'hint' => '5222',
             'tags' => ['basic'],
             'default' => '5222',
+            'help' => $xmppHelp,
         ],
         'xmpp_muc_component_domain' => [
             'name' => tra('XMPP MUC Domain'),
@@ -48,6 +52,7 @@ function prefs_xmpp_list()
             'size' => 40,
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_server_http_bind' => [
             'name' => tra('XMPP BOSH URL (http-bind)'),
@@ -59,6 +64,7 @@ function prefs_xmpp_list()
             'hint' => tra('https://xmpp.example.org/http-bind/'),
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_auth_method' => [
             'name' => tra('Authentication method'),
@@ -73,17 +79,19 @@ function prefs_xmpp_list()
                 'tikitoken' => tra('Openfire TikiToken'),
                 'http' => tra('Prosody HTTP Auth'),
             ],
+            'help' => $xmppHelp,
         ],
         'xmpp_openfire_allow_anonymous' => [
             'name' => tra('Allow anonymous'),
             'description' => tra('Allow anonymous users on Chat'),
             'type' => 'flag',
             'keywords' => 'xmpp jabber anonymous conversejs chat',
-            'help' => 'XMPP',
+            'help' => $xmppHelp,
             'tags' => ['basic'],
             'default' => 'n',
             'extensions' => [
             ],
+            'help' => $xmppHelp,
         ],
         'xmpp_openfire_rest_api' => [
             'name' => tra('Openfire REST API endpoint'),
@@ -95,6 +103,7 @@ function prefs_xmpp_list()
             'hint' => tra('https://xmpp.example.org:9091/plugins/restapi/v1/'),
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_openfire_rest_api_username' => [
             'name' => tra('Rest API username'),
@@ -104,6 +113,7 @@ function prefs_xmpp_list()
             'size' => 40,
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_openfire_rest_api_password' => [
             'name' => tra('Rest API password'),
@@ -113,6 +123,7 @@ function prefs_xmpp_list()
             'size' => 40,
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_conversejs_debug' => [
             'name' => tra('ConverseJS Debug Mode'),
@@ -120,6 +131,7 @@ function prefs_xmpp_list()
             'description' => tra('Enables more logging, e.g. XML stanzas and error tracebacks to the JavaScript Console'),
             'keywords' => 'xmpp jabber openfire chat',
             'type' => 'flag',
+            'help' => $xmppHelp,
         ],
         'xmpp_conversejs_init_json' => [
             'name' => tra('ConverseJS Extra Settings'),
@@ -129,12 +141,22 @@ function prefs_xmpp_list()
             'keywords' => 'xmpp jabber openfire converse chat',
             'size' => 10,
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_conversejs_always_load' => [
             'name' => tra('Always Load ConverseJS'),
             'default' => 'n',
             'description' => tra('Adds the ConverseJS Javascript and CSS files to every page.'),
             'keywords' => 'xmpp jabber openfire chat',
+            'type' => 'flag',
+            'dependencies' => ['xmpp_feature'],
+            'help' => $xmppHelp,
+        ],
+        'xmpp_chat_button' => [
+            'name' => tra('Floating chat button'),
+            'default' => 'y',
+            'description' => tra('Show a floating "Chat" button site-wide. Turn this off to keep XMPP chat available only through PluginXMPP on specific pages.'),
+            'keywords' => 'xmpp jabber chat button floating bubble',
             'type' => 'flag',
             'dependencies' => ['xmpp_feature'],
         ],
@@ -146,6 +168,7 @@ function prefs_xmpp_list()
             'hint' => 'xmpp.example.org',
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_domain_guest' => [
             'name' => tra('XMPP domain for anonymous visitors'),
@@ -155,6 +178,7 @@ function prefs_xmpp_list()
             'hint' => 'guest.example.org',
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_anonymous_mode' => [
             'name' => tra('Anonymous visitor mode'),
@@ -166,6 +190,14 @@ function prefs_xmpp_list()
             ],
             'default' => 'community',
             'tags' => ['basic'],
+            'help' => $xmppHelp,
+        ],
+        'xmpp_anonymous_allow_custom_nickname' => [
+            'name' => tra('Allow anonymous visitors to choose a nickname'),
+            'description' => tra('When enabled, anonymous visitors are prompted to choose their chat nickname before sending messages. When disabled, Tiki uses an automatic visitor nickname.'),
+            'type' => 'flag',
+            'tags' => ['basic'],
+            'default' => 'n',
         ],
         'xmpp_ws_url' => [
             'name' => tra('XMPP WebSocket URL'),
@@ -175,6 +207,7 @@ function prefs_xmpp_list()
             'hint' => 'wss://xmpp.example.org/xmpp-websocket',
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_anonymous_room' => [
             'name' => tra('Default anonymous chat room'),
@@ -184,6 +217,7 @@ function prefs_xmpp_list()
             'hint' => 'community@conference.example.org',
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_anonymous_support_room' => [
             'name' => tra('Anonymous support room'),
@@ -193,6 +227,7 @@ function prefs_xmpp_list()
             'hint' => 'support@conference.example.org',
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_registered_room' => [
             'name' => tra('Default registered chat room'),
@@ -202,6 +237,7 @@ function prefs_xmpp_list()
             'hint' => 'registered@conference.example.org',
             'tags' => ['basic'],
             'default' => '',
+            'help' => $xmppHelp,
         ],
         'xmpp_group_room_map' => [
             'name' => tra('Mapping Tiki groups to chat rooms'),
@@ -213,6 +249,7 @@ function prefs_xmpp_list()
             }",
             'default' => '',
             'tags' => ['advanced'],
+            'help' => $xmppHelp,
         ],
         'xmpp_auto_join_strategy' => [
             'name' => tra('Auto-join strategy'),
@@ -225,6 +262,7 @@ function prefs_xmpp_list()
             ],
             'default' => 'by-groups',
             'tags' => ['basic'],
+            'help' => $xmppHelp,
         ],
         'xmpp_shared_secret' => [
             'name' => tra('XMPP shared secret (HTTP auth)'),
@@ -232,6 +270,7 @@ function prefs_xmpp_list()
             'type' => 'password',
             'default' => '',
             'tags' => ['advanced'],
+            'help' => $xmppHelp,
         ],
         'xmpp_cors_allowed_origins' => [
             'name' => tra('CORS allowed origins (comma-separated)'),
@@ -239,6 +278,7 @@ function prefs_xmpp_list()
             'type' => 'text',
             'default' => '',
             'tags' => ['advanced'],
+            'help' => $xmppHelp,
         ],
         'xmpp_admin_jid' => [
             'name' => tra('XMPP Admin JID'),
@@ -247,6 +287,7 @@ function prefs_xmpp_list()
             'hint' => 'admin@xmpp.example.org',
             'default' => '',
             'tags' => ['advanced'],
+            'help' => $xmppHelp,
         ],
         'xmpp_admin_password' => [
             'name' => tra('XMPP Admin Password'),
@@ -254,6 +295,7 @@ function prefs_xmpp_list()
             'type' => 'password',
             'default' => '',
             'tags' => ['advanced'],
+            'help' => $xmppHelp,
         ],
     ];
 }

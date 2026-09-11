@@ -6,23 +6,28 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_comments_list()
 {
+    $commentsHelp = 'Comments';
+
     return [
         'comments_notitle' => [
             'name' => tra('Disable comment titles'),
             'description' => tra('Don\'t display the title input field on comments and their replies.'),
             'type' => 'flag',
+            'help' => $commentsHelp,
             'default' => 'y',
         ],
         'comments_field_email' => [
             'name' => tra('Email field'),
             'description' => tra('Email field for comments (only for anonymous users).'),
             'type' => 'flag',
+            'help' => $commentsHelp,
             'default' => 'n',
         ],
         'comments_field_website' => [
             'name' => tra('Website field'),
             'description' => tra('Website field for comments (only for anonymous users).'),
             'type' => 'flag',
+            'help' => $commentsHelp,
             'default' => 'n',
         ],
         'comments_vote' => [
@@ -30,12 +35,14 @@ function prefs_comments_list()
             'description' => tra('Allow users with permission to vote on comments.'),
             'hint' => tr('Permissions involved: %0', 'vote_comments, wiki_view_comments, ratings_view_results'),
             'type' => 'flag',
+            'help' => $commentsHelp,
             'default' => 'n',
         ],
         'comments_archive' => [
             'name' => tra('Archive comments'),
             'description' => tra('If a comment is archived, only admins can see it'),
             'type' => 'flag',
+            'help' => $commentsHelp,
             'default' => 'n',
         ],
         'comments_resolved_threads' => [
@@ -43,11 +50,13 @@ function prefs_comments_list()
             'description' => tra('Allow marking top-level comment threads as resolved. Resolved threads are collapsed by default.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $commentsHelp, // TODO: Update help for this preference
         ],
         'comments_allow_correction' => [
             'name' => tr('Allow comments to be edited by their author'),
             'description' => tr('Allow a comment to be modified by its author after posting it, for clarifications, correction of errors, etc.'),
             'type' => 'flag',
+            'help' => $commentsHelp,
             'default' => 'y',
             'tags' => ['advanced'],
         ],
@@ -56,6 +65,7 @@ function prefs_comments_list()
             'description' => tra('The time in minutes during which a comment can be modified by its author after posting it, for clarifications, correction of errors, etc.'),
             'type' => 'text',
             'filter' => 'digits',
+            'help' => $commentsHelp,
             'units' => tra('minutes'),
             'default'  => 90,
             'tags' => ['advanced'],
@@ -68,6 +78,7 @@ function prefs_comments_list()
             'description' => tr('Use the Open/Apache Annotator JavaScript based library for managing inline comments as annotations.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $commentsHelp,
             'tags' => ['advanced', 'experimental'],
             'dependencies' => [
                 'feature_inline_comments',
@@ -79,6 +90,7 @@ function prefs_comments_list()
             'description' => tr('Show author and date on Open Annotator inline comments.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $commentsHelp,
             'tags' => ['advanced', 'experimental'],
             'dependencies' => [
                 'comments_inline_annotator',
@@ -90,20 +102,25 @@ function prefs_comments_list()
             'description' => tr('Displays a link icon on hover over each comment heading, allowing users to copy the link for easy sharing.'),
             'keywords' => 'Display hidden anchor on mouseover of headings',
             'type' => 'flag',
+            'help' => $commentsHelp,
             'default' => 'y',
             'dependencies' => [],
         ],
         'comments_per_page'      => [
             'name'         => tr('Number of comments per page'),
+            'description'  => tra('How many comments to show per page.'),
             'type'         => 'text',
             'filter'       => 'digits',
+            'help' => $commentsHelp,
             'default'      => 25,
             'dependencies' => [],
         ],
         'comments_sort_mode'     => [
             'name'    => tr('Sort mode for comments'),
+            'description' => tra('Show oldest or newest comments first.'),
             'type'    => 'list',
             'default' => 'commentDate_asc',
+            'help' => $commentsHelp,
             'options' => [
                 'commentDate_asc'  => tra('Oldest first'),
                 'commentDate_desc' => tra('Newest first'),
@@ -111,9 +128,11 @@ function prefs_comments_list()
         ],
         'comments_threshold_indent'     => [
             'name'    => tr('Limit indentation on thread reply'),
+            'description' => tra('How many levels of replies are indented. Pick "All indented" for no limit.'),
             'type'    => 'list',
             'default' => '5',
             'filter' => 'digits',
+            'help' => $commentsHelp,
             'options' => [
                 '5' => tra('Limit Indentation (to 5)'),
                 '0' => tra('All indented'),

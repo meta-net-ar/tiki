@@ -173,7 +173,7 @@ if ($output["data"] == "EMPTY") {
         $data[$titleId] = strip_tags($data[$titleId]);
         $data["id"] = $_REQUEST["$id"];
         $data["field_values"] = null;
-        $data['sefurl'] = smarty_modifier_sefurl($data['itemId'], 'trackeritem');
+        $data['sefurl'] = \SmartyTiki\Modifier\Sefurl::apply($data['itemId'], 'trackeritem');
         $changes["data"][] = $data;
         $data = null;
     }

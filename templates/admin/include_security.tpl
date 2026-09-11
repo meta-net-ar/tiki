@@ -83,11 +83,15 @@
                 {preference name=feature_debug_console}
             </fieldset>
             <fieldset>
+                <legend class="h3">{tr}SSRF Protection{/tr}</legend>
+                {preference name=ssrf_whitelisted_hosts}
+            </fieldset>
+            <fieldset>
                 <legend class="h3">{tr}Trackers Security{/tr}</legend>
                 {preference name=tracker_adminonlyviewedititem_by_default}
             </fieldset>
             <fieldset>
-                <legend class="h3">{tr}User Encryption{/tr}{help url="User Encryption"}</legend>
+                <legend class="h3">{tr}User Encryption{/tr}{help url="User-Encryption"}</legend>
                 {preference name=feature_user_encryption}
                 <div class="adminoptionboxchild" id="feature_user_encryption_childcontainer">
                     {if $sodium_available}
@@ -181,9 +185,21 @@
                     {preference name=http_header_strict_transport_security_value}
                 </div>
 
+                {preference name=http_header_set_cookie_samesite}
+
                 {preference name=http_header_public_key_pins}
                 <div class="adminoptionboxchild" id="http_header_public_key_pins_childcontainer">
                     {preference name=http_header_public_key_pins_value}
+                </div>
+
+                {preference name=http_header_referrer_policy}
+                <div class="adminoptionboxchild" id="http_header_referrer_policy_childcontainer">
+                    {preference name=http_header_referrer_policy_value}
+                </div>
+
+                {preference name=http_header_permitted_cross_domain_policies}
+                <div class="adminoptionboxchild" id="http_header_permitted_cross_domain_policies_childcontainer">
+                    {preference name=http_header_permitted_cross_domain_policies_value}
                 </div>
             </fieldset>
             <fieldset>
@@ -194,7 +210,7 @@
 
         {tab name="{tr}Spam Protection{/tr}"}
             {remarksbox type="tip" title="{tr}Tip{/tr}"}
-                {tr _0='<a href="http://doc.tiki.org/Forum+Admin#Forum_moderation" target="_blank" class="alert-link">' _1="</a>" _2="<strong>" _3="</strong>" _4='<a href="tiki-admin_actionlog.php" target="_blank" class="alert-link">' _5="</a>" _6='<a href="tiki-adminusers.php" target="_blank" class="alert-link">' _7="</a>" _8='<a href="tiki-list_comments.php" target="_blank" class="alert-link">' _9="</a>"}You can additionally protect from spam enabling the '%0moderation queue on forums%1', or through %2banning%3 multiple ip's from the '%4Action log%5', from '%6Users registration%7', or from the '%8Comments moderation queue%9' itself{/tr}.
+                {tr _0='<a href="http://doc.tiki.org/Forum-Admin#Forum_moderation" target="_blank" class="alert-link">' _1="</a>" _2="<strong>" _3="</strong>" _4='<a href="tiki-admin_actionlog.php" target="_blank" class="alert-link">' _5="</a>" _6='<a href="tiki-adminusers.php" target="_blank" class="alert-link">' _7="</a>" _8='<a href="tiki-list_comments.php" target="_blank" class="alert-link">' _9="</a>"}You can additionally protect from spam enabling the '%0moderation queue on forums%1', or through %2banning%3 multiple ip's from the '%4Action log%5', from '%6Users registration%7', or from the '%8Comments moderation queue%9' itself{/tr}.
             {/remarksbox}
             <fieldset>
                 <legend class="h3">{tr}CAPTCHA Options{/tr}</legend>
@@ -327,199 +343,26 @@
             <br>
             {remarksbox type="note" title="{tr}About encryption{/tr}"}
                 {tr}Encryption page allows you to create different encryption keys and share them securely with team members.{/tr}<br>
-                {tr}Find out more here:{/tr}{help url="Encryption"}
+                {tr}Find out more here:{/tr}{help url="User-Encryption"}
             {/remarksbox}
             {if $encryption_enabled neq 'y'}
                 {remarksbox type="error" title="{tr}Error{/tr}"}
                     {tr}Openssl extension is required to use this module.{/tr}
                 {/remarksbox}
             {/if}
-            {if $encryption_shares}
-                {remarksbox type="warning" title="{tr}Encryption keys{/tr}"}
-                    {tr}Encryption key has been generated. Accessing content encrypted with the key would only be possible if you use one of the following requested keys. If you chose existing users, the keys are stored securely in their accounts. Otherwise, make sure you copy and send them to the right team members as these won't be saved on the server. Each of the following keys can be used to encrypt and decrypt data.{/tr}<br>
-                    <ol>
-                        {foreach $encryption_shares as $key}
-                            <li>{$key}</li>
-                        {/foreach}
-                    </ol>
-                {/remarksbox}
-            {/if}
-            {tabset name='encryption'}
-                {tab name='{tr}Available keys{/tr}'}
-                    <input type="hidden" name="keyId" value="{$encryption_key.keyId}">
-                    <input type="hidden" name="new_key" value="{$smarty.request.new_key}">
-                    <fieldset id="encryption_keys">
-                        <div class="input_submit_container table-responsive">
-                            <table class="table table-striped">
-                                <tr>
-                                    <th>{tr}Name{/tr}</th>
-                                    <th>{tr}Description{/tr}</th>
-                                    {if $encryption_algos}
-                                    <th>{tr}Algorithm{/tr}</th>
-                                    {/if}
-                                    <th>{tr}Number of shares{/tr}</th>
-                                    <th>{tr}Users{/tr}</th>
-                                    <th>{tr}Encrypted fields{/tr}</th>
-                                    <th>{tr}Edit{/tr}</th>
-                                    <th>{tr}Delete{/tr}</th>
-                                </tr>
-                                {foreach $encryption_keys as $key}
-                                    <tr>
-                                        <td>
-                                            {$key.name|escape}
-                                        </td>
-                                        <td>
-                                            {$key.description|escape}
-                                        </td>
-                                        {if $encryption_algos}
-                                        <td>
-                                            {$key.algo}
-                                        </td>
-                                        {/if}
-                                        <td>
-                                            {$key.shares}
-                                        </td>
-                                        <td>
-                                            {$key.users}
-                                        </td>
-                                        <td>
-                                            {foreach $encrypted_fields[$key.keyId] as $field}
-                                                <a href="{$field.trackerId|sefurl:'trackerfields'}">{$field.name|escape}</a><br/>
-                                            {foreachelse}
-                                                None
-                                            {/foreach}
-                                        </td>
-                                        <td>
-                                            {icon name='pencil' href='tiki-admin.php?page=security&encryption_key='|cat:$key.keyId}
-                                        </td>
-                                        <td>
-                                            <button type="submit" name="key_delete" value="{$key.keyId}" class="btn btn-link text-danger" style="cursor: pointer" onclick="confirmPopup('{tr}Remove key? Encrypted data will be lost!{/tr}', '{ticket mode=get}')" aria-label="{tr}Delete{/tr}">
-                                                {icon name='delete'}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                {foreachelse}
-                                    {norecords _colspan=7}
-                                {/foreach}
-                            </table>
-                            <div class="submit">
-                                {if  not empty($smarty.request.encryption_key)}
-                                    {button name='add' id='key_add' _text='Create' _class='btn btn-info' _script='tiki-admin.php?page=security&new_key'}
-                                {/if}
-                                {if isset($smarty.request.new_key)}
-                                    {jq}$("a[href='#contentencryption-2']").tab("show");{/jq}
-                                {/if}
-                            </div>
-                        </div>
-                    </fieldset>
-                {/tab}
-                {if not empty($smarty.request.encryption_key)}
-                    {$tabname='Edit Key'}
-                    {jq}$("a[href='#contentencryption-2']").tab("show");{/jq}
-                {else}
-                    {$tabname='Create Key'}
-                    {if not isset($smarty.request.new_key)}
-                        {jq}$("a[href='#contentencryption-1']").tab("show");{/jq}
-                    {/if}
-                {/if}
-                {tab name=$tabname}
-                    {if $encryption_error}
-                        {remarksbox type="error" title="{tr}Error{/tr}"}
-                            {$encryption_error}
-                        {/remarksbox}
-                    {/if}
-                    <fieldset id="encryption_general">
-                        <legend class="h3">
-                            {tr}General information{/tr}
-                        </legend>
-                        <div class="mb-3 row">
-                            <label class="col-form-label col-sm-4" for="name">
-                                {tr}Key name or domain{/tr}
-                            </label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="name" value="{$encryption_key.name|escape}">
-                            </div>
-                        </div><br>
-                        <div class="mb-3 row">
-                            <label class="col-form-label col-sm-4" for="description">
-                                {tr}Description{/tr}
-                            </label>
-                            <div class="col-sm-8">
-                                <textarea class="form-control" cols="60" rows="12" name="description">{$encryption_key.description|default:''|escape}</textarea>
-                            </div>
-                        </div><br>
-                        {if !empty($encryption_key.keyId)}
-                        <div class="mb-3 row">
-                            <label class="col-form-label col-sm-4" for="regenerate">
-                                {tr}Regenerate shares{/tr}
-                            </label>
-                            <div class="col-sm-8">
-                                <input type="checkbox" name="regenerate" id="regenerate" value="1">
-                                <a class="tikihelp text-info" title="{tr}Regenerate shares:{/tr} {tr}Enabling this option will create new secret shares with the defined number of shares. Old shares will no longer be valid, so you will need to distribute the new shares to team members again. Data encrypted with existing key will stay intact and new shares will be able to decrypt it. No data loss occurs as long as you keep the shared keys known. Use this option to increase or decrease the number of people with shared keys for this domain. If User Encryption is turned on, newly generated keys will be automatically saved to relevant user accounts.{/tr}">
-                                    {icon name=information}
-                                </a>
-                            </div>
-                        </div><br>
-                        {if $encryption_setup neq 'y'}
-                        <div class="mb-3 row" id="old_share_container" style="display:none">
-                            <label class="col-form-label col-sm-4" for="old_share">
-                                {tr}Old shared key{/tr}
-                            </label>
-                            <div class="col-sm-8">
-                                <input type="password" class="form-control" name="old_share" value="">
-                                <a class="tikihelp text-info" title="{tr}Old shared key:{/tr} {tr}You need to input one of the existing shared keys in order to regenerate the secret shares.{/tr}">
-                                    {icon name=information}
-                                </a>
-                                <a class="tikihelp text-warning" title="{tr}Warning:{/tr} Be absolutely sure that the key you use is the right key from previous generation. Otherwise, the stored security key will be invalidated and all encrypted data using this key lost!">
-                                    {icon name="warning"}
-                                </a>
-                            </div>
-                            <br>
-                        </div>
-                        {/if}
-                        {/if}
-                        <div class="mb-3 row">
-                            <label class="col-form-label col-sm-4" for="user_selector_1">
-                                {tr}Users to share with{/tr}
-                            </label>
-                            <div class="col-sm-8">
-                                {if $prefs.feature_user_encryption eq 'y'}
-                                    {user_selector multiple='true' name='users[]' class='form-control' user=$encryption_key.users select=$encryption_key.users_array editable=y}
-                                {else}
-                                    {tr}Depends on "User encryption".{/tr}
-                                {/if}
-                            </div>
-                        </div><br>
-                        {if $encryption_algos}
-                        <div class="mb-3 row">
-                            <label class="col-form-label col-sm-4" for="algo">
-                                {tr}Encryption algorithm{/tr}
-                            </label>
-                            <div class="col-sm-8">
-                                <select class="form-select" name="algo" id="algo" {if !empty($encryption_key.keyId)}disabled{/if}>
-                                    <option></option>
-                                    {foreach $encryption_algos as $algo}
-                                        <option value="{$algo|escape}" {if $encryption_key.algo eq $algo}selected="selected"{/if}>
-                                            {$algo|escape}
-                                        </option>
-                                    {/foreach}
-                                </select>
-                            </div>
-                        </div><br>
-                        {/if}
-                        {if $prefs.feature_user_encryption neq 'y'}
-                        <div class="mb-3 row">
-                            <label class="col-form-label col-sm-4" for="shares">
-                                {tr}No. of people to share{/tr}
-                            </label>
-                            <div class="col-sm-8">
-                                <input type="number" min="1" class="form-control" name="shares" id="shares" value="{$encryption_key.shares|escape}" {if !empty($encryption_key.keyId)}disabled{/if}>
-                            </div>
-                        </div><br>
-                        {/if}
-                    </fieldset>
-                {/tab}
-            {/tabset}
+            <div id="single-spa-application:@vue-mf/sss-admin"></div>
+
+            {jq}
+                window.registerApplication({
+                    name: "@vue-mf/sss-admin",
+                    app: () => importShim("@vue-mf/sss-admin"),
+                    activeWhen: (location) => true,
+                    customProps: {},
+                });
+                onDOMElementRemoved("single-spa-application:@vue-mf/sss-admin", function () {
+                    window.unregisterApplication("@vue-mf/sss-admin");
+                });
+            {/jq}
         {/tab}
         {tab name="{tr}API{/tr}" key="api"}
             <br>
@@ -531,6 +374,7 @@
             <div class="adminoptionboxchild" id="auth_api_tokens_childcontainer">
                 {service_inline controller=api_token action=list}
             </div>
+            {preference name=auth_api_tiki_version}
         {/tab}
         {tab name="{tr}Webhooks{/tr}" key="webhooks"}
             <br>

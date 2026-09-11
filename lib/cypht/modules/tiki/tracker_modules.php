@@ -56,7 +56,7 @@ class Hm_Handler_check_path_redirect extends Hm_Handler_Module
     {
         $path = $this->request->get['list_path'];
         if (preg_match("/tracker_folder_(\d+)_(\d+)/", $path, $m)) {
-            $url = smarty_modifier_sefurl($m[1], 'trackeritem');
+            $url = \SmartyTiki\Modifier\Sefurl::apply($m[1], 'trackeritem');
             Hm_Dispatch::page_redirect($url);
         }
     }
@@ -76,7 +76,7 @@ class Hm_Handler_check_path_redirect_after_sent extends Hm_Handler_Module
         }
         $path = $this->request->post['compose_msg_path'];
         if (preg_match("/tracker_folder_(\d+)_(\d+)/", $path, $m)) {
-            $url = smarty_modifier_sefurl($m[1], 'trackeritem');
+            $url = \SmartyTiki\Modifier\Sefurl::apply($m[1], 'trackeritem');
             Hm_Dispatch::page_redirect($url);
         }
     }
@@ -850,17 +850,31 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
         $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=%s&amp;tiki_download_message=1", $form['imap_msg_uid'], $this->request->post['list_path']));
         $this->out('msg_show_args', sprintf("page=message&amp;uid=%s&amp;list_path=%s&amp;tiki_show_message=1", $form['imap_msg_uid'], $this->request->post['list_path']));
         if ($email['prev']) {
-            $this->out('msg_prev_link', sprintf("?page=message&amp;uid=%s&amp;list_path=tracker_folder_%s_%s&list_parent=tracker_%s", $email['prev']['fileId'], $email['prev']['itemId'], $email['prev']['fieldId'], $email['prev']['trackerId']));
+            $this->out('msg_prev_link', $this->build_page_url('message', ['uid' => $email['prev']['fileId'], 'list_path' => sprintf("tracker_folder_%s_%s", $email['prev']['itemId'], $email['prev']['fieldId']), 'list_parent' => sprintf("tracker_%s", $email['prev']['trackerId'])]));
             $this->out('msg_prev_subject', $email['prev']['subject']);
         }
         if ($email['next']) {
-            $this->out('msg_next_link', sprintf("?page=message&amp;uid=%s&amp;list_path=tracker_folder_%s_%s&list_parent=tracker_%s", $email['next']['fileId'], $email['next']['itemId'], $email['next']['fieldId'], $email['next']['trackerId']));
+            $this->out('msg_next_link', $this->build_page_url('message', ['uid' => $email['next']['fileId'], 'list_path' => sprintf("tracker_folder_%s_%s", $email['next']['itemId'], $email['next']['fieldId']), 'list_parent' => sprintf("tracker_%s", $email['next']['trackerId'])]));
             $this->out('msg_next_subject', $email['next']['subject']);
         }
         $this->out('show_archive', $email['show_archive']);
 
-        if (preg_match("/tracker_folder_(\d+)_(\d+)/", $this->request->post['list_path'], $m) && $email['is_tiki_tracker_trash_folder']) {
-            $this->out('show_restore', true);
+        if (preg_match("/tracker_folder_(\d+)_(\d+)/", $this->request->post['list_path'], $m)) {
+            $trklib = TikiLib::lib('trk');
+            $uid = $this->request->get['uid'];
+            $value = $trklib->get_item_value(null, $m[1], $m[2]);
+            $value = json_decode($value, true);
+
+            foreach ($value as $folder => $emailIds) {
+                if (in_array($uid, $emailIds)) {
+                    $this->out('msg_current_folder', $folder);
+                    break;
+                }
+            }
+
+            if ($email['is_tiki_tracker_trash_folder']) {
+                $this->out('show_restore', true);
+            }
         }
 
         clear_existing_reply_details($this->session);
@@ -1106,8 +1120,7 @@ class Hm_Output_add_move_to_trackers extends Hm_Output_Module
     protected function output()
     {
         $res = tiki_move_to_tracker_dropdown($this, 'Trackers', 'Move to Tracker', 'move_to_trackers', true);
-        $headers = append_to_msg_headers($this->get('msg_headers'), $res);
-        $this->out('msg_headers', $headers, false);
+        $this->concat('extra_header_buttons', $res);
     }
 }
 
@@ -1116,8 +1129,7 @@ class Hm_Output_tiki_get_create_item_trackers_output extends Hm_Output_Module
     public function output()
     {
         $res = tiki_move_to_tracker_dropdown($this, 'Create item', 'Select Tracker', 'item_to_trackers', true);
-        $headers = append_to_msg_headers($this->get('msg_headers'), $res);
-        $this->out('msg_headers', $headers, false);
+        $this->concat('extra_header_buttons', $res);
     }
 }
 
@@ -1130,8 +1142,7 @@ class Hm_Output_add_restore_message extends Hm_Output_Module
     protected function output()
     {
         $res = tiki_restore_message($this);
-        $headers = append_to_msg_headers($this->get('msg_headers'), $res);
-        $this->out('msg_headers', $headers, false);
+        $this->concat('extra_header_buttons', $res);
     }
 }
 
@@ -1248,6 +1259,96 @@ class Hm_Output_pass_redirect_url extends Hm_Output_Module
     {
         $url = $this->get('tiki_redirect_url');
         $this->out('tiki_redirect_url', $url);
+    }
+}
+
+/**
+ * Pass tracker target params from GET request into output
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_pass_tracker_target_params extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $item_id = intval($this->request->get['target_tracker_item_id'] ?? 0);
+        $field_id = intval($this->request->get['target_tracker_field_id'] ?? 0);
+        $folder = isset($this->request->get['target_tracker_folder'])
+            ? $this->request->get['target_tracker_folder']
+            : 'inbox';
+
+        $this->out('target_tracker_item_id', $item_id);
+        $this->out('target_tracker_field_id', $field_id);
+        $this->out('target_tracker_folder', $folder);
+    }
+}
+
+/**
+ * Add tracker target params as hidden inputs to the search form
+ * @subpackage tiki/output
+ */
+class Hm_Output_search_form_tracker_target_inputs extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $target_tracker_item_id = $this->get('target_tracker_item_id');
+        $target_tracker_field_id = $this->get('target_tracker_field_id');
+        $target_tracker_folder = $this->get('target_tracker_folder');
+
+        if (! ($target_tracker_item_id && $target_tracker_field_id)) {
+            return;
+        }
+
+        return '<input type="hidden" name="target_tracker_item_id" value="' . $target_tracker_item_id . '" />'
+            . '<input type="hidden" name="target_tracker_field_id" value="' . $target_tracker_field_id . '" />'
+            . '<input type="hidden" name="target_tracker_folder" value="' . $this->html_safe($target_tracker_folder) . '" />';
+    }
+}
+
+/**
+ * Append tracker target params to saved search folder URLs
+ * Runs after Hm_Output_search_folders to inject tracker context into saved search links
+ * @subpackage tiki/output
+ */
+class Hm_Output_append_tracker_params_to_searches extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $target_tracker_item_id = $this->get('target_tracker_item_id', false);
+        $target_tracker_field_id = $this->get('target_tracker_field_id', false);
+        $target_tracker_folder = $this->get('target_tracker_folder', 'inbox');
+
+        if (! ($target_tracker_item_id && $target_tracker_field_id)) {
+            return;
+        }
+
+        $folder_sources = $this->get('folder_sources', []);
+        if (! is_array($folder_sources) || empty($folder_sources)) {
+            return;
+        }
+
+        foreach ($folder_sources as $key => &$source) {
+            if (is_array($source) && count($source) >= 2 && $source[0] === 'search_folders') {
+                $html = $source[1];
+
+                $param_string = '&target_tracker_item_id=' . $target_tracker_item_id
+                    . '&target_tracker_field_id=' . $target_tracker_field_id
+                    . '&target_tracker_folder=' . urlencode($target_tracker_folder);
+
+                // Replace href patterns in search links
+                // Match: href="?page=search..."
+                $html = preg_replace_callback(
+                    '/(href=")([^"]*page=search[^"]*)(")/i',
+                    function ($matches) use ($param_string) {
+                        return $matches[1] . $matches[2] . $param_string . $matches[3];
+                    },
+                    $html
+                );
+
+                $source[1] = $html;
+            }
+        }
+
+        $this->out('folder_sources', $folder_sources);
     }
 }
 
@@ -1380,7 +1481,7 @@ class Hm_Output_combined_trackers_link extends Hm_Output_Module
 {
     protected function output()
     {
-        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="?page=message_list&list_path=trackers">';
+        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="' . $this->build_page_url('message_list', ['list_path' => 'trackers']) . '">';
         if (! $this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-database account_icon"></i> ';
         }

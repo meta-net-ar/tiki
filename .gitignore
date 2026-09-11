@@ -29,8 +29,6 @@ auto-imports.d.ts
 #dbdiff
 tikiold.sql
 tikinew.sql
-#phpunit report
-report.xml
 /.composercache
 /before
 /after
@@ -79,6 +77,7 @@ index.php
 /lib/test/traces-phpunit_with_baseline.txt
 /modules/cache
 /permissioncheck/.htaccess
+/private/generated
 /project.index
 /profiles/info.ini
 /profiles/*.yml
@@ -98,7 +97,15 @@ index.php
 /temp/mail_attachs/*
 /temp/public/*
 /temp/templates_c/*
+
+# Playwright test results
 /tests/.htaccess
+/test-results
+/tests/e2e/test-results
+/tests/e2e/playwright-report
+/tests/e2e/.local
+/tests/e2e/.env
+/tests/e2e/php-server.log
 
 /tiki-*.log
 /tiki-emptycache.php
@@ -116,7 +123,7 @@ index.php
 /prefreport.csv
 sbom.json
 
-#TIKI, MATCH ANYWHERE SECTION 
+#TIKI, MATCH ANYWHERE SECTION
 #(may repeat in subpaths, such as themes, Tiki Extension Packages, Multitiki, domains etc.).  As of 2023-04-13, some of this may be here in error
 db/*.ini
 db/*.local
@@ -131,6 +138,8 @@ templates/.htaccess
 
 themes/css/custom.css
 themes/js/custom.js
+public/storage/custom_css/
+public/storage/custom_js/
 #These cannot go in public/generated as it would break the current theme system.
 themes/**/*.css
 themes/**/*.css.map

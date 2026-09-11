@@ -6,11 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_email_list()
 {
+    $loginGeneralPreferencesHelp = 'Login-General-Preferences';
+
     return [
         'email_due' => [
             'name' => tra('Re-validate user email after'),
             'description' => tra('The number of days after which an email will be sent to the user with a link to revalidate the account. The user will not be able to login (that is, the account will be invalid), until the user clicks the link. Use this feature to verify that a user’s email is still valid.'),
             'type' => 'text',
+            'help' => $loginGeneralPreferencesHelp,
             'size' => 5,
             'filter' => 'int',
             'units' => tra('days'),
@@ -21,6 +24,7 @@ function prefs_email_list()
             'name' => tra('Email footer'),
             'description' => tra('Text appended to outgoing emails.'),
             'type' => 'textarea',
+            'help' => 'General-Preferences',
             'size' => 5,
             'default' => '',
         ],
@@ -28,13 +32,14 @@ function prefs_email_list()
             'name' => tra('Display Disposable Emails'),
             'description' => tra("Show if a user's email address is from a disposable / temporary email address provider"),
             'type' => 'flag',
-            //'help' => '', TODO
+            'help' => $loginGeneralPreferencesHelp,
             'default' => 'n',
         ],
         'email_to_tracker_mode' => [
             'name' => tra('When creating tracker items from email'),
             'description' => tra('Choose whether emails are deleted (move mode) or kept on the original server (copy mode)'),
             'type' => 'list',
+            'help' => 'Email-filters',
             'options' => [
                 'move' => tra('Delete from server (move)'),
                 'copy' => tra('Keep on server (copy)'),

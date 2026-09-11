@@ -344,12 +344,13 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
         $relatedItems = $relationlib->getAllRelatedTrackerItems();
 
         $lib = TikiLib::lib('unifiedsearch');
-        foreach (array_chunk($relatedItems, 500) as $chunk) {
+        foreach (array_chunk($relatedItems, Search_Query::MAX_OBJECTS_PER_QUERY) as $chunk) {
             $query = $lib->buildQuery([]);
             foreach ($chunk as $object) {
                 $query->addObject('trackeritem', $object);
             }
             $query->setSelectionFields($selectionFields);
+            $query->setRange(0, count($chunk));
             $result = $query->search($lib->getIndex());
             foreach ($result as $item) {
                 Tracker_Field_Relation::$relationFieldCache[$item['object_id']] = $item;

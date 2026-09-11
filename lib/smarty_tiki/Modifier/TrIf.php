@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class TrIf
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class TrIf implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tr_if';
+    }
+
     public function handle($source)
     {
         global $prefs;
@@ -16,12 +23,12 @@ class TrIf
 
         if ($prefs['language'] != 'en') {
             include_once('lib/init/tra.php');
-            return tra($source, '', false, $args);
+            return tra($source, '', false, $args, true);
         } else {
             $replace = array_values($args);
             $search = array_map(
-                function ($arg) {
-                    return '%' . $arg;
+                function ($k) {
+                    return "%$k";
                 },
                 array_keys($args)
             );

@@ -8,7 +8,7 @@
             {/if}
             <ul class="relation-list">
                 {foreach from=$data.relations item=rel}
-                    <li>{object_link identifier=[$rel.target.type,$rel.target.itemId]|join:':' format=$data.format metaItemId=$rel->getMetadataItemId() target='_blank'}</li>
+                    <li>{object_link identifier=[$rel.target.type,$rel.target.itemId]|join:':' format=$data.format metaItemId=$rel->getMetadataItemId() target=$data.linkTarget}</li>
                 {/foreach}
             </ul>
         </div>

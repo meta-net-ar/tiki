@@ -76,10 +76,10 @@ add_output('compose', 'post_imap_save_sent', true, 'tiki', 'compose_form_end', '
 /* message page calendar invitation hooks */
 add_handler('ajax_imap_message_content', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
 add_output('ajax_imap_message_content', 'add_rsvp_actions', true, 'imap', 'filter_message_headers', 'after');
-add_output('ajax_imap_message_content', 'filter_message_headers_mpdf', true, 'imap', 'filter_message_headers', 'after');
-add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'filter_message_headers', 'after');
-add_output('ajax_imap_message_content', 'tiki_get_create_item_trackers_output', true, 'imap', 'filter_message_headers', 'after');
-add_output('ajax_imap_message_content', 'add_restore_message', true, 'imap', 'filter_message_headers', 'after');
+add_output('ajax_imap_message_content', 'filter_message_headers_mpdf', true, 'imap', 'filter_message_headers', 'before');
+add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'filter_message_headers', 'before');
+add_output('ajax_imap_message_content', 'tiki_get_create_item_trackers_output', true, 'imap', 'filter_message_headers', 'before');
+add_output('ajax_imap_message_content', 'add_restore_message', true, 'imap', 'filter_message_headers', 'before');
 
 /* message page calendar invitation hooks (Tracker-stored messages) */
 add_handler('ajax_tiki_message_content', 'check_calendar_invitations_imap', true, 'imap', 'tiki_message_content', 'after');
@@ -156,6 +156,8 @@ add_handler('compose', 'check_path_redirect_after_sent', true, 'smtp', 'tiki_arc
 add_handler('compose', 'tiki_compose_from_draft', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_output('message_list', 'add_multiple_move_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
 add_output('search', 'add_multiple_move_to_trackers', true, 'imap', 'search_move_copy_controls', 'after');
+add_handler('search', 'pass_tracker_target_params', true, 'tiki', 'load_user_data', 'after');
+add_output('search', 'search_form_tracker_target_inputs', true, 'tiki', 'search_form_content', 'after');
 add_output('message_list', 'add_multiple_item_to_trackers', true, 'imap', 'imap_custom_controls', 'after');
 add_handler('ajax_smtp_save_draft', 'tiki_presave_draft', true, 'smtp', 'smtp_save_draft', 'before');
 add_handler('ajax_smtp_save_draft', 'tiki_save_draft', true, 'smtp', 'smtp_save_draft', 'after');
@@ -232,8 +234,10 @@ add_output('info', 'server_status_end', true, 'developer', 'server_status_start'
 add_output('info', 'config_map', true, 'developer', 'server_status_end', 'after');
 
 /* folder list */
+add_handler('ajax_hm_folders', 'pass_tracker_target_params', true, 'tiki', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'info_page_link', true, 'developer', 'settings_menu_end', 'before');
 add_output('ajax_hm_folders', 'combined_trackers_link', true, 'tiki', 'main_menu_content', 'before');
+add_output('ajax_hm_folders', 'append_tracker_params_to_searches', true, 'tiki', 'search_folders', 'after');
 
 /* sieve filters */
 add_handler('sieve_filters', 'tiki_add_sieve_config_host', true, 'tiki', 'load_imap_servers_from_config', 'after');
@@ -287,6 +291,9 @@ return [
   'allowed_get' => [
     'tiki_download_message' => FILTER_VALIDATE_BOOLEAN,
     'tiki_show_message'  => FILTER_VALIDATE_BOOLEAN,
+    'target_tracker_item_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'target_tracker_field_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+    'target_tracker_folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
   ],
   'allowed_output' => [
     'operator' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
@@ -301,6 +308,7 @@ return [
     'restore_error' => [FILTER_VALIDATE_BOOLEAN, false],
     'show_archive' => [FILTER_VALIDATE_BOOLEAN, false],
     'show_restore' => [FILTER_VALIDATE_BOOLEAN, false],
+    'msg_current_folder' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'flag_state' => [FILTER_SANITIZE_FULL_SPECIAL_CHARS, false],
     'trackers' => [FILTER_DEFAULT, false],
     'tracker_data' => [FILTER_DEFAULT, false],

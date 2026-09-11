@@ -16,14 +16,14 @@
                                     </option>
                                 {/section}
                             </select>
-                            <input type="submit" class="wikiaction btn btn-info btn-sm" name="modTasksSearch" value="{tr}Go{/tr}" />
+                            <input type="submit" class="wikiaction btn btn-info btn-sm" name="modTasksSearch" value="{tr}Search{/tr}" />
                         </form>
                     </td>
                 </tr>
                 {section name=iix loop=$public_tasks}
                     <tr>
                         <td class="prio{$public_tasks[iix].priority}">
-                            {if isset($modTasks[ix].percentage)}({$public_tasks[iix].percentage}%) {/if}{$public_tasks[iix].taskId|tasklink:linkmodule}
+                            {if isset($public_tasks[iix].percentage)}({$public_tasks[iix].percentage}%) {/if}{$public_tasks[iix].taskId|tasklink:linkmodule}
                             <br>{$public_tasks[iix].user|username}
                         </td>
                     </tr>

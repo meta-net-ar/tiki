@@ -321,7 +321,7 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
                     }
                     if (str_contains($this->getOption('outputtype'), 'links') && $rendered) {
                         $deep = $this->getOption('descendants') != 0;
-                        $href = smarty_modifier_sefurl($categId, 'category', $deep, '', 'y', $str);
+                        $href = \SmartyTiki\Modifier\Sefurl::apply($categId, 'category', $deep, '', 'y', $str);
                         if ($deep) {
                             $href .= 'deep=on';
                         }
@@ -346,6 +346,36 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
         } else {
             return implode("<br/>\n", $ret);
         }
+    }
+
+    /**
+     * Return plain text representation of selected categories
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $data = $this->getFieldData();
+        $selected_categories = $data['selected_categories'];
+        $categories = $data['list'];
+
+        if (! is_array($selected_categories)) {
+            $selected_categories = [];
+        }
+        if (! is_array($categories)) {
+            $categories = [];
+        }
+        $out = [];
+        foreach ($categories as $category) {
+            foreach ($selected_categories as $categId) {
+                if ($category['categId'] == $categId) {
+                    $out[] = $category['name'];
+                }
+            }
+        }
+
+        return implode(', ', $out);
     }
 
     public function handleSave($value, $oldValue)
@@ -607,7 +637,7 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
             ->setRenderTransform(function ($value, $extra) use ($smarty, $matching, $categId) {
                 $categories = $matching($extra);
 
-                return in_array($categId, $categories) ? smarty_function_icon(['name' => 'success'], $smarty->getEmptyInternalTemplate()) : '';
+                return in_array($categId, $categories) ? \SmartyTiki\FunctionHandler\Icon::render(['name' => 'success'], $smarty->getEmptyInternalTemplate()) : '';
             })
             ;
         $schema->addNew($permName, 'check-' . $categId)

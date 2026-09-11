@@ -273,7 +273,7 @@
             {/remarksbox}
         </div>
     </div>
-    {if $schedulerinfo.task == 'ConsoleCommandTask' and empty($prefs.fallbackBaseUrl) }
+    {if $schedulerinfo.task == 'ConsoleCommandTask' and empty($prefs.fallbackBaseUrl)}
         <div class="row">
            <div class="offset-sm-2 col-sm-10">
                {remarksbox type="warning" title="{tr}Warning{/tr}"}

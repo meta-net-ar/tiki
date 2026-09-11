@@ -223,7 +223,7 @@ class WikiPluginWantedPages extends PluginsLib
                 'ELSE tpf.`data` ' .
             'END AS fromPageContent ' .
             'FROM `tiki_links` tl ' .
-            'LEFT JOIN `tiki_pages` tp ON (tl.`toPage` = tp.`pageName`) ' .
+            'LEFT JOIN `tiki_pages` tp ON (tl.`toPage` = tp.`pageName` OR tl.`toPage` = tp.`pageSlug`) ' .
             'LEFT JOIN `tiki_pages` tpf ON (tl.`fromPage` = tpf.`pageName`) ' .
             'LEFT JOIN `tiki_tracker_item_fields` ttif ON (' .
                 'SUBSTRING_INDEX(SUBSTRING_INDEX(tl.`fromPage`, \':\', 3), \':\', -1) = ttif.`itemId` ' .
@@ -522,7 +522,7 @@ if (! function_exists('parse_object_link')) {
     {
         $smarty = TikiLib::lib('smarty');
         $parts = explode(':', $link);
-        $data = smarty_function_object_link(
+        $data = \SmartyTiki\FunctionHandler\ObjectLink::render(
             [
                 'type' => $parts[1],
                 'id' => $parts[2],

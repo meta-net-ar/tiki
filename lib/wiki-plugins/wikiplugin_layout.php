@@ -302,7 +302,7 @@ function wikiplugin_layout($data, $params)
     $headerlib->add_css("#row-middle{display:none} #show-errors-button{display:none}");
     $headerlib->add_js('$( document ).ready(function() {$(\'#row-middle\').attr("style","display:flex").fadeIn(1000); });');
     if ($params['header'] == 'n') {
-        $headerlib->add_css("#page-header{display:none}");
+        $headerlib->add_css("#page-header, #site-header{display:none}");
     }
     if ($params['footer'] == 'n') {
         $headerlib->add_css("#footer{display:none}");

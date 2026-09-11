@@ -123,9 +123,9 @@ function wikiplugin_map_info()
             'cluster' => [
                 'required' => false,
                 'name' => tra('Cluster Distance'),
-                'description' => tra('Distance between features before they are "clustered", 0 (off) to 100. (requires Open Layers v3+, default is 0)'),
+                'description' => tra('Distance in pixels between features before they are "clustered", 0 (off) to 100. (default is 25)'),
                 'since' => '20.0',
-                'default' => 0,
+                'default' => '0',
                 'filter' => 'digits',
                 'advanced' => true,
             ],
@@ -161,6 +161,24 @@ function wikiplugin_map_info()
                 'filter' => 'text',
                 'advanced' => true,
             ],
+            'clusterExcludeField' => [
+                'required' => false,
+                'name' => tra('Name of field to exclude from clustering'),
+                'description' => tra('Some features like borders and rivers should not be clustered. Add the permanent name of a checkbox field to exclude some items.'),
+                'since' => '30.1',
+                'default' => "",
+                'filter' => 'text',
+                'advanced' => true,
+            ],
+            'clusterIncludeField' => [
+                'required' => false,
+                'name' => tra('Name of field to include in clustering'),
+                'description' => tra('If not set then include by default, otherwise do not include unless the value is "y". Add the permanent name of a checkbox field to include some items.'),
+                'since' => '30.1',
+                'default' => "",
+                'filter' => 'text',
+                'advanced' => true,
+            ],
         ],
     ];
 }
@@ -180,7 +198,7 @@ function wikiplugin_map($data, $params)
     }
 
 
-    $popupStyle = smarty_modifier_escape($params['popupstyle']);
+    $popupStyle = \SmartyTiki\Modifier\Escape::apply($params['popupstyle']);
 
     if ($params['tooltips'] === 'y') {
         $tooltips = ' data-tooltips="1"';
@@ -188,9 +206,15 @@ function wikiplugin_map($data, $params)
         $tooltips = '';
     }
 
-    $cluster = (int) $params['cluster'];
+    if (isset($params['cluster'])) {
+        $cluster = ' data-cluster="' . $params['cluster'] . '"';
+    } else {
+        $cluster = '';
+    }
     if ($params['clusterHover']) {
         $clusterHover = ' data-clusterhover="' . $params['clusterHover'] . '"';
+    } else {
+        $clusterHover = '';
     }
     if ($params['clusterFillColor']) {
         $clusterFillColor = ' data-clusterfillcolor="' . $params['clusterFillColor'] . '"';
@@ -201,6 +225,16 @@ function wikiplugin_map($data, $params)
         $clusterTextColor = ' data-clustertextcolor="' . $params['clusterTextColor'] . '"';
     } else {
         $clusterTextColor = '';
+    }
+    if ($params['clusterExcludeField']) {
+        $clusterExcludeField = ' data-clusterexcludefield="' . $params['clusterExcludeField'] . '"';
+    } else {
+        $clusterExcludeField = '';
+    }
+    if ($params['clusterIncludeField']) {
+        $clusterIncludeField = ' data-clusterincludefield="' . $params['clusterIncludeField'] . '"';
+    } else {
+        $clusterIncludeField = '';
     }
     if ($params['tilesets']) {
         $tilesets = ' data-tilesets="' . $params['tilesets'] . '"';
@@ -215,23 +249,18 @@ function wikiplugin_map($data, $params)
     $geolib = TikiLib::lib('geo');
     if (isset($params['center'])) {
         if ($coords = $geolib->parse_coordinates($params['center'])) {
-            $center = ' data-geo-center="' . smarty_modifier_escape($geolib->build_location_string($coords)) . '" ';
+            $center = ' data-geo-center="' . \SmartyTiki\Modifier\Escape::apply($geolib->build_location_string($coords)) . '" ';
         }
     } else {
         $center = $geolib->get_default_center();
     }
 
-    TikiLib::lib('header')
-        ->add_cssfile(OL_PATH . '/ol.css')
-        ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js")
-        ->add_jsfile(OL_PATH . '/dist/ol.js')
-        ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
-        ->add_jsfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
-    ;
-    $scope = smarty_modifier_escape(wp_map_getscope($params));
+    TikiLib::lib('header')->add_map();
+
+    $scope = \SmartyTiki\Modifier\Escape::apply(wp_map_getscope($params));
 
     $output = "<div class=\"map-container\" data-marker-filter=\"$scope\" data-map-controls=\"$controls\" data-popup-style=\"$popupStyle\"" .
-        " data-cluster=\"$cluster\" style=\"width: $width; height: $height;\" $center $tooltips $clusterFillColor $clusterTextColor $tilesets $clusterHover>";
+        " style=\"width: $width; height: $height;\" $center $tooltips $cluster $clusterFillColor $clusterTextColor $tilesets $clusterHover $clusterExcludeField $clusterIncludeField>";
 
     $argumentParser = new WikiParser_PluginArgumentParser();
     $matches = WikiParser_PluginMatcher::match($data);
@@ -316,7 +345,7 @@ function wp_map_plugin_searchlayer($body, $args)
 
     $filters = '';
     foreach ($args as $key => $arg) {
-        $filters .= '<input type="hidden" name="filter~' . $key . '" value="' . smarty_modifier_escape($arg) . '"/>';
+        $filters .= '<input type="hidden" name="filter~' . $key . '" value="' . \SmartyTiki\Modifier\Escape::apply($arg) . '"/>';
     }
 
     if ($maxRecords) {
@@ -332,7 +361,7 @@ function wp_map_plugin_searchlayer($body, $args)
         $fields = array_map(function ($field) {
             return str_replace('tracker_field_', '', $field);
         }, $fields);
-        $fieldList = '<input type="hidden" name="fields" value="' . smarty_modifier_escape(implode(',', $fields)) . '"/>';
+        $fieldList = '<input type="hidden" name="fields" value="' . \SmartyTiki\Modifier\Escape::apply(implode(',', $fields)) . '"/>';
     }
 
     $popup_config = [];
@@ -349,8 +378,8 @@ function wp_map_plugin_searchlayer($body, $args)
     }
     $popup_fields = implode(',', $fields);
 
-    $escapedLayer = smarty_modifier_escape($layer);
-    $escapedSuffix = smarty_modifier_escape($suffix);
+    $escapedLayer = \SmartyTiki\Modifier\Escape::apply($layer);
+    $escapedSuffix = \SmartyTiki\Modifier\Escape::apply($suffix);
     return <<<OUT
 <form method="post" action="tiki-searchindex.php" class="search-box onload" style="display: none" data-result-refresh="$refresh" data-result-layer="$escapedLayer" data-result-suffix="$escapedSuffix" data-load-delay="$load_delay" data-popup-fields="$popup_fields" data-popup-tpl="$popup_tpl"{$popup_config}>
     <p>$maxRecords$sort_mode$fieldList$filters<input type="submit" class="btn btn-primary btn-sm" /></p>

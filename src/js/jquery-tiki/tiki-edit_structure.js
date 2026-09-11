@@ -6,7 +6,133 @@
 import Sortable from "sortablejs";
 
 $(function () {
+    let newNodeSequence = 1;
     let tocDirty = false;
+    // Admin nodes use the single class "admintoclevel"; newly dragged nodes use "toclevel".
+    const structureNodeSelector = ".structure-container li.admintoclevel, .structure-container li.toclevel";
+    const structureNodeChildSelector = "li.admintoclevel, li.toclevel";
+
+    const isStructureNode = function ($node) {
+        return $node.hasClass("admintoclevel") || ($node.hasClass("toclevel") && !$node.hasClass("list-group-item"));
+    };
+
+    const markDirty = function () {
+        tocDirty = true;
+        if ($(".save_structure:visible").length === 0) {
+            $(".save_structure").show("fast").parent().show("fast");
+        }
+    };
+
+    const markClean = function () {
+        tocDirty = false;
+        $(".save_structure").hide();
+        $(".save-structure-wrapper").hide();
+    };
+
+    const normalizePageName = function (name) {
+        return String(name || "").trim();
+    };
+
+    const structurePageNameSet = new Set((jqueryTiki.structurePageNames || []).map(normalizePageName).filter(Boolean));
+
+    const registerStructurePageName = function (pageName) {
+        const normalized = normalizePageName(pageName);
+        if (normalized) {
+            structurePageNameSet.add(normalized);
+        }
+    };
+
+    const syncStructurePageNamesFromDom = function () {
+        $(structureNodeSelector).each(function () {
+            registerStructurePageName(getNodePageName($(this)));
+        });
+    };
+
+    const getPageNameFromElement = function ($el) {
+        const dataName = $el.attr("data-page-name");
+        if (dataName) {
+            return normalizePageName(dataName);
+        }
+        if ($el.hasClass("list-group-item")) {
+            return normalizePageName($el.text());
+        }
+        const $link = $el.children("div.col-sm-12").first().find("label a.link").first();
+        if ($link.length) {
+            return normalizePageName($link.attr("title") || $link.text());
+        }
+        return "";
+    };
+
+    const getNodePageName = function ($node) {
+        return getPageNameFromElement($node);
+    };
+
+    const getNodeId = function ($node) {
+        const id = $node.attr("data-id");
+        if (id === undefined || id === "") {
+            return undefined;
+        }
+        return id;
+    };
+
+    const getChildOl = function ($node) {
+        return $node.children("div.col-sm-12").last().children("ol.admintoc").first();
+    };
+
+    const getChildOlContainer = function ($node) {
+        const $childOl = getChildOl($node);
+        return $childOl.parent();
+    };
+
+    const isPageAlreadyInStructure = function (pageName) {
+        const normalized = normalizePageName(pageName);
+        if (!normalized || jqueryTiki.structurePageRepeat) {
+            return false;
+        }
+        return structurePageNameSet.has(normalized);
+    };
+
+    const createNewStructureNode = function (item, pageName) {
+        const nodeId = "new_" + newNodeSequence++;
+        $(item)
+            .attr("id", "node_" + nodeId)
+            .attr("data-id", nodeId)
+            .attr("data-page-name", pageName)
+            .data("id", nodeId)
+            .data("pageName", pageName)
+            .text("")
+            .removeClass("ui-state-default list-group-item")
+            .addClass("row admintoclevel new").append(`
+                <div class="col-sm-12">
+                    <label>
+                        <a href="#" class="link" title="${pageName}">${pageName}</a>
+                    </label>
+                    <div class="actions input-group input-group-sm mb-2">
+                        <span class="input-group-text"><span class="icon icon-sort fa-fw"></span></span>
+                        <input type="text" class="page-alias-input form-control" value="" placeholder="Page alias...">
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <ol class="admintoc"></ol>
+                </div>
+            `);
+        registerStructurePageName(pageName);
+    };
+
+    const convertPendingListItems = function () {
+        $(".structure-container li.list-group-item").each(function () {
+            const $item = $(this);
+            const pageName = getPageNameFromElement($item);
+            if (!pageName) {
+                return;
+            }
+            if (isPageAlreadyInStructure(pageName)) {
+                $item.remove();
+                return;
+            }
+            createNewStructureNode(this, pageName);
+        });
+    };
 
     // Get page_ref_id from URL parameters
     const getPageRefId = function () {
@@ -17,46 +143,77 @@ $(function () {
     // Restore collapsed/expanded state from localStorage
     const restoreStructureState = function () {
         const pageRefId = getPageRefId();
+        let savedState = null;
         if (pageRefId) {
-            const storageKey = "tiki_structure_state_" + pageRefId;
-            const savedState = localStorage.getItem(storageKey);
-            // First, hide all sub-levels by default (except root level)
-            $(".admintoclevel").each(function () {
-                const $node = $(this);
-                const $children = $node.find("ol.admintoc").first().parent();
-                // Only hide if it's not the root level (check if it has a parent admintoclevel)
-                if ($node.parents(".admintoclevel").length > 0 && $children.length > 0) {
-                    $children.hide();
-                    $node.find(".flip-children .icon").setIcon("caret-right");
-                }
-            });
+            savedState = localStorage.getItem("tiki_structure_state_" + pageRefId);
+        }
 
-            // Then restore saved expanded states
+        $(structureNodeSelector).each(function () {
+            const $node = $(this);
+            const nodeId = $node.attr("id");
+            const $childOl = getChildOl($node);
+            const $childContainer = getChildOlContainer($node);
+            const hasChildItems = $childOl.children(structureNodeChildSelector).length > 0;
+
+            if ($childContainer.length === 0) {
+                return;
+            }
+
+            // Empty child lists must stay visible: they are drop targets for nesting.
+            if (!hasChildItems) {
+                $childContainer.show();
+                return;
+            }
+
+            // Top-level tree nodes stay expanded.
+            if ($node.parents(structureNodeChildSelector).length === 0) {
+                $childContainer.show();
+                $node.find(".flip-children .icon").setIcon("caret-down");
+                return;
+            }
+
+            let expanded = false;
             if (savedState) {
                 try {
                     const state = JSON.parse(savedState);
-                    Object.keys(state).forEach(function (nodeId) {
-                        const $node = $("#" + nodeId);
-                        if ($node.length && state[nodeId] === "expanded") {
-                            const $children = $node.find("ol.admintoc").first().parent();
-                            $children.show();
-                            $node.find(".flip-children .icon").setIcon("caret-down");
-                        }
-                    });
+                    expanded = !!(nodeId && state[nodeId] === "expanded");
                 } catch (e) {
                     console.error("Error restoring structure state:", e); // eslint-disable-line no-console
                 }
             }
-        } else {
-            // If no storage key, hide all sub-levels by default
-            $(".admintoclevel").each(function () {
-                const $node = $(this);
-                const $children = $node.find("ol.admintoc").first().parent();
-                if ($node.parents(".admintoclevel").length > 0 && $children.length > 0) {
-                    $children.hide();
-                    $node.find(".flip-children .icon").setIcon("caret-right");
-                }
-            });
+
+            if (expanded) {
+                $childContainer.show();
+                $node.find(".flip-children .icon").setIcon("caret-down");
+            } else {
+                $childContainer.hide();
+                $node.find(".flip-children .icon").setIcon("caret-right");
+            }
+        });
+    };
+
+    const revealDropTargets = function () {
+        $(structureNodeSelector).each(function () {
+            const $childContainer = getChildOlContainer($(this));
+            if ($childContainer.length) {
+                $childContainer.show();
+            }
+        });
+    };
+
+    const destroyStructureSortables = function () {
+        document.querySelectorAll(".structure-container .admintoc").forEach(function (el) {
+            const instance = Sortable.get(el);
+            if (instance) {
+                instance.destroy();
+            }
+        });
+        const pageList = document.querySelector("#page_list_container");
+        if (pageList) {
+            const listInstance = Sortable.get(pageList);
+            if (listInstance) {
+                listInstance.destroy();
+            }
         }
     };
 
@@ -66,11 +223,11 @@ $(function () {
         if (pageRefId) {
             const storageKey = "tiki_structure_state_" + pageRefId;
             const state = {};
-            $(".admintoclevel").each(function () {
+            $(structureNodeSelector).each(function () {
                 const $node = $(this);
                 const nodeId = $node.attr("id");
                 if (nodeId) {
-                    const $children = $node.find("ol.admintoc").first().parent();
+                    const $children = getChildOlContainer($node);
                     state[nodeId] = $children.is(":visible") ? "expanded" : "collapsed";
                 }
             });
@@ -82,71 +239,135 @@ $(function () {
         }
     };
 
+    const appendStructureNodes = function ($container, parentId, depth, arr, structureId) {
+        $container.children(structureNodeChildSelector).each(function () {
+            const $node = $(this);
+            const itemId = getNodeId($node);
+            const pageName = getNodePageName($node);
+            const pageAlias = $node.find(".page-alias-input").val();
+
+            if (itemId === undefined || !pageName) {
+                return;
+            }
+
+            arr.push({
+                item_id: itemId,
+                parent_id: parentId || "root",
+                structure_id: structureId,
+                page_name: pageName,
+                page_alias: pageAlias,
+                depth: depth,
+            });
+
+            const $childOl = getChildOl($node);
+            if ($childOl.length) {
+                appendStructureNodes($childOl, itemId, depth + 1, arr, structureId);
+            }
+        });
+    };
+
     const setupStructure = function () {
+        destroyStructureSortables();
+
         const sortableOptions = {
             group: {
                 name: "shared",
             },
             dataIdAttr: "data-id",
             ghostClass: "draggable-background",
+            chosenClass: "draggable-background",
             animation: 150,
-            // invertSwap: true,
+            invertSwap: true,
             swapThreshold: 0.65,
             direction: "vertical",
-            forceFallback: true,
-            fallbackOnBody: true,
-            // Called when dragging element changes position
+            scroll: true,
+            bubbleScroll: true,
+            emptyInsertThreshold: 20,
+            handle: ".icon-sort",
+            filter: ".flip-children, a, button, input, select, textarea, form, label",
+            preventOnFilter: false,
+            onChoose: revealDropTargets,
             onAdd: function (event) {
-                const pageName = $(event.item).data("page-name");
-                if (!jqueryTiki.structurePageRepeat && $(`.structure-container li .link:contains(${pageName})`).length > 0) {
-                    $.getJSON($.service("object", "report_error", { message: tr("Page only allowed once in a structure") }));
-                    $(event.item).remove();
+                const $item = $(event.item);
+                if (isStructureNode($item)) {
+                    markDirty();
+                    return;
                 }
+
+                const pageName = getPageNameFromElement($item);
+                if (!pageName) {
+                    $item.remove();
+                    return;
+                }
+
+                if (isPageAlreadyInStructure(pageName)) {
+                    $.getJSON($.service("object", "report_error", { message: tr("Page only allowed once in a structure") }));
+                    $item.remove();
+                    return;
+                }
+
+                createNewStructureNode(event.item, pageName);
+                const childOl = getChildOl($item)[0];
+                if (childOl) {
+                    new Sortable(childOl, sortableOptions);
+                }
+
+                markDirty();
             },
             onEnd: function (event) {
-                if ($(".save_structure:visible").length === 0) {
-                    $(".save_structure").show("fast").parent().show("fast");
-                    tocDirty = true;
+                if (event.oldIndex !== event.newIndex || event.from !== event.to) {
+                    restoreStructureState();
+                    markDirty();
                 }
             },
         };
 
-        document.querySelectorAll(".admintoc").forEach(function (el) {
+        document.querySelectorAll(".structure-container .admintoc").forEach(function (el) {
             new Sortable(el, sortableOptions);
         });
 
-        $(".flip-children", ".admintoc").on("click", function (event) {
-            const $this = $(this),
-                $children = $this
-                    .parents("li.admintoclevel")
-                    .first()
-                    .find("ol.admintoc")
-                    .filter(function (index) {
-                        return event.altKey || index === 0;
-                    })
-                    .parent();
+        $(".flip-children", ".structure-container")
+            .off("click")
+            .on("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
 
-            if ($children.is(":visible")) {
-                $this.find(".icon").setIcon("caret-right");
+                const $flip = $(this);
+                const $node = $flip.parents(structureNodeChildSelector).first();
+                const $children = getChildOlContainer($node);
+
                 if (event.altKey) {
-                    $children.find(".icon-caret-down").setIcon("caret-right");
+                    if ($children.is(":visible")) {
+                        $node.find(".flip-children .icon").setIcon("caret-right");
+                        $node.find("ol.admintoc").parent().hide("fast");
+                    } else {
+                        $node.find(".flip-children .icon").setIcon("caret-down");
+                        $node.find("ol.admintoc").parent().show("fast");
+                    }
+                    saveStructureState();
+                    return;
                 }
-                $children.hide("fast");
-                saveStructureState();
-            } else {
-                $this.find(".icon").setIcon("caret-down");
-                if (event.altKey) {
-                    $children.find(".icon-caret-right").setIcon("caret-down");
+
+                if ($children.is(":visible")) {
+                    $flip.find(".icon").setIcon("caret-right");
+                    if (event.altKey) {
+                        $children.find(".icon-caret-down").setIcon("caret-right");
+                    }
+                    $children.hide("fast");
+                    saveStructureState();
+                } else {
+                    $flip.find(".icon").setIcon("caret-down");
+                    if (event.altKey) {
+                        $children.find(".icon-caret-right").setIcon("caret-down");
+                    }
+                    $children.show("fast");
+                    saveStructureState();
                 }
-                $children.show("fast");
-                saveStructureState();
-            }
-        });
+            });
 
         $(".page-alias-input")
             .on("change", function () {
-                $(".save_structure").show("fast").parent().show("fast");
-                tocDirty = true;
+                markDirty();
             })
             .on("click", function () {
                 // for Firefox
@@ -157,32 +378,17 @@ $(function () {
             group: {
                 name: "shared",
                 pull: "clone",
-                put: false, // Do not allow items to be put into this list
+                put: false,
             },
             sort: false,
             animation: 500,
-            onEnd: function (event) {
-                const pageName = $(event.item).data("page-name");
-
-                if ($(event.to).closest(".structure-container").length > 0) {
-                    $(event.item).text("");
-                    $(event.item).removeClass("ui-state-default").addClass("row admintoclevel new").append(`
-                        <div class="col-sm-12">
-                            <label>${pageName}</label>
-                            <div class="actions input-group input-group-sm mb-2"><input type="text" class="page-alias-input form-control" value="" placeholder="Page alias..."></div>
-                        </div>
-                        <div class="col-sm-12">
-                            <ol class="admintoc"></ol>
-                        </div>
-                    `);
-                    new Sortable($(event.item).find(".admintoc")[0], sortableOptions);
-
-                    $(".save_structure").show("fast").parent().show("fast");
-                    tocDirty = true;
-                }
-            },
         };
-        new Sortable(document.querySelector("#page_list_container"), sortableListOptions);
+        const pageList = document.querySelector("#page_list_container");
+        if (pageList) {
+            new Sortable(pageList, sortableListOptions);
+        }
+
+        syncStructurePageNamesFromDom();
     };
 
     $(window).on("beforeunload", function () {
@@ -194,74 +400,78 @@ $(function () {
     setupStructure();
     restoreStructureState();
 
-    $(".save_structure").on("click", function () {
-        const $sortable = $(this).parent().find(".admintoc").first();
+    $(document).on("click", ".save_structure", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const $sortable = $(".structure-container .admintoc").first();
+        if ($sortable.length === 0 || !$sortable.data("params")) {
+            $.getJSON($.service("object", "report_error", { message: tr("Unable to save structure: missing structure data.") }));
+            return false;
+        }
+
+        convertPendingListItems();
+
         $sortable.tikiModal(tr("Saving..."));
 
         let fakeId = 1000000;
-        $(".admintoclevel.new").each(function () {
+        $(".structure-container li.admintoclevel.new, .structure-container li.toclevel.new").each(function () {
             $(this).attr("id", "node_" + fakeId);
+            $(this).attr("data-id", fakeId);
             $(this).data("id", fakeId);
             fakeId++;
         });
-        // Adjusted to previous sortable result array
+
+        const structureId = $sortable.data("params").page_ref_id;
         const arr = [
             {
                 item_id: "root",
                 parent_id: "none",
-                structure_id: $sortable.data("params").page_ref_id,
+                structure_id: structureId,
                 depth: 0,
             },
         ];
 
-        $sortable.find("li.admintoclevel").each(function () {
-            const parentId = $(this).parent().closest("li.admintoclevel").data("id");
-            const itemId = $(this).data("id");
-            const pageAlias = $(this).find(".page-alias-input").val();
-            const structureId = $sortable.data("params").page_ref_id;
-            const pageName = $(this).find("> div").text().trim();
-            const obj = {
-                item_id: itemId,
-                parent_id: parentId || "root",
-                structure_id: structureId,
-                page_name: pageName.split("\n")[0],
-                page_alias: pageAlias,
-                depth: 1,
-                // el: $(this)[0] // Debug only
-            };
+        appendStructureNodes($sortable, null, 1, arr, structureId);
 
-            let item = arr.find((el) => el.parent_id === parentId);
-            if (!parentId) {
-                obj.depth = 1;
-            } else if (item) {
-                obj.depth = item.depth;
-            } else {
-                obj.depth = arr[arr.length - 1].depth + 1;
-            }
-
-            arr.push(obj);
-        });
+        if (arr.length < 2) {
+            $sortable.tikiModal();
+            $.getJSON($.service("object", "report_error", { message: tr("Nothing to save. Drag a page into the structure first.") }));
+            return false;
+        }
 
         $.post(
             $.service("wiki_structure", "save_structure"),
             { data: JSON.stringify(arr), params: JSON.stringify($sortable.data("params")) },
             function (data) {
                 $sortable.tikiModal();
-                if (data) {
-                    $sortable.replaceWith(data.html);
+                if (data && data.error) {
+                    $.getJSON($.service("object", "report_error", { message: data.error }));
+                } else if (data && data.html) {
+                    const $wrapper = $sortable.closest(".col-sm-12");
+                    if ($wrapper.length) {
+                        $wrapper.replaceWith(data.html);
+                    } else {
+                        $sortable.replaceWith(data.html);
+                    }
                     setupStructure();
                     restoreStructureState();
-                    $(".save_structure").hide();
-                    tocDirty = false;
+                    syncStructurePageNamesFromDom();
+                    markClean();
+                } else {
+                    $.getJSON($.service("object", "report_error", { message: tr("Unable to save structure.") }));
                 }
             },
             "json"
-        );
+        ).fail(function () {
+            $sortable.tikiModal();
+            $.getJSON($.service("object", "report_error", { message: tr("Unable to save structure.") }));
+        });
         return false;
     });
 
     $(".add_new_child_page").on("click", function () {
-        let id = $(this).parents(".admintoclevel").first().attr("id").match(/\d*$/);
+        let id = $(this).parents(structureNodeChildSelector).first().attr("id").match(/\d*$/);
         if (id) {
             id = id[0];
         }
@@ -275,7 +485,7 @@ $(function () {
     });
 
     $(".move_page").on("click", function () {
-        let id = $(this).parents(".admintoclevel").first().attr("id").match(/\d*$/);
+        let id = $(this).parents(structureNodeChildSelector).first().attr("id").match(/\d*$/);
         if (id) {
             id = id[0];
         }

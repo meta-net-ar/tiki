@@ -1,0 +1,46 @@
+---
+description: Search lookup response with results.
+type: object
+required:
+  - title
+  - resultset
+properties:
+  title:
+    type: string
+  resultset:
+    type: object
+    required:
+      - count
+      - offset
+      - maxRecords
+      - result
+    properties:
+      count:
+        type: integer
+      offset:
+        type: integer
+      maxRecords:
+        type: integer
+      result:
+        type: array
+        items:
+          type: object
+          required:
+            - object_type
+            - object_id
+            - parent_id
+            - title
+          properties:
+            object_type:
+              type: string
+            object_id:
+              oneOf:
+                - type: string
+                - type: integer
+            parent_id:
+              oneOf:
+                - type: integer
+                - type: string
+              nullable: true
+            title:
+              type: string

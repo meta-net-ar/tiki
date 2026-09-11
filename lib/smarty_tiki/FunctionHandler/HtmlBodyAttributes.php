@@ -16,9 +16,15 @@ use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use Tiki\Sections;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class HtmlBodyAttributes extends Base
+class HtmlBodyAttributes extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'html_body_attributes';
+    }
+
     // Used in the template to create the html_body_attributes tag which can take a class as parameter and returns the attributes for a standard tiki page body tag
     public function handle($params, Template $template)
     {
@@ -27,7 +33,7 @@ class HtmlBodyAttributes extends Base
         $smarty = \TikiLib::lib('smarty');
         $back = '';
         $onload = '';
-        $class = 'tiki ' . 'd-flex ' . 'flex-column ' . 'min-vh-100 ' . 'm-0 ' . ' ' . $params['class'] ?? '';
+        $class = 'tiki ' . 'd-flex ' . 'flex-column ' . 'min-vh-100 ' . 'm-0 ' . ' ' . ($params['class'] ?? '');
 
         //filename of script called (i.e. tiki-index, tiki-user_information, tiki-view_forum, etc), then sanitize chars
         $script_filename = pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_FILENAME);
@@ -50,8 +56,12 @@ class HtmlBodyAttributes extends Base
             $class .= ' sandbox ';
         }
 
-        if ($prefs['site_layout']) {
-            $class .= ' layout_' . $prefs['site_layout'];
+        if (Sections::getCurrentSection() === Sections::SECTION_ADMIN_LAYOUT) {
+            $class .= ' layout_admin';
+        } else {
+            if ($prefs['site_layout']) {
+                $class .= ' layout_' . $prefs['site_layout'];
+            }
         }
 
         if (! empty($_REQUEST['filegals_manager'])) {

@@ -234,19 +234,23 @@ class AdminLib extends TikiLib
         if ($tikidomain) {
             $path .= "/$tikidomain";
         }
-        $h = opendir($path);
+        $dir = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
 
-        while (($file = readdir($h)) !== false) {
-            if (is_file("$path/$file") && $file != 'license.txt' && $file != 'index.php' && $file != '.cvsignore' && $file != 'README') {
-                $filename = "$path/$file";
+        foreach ($dir as $fileInfo) {
+            if ($fileInfo->isFile()) {
+                $filename = $fileInfo->getPathname();
+                $baseName = $fileInfo->getBasename();
+
+                $protected = ['license.txt', 'index.php', '.cvsignore', 'README'];
+                if (in_array($baseName, $protected)) {
+                    continue;
+                }
 
                 if (! in_array($filename, $pictures)) {
                     @unlink($filename);
                 }
             }
         }
-
-        closedir($h);
     }
 
     /**
@@ -580,8 +584,10 @@ class AdminLib extends TikiLib
         global $system_configuration_files;
         $show_warning = false;
 
-        if (file_exists(TIKI_CONFIG_FILE_PATH)) {
-            include(TIKI_CONFIG_FILE_PATH);
+        // Get local.php path including for multitiki
+        $configFilePath = \Tiki\TikiInit::getCredentialsFile();
+        if (file_exists($configFilePath)) {
+            include($configFilePath);
 
             foreach ($system_configuration_files as $configFile) {
                 if (isset($configFile) && file_exists($configFile)) {

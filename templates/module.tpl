@@ -76,7 +76,7 @@
              class="card-body{if !empty($module_params.class)} {$module_params.class}{/if}">
             {else}{* $module_nobox eq 'y' *}
             <div id="module_{$moduleId}" style="{$module_params.style}{$tpl_module_style}"
-                 class="module{if !empty($module_params.class)} {$module_params.class}{/if} box-{$module_name} p-2">
+                 class="module{if !empty($module_params.class)} {$module_params.class}{/if} box-{$module_name} no-box">
                 <div id="mod-{$smarty.capture.name}">
                     {/if}{* close $module_nobox *}
                     {$module_content}

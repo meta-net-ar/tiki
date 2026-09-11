@@ -7,6 +7,7 @@
 namespace Tiki\Cache;
 
 use Exception;
+use FilesystemIterator;
 
 //This happens really early in tiki init, autoloading doesn't seem to be available yet
 require_once __DIR__ . '/KvpCacheInterface.php';
@@ -18,19 +19,22 @@ class FileSystem implements KvpCacheInterface
     public function __construct()
     {
         global $tikidomain;
-        $this->folder = realpath(TEMP_CACHE_PATH);
+        $folder = realpath(TEMP_CACHE_PATH);
         if ($tikidomain) {
-            $this->folder .= "/$tikidomain";
+            $folder .= "/$tikidomain";
         }
-        if (! is_dir($this->folder)) {
-            mkdir($this->folder);
-            chmod($this->folder, 0777);
-            $resource = opendir($this->folder);
-            if ($resource === false) {
-                throw new Exception("Unable to create cache directory {$this->folder}");
+        if (! is_dir($folder)) {
+            // Create directory recursively with permissions
+            if (! mkdir($folder, 0777, true)) {
+                throw new Exception("Unable to create cache directory $folder");
             }
+            // Ensure permissions are set correctly (mkdir 0777 is often affected by umask)
+            chmod($folder, 0777);
         }
+
+        $this->folder = $folder;
     }
+
 
     public function isFunctional(): bool
     {
@@ -77,14 +81,11 @@ class FileSystem implements KvpCacheInterface
 
     public function invalidateAll($type)
     {
-        $path = $this->folder;
-        $all = opendir($path);
-        if ($all === false) {
-            throw new Exception("Unable to open cache directory {$this->folder}");
-        }
-        while ($file = readdir($all)) {
-            if (str_starts_with($file, $type)) {
-                unlink("$path/$file");
+        $iterator = new FilesystemIterator($this->folder, FilesystemIterator::SKIP_DOTS);
+
+        foreach ($iterator as $fileInfo) {
+            if (str_starts_with($fileInfo->getBasename(), $type)) {
+                unlink($fileInfo->getPathname());
             }
         }
     }

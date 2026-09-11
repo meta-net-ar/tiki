@@ -4,7 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once __DIR__ . '/../../language/CollectFiles.php';
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -82,6 +81,17 @@ class Language_CollectFilesTest extends TikiTestCase
     {
         $expectedResult = ['vfs://root/dir1/file1.tpl', 'vfs://root/dir2/file2.php', 'vfs://root/dir2/file3.php'];
         $this->assertEquals($expectedResult, $this->obj->scanDir(vfsStream::url('root')));
+    }
+
+    public function testScanDirShouldTraverseDirectoryNamedLikeAFile(): void
+    {
+        vfsStream::setup('root', null, [
+            'package.js' => ['translations.php' => ''],
+        ]);
+
+        $files = $this->obj->scanDir(vfsStream::url('root'));
+
+        $this->assertSame(['vfs://root/package.js/translations.php'], $files);
     }
 
     public function testScanDirShouldIgnoreExcludedDirs(): void

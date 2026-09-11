@@ -205,7 +205,7 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
             ];
             // clever way of filtering by keys from http://stackoverflow.com/questions/4260086
             $info = array_intersect_key($info, array_flip($allowed));
-            $info['link'] = smarty_function_object_link(
+            $info['link'] = \SmartyTiki\FunctionHandler\ObjectLink::render(
                 [
                     'id' => $info['galleryId'],
                     'type' => 'file gallery',
@@ -227,7 +227,7 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
             } else {
                 $type = 'file';
             }
-            $info['link'] = smarty_function_object_link(
+            $info['link'] = \SmartyTiki\FunctionHandler\ObjectLink::render(
                 [
                     'id' => $info['fileId'],
                     'type' => $type,
@@ -880,9 +880,11 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
     {
         $fileId = $this->pathToId($path);
         $galleryId = $this->options['accessControlData']['parentIds']['files'][$fileId];
-        $perms = TikiLib::lib('tiki')->get_perm_object($galleryId, 'file gallery', TikiLib::lib('filegal')->get_file_gallery_info($galleryId));
-        if ($perms['tiki_p_remove_files'] === 'y') {
-            $fileInfo = TikiLib::lib('filegal')->get_file_info($fileId, false, false);
+        $galInfo = TikiLib::lib('filegal')->get_file_gallery_info($galleryId);
+        $perms = TikiLib::lib('tiki')->get_perm_object($galleryId, 'file gallery', $galInfo);
+        $fileInfo = TikiLib::lib('filegal')->get_file_info($fileId, false, false);
+        // Use the shared permission model so elFinder deletion matches the standard gallery view.
+        if ($this->filegallib->userCanRemoveFile($fileInfo, $galInfo, $perms)) {
             return $this->filegallib->remove_file($fileInfo);
         } else {
             return false;

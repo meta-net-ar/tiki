@@ -14,8 +14,6 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use TikiLib;
 
-require_once(__DIR__ . '/../../wiki-plugins/wikiplugin_redirect.php');
-
 class WikiPluginRedirectTest extends TestCase
 {
     public function testRedirectInPrintMode(): void

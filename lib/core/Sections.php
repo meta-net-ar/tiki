@@ -267,13 +267,24 @@ class Sections
 
     public static function setCurrentSection(string $section): void
     {
+        global $prefs;
+
         if (! in_array($section, self::getAllSections(), true)) {
             throw new \InvalidArgumentException("Invalid section: $section");
         }
-        self::$currentSection = $section;
 
-        // Trigger callbacks when section changes
-        self::triggerSectionChangeCallbacks($section);
+        if ($prefs['theme_unified_admin_backend'] !== 'y' && $section === self::SECTION_ADMIN_LAYOUT) {
+            // Trigger SECTION_ADMIN instead of SECTION_ADMIN_LAYOUT when UAB is disabled
+            $section = self::SECTION_ADMIN;
+            self::$currentSection = $section;
+            self::triggerSectionChangeCallbacks($section);
+        }
+
+        if (self::$currentSection !== $section) {
+            // Trigger callbacks when section changes
+            self::$currentSection = $section;
+            self::triggerSectionChangeCallbacks($section);
+        }
     }
 
     public static function getCurrentSection(): ?string
@@ -330,7 +341,8 @@ class Sections
     public static function currentObject($request = null)
     {
         global $cat_type, $cat_objid, $postId, $prefs;
-        $section = self::getCurrentSection();
+        // PHP 8.5 deprecates null as an array offset; normalize to ''.
+        $section = self::getCurrentSection() ?? '';
 
         if (! is_array($request)) {
             $request = $_REQUEST; // use the global request object
@@ -353,11 +365,15 @@ class Sections
         // Pretty tracker pages return the tracker item object instead of the parent wiki page object
         // We expose the parent wiki page type and objectId for the benefit of modules, plugins or smarty functions which may want to access the parent page categories and permissions
         if (self::isCurrentSection(self::SECTION_WIKI_PAGE) && isset($request['itemId'])) {
+            $parentObject = $cat_objid;
+            if (empty($parentObject) && ! empty($request['page'])) {
+                $parentObject = $request['page'];
+            }
             return [
                 'type' => 'trackeritem',
                 'object' => (int)$request['itemId'],
                 'parentType' => $cat_type,
-                'parentObject' => $cat_objid,
+                'parentObject' => $parentObject,
             ];
         }
 
@@ -393,6 +409,13 @@ class Sections
                     $k = $request[$info['key']];
                     // when using wiki_url_scheme the page request var is the page slug, not the page/object name
                     if ($prefs['wiki_url_scheme'] !== 'urlencode' && $info['objectType'] === 'wiki page') {
+                        global $jitRequest;
+                        if ($prefs["feature_sefurl_tracker_prefixalias"] == 'y') {
+                            $referencedPages = TikiLib::lib('wiki')->get_pages_by_alias($k);
+                            if ($referencedPages) {
+                                $k = $referencedPages[0];
+                            }
+                        }
                         $k = TikiLib::lib('wiki')->get_page_by_slug($k);
                     }
                 }

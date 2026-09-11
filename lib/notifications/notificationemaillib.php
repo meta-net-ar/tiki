@@ -400,6 +400,11 @@ function sendWikiEmailNotification(
                 continue;
             }
             $smarty->assign('watchId', $not['watchId'] ?? '');
+            $watchUnsubscribeHash = '';
+            if (! empty($not['watchId']) && ! empty($not['user'])) {
+                $watchUnsubscribeHash = $tikilib->generateWatchUnsubscribeHash($not['watchId'], $not['user']);
+            }
+            $smarty->assign('watchUnsubscribeHash', $watchUnsubscribeHash);
 
             $mail_subject = $smarty->fetchLang($not['language'], "mail/user_watch_wiki_page_changed_subject.tpl");
             $mail_data = $smarty->fetchLang($not['language'], "mail/user_watch_wiki_page_changed.tpl");
@@ -448,6 +453,11 @@ function sendEmailNotification($watches, $dummy, $subjectTpl, $subjectParam, $tx
         }
 
         $smarty->assign('watchId', $watch['watchId'] ?? null);
+        $watchUnsubscribeHash = '';
+        if (! empty($watch['watchId']) && ! empty($watch['user'])) {
+            $watchUnsubscribeHash = $tikilib->generateWatchUnsubscribeHash($watch['watchId'], $watch['user']);
+        }
+        $smarty->assign('watchUnsubscribeHash', $watchUnsubscribeHash);
         if ($watch['user']) {
             $mail->setUser($watch['user']);
         }

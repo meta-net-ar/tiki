@@ -7,12 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * \brief Smarty modifier plugin to add user's country flag
  *
  * - type:     modifier
  * - name:     countryflag
- * - purpose:  Returns a specified user's country flag
+ * - purpose:  Returns a specified user's country flag. Takes a user login, not a country
+ *             name: use countryflagwithlabel or countryflagemoji for a country name.
  *
  * @author
  * @param string
@@ -20,8 +23,13 @@ namespace SmartyTiki\Modifier;
  *
  * Example: {$userinfo.login|countryflag}
  */
-class CountryFlag
+class CountryFlag implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'countryflag';
+    }
+
     public function handle($user)
     {
         global $tikilib;
@@ -29,7 +37,7 @@ class CountryFlag
         if ($flag == 'Other' || empty($flag)) {
             return '';
         }
-        return "<img alt='" . tra(str_replace('_', ' ', $flag)) . "' src='img/flags/" . str_replace(' ', '_', $flag) .
-            ".png' title='" . tra(str_replace('_', ' ', $flag)) . "' />";
+        $label = tra(str_replace('_', ' ', $flag));
+        return \Tiki\CountryFlagHelper::toHtml(str_replace(' ', '_', $flag), $label);
     }
 }

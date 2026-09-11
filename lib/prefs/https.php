@@ -6,12 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_https_list()
 {
+    $loginGeneralPreferencesHelp = 'Login-General-Preferences';
+
     return [
         'https_external_links_for_users' => [
             'name' => tra('HTTPS for user-specific links'),
             'description' => tra('When building notification emails, RSS feeds, the canonical URL or other externally available links, use HTTPS when the content applies to a specific user. HTTPS must be configured on the server.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
             'keywords' => 'SSL secure',
         ],
         'https_port' => [
@@ -21,6 +24,7 @@ function prefs_https_list()
             'size' => 5,
             'filter' => 'digits',
             'default' => '443',
+            'help' => $loginGeneralPreferencesHelp,
             'keywords' => 'SSL secure',
         ],
         'https_login' => [
@@ -34,6 +38,7 @@ function prefs_https_list()
                 'force_nocheck' => tra('Consider we are always in HTTPS, but do not check'),
                 'required' => tra('Require secure (HTTPS) login'),
             ],
+            'help' => $loginGeneralPreferencesHelp,
             'default' => 'allowed',
             'warning' => tra('Do not require HTTPS until the connection has been set up and tested; otherwise, the website will be inaccessible'),
             'keywords' => 'SSL secure',

@@ -120,27 +120,6 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $this->assureDefaultCharSetIsAlignedWithTikiSchema();
         $this->assureInnoDdTableRowFormatIsDynamicOrBetter();
 
-        $TWV = new TWVersion();
-
-        // If a Mysql data file exists, use that. Very fast
-        //  If data file is missing or the batch loader is not available, use the single insert method
-        $secdb = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $TWV->version . '_mysql.sql';
-        $secdbData = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $TWV->version . '_mysql.data';
-        if (file_exists($secdbData)) {
-            // A MySQL datafile exists
-            $truncateTable = true;
-            $rc = $this->runDataFile($secdbData, 'tiki_secdb', $truncateTable);
-            if ($rc == false) {
-                // The batch loader failed
-                if (file_exists($secdb)) {
-                    // Run single inserts
-                    $this->runFile($secdb, false);
-                }
-            }
-        } elseif (file_exists($secdb)) {
-            // Run single inserts
-            $this->runFile($secdb, false);
-        }
         foreach (Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch) {
             try {
                 $this->installPatch($patchName);
@@ -269,37 +248,6 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $tx->commit();
 
         return $ret;
-    }
-
-    /**
-     * Batch insert from a mysql data file
-     *
-     * @param $file             MySQL export file
-     * @param $targetTable      Target table
-     * @param $clearTable=true  Flag saying if the target table should be truncated or not
-     * @return bool
-     */
-    public function runDataFile($file, $targetTable, $clearTable = true)
-    {
-        if (! is_file($file) || ! $command = file_get_contents($file)) {
-            print('Fatal: Cannot open ' . $file);
-            exit(1);
-        }
-
-        if ($clearTable == true) {
-            $statement = 'truncate table ' . $targetTable;
-            $this->query($statement);
-        }
-
-        // LOAD DATA INFILE doesn't like single \ directory separators. Replace with \\
-        $inFile = str_replace('\\', '\\\\', $file);
-
-        $status = true;
-        $statement = 'LOAD DATA INFILE "' . $inFile . '" INTO TABLE ' . $targetTable;
-        if ($this->query($statement) === false) {
-            $status = false;
-        }
-        return $status;
     }
 
     /**
@@ -519,62 +467,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
     }
     private function getBaseImage()
     {
-        $iniFile = __DIR__ . '/../db/install.ini';
-
-        $ini = [];
-        if (is_readable($iniFile)) {
-            $ini = parse_ini_file($iniFile);
-        }
-
-        $direct = __DIR__ . '/../db/custom_tiki.sql';
-        $fetch = null;
-        $check = null;
-
-        if (isset($ini['source.type'])) {
-            switch ($ini['source.type']) {
-                case 'local':
-                    $direct = $ini['source.file'];
-                    break;
-                case 'http':
-                    $fetch = $ini['source.file'];
-                    if (isset($ini['source.md5'])) {
-                        $check = $ini['source.md5'];
-                    }
-                    break;
-            }
-        }
-
-        if (is_readable($direct)) {
-            return $direct;
-        }
-
-        if (! $fetch) {
-            return;
-        }
-
-        $cacheFile = __DIR__ . '/../' . TEMP_CACHE_PATH . '/sql' . md5($fetch);
-
-        if (is_readable($cacheFile)) {
-            return $cacheFile;
-        }
-
-        $read = fopen($fetch, 'r');
-        $write = fopen($cacheFile, 'w+');
-
-        if ($read && $write) {
-            while (! feof($read)) {
-                fwrite($write, fread($read, 1024 * 100));
-            }
-
-            fclose($read);
-            fclose($write);
-
-            if (! $check || $check == md5_file($cacheFile)) {
-                return $cacheFile;
-            } else {
-                unlink($cacheFile);
-            }
-        }
+        return (new BaseImageResolver(__DIR__ . '/..'))->resolve();
     }
 
     /**

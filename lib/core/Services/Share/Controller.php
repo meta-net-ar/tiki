@@ -19,14 +19,15 @@ class Services_Share_Controller
 
     public function action_index()
     {
-        global $prefs, $tikiroot, $base_url;
+        global $prefs, $tikiroot, $base_url, $user;
 
         $tokenlib = TikiLib::lib('authtokens')::build($prefs);
+        $globalperms = Perms::get();
         $tokens = $tokenlib->getTokens();
         $tokens = array_filter(
             $tokens,
-            function ($row) {
-                return isset($row['data']);
+            function ($row) use ($globalperms, $user) {
+                return isset($row['data']) && $this->canViewToken($row, $user, $globalperms);
             }
         );
 
@@ -106,7 +107,7 @@ class Services_Share_Controller
 
             foreach ($tokens as $token) {
                 if (in_array($token['tokenId'], $tokenIDs)) {
-                    if ($globalperms->remove_share && $user && $token['user'] == $user) {
+                    if ($this->canDeleteToken($token, $user, $globalperms)) {
                         $tokenlib->deleteToken($token['tokenId']);
                     } else {
                         $errorIds[] = $token['tokenId'];
@@ -147,5 +148,15 @@ class Services_Share_Controller
 
             return Services_Utilities::refresh();
         }
+    }
+
+    private function canDeleteToken(array $token, ?string $user, $globalperms): bool
+    {
+        return $globalperms->admin || ($globalperms->remove_share && $user && ($token['user'] ?? null) === $user);
+    }
+
+    private function canViewToken(array $token, ?string $user, $globalperms): bool
+    {
+        return $globalperms->admin || ($user && ($token['user'] ?? null) === $user);
     }
 }

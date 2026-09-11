@@ -15,6 +15,9 @@ use TikiLib;
  */
 class ApiToken extends TikiLib
 {
+    private const TOKEN_BYTES = 32;
+    private const VERIFIER_PREFIX = 'sha256:';
+
     private $table;
 
     public function __construct()
@@ -25,16 +28,20 @@ class ApiToken extends TikiLib
 
     public function getTokens($conditions = [])
     {
-        return $this->table->fetchAll([], $conditions, -1, -1, ['tokenId' => 'asc']);
+        $tokens = $this->table->fetchAll([], $conditions, -1, -1, ['tokenId' => 'asc']);
+
+        return array_map([$this, 'removeVerifier'], $tokens);
     }
 
     public function getToken($tokenId)
     {
         if (is_numeric($tokenId)) {
-            return $this->table->fetchFullRow(['tokenId' => (int) $tokenId]);
+            $token = $this->table->fetchFullRow(['tokenId' => (int) $tokenId]);
         } else {
-            return $this->table->fetchFullRow(['token' => $tokenId]);
+            $token = $this->findTokenByValue($tokenId);
         }
+
+        return $token ? $this->removeVerifier($token) : $token;
     }
 
     public function createToken($token)
@@ -43,20 +50,32 @@ class ApiToken extends TikiLib
             'type' => $this->table->expr("$$ != 'manual'"),
             'expireAfter' => $this->table->expr("$$ < NOW()")
         ]);
-        if (empty($token['token'])) {
-            $token['token'] = $this->generate((string)$token['user'], microtime());
+        $tokenValue = (string) ($token['token'] ?? '');
+        if ($tokenValue === '') {
+            $tokenValue = $this->generate();
         }
-        if ($this->getToken($token['token'])) {
+
+        if (str_starts_with($tokenValue, self::VERIFIER_PREFIX)) {
+            throw new ApiTokenException(tr('Access token uses a reserved prefix.'));
+        }
+
+        if ($this->findTokenByValue($tokenValue)) {
             throw new ApiTokenException(tr('Access token already exists.'));
         }
+        $token['token'] = $this->createVerifier($tokenValue);
         $token['created'] = $this->now;
         $token['lastModif'] = $this->now;
         $tokenId = $this->table->insert($token);
-        return $this->getToken($tokenId);
+        $createdToken = $this->table->fetchFullRow(['tokenId' => $tokenId]);
+        $createdToken['token'] = $tokenValue;
+
+        return $createdToken;
     }
 
     public function updateToken($tokenId, $token)
     {
+        // Tokens are immutable. Rotating a token means creating a replacement.
+        unset($token['token']);
         $token['lastModif'] = $this->now;
         $this->table->update($token, ['tokenId' => $tokenId]);
         return $this->getToken($tokenId);
@@ -66,21 +85,31 @@ class ApiToken extends TikiLib
     {
         if (is_numeric($tokenId)) {
             return $this->table->delete(['tokenId' => $tokenId]);
-        } else {
-            return $this->table->delete(['token' => $tokenId]);
         }
+
+        $token = $this->findTokenByValue($tokenId);
+        if (! $token) {
+            return false;
+        }
+
+        return $this->table->delete(['tokenId' => $token['tokenId']]);
+    }
+
+    public function deleteAllTokens()
+    {
+        return $this->table->deleteMultiple([]);
     }
 
     public function validToken($token)
     {
-        $token = $this->table->fetchFullRow(['token' => $token]);
+        $token = $this->findTokenByValue($token);
         if (! $token) {
             return false;
         }
         if (! empty($token['expireAfter']) && $token['expireAfter'] < $this->now) {
             return false;
         }
-        return $token;
+        return $this->removeVerifier($token);
     }
 
     public function hit($token)
@@ -88,8 +117,40 @@ class ApiToken extends TikiLib
         $this->table->update(['hits' => $token['hits'] + 1], ['tokenId' => $token['tokenId']]);
     }
 
-    private function generate($prefix = '', $suffix = '')
+    private function generate()
     {
-        return hash('sha256', $prefix . uniqid() . $suffix);
+        return bin2hex(random_bytes(self::TOKEN_BYTES));
+    }
+
+    private function createVerifier(string $token): string
+    {
+        return self::VERIFIER_PREFIX . hash('sha256', $token);
+    }
+
+    /**
+     * Find a token by its bearer value, without ever accepting the stored
+     * verifier as a bearer value.
+     *
+     * All stored tokens are hashed verifiers: the installer patch
+     * (20260621_hash_api_tokens) converts any pre-upgrade plaintext tokens, and
+     * createToken() only ever stores verifiers, so a plaintext lookup is no
+     * longer needed.
+     */
+    private function findTokenByValue(string $token)
+    {
+        if ($token === '' || str_starts_with($token, self::VERIFIER_PREFIX)) {
+            return false;
+        }
+
+        $row = $this->table->fetchFullRow(['token' => $this->createVerifier($token)]);
+
+        return $row ?: false;
+    }
+
+    private function removeVerifier(array $token): array
+    {
+        unset($token['token']);
+
+        return $token;
     }
 }

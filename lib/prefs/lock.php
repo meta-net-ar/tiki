@@ -11,6 +11,7 @@ function prefs_lock_list()
             'name' => tra('Lock Content Templates'),
             'description' => tra('Enable users to lock content templates and so prevent others from editing them'),
             'type' => 'flag',
+            'help' => 'Content-Templates#Activate_the_feature',
             'default' => 'n',
         ],
         'lock_wiki_structures' => [
@@ -18,6 +19,7 @@ function prefs_lock_list()
             'description' => tra('Enable users to lock wiki structures and so prevent others from editing them'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Structures#Enable_the_Featuree',
         ],
     ];
 }

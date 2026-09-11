@@ -1,0 +1,100 @@
+---
+description: Response from GET /galleries/files/{fileId}.
+type: object
+required:
+  - title
+  - fileId
+  - info
+properties:
+  title:
+    type: string
+  fileId:
+    type: integer
+  info:
+    type: object
+    required:
+      - fileId
+      - galleryId
+      - name
+      - description
+      - created
+      - filename
+      - filesize
+      - filetype
+      - user
+      - author
+      - hits
+      - maxhits
+      - lastDownload
+      - votes
+      - points
+      - path
+      - reference_url
+      - is_reference
+      - hash
+      - metadata
+      - lastModif
+      - lastModifUser
+    properties:
+      fileId:
+        type: integer
+      galleryId:
+        type: integer
+      name:
+        type: string
+      description:
+        type: string
+        nullable: true
+      created:
+        type: integer
+        nullable: true
+      filename:
+        type: string
+      filesize:
+        type: integer
+        nullable: true
+      filetype:
+        type: string
+        nullable: true
+      user:
+        type: string
+        nullable: true
+      author:
+        type: string
+        nullable: true
+      hits:
+        type: integer
+        nullable: true
+      maxhits:
+        type: integer
+        nullable: true
+      lastDownload:
+        type: integer
+        nullable: true
+      votes:
+        type: integer
+        nullable: true
+      points:
+        type: string
+        nullable: true
+      path:
+        type: string
+        nullable: true
+      reference_url:
+        type: string
+        nullable: true
+      is_reference:
+        type: string
+        nullable: true
+      hash:
+        type: string
+        nullable: true
+      metadata:
+        type: string
+        nullable: true
+      lastModif:
+        type: integer
+        nullable: true
+      lastModifUser:
+        type: string
+        nullable: true

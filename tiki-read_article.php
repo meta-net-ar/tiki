@@ -12,8 +12,6 @@ use Tiki\Lib\Image\Image;
 use Tiki\Wiki\WikiPaginationUtils;
 use Tiki\Sections;
 
-$here = [];
-
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [

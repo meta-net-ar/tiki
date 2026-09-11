@@ -556,29 +556,41 @@
                     {if $prefs.xmpp_feature eq 'y'}
                         <div class="tiki-form-group row mb-2">
                             <label class="col-form-label col-md-4" for="xmpp_username">
-                                {tr}XMPP account JID{/tr}
+                                {tr}Preferred / alternative XMPP address{/tr}
                             </label>
                             <div class="col-md-8">
                                 <input type="text" class="form-control" name="xmpp_jid" id="xmpp_jid" value="{$user_prefs.xmpp_jid|escape}">
-                                <p><small>{tr}If empty, Tiki will provide default value{/tr}</small></p>
+                                <p><small>{tr}Leave empty to use your default Tiki-managed XMPP address{/tr}</small></p>
+                                <p><small>{tr}Enter a full JID such as user@example.org if you prefer to use an existing external XMPP account{/tr}</small></p>
+                                <p><small>{tr}Your group chat rooms will keep working under this address. Chat history tied to your previous address won't be visible from this new one, since XMPP accounts each keep their own separate history.{/tr}</small></p>
                             </div>
                         </div>
                         <div class="tiki-form-group row">
-                            <label class="col-form-label col-md-4" for="xmpp_password">
-                                {tr}XMPP account password{/tr}
+                            <label class="col-form-label col-md-4" for="xmpp_custom_server_endpoint">
+                                {tr}XMPP connection endpoint{/tr}
                             </label>
                             <div class="col-md-8">
-                                <input type="password" class="form-control" name="xmpp_password" id="xmpp_password" value="{$user_prefs.xmpp_password|escape}" autocomplete="new-password">
-                                <p><small>This password will be stored in database</small></p>
+                                <input type="text" class="form-control" name="xmpp_custom_server_endpoint" id="xmpp_custom_server_endpoint" value="{if $user_prefs.xmpp_custom_server_endpoint}{$user_prefs.xmpp_custom_server_endpoint|escape}{else}{$user_prefs.xmpp_custom_server_http_bind|escape}{/if}">
+                                <p><small>{tr}Provide this when using an external XMPP server that requires a custom BOSH or WebSocket endpoint{/tr}</small></p>
+                                <p><small>{tr}Use an http:// or https:// URL for BOSH, or a ws:// or wss:// URL for WebSocket{/tr}</small></p>
+                                <p><small>{tr}Optional when the external domain publishes XMPP connection discovery records. Set it explicitly when discovery is unavailable or when you need to force a specific BOSH or WebSocket service.{/tr}</small></p>
                             </div>
                         </div>
                         <div class="tiki-form-group row">
-                            <label class="col-form-label col-md-4" for="xmpp_server_http_bind">
-                                {tr}XMPP http-bind URL{/tr}
+                            <label class="col-form-label col-md-4" for="xmpp_external_password">
+                                {tr}External XMPP account password{/tr}
                             </label>
                             <div class="col-md-8">
-                                <input type="text" class="form-control" name="xmpp_custom_server_http_bind" id="xmpp_custom_server_http_bind" value="{$user_prefs.xmpp_custom_server_http_bind|escape}">
-                                <p><small>{tr}You have to provide this when using custom XMPP server{/tr}</small></p>
+                                <input type="password" class="form-control" name="xmpp_external_password" id="xmpp_external_password" value="" autocomplete="new-password">
+                                {if $xmpp_external_password_saved}
+                                    <p><small>{tr}A password is currently saved. Leave blank to keep it, or enter a new one to replace it.{/tr}</small></p>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="xmpp_external_password_clear" id="xmpp_external_password_clear" value="y">
+                                        <label class="form-check-label" for="xmpp_external_password_clear">{tr}Remove the saved password (you'll be asked to log in manually next time){/tr}</label>
+                                    </div>
+                                {else}
+                                    <p><small>{tr}Optional. Saving it lets Tiki sign in automatically through either BOSH or WebSocket. It is stored with authenticated encryption; leave it blank to log in manually in the chat window instead.{/tr}</small></p>
+                                {/if}
                             </div>
                         </div>
                     {/if}
@@ -766,7 +778,7 @@
                                     <div class="col-md-8">
                                         <input class="form-control" type="password" name="pass1" id="pass1" autocomplete="new-password">
                                         <div style="ms-1">
-                                            <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none' } <span id="mypassword_text_inner"></span></div>
+                                            <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
                                             <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
                                         </div>
                                         <div style="mt-1">

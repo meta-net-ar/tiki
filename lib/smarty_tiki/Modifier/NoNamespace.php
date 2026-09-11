@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class NoNamespace
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class NoNamespace implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'nonamespace';
+    }
+
     public function handle($pageName)
     {
         return \TikiLib::lib('wiki')->get_without_namespace($pageName);

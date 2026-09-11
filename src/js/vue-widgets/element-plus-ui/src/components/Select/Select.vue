@@ -19,7 +19,12 @@ watch(() => props.value, (newValue) => {
 });
 
 const isInvalid = computed(() => normalize(props.isInvalid, false));
-const multiple = computed(() => normalize(props.multiple, false))
+const normalizeBooleanAttribute = (value) => {
+    const normalized = normalize(value, false);
+    // HTML boolean attributes can be serialized as an empty string.
+    return normalized === "" || Boolean(normalized);
+}
+const multiple = computed(() => normalizeBooleanAttribute(props.multiple))
 const clearable = computed(() => normalize(props.clearable, false));
 const collapseTags = computed(() => normalize(props.collapseTags, false));
 const filterable = computed(() =>
@@ -41,6 +46,7 @@ const getOptionsProp = computed(() => {
             group.options.push({
                 label: item.label,
                 value: item.value,
+                disabled: item.disabled,
             });
         } else {
             acc.push({
@@ -48,6 +54,7 @@ const getOptionsProp = computed(() => {
                 options: [{
                     label: item.label,
                     value: item.value,
+                    disabled: item.disabled,
                 }],
             });
         }
@@ -56,6 +63,16 @@ const getOptionsProp = computed(() => {
 });
 const options = ref([]);
 const wrapperRef = ref(null);
+const deduplicateOptionsByValue = (items) => {
+    const seenValues = new Set();
+    return items.filter((item) => {
+        if (seenValues.has(item.value)) {
+            return false;
+        }
+        seenValues.add(item.value);
+        return true;
+    });
+};
 
 const handleValueChange = (value) => {
     // check if the checkbox with id "intertrans-active" is checked
@@ -90,10 +107,10 @@ const remoteMethod = async (query) => {
 
         const data = await response.json();
         const loadedOptions = data.map(item => (typeof item === "string" ? { value: item, label: item } : item));
-        const newOptions = [
+        const newOptions = deduplicateOptionsByValue([
             ...options.value.filter(item => modelValue.value?.includes(item.value)),
             ...loadedOptions,
-        ];
+        ]);
         options.value = newOptions;
     } catch (error) {
         console.error('Error loading remote options:', error);
@@ -136,7 +153,7 @@ export const DATA_TEST_ID = {
     <ConfigWrapper :language="language">
         <div :class="{ 'invalid': isInvalid }" :data-testid="DATA_TEST_ID.SELECT_WRAPPER" ref="wrapperRef">
             <el-select v-model="modelValue" :multiple="multiple" :filterable="filterable" :allow-create="allowCreate"
-                default-first-option :reserve-keyword="false" :placeholder="placeholder" :teleported="false"
+                default-first-option :reserve-keyword="false" :placeholder="placeholder" :teleported="false" :automatic-dropdown="multiple"
                 @change="handleValueChange" :multiple-limit="parseInt(max ?? 0, 10)" :clearable="clearable"
                 :collapse-tags="collapseTags" :max-collapse-tags="parseInt(maxCollapseTags ?? 0, 10)" :size="size"
                 :data-testid="DATA_TEST_ID.SELECT_ELEMENT" :remote-method="remoteMethod"

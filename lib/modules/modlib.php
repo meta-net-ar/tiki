@@ -307,17 +307,17 @@ class ModLib extends TikiLib
         }
 
         // Now add all the system modules
-        $h = opendir(TEMPLATES_MODULES_PATH);
-        while (($file = readdir($h)) !== false) {
-            if (str_starts_with($file, 'mod-') && preg_match("/\.tpl$/", $file)) {
+        $iterator = new FilesystemIterator(TEMPLATES_MODULES_PATH, FilesystemIterator::SKIP_DOTS);
+        foreach ($iterator as $fileInfo) {
+            $file = $fileInfo->getFilename();
+            if (str_starts_with($file, 'mod-') && str_ends_with($file, '.tpl')) {
                 if (! str_contains($file, "nocache")) {
-                    $name = substr($file, 4, strlen($file) - 8);
-
-                    $all_modules[] = $name;
+                    // Remove 'mod-' (4 chars) from start and '.tpl' (4 chars) from end
+                    $all_modules[] = substr($file, 4, -4);
                 }
             }
         }
-        closedir($h);
+
         return $all_modules;
     }
 
@@ -375,20 +375,26 @@ class ModLib extends TikiLib
         if ($tikidomain) {
             $dircache .= "/$tikidomain";
         }
-        $h = opendir($dircache);
+
+        if (! is_dir($dircache)) {
+            return 0;
+        }
+
         $i = 0;
-        while (($file = readdir($h)) !== false) {
-            if (str_starts_with($file, 'mod-')) {
-                $file = "$dircache/$file";
-                $result = unlink($file);
-                if ($result) {
+        $iterator = new FilesystemIterator($dircache, FilesystemIterator::SKIP_DOTS);
+
+        foreach ($iterator as $fileInfo) {
+            if (str_starts_with($fileInfo->getFilename(), 'mod-')) {
+                // unlink() returns true on success
+                if (unlink($fileInfo->getPathname())) {
                     $i++;
                 }
             }
         }
-        closedir($h);
+
         return $i;
     }
+
     /* @param module_info = info of a module
      * @param user_groups = list of groups of a user
      * @param user = the user
@@ -857,20 +863,24 @@ class ModLib extends TikiLib
      */
     public function list_module_files()
     {
+        if (! is_dir(MODULES_PATH)) {
+            return [];
+        }
+
         $files = [];
-        if (is_dir(MODULES_PATH)) {
-            if ($dh = opendir(MODULES_PATH)) {
-                while (($file = readdir($dh)) !== false) {
-                    if (preg_match("/^mod-func-.*\.php$/", $file)) {
-                        $files[] = $file;
-                    }
-                }
-                closedir($dh);
+        $iterator = new FilesystemIterator(MODULES_PATH, FilesystemIterator::SKIP_DOTS);
+        foreach ($iterator as $fileInfo) {
+            $filename = $fileInfo->getFilename();
+            // Match mod-func-*.php
+            if (str_starts_with($filename, 'mod-func-') && str_ends_with($filename, '.php')) {
+                $files[] = $filename;
             }
         }
+
         sort($files);
         return $files;
     }
+
 
     /**
      * @param $module
@@ -1157,7 +1167,7 @@ class ModLib extends TikiLib
             foreach ((array) $info['prefs'] as $preference) {
                 if ($prefs[$preference] != 'y') {
                     $this->add_pref_error($mod_reference['name'], $preference);
-                    return smarty_block_remarksbox(
+                    return \SmartyTiki\BlockHandler\Remarksbox::render(
                         [
                             'type' => 'warning',
                             'title' => tr('Failed to execute "%0" module', $mod_reference['name']),
@@ -1258,7 +1268,7 @@ class ModLib extends TikiLib
                 $message = tr('Contact the system administrator');
             }
             $repeat = false;
-            return smarty_block_remarksbox(
+            return \SmartyTiki\BlockHandler\Remarksbox::render(
                 [
                     'type' => 'warning',
                     'title' => tr('Failed to execute "%0" module', $mod_reference['name']),
@@ -1332,7 +1342,8 @@ class ModLib extends TikiLib
             $info = $this->parse($info);
 
             // re-assign module_params for the custom module in case a module plugin is used inside it
-            $smarty->assign_by_ref('user_module_params', $module_params);
+            // by value, not by ref, so a nested recursive call can't repoint it
+            $smarty->assign('user_module_params', (array) $module_params);
             $smarty->assign('user_title', tra($info['title']));
             $smarty->assign_by_ref('user_data', $info['data']);
             $smarty->assign_by_ref('user_module_name', $info['name']);
@@ -1425,9 +1436,16 @@ class ModLib extends TikiLib
                     } else {
                         $inner['value'] = implode($inner['separator'], (array) $module_params[$name]);
                     }
+
+                    // Init dynamic parameter options with current values
+                    if (isset($inner['options']) && empty($inner['options'])) {
+                        $inner['options'] = array_combine($inner['value'], $inner['value']);
+                    }
                 } else {
                     $inner['value'] = $module_params[$name];
                 }
+            } elseif (isset($inner['default'])) {
+                $inner['value'] = $inner['default'];
             } else {
                 $inner['value'] = null;
             }

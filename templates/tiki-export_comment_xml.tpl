@@ -5,6 +5,6 @@
     <data><![CDATA[{$comment.data}]]></data>
     {*TODO*}
     {foreach from=$comment.replies_info.replies item=com}
-        {include file='tiki-export_comment_xml.tpl' comment=com}
+        {include file='tiki-export_comment_xml.tpl' comment=$com}
     {/foreach}
 </comment>

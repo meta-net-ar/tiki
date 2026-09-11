@@ -38,7 +38,6 @@ function wikiplugin_archivebuilder($data, $params)
         $files = [];
 
         $handlers = [
-            'tracker-attachments' => 'wikiplugin_archivebuilder_trackeratt',
             'tracker-files' => 'wikiplugin_archivebuilder_trackerfiles',
             'page-as-pdf' => 'wikiplugin_archivebuilder_pagetopdf',
         ];
@@ -105,35 +104,6 @@ function wikiplugin_archivebuilder($data, $params)
         $downloadLink = '<a href=' . $path . '?' . $archiveParamStr . ' class="btn btn-primary btn-sm">' . $label . '</a>';
         return $downloadLink;
     }
-}
-
-function wikiplugin_archivebuilder_trackeratt($basepath, $trackerItem)
-{
-    $trklib = TikiLib::lib('trk');
-    $data = $trklib->get_tracker_item($trackerItem);
-
-    $item = Tracker_Item::fromInfo($data);
-
-    if (! $item->canView()) {
-        return [];
-    }
-
-    $basepath = rtrim($basepath, '/') . '/';
-    if ($basepath == '/') {
-        $basepath = '';
-    }
-
-    $attachments = [];
-
-    $files = $trklib->list_item_attachments($trackerItem, 0, -1, 'attId_asc');
-    foreach ($files['data'] as $file) {
-        $name = $basepath . $file['filename'];
-        $complete = $trklib->get_item_attachment($file['attId']);
-
-        $attachments[$name] = wikiplugin_archivebuilder_tracker_get_attbody($complete);
-    }
-
-    return $attachments;
 }
 
 function wikiplugin_archivebuilder_trackerfiles($basepath, $trackerItem)

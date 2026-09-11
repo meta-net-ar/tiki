@@ -6,11 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_geo_list()
 {
+    $mapsConfigHelp = 'Maps-Config';
+
     return [
         'geo_enabled' => [
             'name' => tr('Maps & Location Enabled'),
             'type' => 'flag',
             'description' => tr('Provide controls to load map and location libraries.'),
+            'help' => $mapsConfigHelp,
             'default' => 'n',
         ],
         'geo_locate_wiki' => [
@@ -18,6 +21,7 @@ function prefs_geo_list()
             'description' => tra('Provide controls to indicate a geographic location of wiki pages in the edit form.'),
             'dependencies' => ['geo_enabled'],
             'type' => 'flag',
+            'help' => $mapsConfigHelp,
             'default' => 'n',
         ],
         'geo_locate_article' => [
@@ -25,6 +29,7 @@ function prefs_geo_list()
             'description' => tra('Provide controls to indicate a geographic location in the article edit form.'),
             'dependencies' => ['geo_enabled'],
             'type' => 'flag',
+            'help' => $mapsConfigHelp,
             'default' => 'n',
         ],
         'geo_locate_blogpost' => [
@@ -32,6 +37,7 @@ function prefs_geo_list()
             'description' => tra('Provide controls to indicate a geographic location in the blog post edit form.'),
             'dependencies' => ['geo_enabled'],
             'type' => 'flag',
+            'help' => $mapsConfigHelp,
             'default' => 'n',
         ],
         'geo_tilesets' => [
@@ -68,6 +74,7 @@ function prefs_geo_list()
                 )
             ),
             'type' => 'text',
+            'help' => $mapsConfigHelp,
             'filter' => 'text',
             'separator' => ',',
             'default' => ['openstreetmap'],
@@ -78,6 +85,7 @@ function prefs_geo_list()
             'description' => tr('Open Google Street View in a new window to see the visible coordinates.'),
             'dependencies' => ['gmap_key', 'geo_enabled'],
             'type' => 'flag',
+            'help' => $mapsConfigHelp,
             'default' => 'n',
             'tags' => ['basic', 'experimental'],
         ],
@@ -87,6 +95,7 @@ function prefs_geo_list()
             'dependencies' => ['geo_google_streetview'],
             'warning' => tr('This is not guaranteed to work.'),
             'type' => 'flag',
+            'help' => $mapsConfigHelp,
             'default' => 'n',
             'tags' => ['basic', 'experimental'],
         ],
@@ -95,6 +104,7 @@ function prefs_geo_list()
             'description' => tr('Zoom level when a searched-for location is found'),
             'dependencies' => ['geo_enabled'],
             'type' => 'list',
+            'help' => $mapsConfigHelp,
             'options' => [
                     'street' => tra('Street'),
                     'town' => tra('Town'),

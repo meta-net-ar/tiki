@@ -21,5 +21,7 @@ function wikiplugin_tr_info()
 
 function wikiplugin_tr($data)
 {
-    return tra($data);
+    $translated = tra($data);
+    // Wrap in noparse tags to prevent wiki parser from interpreting translation content as wiki syntax
+    return "~np~{$translated}~/np~";
 }

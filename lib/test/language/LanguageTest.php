@@ -4,7 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once __DIR__ . '/../../language/Language.php';
 
 /**
  * Test class for Language.
@@ -12,6 +11,101 @@ require_once __DIR__ . '/../../language/Language.php';
  */
 class LanguageTest extends TikiTestCase
 {
+    public function testDefaultAdminLanguageUsesDefaultSiteLanguage(): void
+    {
+        global $prefs, $user, $user_preferences;
+
+        $oldPrefs = $prefs;
+        $hadUser = array_key_exists('user', $GLOBALS);
+        $oldUser = $user ?? null;
+        $hadUserPreferences = array_key_exists('user_preferences', $GLOBALS);
+        $oldUserPreferences = $user_preferences ?? [];
+        $currentSection = new ReflectionProperty(Tiki\Sections::class, 'currentSection');
+        $oldSection = Tiki\Sections::getCurrentSection();
+
+        try {
+            $user = 'admin-language-test-user';
+            $user_preferences[$user]['language'] = 'en';
+            $prefs['language'] = 'en';
+            $prefs['language_admin'] = '';
+            $prefs['site_language'] = 'fr';
+            $prefs['restrict_language'] = 'n';
+            $prefs['available_languages'] = [];
+            $prefs['feature_multilingual'] = 'n';
+            $prefs['change_language'] = 'n';
+            $prefs['theme_unified_admin_backend'] = 'y';
+
+            foreach ([Tiki\Sections::SECTION_ADMIN, Tiki\Sections::SECTION_ADMIN_LAYOUT] as $section) {
+                Tiki\Sections::setCurrentSection($section);
+                Language::setSectionLanguage();
+                $this->assertSame('fr', Language::getCurrentLanguage());
+                $this->assertSame('en', $user_preferences[$user]['language']);
+            }
+        } finally {
+            $currentSection->setValue(null, $oldSection);
+            $prefs = $oldPrefs;
+            if ($hadUser) {
+                $user = $oldUser;
+            } else {
+                unset($GLOBALS['user']);
+            }
+            if ($hadUserPreferences) {
+                $user_preferences = $oldUserPreferences;
+            } else {
+                unset($GLOBALS['user_preferences']);
+            }
+        }
+    }
+
+    public function testLocaleIdentifierValidationRejectsPaths(): void
+    {
+        $this->assertTrue(Language::isValidLocaleIdentifier('en'));
+        $this->assertTrue(Language::isValidLocaleIdentifier('pt-br'));
+        $this->assertTrue(Language::isValidLocaleIdentifier('fy-NL'));
+        $this->assertTrue(Language::isValidLocaleIdentifier('ts_0'));
+
+        $this->assertFalse(Language::isValidLocaleIdentifier(''));
+        $this->assertFalse(Language::isValidLocaleIdentifier('../lang/en'));
+        $this->assertFalse(Language::isValidLocaleIdentifier('en/../../en'));
+        $this->assertFalse(Language::isValidLocaleIdentifier('en.php'));
+        $this->assertFalse(Language::isValidLocaleIdentifier('en\\..\\en'));
+    }
+
+    public function testIsValidLocaleRejectsTraversalThatResolvesToExistingLanguage(): void
+    {
+        global $prefs;
+
+        $oldRestrictLanguage = $prefs['restrict_language'] ?? null;
+        $oldAvailableLanguages = $prefs['available_languages'] ?? null;
+
+        $prefs['restrict_language'] = 'n';
+        $prefs['available_languages'] = [];
+
+        try {
+            $this->assertTrue(Language::isValidLocale('en'));
+            $this->assertFalse(Language::isValidLocale('../lang/en'));
+            $this->assertFalse(Language::isValidLocale('en/../../en'));
+            $this->assertFalse(Language::isValidLocale('../../tiki/lang/en'));
+        } finally {
+            if ($oldRestrictLanguage === null) {
+                unset($prefs['restrict_language']);
+            } else {
+                $prefs['restrict_language'] = $oldRestrictLanguage;
+            }
+
+            if ($oldAvailableLanguages === null) {
+                unset($prefs['available_languages']);
+            } else {
+                $prefs['available_languages'] = $oldAvailableLanguages;
+            }
+        }
+    }
+
+    public function testLoadExtensionsRejectsPathTraversalLanguage(): void
+    {
+        $this->assertSame([], Language::loadExtensions('../lang/en'));
+    }
+
     public function testAddPhpSlashes(): void
     {
         $string = "\n \t \r " . '\\ $ "';
@@ -24,6 +118,31 @@ class LanguageTest extends TikiTestCase
         $string = '\n \t \r \\\\ \$ \"';
         $expectedResult = "\n \t \r " . '\\ $ "';
         $this->assertEquals($expectedResult, Language::removePhpSlashes($string));
+    }
+
+    public function testListDiskLanguagesFalsyPathUsesDefaultDirectory(): void
+    {
+        $listDiskLanguages = new ReflectionMethod(Language::class, 'list_disk_languages');
+        $listDiskLanguages->setAccessible(true);
+
+        $expected = $listDiskLanguages->invoke(null, 'lang');
+        $this->assertNotEmpty($expected, 'The lang directory should contain language directories');
+
+        foreach ([false, null, ''] as $falsyPath) {
+            $this->assertEqualsCanonicalizing(
+                $expected,
+                $listDiskLanguages->invoke(null, $falsyPath),
+                'Falsy path ' . var_export($falsyPath, true) . ' should fall back to the lang directory'
+            );
+        }
+    }
+
+    public function testListDiskLanguagesMissingDirectoryReturnsEmptyArray(): void
+    {
+        $listDiskLanguages = new ReflectionMethod(Language::class, 'list_disk_languages');
+        $listDiskLanguages->setAccessible(true);
+
+        $this->assertSame([], $listDiskLanguages->invoke(null, 'lang/does_not_exist'));
     }
 
     // TODO: We need a way to create a Tiki database just for the tests

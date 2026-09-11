@@ -96,11 +96,11 @@ class ObjectSelector implements Control
                 $params['_value'] = $this->value;
             }
 
-            $result = smarty_function_object_selector_multi($params, $smarty->getEmptyInternalTemplate());
+            $result = \SmartyTiki\FunctionHandler\ObjectSelectorMulti::render($params, $smarty->getEmptyInternalTemplate());
         } else {
             $params['_value'] = $this->value;
 
-            $result = smarty_function_object_selector($params, $smarty->getEmptyInternalTemplate());
+            $result = \SmartyTiki\FunctionHandler\ObjectSelector::render($params, $smarty->getEmptyInternalTemplate());
         }
 
         return $result;

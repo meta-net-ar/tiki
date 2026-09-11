@@ -156,7 +156,8 @@ class Tracker_Field_Factory
                 return new $class($fieldInfo, $itemData, $this->trackerDefinition);
             }
         } else {
-            throw new Exception("type {$type} is missing in typeMap");
+            Feedback::error(tr('Tracker Field Factory Error: Unknown field type "%0"', $type));
+            return null;
         }
     }
 }

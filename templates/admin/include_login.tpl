@@ -10,7 +10,7 @@
         warning_ept = $('#empty_pretty_tracker_warning');
     warning_ept.hide();
     //prevent space, backslash and bad chars in template name, see lib/wiki/wikilib.php:188
-    pretty_tracker_tpl.keypress(function(e){
+    pretty_tracker_tpl.on('keypress', function(e){
     return /[^ //?#\[\]@$&+;=<>\\]/i.test(e.key);
     });
     frm.on("submit", function(){
@@ -152,8 +152,6 @@
                         </div>
                     </div>
                 </div>
-                {preference name=user_force_avatar_upload}
-                {preference name=user_default_avatar_style}
                 {preference name=tracker_force_fill}
                 <div class="adminoptionboxchild" id="tracker_force_fill_childcontainer">
                     {preference name=tracker_force_tracker_id}
@@ -161,6 +159,7 @@
                     {preference name=tracker_force_tracker_fields}
                 </div>
                 {preference name=groupTracker}
+                {preference name=login_text_below_login_box}
                 <legend class="h3">{tr}Other login settings{/tr}</legend>
                 {preference name=email_due}
                 {preference name=unsuccessful_logins}
@@ -200,7 +199,7 @@
                     {preference name=cookie_consent_feature}
                     <div class="adminoptionboxchild" id="cookie_consent_feature_childcontainer">
                         {preference name=cookie_consent_expires}
-                        {preference name=cookie_consent_description}
+                        {preference name=cookie_consent_description syntax=''}
                         {preference name=cookie_consent_mode}
                         {preference name=cookie_consent_dom_id}
                         {preference name=cookie_consent_disable_builtin_categories}
@@ -296,7 +295,7 @@
         {tab name="{tr}LDAP{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">LDAP {help url="Login+Authentication+Methods"}</legend>
+                <legend class="h3">LDAP {help url="External-Authentication"}</legend>
                 {if ! $ldap_extension_loaded}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must install PHP extension LDAP{/tr}
@@ -315,7 +314,7 @@
                 {preference name=auth_ldap_permit_tiki_users}
             </fieldset>
             <fieldset>
-                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP+Authentication"}</legend>
+                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP-Authentication"}</legend>
                 {preference name=auth_ldap_host}
                 {preference name=auth_ldap_port}
                 {preference name=auth_ldap_debug}
@@ -348,7 +347,7 @@
                 {preference name=auth_ldap_group_external}
             </fieldset>
             <fieldset>
-                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP+Authentication"}</legend>
+                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP-Authentication"}</legend>
                 {preference name=auth_ldap_group_host}
                 {preference name=auth_ldap_group_port}
                 {preference name=auth_ldap_group_debug}
@@ -408,7 +407,7 @@
         {tab name="{tr}Shibboleth{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}Shibboleth{/tr}{help url="AuthShib" desc="{tr}Shibboleth Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}Shibboleth{/tr}{help url="Shibboleth-Authentication" desc="{tr}Shibboleth Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'shib'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to Shibboleth for these changes to take effect{/tr}
@@ -490,7 +489,7 @@
         {tab name="{tr}CAS{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}CAS (central authentication service){/tr}{help url="CAS+Authentication"}</legend>
+                <legend class="h3">{tr}CAS (central authentication service){/tr}{help url="CAS-Authentication"}</legend>
                 {if $prefs.auth_method ne 'cas'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to CAS for these changes to take effect{/tr}
@@ -516,7 +515,7 @@
         {tab name="{tr}phpBB{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}phpBB{/tr}{help url="phpBB+Authentication" desc="{tr}phpBB User Database Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}phpBB{/tr}{help url="phpBB-Authentication" desc="{tr}phpBB User Database Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'phpbb'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to phpBB for these changes to take effect{/tr}
@@ -545,7 +544,7 @@
         {tab name="{tr}Web Server{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}Web server{/tr}{help url="External+Authentication#Web_Server_HTTP_" desc="{tr}Web Server Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}Web server{/tr}{help url="External-Authentication#Web_Server_HTTP_" desc="{tr}Web Server Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'ws'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to Web Server for these changes to take effect{/tr}

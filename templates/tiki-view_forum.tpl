@@ -429,10 +429,10 @@
                         <span class="input-group-text">
                             {icon name="search"}
                         </span>
-                        <input name="highlight" id="findinforums" type="text" class="form-control" placeholder="{tr}Find{/tr}..." aria-label={tr}Find{/tr}>
+                        <input name="highlight" id="findinforums" type="text" class="form-control" placeholder="{tr}Search{/tr}..." aria-label={tr}Search{/tr}>
                         <input type="hidden" name="where" value="forums">
                         <input type="hidden" name="forumId" value="{$forum_info.forumId}">
-                        <input type="submit" class="wikiaction btn btn-primary" name="search" value="{tr}Find{/tr}">
+                        <input type="submit" class="wikiaction btn btn-primary" name="search" value="{tr}Search{/tr}">
                     </div>
                 </div>
             </form>
@@ -806,9 +806,9 @@
                             <td class="integer"><span class="badge bg-secondary">{$comments_coms[ix].hits}</span></td>
                         {/if}
                         {if $forum_info.vote_threads eq 'y' and ($tiki_p_ratings_view_results eq 'y' or $tiki_p_admin eq 'y')}
-                            <td class="integer">{rating_result_avg type=comment id=$comments_coms[ix].threadId }&nbsp;&nbsp;&nbsp;</td>
+                            <td class="integer">{rating_result_avg type=comment id=$comments_coms[ix].threadId}&nbsp;&nbsp;&nbsp;</td>
                             {if $prefs.rating_results_detailed eq 'y'}
-                                <td class="text">{rating_result type=comment id=$comments_coms[ix].threadId }</td>
+                                <td class="text">{rating_result type=comment id=$comments_coms[ix].threadId}</td>
                             {/if}
                         {/if}
                         {if $forum_info.topics_list_pts eq 'y'}

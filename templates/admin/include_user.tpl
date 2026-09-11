@@ -6,7 +6,7 @@
         warning_empty_period.hide();
 
     // allow to type in only digits
-    days_before_lock.keypress(function(e){
+    days_before_lock.on('keypress', function(e){
         return /^\d*$/i.test(e.key);
     });
     frm.on("submit", function(){
@@ -31,14 +31,13 @@
             <fieldset>
                 <legend class="h3">
                     {tr}Default user preferences{/tr}
-                    {help url="UsersDefaultPrefs" desc="{tr}Users Default Preferences{/tr}"}
+                    {help url="User-Preferences" desc="{tr}Users Default Preferences{/tr}"}
                 </legend>
                 <div class="adminoptionbox">
                     {preference name=feature_userPreferences}
                     {preference name=feature_mytiki}
                     {preference name=users_prefs_xmpp_jid}
-                    {preference name=users_prefs_xmpp_password}
-                    {preference name=users_prefs_xmpp_custom_server_http_bind}
+                    {preference name=users_prefs_xmpp_custom_server_endpoint}
                     <div class="adminoptionboxchild" id="feature_mytiki_childcontainer">
                         <legend class="h4">{tr}My Account Items{/tr}</legend>
                         {preference name=users_prefs_mytiki_pages}
@@ -108,8 +107,7 @@
                 <div class="adminoptionbox">
                     {preference name=users_prefs_user_information}
                     {preference name=user_show_realnames}
-                    {preference name='urlOnUsername'}
-                    {preference name=users_prefs_show_mouseover_user_info}
+                    {preference name=urlOnUsername}
                     {preference name=user_in_search_result}
                     {preference name=highlight_group}
                     {preference name=feature_display_my_to_others}
@@ -124,6 +122,9 @@
                 <legend class="h3">{tr}Profile picture{/tr}</legend>
                 <div class="adminoptionbox">
                     {preference name=user_use_gravatar}
+                    {preference name=user_dicebear_avatar}
+                    {preference name=user_default_avatar_style}
+                    {preference name=user_force_avatar_upload}
                     {preference name=user_store_file_gallery_picture}
                     {preference name=user_small_avatar_size}
                     {preference name=user_small_avatar_square_crop}

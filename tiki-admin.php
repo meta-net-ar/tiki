@@ -16,7 +16,11 @@ use Tiki\Package\ExtensionManager;
 use Tiki\Suggestion\Rules;
 use Tiki\Sections;
 
-$section = Sections::SECTION_ADMIN_LAYOUT;
+if (! isset($_REQUEST['admin_dashboard_icons']) && $prefs['theme_unified_admin_backend'] !== 'n') {
+    $section = Sections::SECTION_ADMIN_LAYOUT;
+} else {
+    $section = Sections::SECTION_ADMIN;
+}
 Sections::setCurrentSection($section);
 
 $adminlib = TikiLib::lib('admin');

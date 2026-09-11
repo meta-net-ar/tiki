@@ -26,6 +26,10 @@
 // Forms
 // Navs
 // Navbar
+.module:not(.no-box) .navbar {
+    border: none;
+}
+
 // Dropdowns
 // Pagination
 // Cards

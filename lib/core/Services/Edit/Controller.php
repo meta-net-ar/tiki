@@ -43,8 +43,8 @@ class Services_Edit_Controller
     public function action_tohtml($input)
     {
         $htmlEditor = (bool)$input->htmleditor->int();
-        $wysiwyg = $input->allowhtml->int() ? true : $htmlEditor;
-        $res = TikiLib::lib('edit')->parseToWysiwyg($input->data->none(), false, $wysiwyg, ['wysiwyg' => $wysiwyg, 'html_editor' => $htmlEditor]);
+        $isHtml = $input->allowhtml->int() ? true : $htmlEditor;
+        $res = TikiLib::lib('edit')->parseToWysiwyg($input->data->none(), true, $isHtml, ['wysiwyg' => $isHtml, 'html_editor' => $htmlEditor]);
 
         return [
             'data' => $res,
@@ -385,7 +385,7 @@ $(window).on("load", function(){
 
         $display = [];
         foreach ($input->fields as $field) {
-            $html = smarty_function_service_inline($field->fetch->text(), $smarty->getEmptyInternalTemplate());
+            $html = \SmartyTiki\FunctionHandler\ServiceInline::render($field->fetch->text(), $smarty->getEmptyInternalTemplate());
             $display[] = [
                 'label' => $field->label->text(),
                 'field' => new Tiki_Render_Editable($html, [
@@ -569,7 +569,7 @@ $(window).on("load", function(){
 
         $tikilib->set_preference($prefName . 'modified', 'y');
 
-        $newTools = smarty_function_toolbars([
+        $newTools = \SmartyTiki\FunctionHandler\Toolbars::render([
             '_wysiwyg' => 'y',
             '_is_html' => 'y',
             'section' => $section,

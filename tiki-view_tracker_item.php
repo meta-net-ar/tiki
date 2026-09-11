@@ -31,7 +31,6 @@ $inputConfiguration = [
             'count'             => 'int',           //get
             'remove'           => 'int',           //post
             'moveto'           => 'int',           //get
-            'removeattach'     => 'int',           //get
             'print'            => 'bool',          //get
             'pdf'              => 'bool',          //get
             'save'             => 'bool',          //post
@@ -46,14 +45,8 @@ $inputConfiguration = [
             'fieldName'        => 'word',          //post
             'returntracker'    => 'bool',          //post
             'watch'            => 'word',          //post
-            'attach'           => 'word',          //get
-            'attId'            => 'int',           //get
-            'attach_comment'   => 'word',          //get
-            'attach_version'   => 'int',           //get
-            'attach_longdesc'  => 'word',          //get
             'status'           => 'word',          //get
             'conflictoverride' => 'bool',          //get
-            'editattach'       => 'int',           //get
             'vi_tpl'           => 'text',          //get
             'ei_tpl'           => 'text',          //get
             'maxRecords'       => 'int',           //get
@@ -442,13 +435,6 @@ if (! empty($_REQUEST['moveto'])) {
         Feedback::errorAndDie(tra("Permission denied"), \Laminas\Http\Response::STATUS_CODE_403);
     }
 }
-if (isset($_REQUEST["removeattach"])) {
-    $owner = $trklib->get_item_attachment_owner($_REQUEST["removeattach"]);
-    if (($user && ($owner == $user)) || ($tiki_p_admin_trackers == 'y')) {
-        $access->checkCsrf(tra('Are you sure you want to remove this attachment?'));
-        $trklib->remove_item_attachment($_REQUEST["removeattach"]);
-    }
-}
 if (isset($_REQUEST['print'])) {
     $access->check_permission('tiki_p_print', '', 'trackeritem', $itemId);
 } elseif (isset($_REQUEST['pdf'])) {
@@ -563,9 +549,6 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["save_return"]) || isset($_REQUE
         } else {
             $error = $ins_fields;
             $cookietab = "2";
-            if ($tracker_info_value('useAttachments') == 'y') {
-                ++$cookietab;
-            }
             if ($tracker_info_value('useComments') == 'y') {
                 ++$cookietab;
             }
@@ -620,8 +603,7 @@ if (isset($_REQUEST["removeImage"])) {
 }
 // ************* return to list ***************************
 if (isset($_REQUEST["returntracker"]) || isset($_REQUEST["save_return"])) {
-    require_once('lib/smarty_tiki/block.self_link.php');
-    $returnUrl = smarty_block_self_link(
+    $returnUrl = \SmartyTiki\BlockHandler\SelfLink::render(
         [
             '_script' => 'tiki-view_tracker.php',
             '_tag' => 'n',
@@ -752,77 +734,6 @@ if ($tracker_info_value('useComments') == 'y') {
     }
     $smarty->assign("saveAndComment", $saveAndComment);
 }
-
-if ($tracker_info_value('useAttachments') == 'y') {
-    if (isset($_REQUEST["removeattach"])) {
-        $_REQUEST["show"] = "att";
-    }
-    if (isset($_REQUEST["editattach"])) {
-        $att = $trklib->get_item_attachment($_REQUEST["editattach"]);
-        $smarty->assign("attach_comment", $att['comment']);
-        $smarty->assign("attach_version", $att['version']);
-        $smarty->assign("attach_longdesc", $att['longdesc']);
-        $smarty->assign("attach_file", $att["filename"]);
-        $smarty->assign("attId", $att["attId"]);
-        $_REQUEST["show"] = "att";
-    }
-    if (isset($_REQUEST['attach']) && $tiki_p_attach_trackers == 'y' && isset($_FILES['userfile1'])) {
-        // Process an attachment here
-        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-            $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
-            $data = '';
-            $fhash = '';
-            if ($prefs['t_use_db'] == 'n') {
-                $fhash = md5($_FILES['userfile1']['name'] . $tikilib->now);
-                $fw = fopen($prefs['t_use_dir'] . $fhash, "wb");
-                if (! $fw) {
-                    Feedback::errorAndDie(tra('Cannot write to this file:') . $fhash, \Laminas\Http\Response::STATUS_CODE_500);
-                }
-            }
-            while (! feof($fp)) {
-                if ($prefs['t_use_db'] == 'n') {
-                    $data = fread($fp, 8192 * 16);
-                    fwrite($fw, $data);
-                } else {
-                    $data .= fread($fp, 8192 * 16);
-                }
-            }
-            fclose($fp);
-            if ($prefs['t_use_db'] == 'n') {
-                fclose($fw);
-                $data = '';
-            }
-            try {
-                if ($prefs['t_use_db'] == 'n') {
-                    $filegallib->assertUploadedFileIsSafe($prefs['t_use_dir'] . $fhash, $_FILES['userfile1']['name']);
-                } else {
-                    $filegallib->assertUploadedContentIsSafe($data, $_FILES['userfile1']['name']);
-                }
-            } catch (Exception $e) {
-                Feedback::errorAndDie($_FILES['userfile1']['name'] . ': ' . $e->getMessage(), \Laminas\Http\Response::STATUS_CODE_500);
-            }
-            $size = $_FILES['userfile1']['size'];
-            $name = $_FILES['userfile1']['name'];
-            $type = $_FILES['userfile1']['type'];
-        } else {
-            Feedback::errorAndDie($_FILES['userfile1']['name'] . ': ' . tra('Upload was not successful') . ': ' . $tikilib->uploaded_file_error($_FILES['userfile1']['error']), \Laminas\Http\Response::STATUS_CODE_500);
-        }
-        $trklib->replace_item_attachment($_REQUEST["attId"], $name, $type, $size, $data, $_REQUEST["attach_comment"], $user, $fhash, $_REQUEST["attach_version"], $_REQUEST["attach_longdesc"], $trackerId, $itemId, $tracker_info);
-        $_REQUEST["attId"] = 0;
-        $_REQUEST['show'] = "att";
-    }
-    // If anything below here is changed, please change lib/wiki-plugins/wikiplugin_attach.php as well.
-    $attextra = 'n';
-    if (str_contains($tracker_info["orderAttachments"], '|')) {
-        $attextra = 'y';
-    }
-    $attfields = explode(',', strtok($tracker_info["orderAttachments"], '|'));
-    $atts = $trklib->list_item_attachments($itemId, 0, -1, 'comment_asc', '');
-    $smarty->assign('atts', $atts["data"]);
-    $smarty->assign('attCount', $atts["count"]);
-    $smarty->assign('attfields', $attfields);
-    $smarty->assign('attextra', $attextra);
-}
 if (isset($_REQUEST['moveto']) && empty($_REQUEST['moveto'])) {
     $trackers = $trklib->list_trackers();
     $smarty->assign_by_ref('trackers', $trackers['data']);
@@ -837,9 +748,6 @@ if (isset($_REQUEST['show'])) {
         $cookietab = 2;
     } elseif ($_REQUEST['show'] == "mod") {
         $cookietab = 2;
-        if ($tracker_info_value('useAttachments') == 'y') {
-            $cookietab++;
-        }
         if ($tracker_info["useComments"] == 'y' && $tiki_p_tracker_view_comments == 'y') {
             $cookietab++;
         }
@@ -894,7 +802,7 @@ if ($itemObject->canModify() && $prefs['tracker_legacy_insert'] == 'y' && $prefs
         ]
     );
     if ($otherUser && $otherUser !== $user) {
-        $msg = tr("This tracker item is being edited by user %0. Please check with the user before editing, otherwise conflicts will occur and data might be lost.", smarty_modifier_username($otherUser));
+        $msg = tr("This tracker item is being edited by user %0. Please check with the user before editing, otherwise conflicts will occur and data might be lost.", \SmartyTiki\Modifier\Username::apply($otherUser));
         $msg .= '<br /><br /><a href="' . filter_out_sefurl('tiki-view_tracker_item.php?itemId=' . $itemId . '&conflictoverride=y') . '">' . tra('Override lock and carry on with edit') . '</a>';
         $smarty->assign('msg', $msg);
         $smarty->assign('errortitle', tra('Item is currently being edited'));
@@ -968,6 +876,7 @@ try {
         $smarty->assign('print_page', 'y');
         //skip_footer controls the inclusion of the footer in templates\tiki-print.tpl, so that it is not included more than once when an item is converted to PDF.
         $smarty->assign('skip_footer', 'y');
+        $smarty->assign('mid_data', $smarty->fetch('tiki-view_tracker_item.tpl'));
         $trackerData = $smarty->fetch('tiki-print.tpl');
         //getting comments associated with tracker item
         $broker = TikiLib::lib('service')->getBroker();
@@ -1006,5 +915,5 @@ try {
 } catch (\Smarty\Exception $e) {
     $message = tr('The requested element cannot be displayed. One of the view/edit templates is missing or has errors: %0', $e->getMessage());
     trigger_error($e->getMessage(), E_USER_WARNING);
-    $access->redirect(smarty_modifier_sefurl($info['trackerId'], 'tracker'), $message, 302, 'error');
+    $access->redirect(\SmartyTiki\Modifier\Sefurl::apply($info['trackerId'], 'tracker'), $message, 302, 'error');
 }

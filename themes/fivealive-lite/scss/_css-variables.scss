@@ -54,14 +54,6 @@
     --tiki-top-border-bottom-width: 5px;
 }
 
-header.navbar.fixed-top {
-    --tiki-fixed-top-border-top-width: 0px;
-    --tiki-fixed-top-border-right-width: 0px;
-    --tiki-fixed-top-border-bottom-width: 5px;
-    --tiki-fixed-top-border-left-width: 0px;
-    --tiki-topbar-light-border-color: #000;
-}
-
 .tiki-top-nav-light {
     @include top-nav-light;
 }
@@ -119,8 +111,10 @@ header.navbar.fixed-top {
 }
 
 // Improve appearance when two areas with same background color meet
-.navbar-wrapper:has(.tiki-admin-aside-nav-light) {
-    box-shadow: 5px 0 10px -5px #e3e1e1;
+@media (min-width: 992px) {
+    .navbar-wrapper:has(.tiki-admin-aside-nav-light, .tiki-admin-aside-nav-dark) {
+        box-shadow: 5px 0 10px -5px #e3e1e1;
+    }
 }
 
 // Dark navbar minus top nav

@@ -260,3 +260,61 @@ $sm-sub-max-height: calc(100vh - ($sm-sub-top-offset + $sm-sub-bottom-buffer));
 .dropdown-divider {
     --bs-dropdown-divider-bg: var(--bs-border-color-translucent);
 }
+
+// Bootstrap horizontal menu (non-smartmenus): nested rows use in-dropdown collapse (bootstrap_menu_horizontal_child.tpl).
+.tiki .navbar-nav > .nav-item.dropdown > .dropdown-menu {
+    max-height: min(85vh, 28rem);
+    overflow-y: auto;
+    min-width: 12rem;
+
+    a.dropdown-item,
+    button.dropdown-item {
+        color: var(--bs-dropdown-link-color);
+        font-weight: var(--bs-body-font-weight, 400);
+
+        &:hover,
+        &:focus {
+            color: var(--bs-dropdown-link-hover-color);
+            background-color: var(--bs-dropdown-link-hover-bg);
+        }
+
+        &.active,
+        &:active {
+            color: var(--bs-dropdown-link-active-color);
+            background-color: var(--bs-dropdown-link-active-bg);
+        }
+    }
+}
+
+.tiki .navbar-nav .dropdown-menu .tiki-menu-submenu-accordion > ul.collapse.tiki-menu-submenu-panel {
+    position: static;
+    margin: 0;
+    padding: 0;
+    padding-inline-start: 0.75rem;
+}
+
+.tiki .navbar-nav .dropdown-menu .tiki-menu-submenu-accordion > button.dropdown-item {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-width: 0;
+    --bs-btn-padding-x: var(--bs-dropdown-item-padding-x);
+    --bs-btn-padding-y: var(--bs-dropdown-item-padding-y);
+
+    .tiki-menu-accordion-caret {
+        display: inline-flex;
+        align-items: center;
+        transition: transform 0.2s ease;
+    }
+
+    &:not(.collapsed) .tiki-menu-accordion-caret {
+        transform: rotate(-180deg);
+    }
+}
+
+@media (min-width: 768px) {
+    .tiki .navbar-expand-md .navbar-collapse.collapse.show,
+    .tiki .navbar-expand-lg .navbar-collapse.collapse.show,
+    .tiki .navbar-expand-xl .navbar-collapse.collapse.show,
+    .tiki .navbar-expand .navbar-collapse.collapse.show {
+        overflow: visible;
+    }
+}

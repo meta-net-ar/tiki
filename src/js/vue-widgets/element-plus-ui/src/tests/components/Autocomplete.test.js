@@ -10,7 +10,7 @@ vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
     return {
         ...actual,
-        ElAutocomplete: vi.fn((props, { slots }) => h("div", props, slots.default ? slots.default() : null)),
+        ElAutocomplete: vi.fn((props, { slots }) => h("div", props, slots.default ? slots.default({ item: { value: "Suggestion" } }) : null)),
     };
 });
 
@@ -116,24 +116,20 @@ describe("Autocomplete", () => {
                 _expose: vi.fn(),
             };
 
-            ElAutocomplete = {
-                emits: ["keyup.enter"],
-                setup(_, { emit }) {
-                    return () =>
-                        h(
-                            "div",
-                            {},
-                            h("input", {
-                                "data-testid": "autocomplete-input",
-                                onKeyup: (e) => {
-                                    if (e.key === "Enter") {
-                                        emit("keyup.enter");
-                                    }
-                                },
-                            })
-                        );
-                },
-            };
+            vi.mocked(ElAutocomplete).mockImplementationOnce((_, ctx) =>
+                h(
+                    "div",
+                    {},
+                    h("input", {
+                        "data-testid": "autocomplete-input",
+                        onKeyup: (e) => {
+                            if (e.key === "Enter") {
+                                ctx.emit("keyup.enter");
+                            }
+                        },
+                    })
+                )
+            );
 
             render(Autocomplete, { props: givenProps });
 
@@ -146,31 +142,44 @@ describe("Autocomplete", () => {
         test.each([
             ["the remote source URL is provided", "https://foo/bar", null],
             ["the source list is provided", null, JSON.stringify([{ value: "foo" }, { value: "bar" }])],
-        ])("calls the fetchSuggestions function when %s", async (_, remoteSourceUrl, sourceList) => {
+            ["the remote source URL and a 'transformResultFn' are provided", "https://foo/bar", null, "fooTransformFn"],
+        ])("calls the fetchSuggestions function when %s", async (_, remoteSourceUrl, sourceList, transformResultFn) => {
             const givenProps = {
                 remoteSourceUrl,
                 sourceList,
+                transformResultFn,
                 _expose: vi.fn(),
             };
 
-            ElAutocomplete = {
-                props: ["fetchSuggestions"],
-                setup(props) {
-                    return () =>
-                        h(
-                            "div",
-                            {},
-                            h("input", { "data-testid": "autocomplete-input", onChange: (e) => props.fetchSuggestions(e.target.value, () => {}) })
-                        );
-                },
-            };
+            if (transformResultFn) {
+                window[transformResultFn] = vi.fn();
+            }
+
+            vi.mocked(ElAutocomplete).mockImplementationOnce((props) => {
+                const fetchSuggestions = props["fetch-suggestions"] ?? props.fetchSuggestions;
+                return h("div", {}, h("input", { "data-testid": "autocomplete-input", onChange: (e) => fetchSuggestions(e.target.value, () => {}) }));
+            });
 
             render(Autocomplete, { props: givenProps });
             const input = screen.getByTestId("autocomplete-input");
             await fireEvent.change(input, { target: { value: "foo" } });
 
-            expect(fetchSuggestions).toHaveBeenCalledWith("foo", expect.any(Function), remoteSourceUrl, sourceList ? JSON.parse(sourceList) : []);
+            expect(fetchSuggestions).toHaveBeenCalledWith(
+                "foo",
+                expect.any(Function),
+                remoteSourceUrl,
+                sourceList ? JSON.parse(sourceList) : [],
+                givenProps.remoteQueryKey
+            );
             expect(givenProps._expose).toHaveBeenCalled({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
+
+            const fecthSuggestionsCb = fetchSuggestions.mock.calls[0][1];
+            const mockResults = [{ value: "foo" }, { value: "bar" }];
+            fecthSuggestionsCb(mockResults);
+
+            if (transformResultFn) {
+                expect(window[transformResultFn]).toHaveBeenCalledWith(mockResults);
+            }
         });
 
         test("calls props.emitCustomEvent when ElAutocomplete emits a select event", async () => {
@@ -180,17 +189,9 @@ describe("Autocomplete", () => {
                 _expose: vi.fn(),
             };
 
-            ElAutocomplete = {
-                emits: ["select"],
-                setup(_, { emit }) {
-                    return () =>
-                        h(
-                            "div",
-                            {},
-                            h("div", { "data-testid": "autocomplete-suggestion", onClick: () => emit("select", "suggestion") }, "Suggestion")
-                        );
-                },
-            };
+            vi.mocked(ElAutocomplete).mockImplementationOnce((_, ctx) =>
+                h("div", {}, h("div", { "data-testid": "autocomplete-suggestion", onClick: () => ctx.emit("select", "suggestion") }, "Suggestion"))
+            );
 
             render(Autocomplete, { props: givenProps });
 
@@ -208,20 +209,16 @@ describe("Autocomplete", () => {
                 _expose: vi.fn(),
             };
 
-            ElAutocomplete = {
-                emits: ["update:modelValue"],
-                setup(_, { emit }) {
-                    return () =>
-                        h(
-                            "div",
-                            {},
-                            h("input", {
-                                "data-testid": "autocomplete-input",
-                                onChange: (e) => emit("input", e.target.value),
-                            })
-                        );
-                },
-            };
+            vi.mocked(ElAutocomplete).mockImplementationOnce((_, ctx) =>
+                h(
+                    "div",
+                    {},
+                    h("input", {
+                        "data-testid": "autocomplete-input",
+                        onChange: (e) => ctx.emit("input", e.target.value),
+                    })
+                )
+            );
 
             render(Autocomplete, { props: givenProps });
 

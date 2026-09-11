@@ -26,6 +26,10 @@ $inputConfiguration = [
 ];
 include_once("tiki-setup.php");
 
+// Emit 401 when reached via an auth challenge (via ?challenge=1 param or session loginfrom).
+if (! $user && (! empty($_GET['challenge']) || ! empty($_SESSION['loginfrom']))) {
+    http_response_code(401);
+}
 
 // Setup Two-Factor Auth form state
 $showTwoFactorForm = $prefs['twoFactorAuth'];
@@ -52,7 +56,7 @@ try {
 $smarty->assign('create2FaCodeNormalLogin', $create2FaCodeNormalLogin);
 
 if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
-    $access->redirect($prefs['login_autologin_redirectlogin_url']);
+    $access->redirect($prefs['login_autologin_redirectlogin_url'], allowExternal: true);
 }
 
 if (isset($_REQUEST['clearmenucache'])) {

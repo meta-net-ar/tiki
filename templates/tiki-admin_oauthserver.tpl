@@ -75,7 +75,7 @@
     </form>
     {/function}
 
-    {foreach $client_list as $key => $entity }
+    {foreach $client_list as $key => $entity}
         {call
             name="printClientForm"
             htmlId="entity-form-{$key}"

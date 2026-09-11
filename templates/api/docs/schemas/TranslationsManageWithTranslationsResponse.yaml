@@ -1,0 +1,53 @@
+---
+description: Response from GET /translations/{type}/{source} when linked translations exist.
+type: object
+required:
+  - title
+  - type
+  - source
+  - filters
+  - translations
+  - canAttach
+  - canDetach
+properties:
+  title:
+    type: string
+  type:
+    type: string
+  source:
+    type: string
+  filters:
+    type: object
+    required:
+      - type
+      - language
+    properties:
+      type:
+        type: string
+      language:
+        type: string
+        nullable: true
+  translations:
+    type: object
+    additionalProperties:
+      type: object
+      required:
+        - traId
+        - objId
+        - lang
+        - language
+      properties:
+        traId:
+          type: integer
+        objId:
+          oneOf:
+            - type: integer
+            - type: string
+        lang:
+          type: string
+        language:
+          type: string
+  canAttach:
+    type: boolean
+  canDetach:
+    type: boolean

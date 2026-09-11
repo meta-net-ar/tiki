@@ -334,8 +334,8 @@ function wikiplugin_include($dataIn, $params)
                 || (isset($_GET['replaceby']) && (int) $_GET['replaceby'] != $includeId)
                 && (! defined('TIKI_PRINTING_PDF') || ! TIKI_PRINTING_PDF)
             ) {
-                $text .= '<a id="' . $id . '" class="editplugin wikiplugin-include-replace" href="javascript:void(1)" data-index="' . $includeId . '" data-page="' . htmlentities($returnto, ENT_COMPAT) . '" data-ticket="' . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '">' .
-                    smarty_function_icon(['name' => 'exchange', 'iclass' => 'tips', 'ititle' => $tip], $smarty->getEmptyInternalTemplate()) . '</a>';
+                $text .= '<a id="' . $id . '" class="editplugin wikiplugin-include-replace" href="javascript:void(1)" data-index="' . $includeId . '" data-page="' . htmlentities($returnto, ENT_COMPAT) . '" data-ticket="' . \SmartyTiki\FunctionHandler\Ticket::render(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '">' .
+                    \SmartyTiki\FunctionHandler\Icon::render(['name' => 'exchange', 'iclass' => 'tips', 'ititle' => $tip], $smarty->getEmptyInternalTemplate()) . '</a>';
             }
 
             $includeId++;
@@ -369,7 +369,7 @@ function wikiplugin_include($dataIn, $params)
         $wikilib = TikiLib::lib('wiki');
         $text .= '<p><a href="' . $wikilib->sefurl($page) . '" class="btn btn-primary"';
         $text .= 'title="' . sprintf(tr('The text above comes from page "%s". Click to go to that page.'), htmlspecialchars($page)) . '">';
-        $text .= smarty_function_icon(['name' => 'align-left'], $smarty->getEmptyInternalTemplate()) . ' ';
+        $text .= \SmartyTiki\FunctionHandler\Icon::render(['name' => 'align-left'], $smarty->getEmptyInternalTemplate()) . ' ';
         $text .= $linkoriginal_text;
         $text .= '</a><p>';
     }
@@ -380,9 +380,10 @@ function wikiplugin_include($dataIn, $params)
             $smarty = TikiLib::lib('smarty');
             $tip = tr('Include Plugin') . ' | ' . tr('Edit the included page:') . ' &quot;' . $page . '&quot;';
             if (! defined('TIKI_PRINTING_PDF') || ! TIKI_PRINTING_PDF) {
+                $repeat = false;
                 $text .= '<a class="editplugin" ' . // ironically smarty_block_self_link doesn't work for this! ;)
-                smarty_block_ajax_href(['template' => 'tiki-editpage.tpl'], 'tiki-editpage.php?page=' . urlencode($page) . '&returnto=' . urlencode($returnto), $smarty->getEmptyInternalTemplate(), false) . '>' .
-                smarty_function_icon(['name' => 'edit', 'iclass' => 'tips', 'ititle' => $tip], $smarty->getEmptyInternalTemplate()) . '</a>';
+                \SmartyTiki\BlockHandler\AjaxHref::render(['template' => 'tiki-editpage.tpl'], 'tiki-editpage.php?page=' . urlencode($page) . '&returnto=' . urlencode($returnto), $smarty->getEmptyInternalTemplate(), $repeat) . '>' .
+                \SmartyTiki\FunctionHandler\Icon::render(['name' => 'edit', 'iclass' => 'tips', 'ititle' => $tip], $smarty->getEmptyInternalTemplate()) . '</a>';
             }
         }
     }

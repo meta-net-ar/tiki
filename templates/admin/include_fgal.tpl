@@ -28,7 +28,6 @@
             </fieldset>
 
             {preference name=home_file_gallery}
-            {preference name=fgal_list_description}
             {preference name='fgal_use_db'}
             <div class="adminoptionboxchild fgal_use_db_childcontainer n">
                 <div class="mb-sm-3">
@@ -53,7 +52,7 @@
             {preference name='fgal_podcast_dir'}
 
             <fieldset>
-                <legend class="h3">{tr}Features{/tr}{help url="File+Gallery+Config"}</legend>
+                <legend class="h3">{tr}Features{/tr}{help url="File-Gallery-Config"}</legend>
 
                 {preference name='feature_file_galleries_rankings'}
                 {preference name='feature_file_galleries_comments'}
@@ -112,7 +111,7 @@
             </fieldset>
 
             <fieldset>
-                <legend class="h3">{tr}Quota{/tr}{help url="File+Gallery+Config#Quota"}</legend>
+                <legend class="h3">{tr}Quota{/tr}{help url="File-Gallery-Config#Quota"}</legend>
                 {preference name='fgal_quota'}{tr}Used:{/tr} {$usedSize|kbsize}
                 <div class="adminoptionboxchild" id="fgal_quota_childcontainer">
                     {if !empty($prefs.fgal_quota)}
@@ -127,7 +126,7 @@
             </fieldset>
 
             <fieldset>
-                <legend class="h3">{tr}Upload Regex{/tr}{help url="File+Gallery+Config#Filename_must_match:"}</legend>
+                <legend class="h3">{tr}Upload Regex{/tr}{help url="File-Gallery-Config#Filename_must_not_match"}</legend>
                 {preference name='fgal_match_regex'}
                 {preference name='fgal_nmatch_regex'}
             </fieldset>
@@ -214,6 +213,7 @@
             {preference name='fgal_show_ocr_state'}
             {preference name='fgal_list_id'}
             {preference name='fgal_list_type'}
+            {preference name='fgal_list_description'}
             {preference name='fgal_list_name'}
             {preference name='fgal_list_size'}
             {preference name='fgal_list_created'}
@@ -276,7 +276,7 @@
                 </div>
             <div class="adminoptionbox">
                 <fieldset>
-                    <legend class="h3">{tr}Handlers{/tr}{help url="Search-within-files" desc='{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}'}</legend>
+                    <legend class="h3">{tr}Handlers{/tr}{help url="Search-within-files" desc="{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}"}</legend>
                     <div class="adminoptionbox">
                         <div class="adminoptionlabel">{tr}Add custom handlers to make your files &quot;searchable&quot; content{/tr}.
                             <ul>

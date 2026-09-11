@@ -8,7 +8,7 @@
     <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
     <table>
         <tr>
-            <td>{tr}Find{/tr}</td>
+            <td>{tr}Search{/tr}</td>
             <td>{tr}Username{/tr}</td>
             <td>{tr}operator{/tr}</td>
             <td>&nbsp;</td>
@@ -32,7 +32,7 @@
                     {/section}
                 </select>
             </td>
-            <td><input type="submit" class="btn btn-info btn-sm" value="{tr}Find{/tr}" name="filter"></td>
+            <td><input type="submit" class="btn btn-info btn-sm" value="{tr}Search{/tr}" name="filter"></td>
         </tr>
     </table>
 </form>

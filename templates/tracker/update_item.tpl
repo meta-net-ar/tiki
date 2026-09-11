@@ -34,17 +34,31 @@
     {else}
         <form method="post" action="{service controller=tracker action=update_item format=$format editItemPretty=$editItemPretty suppressFeedback=$suppressFeedback}" id="updateItemForm{$trackerId|escape}">
             {trackerfields trackerId=$trackerId fields=$fields status=$status itemId=$itemId format=$format editItemPretty=$editItemPretty}
-            <div class="form-check form-switch alert alert-warning mt-5">
-                <input type="checkbox"
-                    class="form-check-input tracker-notify-switch"
-                    id="notify_watchers"
-                    name="notify_watchers"
-                    value="1"
-                    checked>
-                <label class="form-check-label" for="notify_watchers">
-                    {tr}Notify users following this item{/tr}
-                </label>
-            </div>
+            {if not empty($notifyWatchers)}
+                <div class="form-check form-switch alert alert-warning mt-5">
+                    <input type="checkbox"
+                        class="form-check-input tracker-notify-switch"
+                        id="notify_watchers"
+                        name="notify_watchers"
+                        value="1"
+                        checked>
+                    <label class="form-check-label" for="notify_watchers">
+                        {tr}Notify users following this item{/tr}
+                    </label>
+                </div>
+                <div class="tracker-notify-watchers">
+                    {accordion}
+                        {* accordion_pos points at a non-existing group so this single group starts collapsed *}
+                        {accordion_group title="{tr}Users to notify{/tr} (`$notifyWatchers|@count`)" accordion_pos=2}
+                            <ul class="list-unstyled mb-0">
+                                {foreach from=$notifyWatchers item=watcher}
+                                    <li>{if not empty($watcher.user)}{$watcher.user|userlink}{else}{$watcher.email|escape}{/if}</li>
+                                {/foreach}
+                            </ul>
+                        {/accordion_group}
+                    {/accordion}
+                </div>
+            {/if}
             {if not empty($saveAndComment) and $saveAndComment neq 'n'}
                 <div class="form-check form-switch mb-4 mt-5">
                     <input type="checkbox" class="form-check-input" name="addComment" id="add-comment"/>
@@ -92,6 +106,15 @@
                 } else {
                     $(".comment-form").addClass("d-none");
                     $(".comment-form").find("textarea").prop("disabled", true);
+                }
+            });
+
+            {* Only show the list of users to notify while the notify switch is on *}
+            $("#notify_watchers").on("change", function() {
+                if ($(this).is(":checked")) {
+                    $(".tracker-notify-watchers").removeClass("d-none");
+                } else {
+                    $(".tracker-notify-watchers").addClass("d-none");
                 }
             });
         {/jq}

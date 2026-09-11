@@ -40,6 +40,11 @@ N.B. this directory and all files within should be neither web readable or writa
   * **themes/**
   * **wiki-plugins/**
     * Typically client specific plugins, but any plugin with the same name as a base tiki plugin will override the tiki implementation.
+  * **smarty/**
+    * Custom Smarty function handlers, block handlers, modifiers, tag/modifier compilers and pre/output filters, autoloaded under the `SmartyTikiCustom\` namespace (PSR-4).
+    * Subdirectories mirror [lib/smarty_tiki/](../lib/smarty_tiki/README.md): `FunctionHandler/`, `BlockHandler/`, `Modifier/`, `Compile/Tag/`, `Compile/Modifier/`, `Filter/Pre/`, `Filter/Output/`.
+    * Each class must implement `SmartyTiki\TikiSmartyExtensionInterface` and declare its Smarty name via `getSmartyName()`. See [shared/smarty/Modifier/HelloWorld.php](./shared/smarty/Modifier/HelloWorld.php) for a sample.
+    * After adding or changing a file here, run `php console.php smarty:generate-mapping` to pick it up.
 
 
 ## Themes

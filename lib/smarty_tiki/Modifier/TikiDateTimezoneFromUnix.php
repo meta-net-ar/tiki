@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -18,8 +20,13 @@ namespace SmartyTiki\Modifier;
  *           tz: optional timezone to apply. If not specified, uses server's default timezone.
  * -------------------------------------------------------------
  */
-class TikiDateTimezoneFromUnix
+class TikiDateTimezoneFromUnix implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tiki_date_timezone_from_unix';
+    }
+
     public function handle($timestamp, $format, $tz = null)
     {
         global $prefs;

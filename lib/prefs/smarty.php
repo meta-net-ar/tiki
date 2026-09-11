@@ -6,6 +6,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_smarty_list()
 {
+    $generalSecurityHelp = 'General-Security';
+    $miscellaneousHelp = 'Miscellaneous';
+
     return [
         'smarty_notice_reporting' => [
             'name' => tra('Include Smarty notices in the PHP error report'),
@@ -13,6 +16,7 @@ function prefs_smarty_list()
             'type' => 'flag',
             'description' => tr('Tiki will display <a href="https://www.smarty.net">Smarty</a> notices with the PHP error messages.'),
             'default' => 'n',
+            'help' => 'General-Preferences',
         ],
         'smarty_security' => [
             'name' => tra('Smarty security'),
@@ -21,6 +25,7 @@ function prefs_smarty_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => 'y',
+            'help' => $generalSecurityHelp,
         ],
         'smarty_security_allowed_tags' => [
             'name' => tr('Allowed Smarty tags'),
@@ -35,6 +40,7 @@ function prefs_smarty_list()
             'dependencies' => [
                 'smarty_security',
             ],
+            'help' => $generalSecurityHelp,
         ],
         'smarty_security_disabled_tags' => [
             'name' => tr('Disabled Smarty tags'),
@@ -49,6 +55,7 @@ function prefs_smarty_list()
             'dependencies' => [
                 'smarty_security',
             ],
+            'help' => $generalSecurityHelp,
         ],
         'smarty_security_allowed_modifiers' => [
             'name' => tr('Allowed Smarty modifiers'),
@@ -63,6 +70,7 @@ function prefs_smarty_list()
             'dependencies' => [
                 'smarty_security',
             ],
+            'help' => $generalSecurityHelp,
         ],
         'smarty_security_disabled_modifiers' => [
             'name' => tr('Disabled Smarty modifiers'),
@@ -77,6 +85,7 @@ function prefs_smarty_list()
             'dependencies' => [
                 'smarty_security',
             ],
+            'help' => $generalSecurityHelp,
         ],
         'smarty_security_allowed_builtin_php_functions' => [
             'name' => tr('Allowed Smarty built-in PHP functions'),
@@ -102,6 +111,7 @@ function prefs_smarty_list()
             'dependencies' => [
                 'smarty_security',
             ],
+            'help' => $generalSecurityHelp,
         ],
         'smarty_compilation' => [
             'name' => tra('Smarty compilation'),
@@ -113,6 +123,7 @@ function prefs_smarty_list()
                 'always' => tra('Always (development, slow)'),
             ],
             'default' => 'modified',
+            'help' => $miscellaneousHelp,
         ],
         'smarty_cache_perms' => [
             'name' => tra('Smarty cache permissions'),
@@ -124,12 +135,14 @@ function prefs_smarty_list()
             ],
             'default' => 0644,
             'keywords' => 'file perms templates',
+            'help' => $miscellaneousHelp,
         ],
         'smarty_enable_string_eval' => [
             'name' => tra('Smarty enable string or eval template'),
             'description' => tra('Enables the use of string or eval template when activated by Administrators.'),
             'type' => 'text',
             'default' => 'n',
+            // TODO: add to documentation
         ],
     ];
 }

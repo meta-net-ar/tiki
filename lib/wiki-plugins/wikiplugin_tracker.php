@@ -658,8 +658,8 @@ function wikiplugin_tracker_info()
             'rulesparent' => [
                 'required' => false,
                 'name' => tra('Field rules parent selector'),
-                'description' => tra('JQuery selector for the parent object to show or hide when executing field rules.'),
-                'default' => '.tracker-field-group:first',
+                'description' => tra('JQuery selector for the parent object to show or hide when executing field rules. Leave empty to use the default selector for the tracker rendering mode.'),
+                'default' => '',
                 'advanced' => true,
                 'filter' => 'text',
             ],
@@ -859,6 +859,9 @@ function wikiplugin_tracker($data, $params)
 
         $wiki = trim($wiki);
     }
+    if (empty($params['rulesparent'])) {
+        $params['rulesparent'] = empty($tpl) && empty($wiki) ? '.tiki-form-group:first' : '.tracker-field-group:first';
+    }
 
     $fields_prefix = 'ins_';
 
@@ -899,13 +902,6 @@ function wikiplugin_tracker($data, $params)
         $logslib->add_action('Viewed', $itemId, 'trackeritem', $_SERVER['REQUEST_URI']);
     }
 
-    if (isset($_REQUEST['removeattach']) && $tracker['useAttachments'] == 'y') {
-        $owner = $trklib->get_item_attachment_owner($_REQUEST['removeattach']);
-        if ($perms['tiki_p_admin_trackers'] == 'y' || ($user && $user == $owner)) {
-            $trklib->remove_item_attachment($_REQUEST["removeattach"]);
-            unset($_REQUEST['removeattach']);
-        }
-    }
     if (isset($_REQUEST['removeImage']) && ! empty($_REQUEST['trackerId']) && ! empty($_REQUEST['itemId']) && ! empty($_REQUEST['fieldId']) && ! empty($_REQUEST['fieldName'])) {
         $img_field = ['data' => []];
         $img_field['data'][] = ['fieldId' => $_REQUEST['fieldId'], 'type' => 'i', 'name' => $_REQUEST['fieldName'], 'value' => 'blank'];
@@ -1604,6 +1600,8 @@ function wikiplugin_tracker($data, $params)
                     $msg = trim($data);
                     if (empty($msg)) {
                         $msg = tr('Form saved successfully.');
+                    } else {
+                        $msg = $parserlib->parse_data($msg);
                     }
                     Feedback::success($msg);
                     TikiLib::lib('access')->redirect($url[$key]);
@@ -1668,7 +1666,7 @@ function wikiplugin_tracker($data, $params)
                 } else {
                     // setting default value prevent dropdown default value working
                     $options = $flds['data'][$i]['options_array'];
-                    if (! in_array($flds['data'][$i]['type'], ['d', 'D', 'R', 'M']) || count($options) === count(array_unique($options))) {
+                    if ($flds['data'][$i]['type'] != 'f' && (! in_array($flds['data'][$i]['type'], ['d', 'D', 'R', 'M']) || count($options) === count(array_unique($options)))) {
                         $flds['data'][$i]['value'] = ''; // initialize fields with blank values
                     }
                 }
@@ -1791,7 +1789,7 @@ function wikiplugin_tracker($data, $params)
                 $_REQUEST['error'] = 'y';
             }
             if (isset($field_errors['err_outputwiki'])) {
-                $icon = smarty_function_icon(['name' => 'warning'], $smarty->getEmptyInternalTemplate());
+                $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'warning'], $smarty->getEmptyInternalTemplate());
                 $back .= '<div class="alert alert-warning">' . $icon . ' ';
                 $back .= $field_errors['err_outputwiki'];
                 $back .= '</div><br />';
@@ -1931,7 +1929,7 @@ function wikiplugin_tracker($data, $params)
             $back .= '<form class="' . $formClasses . '" name="editItemForm' . $iTRACKER . '" id="editItemForm' . $iTRACKER . '" enctype="multipart/form-data" method="post"' . (! is_null($target) ? ' target="' . $target . '"' : '') . ' action="' . $_SERVER['REQUEST_URI'] . '" ' . $ajax_datas . '><input type="hidden" name="trackit" value="' . $trackerId . '" />';
             $back .= '<input type="hidden" name="refresh" value="1" />';
         }
-        $back .= smarty_function_ticket([], $smarty->getEmptyInternalTemplate());
+        $back .= \SmartyTiki\FunctionHandler\Ticket::render([], $smarty->getEmptyInternalTemplate());
         $back .= '<input type="hidden" name="iTRACKER" value="' . $iTRACKER . '" />';
         if (isset($_REQUEST['page'])) {
             $back .= '<input type="hidden" name="page" value="' . $_REQUEST["page"] . '" />';
@@ -2224,7 +2222,7 @@ function wikiplugin_tracker($data, $params)
         }
 
         if ($datepicker) {
-            $back .= smarty_function_js_insert_icon(['type' => "jscalendar"], $smarty->getEmptyInternalTemplate());
+            $back .= \SmartyTiki\FunctionHandler\JsInsertIcon::render(['type' => "jscalendar"], $smarty->getEmptyInternalTemplate());
         }
 
         if (! empty($tpl)) {

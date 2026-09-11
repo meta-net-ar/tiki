@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Wiki;
 
-use PEAR;
 use TikiLib;
 use ZipArchive;
 
@@ -21,9 +20,9 @@ use ZipArchive;
 // comments).
 //
 // For the import, the import_pages() method opens the Zip file, parses the wiki.xml file and
-// creates the pages by calling create_page() for each page. The parser (page_Parser) is defined
-// below. It extends the XML_Parser class. create_page() either creates a new page or updates an old
-// one. In the latter case, the page is extended by such things as the attachments or page history.
+// creates the pages by calling create_page() for each page. The parser (PageParser) is defined
+// in lib/wiki/PageParser.php. create_page() either creates a new page or updates an old one. In the
+// latter case, the page is extended by such things as the attachments or page history.
 
 
 //this script may only be included - so its better to die if called directly.
@@ -69,7 +68,7 @@ class XmlLib extends TikiLib
         $zipFile = 'dump/xml.zip',  // Name of the temporary Zip file, which is being generated
         $config = null
     ) {             // Configuration (see the $config property, above). Overrides
-                                    // the default configuration (above)
+        // the default configuration (above)
         // Setup the Zip archive, which is to be generated
         if (! class_exists('ZipArchive')) {
             $this->errors[] = 'Problem zip initialisation';
@@ -77,12 +76,27 @@ class XmlLib extends TikiLib
             return false;
         }
 
-        $this->zip = new ZipArchive();
-        if (! file_exists($zipFile)) {
-            mkdir(EXPORT_DUMP_PATH, 0777, true);
+        $zipDir = dirname($zipFile);
+
+        if ($zipDir !== '.' && ! is_dir($zipDir)) {
+            if (! mkdir($zipDir, 0777, true) && ! is_dir($zipDir)) {
+                $this->errors[] = 'Cannot create export directory';
+                $this->errorsArgs[] = $zipDir;
+                return false;
+            }
         }
 
-        if (! $this->zip->open($zipFile, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) {
+        if ($zipDir !== '.' && ! is_writable($zipDir)) {
+            $this->errors[] = 'Export directory is not writable';
+            $this->errorsArgs[] = $zipDir;
+            return false;
+        }
+
+        $this->zip = new ZipArchive();
+
+        $res = $this->zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+        if ($res !== true) {
             $this->errors[] = 'The file cannot be opened';
             $this->errorsArgs[] = $zipFile;
             return false;
@@ -347,14 +361,16 @@ class XmlLib extends TikiLib
             return false;
         }
 
-        // Parse the wiki.xml
-        $parser = new PageParser();
-        $parser->setInput($this->xml);
-        $ok = $parser->parse();
-        if (PEAR::isError($ok)) {
-            $this->errors[] = $ok->getMessage();
+        try {
+            $parser = new PageParser();
+            $parser->setInput($this->xml);
+            $parser->parse();
+        } catch (\RuntimeException $e) {
+            $this->errors[] = $e->getMessage();
             $this->errorsArgs[] = '';
+
             $this->zip->close();  // Close the ZIP file before returning
+
             return false;
         }
         $infos = $parser->getPages();
@@ -405,8 +421,8 @@ class XmlLib extends TikiLib
                 $info['name'],
                 $info['data'],
                 'Updated from import',
-                ! empty($this->config['fromUser']) ? $this->config['fromUser'] : $info['user'],
-                ! empty($this->config['fromSite']) ? $this->config['fromSite'] : $info['ip'],
+                $this->config['fromUser'] ?? $info['user'],
+                $this->config['fromSite'] ?? $info['ip'],
                 $info['description'],
                 0,
                 $info['lang'] ?? '',
@@ -424,8 +440,8 @@ class XmlLib extends TikiLib
                 $info['data'],
                 $info['lastModif'],
                 $info['comment'],
-                ! empty($this->config['fromUser']) ? $this->config['fromUser'] : $info['user'],
-                ! empty($this->config['fromSite']) ? $this->config['fromSite'] : $info['ip'],
+                $this->config['fromUser'] ?? $info['user'],
+                $this->config['fromSite'] ?? $info['ip'],
                 $info['description'],
                 $info['lang'] ?? '',
                 $info['is_html'] ?? false,
@@ -446,6 +462,7 @@ class XmlLib extends TikiLib
             foreach ($info['comments'] as $comment) {
                 $commentslib = TikiLib::lib('comments');
                 $parentId = empty($comment['parentId']) ? 0 : $newThreadIds[$comment['parentId']];
+                $in_reply_to = '';
                 if ($parentId) {
                     $reply_info = $commentslib->get_comment($parentId);
                     $in_reply_to = $reply_info['message_id'];
@@ -454,7 +471,7 @@ class XmlLib extends TikiLib
                 $newThreadIds[$comment['threadId']] = $commentslib->post_new_comment(
                     'wiki page:' . $info['name'],
                     $parentId,
-                    $this->config['fromUser'] ? $this->config['fromUser'] : $comment['user'],
+                    $this->config['fromUser'] ?? $comment['user'],
                     $comment['title'],
                     $comment['data'],
                     $message_id,

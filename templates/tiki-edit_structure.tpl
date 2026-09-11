@@ -151,13 +151,22 @@
         {if $structure_id eq $page_ref_id}</strong>{/if}
     {/self_link}
 </div>
-{button _text="{tr}Save{/tr}" _style="display:none;" _class="save_structure" _type="primary" _ajax="n" _auto_args="save_structure,page_ref_id"}
+<div class="save-structure-wrapper sticky-top bg-body py-2 border-bottom" style="display:none;">
+    {button _text="{tr}Save{/tr}" _style="display:none;" _class="save_structure" _type="primary" _ajax="n" _auto_args="save_structure,page_ref_id"}
+</div>
 <div class="structure-container">
     {$nodelist}
 </div>
-{button _text="{tr}Save{/tr}" _style="display:none;" _class="save_structure" _type="primary" _ajax="n" _auto_args="save_structure,page_ref_id"}
+<div class="save-structure-wrapper text-center mt-2" style="display:none;">
+    {button _text="{tr}Save{/tr}" _style="display:none;" _class="save_structure" _type="primary" _ajax="n" _auto_args="save_structure,page_ref_id"}
+</div>
 
 {if $editable == 'y'}
+    {remarksbox type="tip" title="{tr}Quick help{/tr}"}
+        {tr}To add an existing page, search in "Add pages", drag the page into the structure, then click Save.{/tr}
+        <br>
+        {tr}Alternative: on any structure page, use "Type to search ... / Add Page / Child".{/tr}
+    {/remarksbox}
     <form action="tiki-edit_structure.php" method="get">
         <div class="card">
             <div class="card-header">
@@ -167,9 +176,9 @@
                 <div>
                     <input type="hidden" name="page_ref_id" value="{$page_ref_id}">
                     <div class="tiki-form-group row">
-                        <label class="sr-only" for="find_objects">{tr}Find{/tr}</label>
+                        <label class="sr-only" for="find_objects">{tr}Search{/tr}</label>
                         <div class="input-group">
-                            <input type="text" name="find_objects" id="find_objects" value="{$find_objects|escape}" class="form-control form-control-sm" placeholder="{tr}Find{/tr}...">
+                            <input type="text" name="find_objects" id="find_objects" value="{$find_objects|escape}" class="form-control form-control-sm" placeholder="{tr}Search{/tr}...">
                             <input type="submit" class="btn btn-primary btn-sm" value="{tr}Filter{/tr}" name="search_objects">
                             {autocomplete element='#find_objects' type='pagename'}
                         </div>

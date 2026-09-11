@@ -44,15 +44,7 @@ function wikiplugin_translated($data, $params)
         return WikiParser_PluginOutput::error(tr('Plugin Translated error'), tr('Incorrect parameter.'));
     }
 
-    $h = opendir("img/flags/");
-    while ($file = readdir($h)) {
-        if (! str_starts_with($file, '.') and str_ends_with($file, '.png')) {
-            $avflags[] = substr($file, 0, strlen($file) - 4);
-        }
-    }
-    if (in_array($flag, $avflags)) {
-        $img = "<img src='img/flags/{$escapedFlag}.png' alt='{$escapedLang}' style='width:18px; height:13px; margin:0 3px 0 0; vertical-align:baseline;' />";
-    }
+    $img = isset($flag) ? \Tiki\CountryFlagHelper::toHtml($flag, $lang) : '';
 
     if (! $img) {
         $img = "( $lang ) ";

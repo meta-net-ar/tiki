@@ -11,18 +11,23 @@ function prefs_pass_list()
 {
     $blackL = TikiLib::lib('blacklist');
 
+    $loginGeneralPreferencesHelp = 'Login-General-Preferences';
+    $passwordBlacklistsHelp = 'Password-Blacklists';
+
     return [
         'pass_chr_num' => [
             'name' => tra('Require characters and numerals'),
             'description' => tra('For improved security, require users to include a mix of alphabetical characters and numerals in passwords.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'pass_blacklist_file' => [
             'name' => tra('Password file used'),
             'description' => tra('The automatically selected file is recommended unless you generate your own blacklist file.'),
             'type' => 'list',
             'default' => 'auto',
+            'help' => $passwordBlacklistsHelp,
             'filter' => 'striptags',
             'options' => array_merge(
                 ['auto' => tra('Automatically select blacklist')],
@@ -32,7 +37,7 @@ function prefs_pass_list()
         'pass_blacklist' => [
             'name' => tra('Prevent common passwords'),
             'description' => tra('For improved security, prevent users from creating blacklisted passwords. Use default blacklist or create custom blacklists through Control Panel -> Log in -> Password Blacklist.'),
-            'help' => 'Password-Blacklists',
+            'help' => $passwordBlacklistsHelp,
             'type' => 'flag',
             'default' => 'n',
         ],
@@ -45,41 +50,48 @@ function prefs_pass_list()
             'units' => tra('days'),
             'hint' => tra('Use "-1" for never'),
             'default' => -1,
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'pass_chr_case' => [
             'name' => tra('Require alphabetical characters in lower and upper case'),
             'description' => tra('Password must contain at least one lowercase alphabetical character like "a" and one uppercase character like "A". Use this option to require users to select stronger passwords.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'pass_chr_special' => [
             'name' => tra('Require special characters'),
             'description' => tra('Password must contain at least one special character like <b>" / $ % ? & * ( ) _ + .</b> Use this option to require users to select stronger passwords.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'pass_repetition' => [
             'name' => tra('Require no consecutive repetition of the same character'),
             'description' => tra('Password must not contain a consecutive repetition of the same character such as "111" or "aab".'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'pass_diff_username' => [
             'name' => tra('The password must be different from the user\'s log-in name'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'pass_show_rules' => [
             'name' => tra('Show rules for password creation'),
             'description' => tra('Display the password creation rules to users when they are setting their passwords. This helps users understand the requirements for creating a valid password.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'pass_history_management' => [
             'name' => tra('Password History Management'),
             'description' => tra('To enforce password security, this option allows to determine the number of password resets associated with a user account before the password can be reused.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'pass_history_number' => [
             'name' => tra('Use old password after'),
@@ -89,6 +101,7 @@ function prefs_pass_list()
             'filter' => 'int',
             'units' => tra('resets'),
             'default' => 5,
+            'help' => $loginGeneralPreferencesHelp,
         ],
     ];
 }

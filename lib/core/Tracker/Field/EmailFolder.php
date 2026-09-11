@@ -224,7 +224,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         if (! empty($parsed_fields['source_id'])) {
             $page_info = TikiLib::lib('tiki')->get_page_info_from_id($parsed_fields['source_id']);
             if ($page_info && stristr($page_info['data'], "cypht")) {
-                $view_path = smarty_modifier_sefurl($page_info['pageName']);
+                $view_path = \SmartyTiki\Modifier\Sefurl::apply($page_info['pageName']);
                 if (preg_match("/tiki-index\.php\?page=.*/", $view_path)) {
                     $view_path = "tiki-index.php?page_id=" . $parsed_fields['source_id'];
                 }
@@ -238,9 +238,9 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
 
 
         if (in_array('Draft', $parsed_fields['flags'])) {
-            $view_path .= "page=compose&draft_id=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+            $view_path .= "cypht_page=compose&draft_id=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
         } else {
-            $view_path .= "page=message&uid=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+            $view_path .= "cypht_page=message&uid=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
         }
         $parsed_fields['view_path'] = $view_path;
 
@@ -296,19 +296,32 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         }
 
         if ($compose_page = $this->getOption('composePage')) {
-            $compose_path = smarty_modifier_sefurl($compose_page);
-            if (preg_match("/tiki-index\.php\?page=.*/", $compose_path)) {
-                $compose_path = "tiki-index.php?page_id=" . TikiLib::lib('tiki')->get_page_id_from_name($compose_page);
+            $base_webmail_path = \SmartyTiki\Modifier\Sefurl::apply($compose_page);
+            if (preg_match("/tiki-index\.php\?page=.*/", $base_webmail_path)) {
+                $base_webmail_path = "tiki-index.php?page_id=" . TikiLib::lib('tiki')->get_page_id_from_name($compose_page);
             }
         } else {
-            $compose_path = "tiki-webmail.php";
+            $base_webmail_path = "tiki-webmail.php";
         }
+        $compose_path = $base_webmail_path;
         if (str_contains($compose_path, '?')) {
             $compose_path .= '&';
         } else {
             $compose_path .= '?';
         }
         $compose_path .= "page=compose&list_path=tracker_folder_" . $this->getItemId() . "_" . $this->getConfiguration('fieldId') . "&list_parent=tracker_" . $this->getTrackerDefinition()->getConfiguration('trackerId');
+
+        $search_path = $base_webmail_path;
+        if (str_contains($search_path, '?')) {
+            $search_path .= '&';
+        } else {
+            $search_path .= '?';
+        }
+        $search_path .= "page=search&list_path=tracker_folder_" . $this->getItemId() . "_" . $this->getConfiguration('fieldId')
+            . "&list_parent=tracker_" . $this->getTrackerDefinition()->getConfiguration('trackerId')
+            . "&target_tracker_item_id=" . $this->getItemId()
+            . "&target_tracker_field_id=" . $this->getConfiguration('fieldId')
+            . "&target_tracker_folder=inbox";
 
         TikiLib::lib('header')->add_js_module('import "@tiki/tracker-fields/emailFolder";');
 
@@ -320,8 +333,31 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                 return $this->folderHandle($folder);
             }, preg_split('/\s*,\s*/', $this->getOption('openedFolders'))),
             'compose_path' => $compose_path,
+            'search_path' => $search_path,
             'itemId' => $this->getItemId(),
         ]);
+    }
+
+    /**
+     * Return a plain text
+     * Intended for simple contexts like titles (isMain)
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $emails = $this->getConfiguration('emails');
+        $output = "";
+        foreach ($this->getFolders() as $folder => $folderName) {
+            if (! empty($emails[$folder])) {
+                $output .= $folderName . ":\n";
+                foreach ($emails[$folder] as $email) {
+                    $output .= "- " . $email['subject'] . "\n";
+                }
+            }
+        }
+        return $output;
     }
 
     public function handleSave($value, $oldValue)

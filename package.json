@@ -5,13 +5,23 @@
         "The short version is that when you update package.json, you have two general choices to get package-lock.json up to date.",
         "1- Just run: ",
         "     npm install",
-        "   It will update package-lock.json to meet the constraints, but not touch any installed package that already meets the constraints.  So it's a minimal impact update",
+        "   It will update package-lock.json to meet the constraints, but not touch any installed package that already meets the constraints.  So it's a minimal impact update in most cases (minimizes the chance of conflicts)",
         "2- Run:",
         "     npm update",
         "   This will update ALL packages including transitive dependencies to the latest version that meet the semver in package.json.",
         "To regenerate package-lock.json from scratch, run:",
-        "  rm -r package-lock.json node_modules/;npm install",
-        "The above should have the same results as npm update, but that isn't always exactly the case."
+        "  rm -r package-lock.json node_modules/ src/js/**/node_modules/;npm install",
+        "The above should have the same results as npm update, but that isn't always exactly the case.",
+        "",
+        "A node about duplicate node_modules (show in git status)",
+        "  There should not be any, and must be fixed!  This is not a treatise on npm, but look up a concept called module hoisting,",
+        "  and know that it must be fixed since tiki has a requirement to run without internet access, and it's local CDN needs predictable file paths to copy files from.",
+        "  If there are, duplicate node_modules it usually means that there is a version conflict in the different workspace requirements. The commands:",
+        "    npm why name_of_package",
+        "    npm find-dupe",
+        "  may get you started finding the actual problem.",
+        "  In one case, for an unknown reason a non-conflicting package was installed in a duplicate node_module after a simple npm install after a version update (looks like a npm bug).",
+        "  It was fixed with a simple npm update"
     ],
     "name" : "tiki",
     "version" : "0.0.1",
@@ -41,8 +51,11 @@
         "clean:wsconf" : "php console.php dev:buildwsconfs --clean",
         "clean:scss" : "npm run clean -w src/scss",
         "clean" : "concurrently \"npm:clean:*\"",
-        "test" : "vitest --config=src/js/vite.config.mjs --coverage",
-        "testci" : "vitest --config=src/js/vite.config.mjs --coverage --run",
+        "test" : "vitest --config=src/js/vite.config.mjs",
+        "testci" : "vitest --config=src/js/vite.config.mjs --reporter=junit --coverage --run",
+        "test:e2e" : "cd tests/e2e && npx playwright test",
+        "test:e2e:smoke" : "cd tests/e2e && npx playwright test suites/smoke/",
+        "test:e2e:report" : "cd tests/e2e && npx playwright show-report",
         "postinstall" : "patch-package --patch-dir=src/js/patches --error-on-fail",
         "patch" : "patch-package --patch-dir=src/js/patches --error-on-fail",
         "prepare" : "husky"
@@ -66,37 +79,39 @@
         "ui-predicate-vue3" : "https://www.npmjs.com/package/ui-predicate-vue3 — Vue 3 adapter for ui-predicate (replaces vendored lib in vue-mf/tracker-rules)"
     },
     "devDependencies" : {
-        "@commitlint/cli" : "^20.2.0",
-        "@commitlint/config-conventional" : "^20.2.0",
-        "@stylistic/eslint-plugin" : "^5.6.1",
+        "@commitlint/cli" : "^21.2.2",
+        "@commitlint/config-conventional" : "^21.2.2",
+        "@playwright/test" : "1.58.2",
+        "@stylistic/eslint-plugin" : "^5.10.0",
         "@testing-library/vue" : "^8.1.0",
-        "@vitejs/plugin-vue" : "^6.0.3",
-        "@vitest/coverage-istanbul" : "^4.0.16",
+        "@vitejs/plugin-vue" : "^6.0.8",
+        "@vitest/coverage-v8" : "^4.1.11",
         "check-engine" : "^1.14.0",
-        "concurrently" : "^9.2.1",
+        "concurrently" : "^10.0.5",
         "copy-and-watch" : "^0.1.8",
-        "es-module-shims" : "^2.7.0",
-        "eslint" : "^9.39.2",
+        "es-module-shims" : "^2.8.4",
+        "eslint" : "^10.9.1",
         "eslint-config-prettier" : "^10.1.8",
-        "eslint-plugin-prettier" : "^5.5.4",
-        "eslint-plugin-vue" : "^10.6.2",
-        "happy-dom" : "^20.0.11",
+        "eslint-plugin-prettier" : "^5.5.6",
+        "eslint-plugin-vue" : "^10.10.0",
+        "happy-dom" : "^20.11.6",
         "husky" : "^9.1.7",
-        "npm-run-all2" : "^8.0.4",
+        "npm-run-all2" : "^9.0.3",
         "patch-package" : "^8.0.1",
-        "prettier" : "^3.7.4",
-        "rollup-plugin-visualizer" : "^6.0.5",
-        "tinyglobby" : "^0.2.15",
-        "unplugin-auto-import" : "^20.3.0",
-        "unplugin-vue-components" : "^30.0.0",
-        "vite" : "^7.3.0",
-        "vite-plugin-static-copy" : "^3.1.4",
-        "vitest" : "^4.0.16"
+        "prettier" : "^3.9.6",
+        "rollup-plugin-visualizer" : "^7.1.1",
+        "tinyglobby" : "^0.2.17",
+        "unplugin-auto-import" : "^21.1.0",
+        "unplugin-vue-components" : "^32.1.0",
+        "vite" : "^8.2.2",
+        "vite-plugin-static-copy" : "^4.1.1",
+        "vitest" : "^4.1.11"
     },
     "devDepencenciesCommentWillAlsoBeAvailableAsDevDependenciesInWorkspace" : {
         "@commitlint/*": "https://github.com/conventional-changelog/commitlint/blob/master/CHANGELOG.md",
         "@stylistic/eslint-plugin" : "https://github.com/eslint-stylistic/eslint-stylistic/blob/main/CHANGELOG.md",
         "@vitejs/plugin-vue" : "https://github.com/vitejs/vite-plugin-vue/blob/main/packages/plugin-vue/CHANGELOG.md",
+        "concurrently": "https://github.com/open-cli-tools/concurrently/releases",
         "es-module-shims" : "https://github.com/guybedford/es-module-shims. Copied to be available as an external, but not in common-externals, because it will not be included from import-maps",
         "eslint" : "",
         "eslint-config-prettier" : "",
@@ -114,24 +129,49 @@
         "vitest" : "https://github.com/vitest-dev/vitest/releases"
     },
     "overrides" : {
-        "dompurify" : "3.3.3",
+        "dompurify" : "3.4.12",
+        "devalue" : "5.8.1",
+        "glob" : "10.5.0",
         "jspdf" : "4.2.1",
+        "svelte" : "5.51.0",
         "svgedit" : {
             "jspdf" : "4.2.1"
+        },
+        "postcss" : "8.5.26",
+        "converse.js" : {
+            "@converse/log" : "0.0.1"
+        },
+        "timeago" : {
+            "jquery" : "4.0.0"
         }
     },
     "overridesComment" : {
-        "jspdf": [
-            "npm audit flagged jspdf <= 4.2.0 (critical). Pin 4.2.1 so the root install and svgedit (nested 4.0.0) resolve to a patched release."
+        "converse.js": "converse.js's own package.json depends on '@converse/log' via 'file:src/log' - a self-referential path into its own package directory. npm's arborist can't resolve that link's target when converse.js is installed as a plain registry dependency (not inside its own monorepo), which crashes any 'npm install' with 'Cannot destructure property package of node.target'. It's also published standalone on the registry with matching content, so overriding it to the registry version sidesteps the broken self-link. (13.0.1 additionally needed a '@converse/headless' override for the same reason - 14.0.0 doesn't depend on that package at all, so it was dropped here rather than left as harmless dead weight.)",
+        "timeago": [
+            "timeago@1.6.7 (unmaintained since 2019) caps jquery at <4.0, a range written before jQuery 4 existed. Without this override npm keeps jQuery 3.7.1 at the top level to satisfy it.",
+            "Scoped to timeago deliberately: a global jquery override makes npm nest jquery-migrate and jquery-validation under src/js/common-externals/node_modules, breaking the paths viteStaticCopy copies from."
         ],
         "dompurify": [
-            "This override forces all packages to use DOMPurify v3.3.3 to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
+            "This override forces all packages to use DOMPurify v3.4.12 to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
             "Upgrading from v2 to v3 is safe for our project because we do not support Internet Explorer (IE).",
             "As noted by Victor Buzinaro in https://github.com/cure53/DOMPurify/issues/785, the only breaking change introduced in v3 is the removal of IE-specific support.",
             "After reviewing the changes between versions 2.5.8 and 3.3.0 (https://github.com/cure53/DOMPurify/compare/2.5.8...3.3.0), we confirmed there are no functional breaking changes that affect our usage.",
             "Toast UI Editor currently depends on DOMPurify v2.x, but its DOMPurify integration",
             "(introduced in https://github.com/nhn/tui.editor/commit/6e5730914902071b54c529673e964a24b58e3eec#diff-e70b3ac7e7e963527907ae78c682a077c1b87015783bdcb150084e023ce17528) is compatible with v3.",
-            "For this reason, enforcing DOMPurify v3.3.x is safe for us. Remove this override when upstream packages pin a secure DOMPurify without conflicts."
+            "For this reason, enforcing DOMPurify v3.4.x is safe for us. Pinned to 3.4.12 for npm audit advisories. Remove this override when upstream packages pin a secure DOMPurify without conflicts."
+        ],
+        "glob": [
+            "copy-and-watch pins glob 10.3.12 (vulnerable CLI <=10.4.5). Override to 10.5.0; Tiki uses glob programmatically, not the CLI -c/--cmd flag."
+        ],
+        "jspdf": [
+            "npm audit flagged jspdf <= 4.2.0 (critical). Pin 4.2.1 so the root install and svgedit (nested 4.0.0) resolve to a patched release."
+        ],
+        "postcss": [
+            "vue3-sfc-loader -> @vue/component-compiler-utils still pulls PostCSS 7.0.x (npm audit range <=8.5.17: parsing/XSS/sourceMappingURL issues).",
+            "Force PostCSS 8.5.26 everywhere (already used by Vite). Remove when upstream stops depending on PostCSS 7."
+        ],
+        "svelte": [
+            "Svelte is pinned to 5.51.0 (and devalue to 5.8.1) for @event-calendar/core 4.x compatibility: Svelte >= 5.51.1 breaks calendar interactions (https://github.com/vkurko/calendar/issues/623). devalue is overridden separately so we can take the npm audit fix without upgrading Svelte. Upgrade path: @event-calendar/core 5.4.1+ then remove both svelte and devalue overrides."
         ]
     },
     "workspaces": [

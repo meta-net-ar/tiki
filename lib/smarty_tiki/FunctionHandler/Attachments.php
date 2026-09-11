@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * smarty function attachments handler
@@ -19,8 +20,13 @@ use Smarty\Template;
  *   _id : id of the object (for a wiki page, use it's name)
  *   _type : type of the object ( e.g. "wiki page" - see objectTypes in lib/setup/sections.php )
  */
-class Attachments extends Base
+class Attachments extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'attachments';
+    }
+
     public function handle($params, Template $template)
     {
         if (! is_array($params) || ! isset($params['_id']) || ! isset($params['_type'])) {
@@ -45,7 +51,7 @@ class Attachments extends Base
             $gal_info['name'] = $page . ' *';   // temp name with * - not displayed in most configs
         } elseif (! $gal_info = $filegallib->get_file_gallery($galleryId)) {
             $repeat = false;
-            return smarty_block_remarksbox(
+            return \SmartyTiki\BlockHandler\Remarksbox::render(
                 ['type' => 'errors', 'title' => tra('Wrong attachments gallery')],
                 tra('You are attempting to display a gallery that is not a valid attachment gallery') . ' (ID=' . $galleryId . ')',
                 $template,
@@ -64,20 +70,55 @@ class Attachments extends Base
 
         // Get URL params specific to this smarty function that should be assigned in smarty
         $url_override_prefix = 's_f_attachments';
-        $url_overrided_arguments = [ 'sort_mode', 'remove', 'galleryId', 'comment', 'upload', 'page' ];
+        $url_overrided_arguments = [ 'sort_mode', 'view', 'offset', 'maxRecords', 'fileId', 'maxWidth', 'remove', 'galleryId', 'comment', 'upload', 'page' ];
         $smarty->set_request_overriders($url_override_prefix, $url_overrided_arguments);
 
-        $params['sort_mode'] = $_REQUEST[$url_override_prefix . '-sort_mode'] ?? '';
+        $params['sort_mode'] = $_REQUEST[$url_override_prefix . '-sort_mode'] ?? 'created_desc';
+
+        $params['view'] = $_REQUEST[$url_override_prefix . '-view'] ?? 'list';
+        if (! in_array($params['view'], ['browse', 'list', 'page'])) {
+            $params['view'] = 'list';
+        }
+        if (! isset($_REQUEST[$url_override_prefix . '-view']) && ! empty($_REQUEST[$url_override_prefix . '-fileId'])) {
+            $params['view'] = 'page';
+        }
+
+        // Pagination: read offset from the request (prefixed)
+        $params['offset'] = max(0, (int)($_REQUEST[$url_override_prefix . '-offset'] ?? 0));
+
+        if ($params['view'] === 'page') {
+            $params['maxRecords'] = 1;
+        } elseif ($params['view'] === 'browse') {
+            $params['maxRecords'] = -1;
+        } else {
+            $params['maxRecords'] = (int)($_REQUEST[$url_override_prefix . '-maxRecords'] ?? $prefs['maxRecords']);
+            if ($params['maxRecords'] <= 0) {
+                $params['maxRecords'] = $prefs['maxRecords'];
+            }
+        }
+
+        $params['maxWidth'] = (int)($_REQUEST[$url_override_prefix . '-maxWidth'] ?? 300);
+        if ($params['maxWidth'] <= 0) {
+            $params['maxWidth'] = 300;
+        }
+
+        $requestedFileId = (int)($_REQUEST[$url_override_prefix . '-fileId'] ?? 0);
+        $params['fileId'] = $requestedFileId > 0 ? $requestedFileId : 0;
+
+        // Force some gallery display parameters before fgal_listing_conf.php reads $gal_info
+        $gal_info['show_checked'] = 'n';
+        $gal_info['show_creator'] = 'y';
+
+        // Pre-set $view so fgal_listing_conf.php (which reads $_REQUEST['view'] otherwise) doesn't
+        // pick up an unrelated 'view' request param and overwrite it with something else.
+        $view = $params['view'];
 
         // Get listing display config
         include_once('fgal_listing_conf.php');
 
-        // Force some gallery display parameters
-        $gal_info['show_checked'] = 'n';
-
-        // Get list of files in the gallery
+        // Get list of files in the gallery (paginated)
         if (! empty($galleryId)) {
-            $files = $filegallib->get_files(0, -1, $params['sort_mode'], '', $galleryId);
+            $files = $filegallib->get_files($params['offset'], $params['maxRecords'], $params['sort_mode'], '', $galleryId);
         } else {
             $files = ['data' => [], 'count' => 0];
         }
@@ -103,6 +144,18 @@ class Attachments extends Base
         $params['files'] = $files['data'];
         $params['count'] = $files['count'];
         $params['from_wiki_page'] = true;
+        $params['thumbnail_size'] = $prefs['fgal_thumb_max_size'];
+
+        if ($params['view'] === 'page') {
+            $params['file'] = $files['data'][0] ?? null;
+
+            if ($params['fileId'] > 0 && empty($params['file']) && ! empty($galleryId)) {
+                $singleFile = $filegallib->get_file_info($params['fileId']);
+                if (! empty($singleFile) && (int)$singleFile['galleryId'] === (int)$galleryId) {
+                    $params['file'] = $singleFile;
+                }
+            }
+        }
 
         $return = "\n" . $smarty->plugin_fetch('fgal_attachments.tpl', $params) . "\n";
 
@@ -157,7 +210,7 @@ function s_f_attachments_actionshandler($params)
                             [
                                 'galleryId' => [$galleryId],
                                 'comment' => [$params['comment']],
-                                'returnUrl' => smarty_function_query(
+                                'returnUrl' => \SmartyTiki\FunctionHandler\Query::render(
                                     [
                                         '_type' => 'absolute_path',
                                         's_f_attachments-upload' => 'NULL',

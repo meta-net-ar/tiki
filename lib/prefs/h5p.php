@@ -7,6 +7,8 @@
 function prefs_h5p_list($partial = false)
 {
     $serviceLib = TikiLib::lib('service');
+    $galleryEnhancementsHelp = 'Gallery-Enhancements';
+
     return [
         'h5p_enabled' => [
             'name' => tra('H5P support'),
@@ -32,6 +34,7 @@ function prefs_h5p_list($partial = false)
                 'h5p_enabled',
             ],
             'type' => 'text',
+            'help' => $galleryEnhancementsHelp,
             'filter' => 'text',
             'default' => H5PCore::$defaultContentWhitelist,
         ],
@@ -41,6 +44,7 @@ function prefs_h5p_list($partial = false)
             'dependencies' => [
                 'h5p_enabled',
             ],
+            'help' => $galleryEnhancementsHelp,
             'type' => 'flag',
             'filter' => 'alpha',
             'default' => 'n',
@@ -56,6 +60,7 @@ function prefs_h5p_list($partial = false)
                 'h5p_enabled',
             ],
             'type' => 'flag',
+            'help' => $galleryEnhancementsHelp,
             'filter' => 'alpha',
             'default' => 'n',
         ],
@@ -67,6 +72,7 @@ function prefs_h5p_list($partial = false)
             ],
             'type' => 'text',
             'filter' => 'int',
+            'help' => $galleryEnhancementsHelp,
             'profile_reference' => 'file_gallery',
             'default' => 1,
         ],
@@ -76,6 +82,7 @@ function prefs_h5p_list($partial = false)
             'dependencies' => [
                 'h5p_enabled',
             ],
+            'help' => $galleryEnhancementsHelp,
             'type' => 'flag',
             'filter' => 'alpha',
             'default' => 'n',
@@ -86,6 +93,7 @@ function prefs_h5p_list($partial = false)
             'dependencies' => [
                 'h5p_save_content_state',
             ],
+            'help' => $galleryEnhancementsHelp,
             'type' => 'text',
             'filter' => 'int',
             'units' => tra('seconds'),
@@ -97,6 +105,7 @@ function prefs_h5p_list($partial = false)
             'dependencies' => [
                 'h5p_enabled',
             ],
+            'help' => $galleryEnhancementsHelp,
             'type' => 'flag',
             'filter' => 'alpha',
             'default' => 'n',
@@ -107,6 +116,7 @@ function prefs_h5p_list($partial = false)
             'dependencies' => [
                 'h5p_enabled',
             ],
+            'help' => $galleryEnhancementsHelp,
             'type' => 'flag',
             'filter' => 'alpha',
             'default' => 'y',
@@ -121,10 +131,12 @@ function prefs_h5p_list($partial = false)
             'filter' => 'text',
             'default' => '',
             'warning' => tra('Experimental'),
+            'help' => $galleryEnhancementsHelp,
         ],
         'h5p_h5p_site_uuid' => [
             'name' => tr('H5P UUID'),
             'description' => tr('H5P Unique ID.'),
+            'help' => $galleryEnhancementsHelp,
             'dependencies' => [
                 'h5p_enabled',
             ],
@@ -139,6 +151,7 @@ function prefs_h5p_list($partial = false)
             'dependencies' => [
                 'h5p_enabled',
             ],
+            'help' => $galleryEnhancementsHelp,
             'type' => 'text',
             'filter' => 'int',
             'units' => tr('seconds'),
@@ -151,6 +164,7 @@ function prefs_h5p_list($partial = false)
             'dependencies' => [
                 'h5p_enabled',
             ],
+            'help' => $galleryEnhancementsHelp,
             'type' => 'flag',
             'filter' => 'alpha',
             'default' => 'y',
@@ -162,6 +176,7 @@ function prefs_h5p_list($partial = false)
                 'h5p_enabled',
             ],
             'type' => 'flag',
+            'help' => $galleryEnhancementsHelp,
             'filter' => 'alpha',
             'default' => 'n',
             'warning' => tra('Experimental'),
@@ -173,6 +188,7 @@ function prefs_h5p_list($partial = false)
                 'h5p_enabled',
             ],
             'type' => 'flag',
+            'help' => $galleryEnhancementsHelp,
             'filter' => 'alpha',
             'default' => 'n',
             'warning' => tra('Experimental'),
@@ -184,6 +200,7 @@ function prefs_h5p_list($partial = false)
                 'h5p_enabled',
             ],
             'type' => 'flag',
+            'help' => $galleryEnhancementsHelp,
             'filter' => 'alpha',
             'default' => 'n',
             'warning' => tra('Experimental'),
@@ -193,6 +210,7 @@ function prefs_h5p_list($partial = false)
             'description' => tra('Comma-separated: library or "*" for all, path to the file and optional version number, one per line.'),
             'perspective' => false,
             'type' => 'textarea',
+            'help' => $galleryEnhancementsHelp,
             'size' => 4,
             'hint' => tra('For example: H5P.Timeline,themes/js/h5p-custom-example.js,1.00'),
             'default' => '',
@@ -202,6 +220,7 @@ function prefs_h5p_list($partial = false)
             'description' => tra('Comma-separated library or "*" for all, path to the file and optional version number, one per line.'),
             'perspective' => false,
             'type' => 'textarea',
+            'help' => $galleryEnhancementsHelp,
             'size' => 4,
             'hint' => tra('For example: H5P.Timeline,themes/css/h5p-custom-example.css,1.00'),
             'default' => '',

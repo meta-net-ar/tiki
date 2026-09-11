@@ -1,5 +1,5 @@
 {strip}
-    <li class="row {if $toc_type eq 'fancy'}fancy{elseif $toc_type eq 'admin'} admin{/if}toclevel"{if $toc_type eq 'admin'} id="node_{$structure_tree.page_ref_id}" data-id="{$structure_tree.page_ref_id}"{/if}>
+    <li class="row {if $toc_type eq 'fancy'}fancy{elseif $toc_type eq 'admin'} admin{/if}toclevel"{if $toc_type eq 'admin'} id="node_{$structure_tree.page_ref_id}" data-id="{$structure_tree.page_ref_id}" data-page-name="{$structure_tree.pageName|escape}"{/if}>
         <div class="col-sm-12">
             {if $numbering}
                 <span class="prefix">{$structure_tree.prefix}&nbsp;</span>

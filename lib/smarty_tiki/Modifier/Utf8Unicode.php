@@ -7,11 +7,18 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * convert utf-8 to unicode
  */
-class Utf8Unicode
+class Utf8Unicode implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'utf8unicode';
+    }
+
     public function handle($utf8_text)
     {
         $output = [];

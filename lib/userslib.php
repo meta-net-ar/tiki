@@ -270,6 +270,76 @@ class UsersLib extends TikiLib
     }
 
     /**
+     * Remember-me cookie name and session key, derived from the cookie_name preference.
+     * Bootstrap sets global user_cookie_site to this value once for the whole request.
+     */
+    public function getRememberMeCookieName()
+    {
+        global $prefs;
+
+        $cookie_site = preg_replace("/[^a-zA-Z0-9]/", "", $prefs['cookie_name']);
+        return 'tiki-user-' . $cookie_site;
+    }
+
+    /**
+     * Remember-me setcookie options: path and domain from prefs, Secure and HttpOnly and SameSite from TikiLib.
+     *
+     * @param int $expires Unix timestamp
+     * @return array
+     */
+    public function getRememberMeCookieOptions($expires)
+    {
+        global $prefs;
+
+        $tikilib = TikiLib::lib('tiki');
+        return array_merge(
+            [
+                'expires' => $expires,
+                'path' => $prefs['feature_intertiki_sharedcookie'] == 'y' ? '/' : $prefs['cookie_path'],
+                'domain' => $prefs['cookie_domain'],
+            ],
+            $tikilib->getSetcookieSecurityAttributesFromSession()
+        );
+    }
+
+    /**
+     * Remember me on login: create the stored token and set the browser cookie.
+     */
+    public function issueRememberMeCookieForUserId($userId)
+    {
+        global $prefs;
+
+        $tikilib = TikiLib::lib('tiki');
+        $secret = $this->create_user_cookie($userId);
+        $value = $secret . '.' . $userId;
+        setcookie($this->getRememberMeCookieName(), $value, $this->getRememberMeCookieOptions($tikilib->now + $prefs['remembertime']));
+    }
+
+    /**
+     * Refresh remember-me expiry from the incoming cookie value and user id.
+     */
+    public function refreshRememberMeCookieFromLoginValue($loginCookieValue, $userId)
+    {
+        global $prefs;
+
+        $cookie_parts = explode('.', $loginCookieValue, 2);
+        if (count($cookie_parts) < 2) {
+            return;
+        }
+        $secret = array_shift($cookie_parts);
+        $secret = $this->create_user_cookie((int)$userId, $secret);
+        $value = $secret . '.' . $userId;
+        $tikilib = TikiLib::lib('tiki');
+        setcookie($this->getRememberMeCookieName(), $value, $this->getRememberMeCookieOptions($tikilib->now + $prefs['remembertime']));
+    }
+
+    /** Remove the remember-me cookie using the same options as issue and refresh. */
+    public function clearRememberMeCookieForSite()
+    {
+        setcookie($this->getRememberMeCookieName(), '', $this->getRememberMeCookieOptions(time() - 3600));
+    }
+
+    /**
      * @param string $user : username
      * @param bool $remote_logout : logged out remotely (so do not redirect)
      * @param string $redir : url to redirect to. Uses home page according to prefs if empty
@@ -277,7 +347,9 @@ class UsersLib extends TikiLib
      */
     public function user_logout($user, $remote_logout = false, $redir = '')
     {
-        global $prefs, $user_cookie_site;
+        global $prefs;
+
+        $rememberMeCookieName = $this->getRememberMeCookieName();
 
         $logslib = TikiLib::lib('logs');
         $logslib->add_log('login', 'logged out');
@@ -285,8 +357,8 @@ class UsersLib extends TikiLib
         $userInfo = $this->get_user_info($user);
         if ($prefs['login_multiple_forbidden'] === 'y') {
             $this->delete_user_cookie($userInfo['userId']);
-        } elseif (! empty($_COOKIE[$user_cookie_site])) {
-            $secret = explode('.', $_COOKIE[$user_cookie_site]);
+        } elseif (! empty($_COOKIE[$rememberMeCookieName])) {
+            $secret = explode('.', $_COOKIE[$rememberMeCookieName]);
             $this->delete_user_cookie($userInfo['userId'], $secret[0]);
         }
 
@@ -332,7 +404,7 @@ class UsersLib extends TikiLib
             }
         }
 
-        setcookie($user_cookie_site, '', -3600, $prefs['feature_intertiki_sharedcookie'] == 'y' ? '/' : $prefs['cookie_path'], $prefs['cookie_domain']);
+        $this->clearRememberMeCookieForSite();
 
         /* change group home page or deactivate if no page is set */
         if (! empty($redir)) {
@@ -351,7 +423,7 @@ class UsersLib extends TikiLib
             $url .= '?' . SID;
         }
 
-        unset($_SESSION['cas_validation_time'], $_SESSION[$user_cookie_site], $_SESSION['phpCAS']);
+        unset($_SESSION['cas_validation_time'], $_SESSION[$rememberMeCookieName], $_SESSION['phpCAS']);
         if (session_status() !== PHP_SESSION_NONE) {
             if (ini_get('session.use_cookies')) {
                 $params = session_get_cookie_params();
@@ -428,8 +500,9 @@ class UsersLib extends TikiLib
     * @param twoFactorCode: ???
     * @param validate_phase: If true, user followed the link from validation email after creation of account
     * @param for_login: If true, we are validating user for login purpose. If false, we are only checking that user is valid (for check of current password for example)
+    * @param record_failure: If false, unsuccessful attempts are not recorded (no lockout / waiting side effects)
     */
-    public function validate_user($user, $pass, $validate_phase = false, $twoFactorCode = null, $for_login = true)
+    public function validate_user($user, $pass, $validate_phase = false, $twoFactorCode = null, $for_login = true, $record_failure = true)
     {
         global $prefs;
 
@@ -485,7 +558,7 @@ class UsersLib extends TikiLib
         // first attempt a login via the standard Tiki system
         //
         if (! ($auth_shib || $auth_cas || $auth_saml) || $isAdminGroupMember) { //redflo: does this mean, that users in cas and shib are not replicated to tiki tables? Does this work well?
-            list($result, $user) = $this->validate_user_tiki($user, $pass, $validate_phase);
+            list($result, $user) = $this->validate_user_tiki($user, $pass, $validate_phase, $record_failure);
         } else {
             $result = null;
         }
@@ -544,6 +617,9 @@ class UsersLib extends TikiLib
         if ($noSpecialAuthEnabled || $adminCanSkip || $ldapUserHasTikiLoginAccess) {
             // if the user verified ok, log them in
             if ($userTiki) {//user validated in tiki, update lastlogin and be done
+                if (! $for_login) {
+                    return [true, $user, $result];
+                }
                 if ($auth_ldap) {
                     return [$this->_ldap_sync_and_update_lastlogin($user, $pass), $user, $result, 'tiki'];
                 }
@@ -849,9 +925,7 @@ class UsersLib extends TikiLib
                     $username = $saml_username;
                 }
 
-                $cookie_site = preg_replace("/[^a-zA-Z0-9]/", "", $prefs['cookie_name']);
-                $user_cookie_site = 'tiki-user-' . $cookie_site;
-                $_SESSION["$user_cookie_site"] = $username;
+                $_SESSION[$this->getRememberMeCookieName()] = $username;
 
                 $randompass = $this->genPass();
                 if (! $userTikiPresent) {
@@ -1235,11 +1309,13 @@ class UsersLib extends TikiLib
         }
 
         $clicked_on_saml_link = false;
+        $post_auth_redirect = '';
 
         // Check endpoints
         if (array_key_exists('auth', $_REQUEST) && $_REQUEST['auth'] == 'saml') {
             $saml_instance = $this->get_saml_auth();
-            $saml_instance->login();
+            $return_to = $_SESSION['loginfrom'] ?? null;
+            $saml_instance->login($return_to);
         } elseif (array_key_exists('saml_metadata', $_REQUEST)) {
             $samlSettingsInfo = $this->get_saml_settings();
             $saml_settings = new Saml2\Settings($samlSettingsInfo, true);
@@ -1277,11 +1353,8 @@ class UsersLib extends TikiLib
             $_SESSION['samlUserdata'] = $saml_instance->getAttributes();
             $_SESSION['samlNameId'] = $saml_instance->getNameId();
             $_SESSION['samlSessionIndex'] = $saml_instance->getSessionIndex();
-/*
-            if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
-                $saml_instance->redirectTo($_POST['RelayState']);
-            }
-*/
+
+            $post_auth_redirect = $_POST['RelayState'] ?? '';
         } elseif (array_key_exists('saml_sls', $_REQUEST)) {
             $saml_instance = $this->get_saml_auth();
 
@@ -1307,6 +1380,11 @@ class UsersLib extends TikiLib
 
         if ($clicked_on_saml_link || ($force_saml_login && ! $already_logged_as_admin)) {
             $this->validate_user("", "", "", "");
+
+            if (! empty($post_auth_redirect)) {
+                header('Location: ' . $post_auth_redirect);
+                exit;
+            }
         }
     }
 
@@ -1945,7 +2023,7 @@ class UsersLib extends TikiLib
      * @param user: username
      * @param pass: password
      */
-    public function validate_user_tiki($user, $pass, $validate_phase = false)
+    public function validate_user_tiki($user, $pass, $validate_phase = false, $record_failure = true)
     {
         global $prefs;
 
@@ -2012,7 +2090,9 @@ class UsersLib extends TikiLib
                 }
                 return [USER_VALID, $user];
             } else {
-                $this->handleUnsuccessfulLogin($user);
+                if ($record_failure) {
+                    $this->handleUnsuccessfulLogin($user);
+                }
                 return [PASSWORD_INCORRECT, $user];      // if the password was incorrect, dont give the md5's a spin
             }
         }
@@ -2030,7 +2110,9 @@ class UsersLib extends TikiLib
             return [USER_VALID, $user];
         }
 
-        $this->handleUnsuccessfulLogin($user);
+        if ($record_failure) {
+            $this->handleUnsuccessfulLogin($user);
+        }
 
         return [PASSWORD_INCORRECT, $user];
     }
@@ -2180,6 +2262,23 @@ class UsersLib extends TikiLib
             ]
         );
 
+        return true;
+    }
+    /**
+     * Updates date and time of user's lastActivity.
+     *
+     * @param user: Username
+     */
+    public function updateLastActivity($user)
+    {
+        $query = 'update `users_users` set `lastActivity`=? where `login`=? and (`waiting` <> \'a\' OR `waiting` IS NULL)';
+        $this->query(
+            $query,
+            [
+                (int)$this->now,
+                $user
+            ]
+        );
         return true;
     }
 
@@ -2504,7 +2603,7 @@ class UsersLib extends TikiLib
             // indicate whether the user's email is from a disposable mail server
             $res['disposable_email'] = false;
 
-            if ($prefs['email_detect_disposable'] === 'y' && isset($res['email'])) {
+            if ($prefs['email_detect_disposable'] === 'y' && ! empty($res['email'])) {
                 try {
                     if (DisposableEmail::isDisposable($res['email'])) {
                         $res['disposable_email'] = true;
@@ -2514,7 +2613,7 @@ class UsersLib extends TikiLib
                 }
             }
 
-            if (TIKI_API) {
+            if (defined('TIKI_API') && TIKI_API) {
                 // TODO: handle this as part of the API output serialization module
                 $res['avatar'] = $this->get_user_avatar_inline($res);
                 unset($res['avatarName']);
@@ -3181,6 +3280,18 @@ class UsersLib extends TikiLib
     {
         global $prefs;
 
+        $perspectivelib = TikiLib::lib('perspective');
+        $perspectiveId = $perspectivelib->get_current_perspective($prefs);
+
+        if ($perspectiveId) {
+            // Always redirect to the perspective homepage while a perspective with its own homepage is selected, not just the first time it is switched to.
+            $perspectivePreferences = $perspectivelib->get_preferences($perspectiveId);
+            if (! empty($perspectivePreferences['wikiHomePage'])) {
+                return $perspectivePreferences['wikiHomePage'];
+            }
+            // Perspective has no homepage of its own — fall through to group home logic below.
+        }
+
         if ($prefs['useGroupHome'] !== 'y') {
             return $prefs['wikiHomePage'];
         }
@@ -3516,7 +3627,7 @@ class UsersLib extends TikiLib
         if (! $useCache || ! $user_details = $cachelib->getSerialized($cacheKey)) {
             $user_details = [];
 
-            $query = 'SELECT `userId`, `login`, `email`, `lastLogin`, `currentLogin`,' .
+            $query = 'SELECT `userId`, `login`, `email`, `lastLogin`, `lastActivity`, `currentLogin`,' .
                             ' `registrationDate`, `created`, `avatarName`, `avatarSize`,' .
                             ' `avatarFileType`, `avatarLibName`, `avatarType`' .
                             ' FROM `users_users` WHERE `login` = ?';
@@ -5499,15 +5610,6 @@ class UsersLib extends TikiLib
                 'scope' => 'object',
             ],
             [
-                'name' => 'tiki_p_tracker_view_attachments',
-                'description' => tra('Can view tracker item attachments and download them'),
-                'level' => 'registered',
-                'type' => 'trackers',
-                'admin' => false,
-                'prefs' => ['feature_trackers'],
-                'scope' => 'object',
-            ],
-            [
                 'name' => 'tiki_p_comment_tracker_items',
                 'description' => tra('Can post tracker item comments'),
                 'level' => 'registered',
@@ -7117,7 +7219,9 @@ class UsersLib extends TikiLib
             );
         }
 
-        TikiLib::lib('userprefs')->set_user_avatar($user, 'l', 'dicebear/' . $prefs['user_default_avatar_style'], $user, null, null, null, false);
+        if ($prefs['user_dicebear_avatar'] == 'y') {
+            TikiLib::lib('userprefs')->set_user_avatar($user, 'l', 'dicebear/' . $prefs['user_default_avatar_style'], $user, null, null, null, false);
+        }
 
         if (empty($groups)) {
             $this->assign_user_to_group($user, 'Registered');
@@ -7335,6 +7439,8 @@ class UsersLib extends TikiLib
         list($secret, $userId) = explode('.', $cookie, 2);
         $query = 'select `userId` from `tiki_user_login_cookies` where `secret`=? and `userId`=? and `expiration` > NOW()';
 
+        // $userId here is always a string because it comes from a cookie
+        // so cast the integer value from the database to a string also to match
         if ($userId === (string) $this->getOne($query, [$secret, $userId])) {
             return $userId;
         } else {
@@ -7437,6 +7543,14 @@ class UsersLib extends TikiLib
             return $pass;
         }
         return false;
+    }
+
+    public function isValidActivationCode(string $user, string $actpass): bool
+    {
+        $query = 'select `provpass` from `users_users` where `login`=?';
+        $pass = $this->getOne($query, [$user]);
+
+        return ! empty($pass) && hash_equals(md5($pass), $actpass);
     }
 
    /**
@@ -7672,9 +7786,9 @@ class UsersLib extends TikiLib
 
             TikiLib::events()->trigger('tiki.user.update', ['type' => 'user', 'object' => $user]);
             return true;
-        } else {
-            throw new Exception(tr('An error occurred while updating the password.'));
         }
+
+        return false;
     }
 
     public function addPasswordHistory($user, $pass)
@@ -8151,6 +8265,9 @@ class UsersLib extends TikiLib
             )
         );
 
+        // falls back to login if not enabled
+        $smarty->assign('mail_realname', $this->clean_user($name));
+
         include_once('lib/webmail/tikimaillib.php');
 
         if ($second == 'y') {
@@ -8450,7 +8567,7 @@ class UsersLib extends TikiLib
         $user_details = $userlib->get_user_details($user);
         $user_info = $userlib->get_user_info($user);
         $ret['avatarData'] = new XML_RPC_Value($user_info['avatarData'], 'base64');
-        $ret['user_details'] = new XML_RPC_Value(serialize($user_details), 'string');
+        $ret['user_details'] = new XML_RPC_Value(json_encode($user_details), 'string');
         $params[] = new XML_RPC_Value($ret, 'struct');
         $msg = new XML_RPC_Message('intertiki.setUserInfo', $params);
         $result = $client->send($msg);
@@ -8469,13 +8586,13 @@ class UsersLib extends TikiLib
                 if ($key == '') {
                     break;
                 } elseif ($key == 'user_details') {
-                    $user_details = unserialize($value->scalarval());
+                    $user_details = json_decode($value->scalarval(), true);
                 } elseif ($key == 'avatarData') {
                     $avatarData = $value->scalarval();
                 }
             }
         } else {
-            $user_details = unserialize($response_value->scalarval());
+            $user_details = json_decode($response_value->scalarval(), true);
         }
 
         $userlib->set_user_fields($user_details['info']);

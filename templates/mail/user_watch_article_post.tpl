@@ -13,7 +13,7 @@
 {tr}Publish Date:{/tr} {$mail_current_publish_date|tiki_short_datetime:"":"n"}
 
 {if !empty($watchId)}{tr}If you don't want to receive these notifications follow this link:{/tr}
-{mailurl}tiki-user_watches.php?id={$watchId}{/mailurl}{/if}
+{mailurl}tiki-user_watches.php?id={$watchId}&hash={$watchUnsubscribeHash}{/mailurl}{/if}
 
 {if isset($mail_old_data)}
 

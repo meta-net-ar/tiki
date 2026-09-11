@@ -37,6 +37,7 @@
                     <input type="button" class="btn btn-secondary previewItemBtn" title="{tr}Preview your changes.{/tr}" name="preview" value="{tr}Preview{/tr}">
                 {/if}
                 <input type="hidden" name="trackerId" value="{$trackerId|escape}">
+                {if $cloneFrom}<input type="hidden" name="clone_from" value="{$cloneFrom|escape}">{/if}
                 <input type="hidden" name="skipRefresh" value="{$skipRefresh|escape}">
                 <input type="hidden" name="refreshMeta" value="{$refreshMeta|escape}">
                 <input type="hidden" name="refreshObject" value="{$refreshObject|escape}">

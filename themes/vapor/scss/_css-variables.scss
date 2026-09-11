@@ -208,4 +208,10 @@ body {
     --bs-border-width: 1px;
     --bs-light-bg-subtle: $light;
     --bs-info-bg-subtle: #065e94; // ($info)
+    .nav-link {
+        --bs-nav-link-color: #{$cyan}; // SCSS variable isn't being used for some reason.
+        &:hover {
+            color: $link-hover-color;
+        }
+    }
 }

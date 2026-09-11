@@ -177,6 +177,7 @@ class AttachmentsMigrateCommand extends Command
                             $arguments = $argumentParser->parse($match->getArguments());
                             $newArgs = [];
                             $modified = false;
+                            $change_source_type = false;
                             foreach ($arguments as $key => $val) {
                                 if ($key == 'attId' && $val == $att['attId']) {
                                     $newArgs[] = "fileId=$fileId";
@@ -184,10 +185,18 @@ class AttachmentsMigrateCommand extends Command
                                 } elseif ($key == 'src' && preg_match('/tiki-download_wiki_attachment\.php\?attId=(\d+)/', $val, $m) && $m[1] == $att['attId']) {
                                     $newArgs[] = "fileId=$fileId";
                                     $modified = true;
+                                    $change_source_type = true;
                                 } elseif ($key == 'type' && $val == 'attId') {
                                     $newArgs[] = "type=fileId";
                                 } else {
                                     $newArgs[] = "$key=\"$val\"";
+                                }
+                            }
+                            if ($change_source_type) {
+                                foreach ($newArgs as $key => $val) {
+                                    if (preg_match('/type\s*=\s*[\'"]*src[\'"]*/', $val)) {
+                                        $newArgs[$key] = 'type=fileId';
+                                    }
                                 }
                             }
                             if ($modified) {

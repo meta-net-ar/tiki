@@ -33,7 +33,7 @@ $inputConfiguration = [
         'permission_scope_behavior' => 'word',     //post
         ],
         'staticKeyFiltersForArrays' => [
-        'feature_filter'            => 'word',       //post
+        'feature_filter'            => 'text',       //post
         'group_filter'              => 'word',       //post
         'perm'                      => 'word',       //post
         'old_perm'                  => 'word',       //post
@@ -42,6 +42,10 @@ $inputConfiguration = [
 ];
 
 include_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
+
 if (! empty($_REQUEST['objectType']) && $_REQUEST['objectType'] != 'global') {
     if (! isset($_REQUEST['objectName']) || empty($_REQUEST['objectId'])) {
         Feedback::errorAndDie(tra('Not enough information to display this page'), \Laminas\Http\Response::STATUS_CODE_409);

@@ -10,11 +10,20 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 // @param numeric $id: id of the payment
 // @params url $returnurl: optional return url
-class Payment extends Base
+class Payment extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'payment';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs, $user;
@@ -123,7 +132,7 @@ class Payment extends Base
         } else {
             $repeat = false;
 
-            return smarty_block_remarksbox(
+            return \SmartyTiki\BlockHandler\Remarksbox::render(
                 [
                     'type' => 'warning',
                     'title' => tra('Payment error'),

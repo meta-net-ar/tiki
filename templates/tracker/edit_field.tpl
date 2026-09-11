@@ -267,7 +267,7 @@
             {if $prefs.feature_user_encryption eq 'y'}
                 <div class="mb-3 mx-0">
                     <label for="encryption_key_id" class="col-form-label">{tr}Encryption key{/tr}</label>
-                    {help url="Encryption"}
+                    {help url="User-Encryption"}
                     <select name="encryption_key_id" data-original="{$field.encryptionKeyId}" class="confirm-prompt form-select">
                         <option value=""></option>
                         {foreach from=$encryption_keys item=key}
@@ -347,5 +347,12 @@
         if ($(this).val() === 'password') {
             isPasswordDropdown.val('1');
         }
+    });
+
+    $(document).on("change", "select[name='option~cascade']", function() {
+        const newVal = $(this).val() === '7' ? '1' : '0';
+        const dupNative = document.querySelector("select[name='option~duplicateCascade']");
+        $(dupNative).val(newVal);
+        $(dupNative).trigger("change");
     });
 {/jq}

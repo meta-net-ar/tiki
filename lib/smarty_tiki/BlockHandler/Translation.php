@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty {translation lang=XX}{/translation} block plugin
@@ -25,15 +26,45 @@ use Smarty\Template;
  * @param Smarty clever simulation of a method
  * @return string string $content re-formatted
  */
-class Translation extends Base
+class Translation extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'translation';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if (! $repeat && ! empty($content)) {
             $lang = $params['lang'];
             $smarty = \TikiLib::lib('smarty');
             if ($smarty->getTemplateVars('language') == $lang) {
-                return $content;
+                $output = $content;
+
+                // Only escape when explicitly requested with escape='y'
+                if (! empty($params['escape']) && $params['escape'] === 'y') {
+                    $output = htmlspecialchars($output, ENT_QUOTES, 'UTF-8');
+                }
+
+                // Auto-detect wiki parsing context for noparse wrapping
+                $shouldNoparse = false;
+
+                // Explicit parameter takes precedence
+                if (isset($params['noparse'])) {
+                    $shouldNoparse = $params['noparse'] == 'y';
+                } else {
+                    // Auto-detect: if we're in a wiki parsing context, apply noparse automatically
+                    $inWikiContext = $smarty->getTemplateVars('wiki_parse_context') === true;
+                    if ($inWikiContext) {
+                        $shouldNoparse = true;
+                    }
+                }
+
+                if ($shouldNoparse) {
+                    $output = '~np~' . $output . '~/np~';
+                }
+
+                return $output;
             } else {
                 return '';
             }

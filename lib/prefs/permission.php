@@ -13,6 +13,7 @@ function prefs_permission_list()
             'type' => 'text',
             'size' => '50',
             'default' => '',
+            // TODO: find the doc link or create one
             'tags' => ['basic'],
         ],
         'permission_denied_login_box' => [
@@ -21,6 +22,7 @@ function prefs_permission_list()
 Alternatively, use the Send to URL field to display a specific page (relative to your Tiki installation) instead.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => 'Login-General-Preferences',
             'tags' => ['basic'],
         ],
         'permission_scope_behavior' => [

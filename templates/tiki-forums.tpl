@@ -20,7 +20,7 @@
                                 <span class="input-group-text">
                                     {icon name="search"}
                                 </span>
-                                <input type="text" name="find" class="form-control" value="{$find|escape}" placeholder="{tr}Find{/tr}">
+                                <input type="text" name="find" class="form-control" value="{$find|escape}" placeholder="{tr}Search{/tr}">
                                 <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
                                 <input type="submit" class="btn btn-info" value="{tr}Search by name{/tr}" name="search">
                             </div>
@@ -35,7 +35,7 @@
                                     <span class="input-group-text">
                                          {icon name="search"}
                                      </span>
-                                    <input name="highlight" type="text" class="form-control" placeholder="{tr}Find{/tr}">
+                                    <input name="highlight" type="text" class="form-control" placeholder="{tr}Search{/tr}">
                                     <input type="hidden" name="where" value="forums">
                                     <input type="hidden" name="filter~type" value="forum post">
                                     <input type="submit" class="wikiaction btn btn-info" name="search" value="{tr}Search in content{/tr}">
@@ -55,7 +55,7 @@
                             <span class="input-group-text">
                                 {icon name="search"}
                             </span>
-                            <input name="filter~content" type="text" class="form-control" aria-label="{tr}Find{/tr}" placeholder="{tr}Find{/tr}">
+                            <input name="filter~content" type="text" class="form-control" aria-label="{tr}Search{/tr}" placeholder="{tr}Search{/tr}">
                             <input type="hidden" name="where" value="forums">
                             <input type="hidden" name="filter~type" value="forum post">
                             <input type="submit" class="wikiaction btn btn-info" name="search" value="{tr}Search in content{/tr}">

@@ -86,6 +86,7 @@ class Services_File_Controller
             'requireTitle'          => $input->requireTitle->text(),
             'changeFileNameOnUpload' => $input->changeFileNameOnUpload->int(),
             'directoryPattern'      => $input->directoryPattern->text(),
+            'subdirectoryBehavior'  => $this->normalizeSubdirectoryBehavior($input->subdirectoryBehavior->word()),
         ];
 
         if ($input->uploadInModal->int()) {
@@ -109,7 +110,7 @@ class Services_File_Controller
             $fileId = false;
         }
 
-        if (! empty($input->asArray('user')) && is_array($input->user->asArray())) {
+        if (! empty($input->asArray('user')) && $input->isArray('user')) {
             $asuser = $input->asArray('user')[0];
         }
         $title = $input->title->text();
@@ -141,7 +142,7 @@ class Services_File_Controller
         }
         if (isset($_FILES['data'])) {
             // used by $this->action_upload_multiple and file gallery Files fields (possibly others)
-            if (is_uploaded_file($_FILES['data']['tmp_name'])) {
+            if (is_uploaded_file($_FILES['data']['tmp_name']) || is_file($_FILES['data']['tmp_name'])) {
                 $_SESSION['lastUploadGalleryId'] = $gal_info["galleryId"];
                 $file = new JitFilter($_FILES['data']);
                 $name = $file->name->text();
@@ -170,7 +171,8 @@ class Services_File_Controller
             $title = $name;
         }
 
-        if ($directory = $input->directory->text()) {
+        $subdirectoryBehavior = $this->normalizeSubdirectoryBehavior($input->subdirectoryBehavior->word());
+        if ($subdirectoryBehavior === 'subgalleries' && ($directory = $input->directory->text())) {
             $gal_info = $this->utilities->findOrCreateDirectoryHierarchy($gal_info['galleryId'], $directory);
         }
 
@@ -216,11 +218,22 @@ class Services_File_Controller
         $cat_name = $name;
         $cat_href = "tiki-download_file.php?fileId=$fileId";
 
-        if ($categories) {
-            $_REQUEST['cat_categories'] = $categories;
-            $_REQUEST["cat_categorize"] = 'on';
+        // Categories are either posted by the form or, on a replace, already on the file.
+        $postedCategories = [];
+        if (isset($_REQUEST['cat_categorize']) && $_REQUEST['cat_categorize'] === 'on' && ! empty($_REQUEST['cat_categories'])) {
+            $postedCategories = array_filter(array_map('intval', (array) $_REQUEST['cat_categories']));
         }
-        include('categorize.php');
+
+        if ($postedCategories) {
+            $_REQUEST['cat_categories'] = $postedCategories;
+            include('categorize.php');
+        } elseif ($categories) {
+            // Replacing a file with nothing posted: keep what it already had.
+            $_REQUEST['cat_categories'] = $categories;
+            $_REQUEST['cat_categorize'] = 'on';
+            include('categorize.php');
+        }
+        // Otherwise skip: categorize.php has no no-op path and would clear the file's categories.
 
         $filegallib = TikiLib::lib('filegal');
         $info = $filegallib->get_file_info($fileId);
@@ -260,29 +273,10 @@ class Services_File_Controller
 
         if (isset($_FILES['files']) && is_array($_FILES['files']['tmp_name']) && $util->checkCsrf()) {
             // a few other params that are still arrays but shouldn't be (mostly)
-            if (! empty($input->asArray('galleryId')) && is_array($input->galleryId->asArray())) {
-                $input->offsetSet('galleryId', $input->asArray('galleryId')[0]);
-            }
-            if (! empty($input->asArray('hit_limit')) && is_array($input->hit_limit->asArray())) {
-                $input->offsetSet('hit_limit', $input->asArray('hit_limit')[0]);
-            }
-            if (! empty($input->asArray('isbatch')) && is_array($input->isbatch->asArray())) {
-                $input->offsetSet('isbatch', $input->asArray('isbatch')[0]);
-            }
-            if (! empty($input->asArray('deleteAfter')) && is_array($input->deleteAfter->asArray())) {
-                $input->offsetSet('deleteAfter', $input->asArray('deleteAfter')[0]);
-            }
-            if (! empty($input->asArray('deleteAfter_unit')) && is_array($input->deleteAfter_unit->asArray())) {
-                $input->offsetSet('deleteAfter_unit', $input->asArray('deleteAfter_unit')[0]);
-            }
-            if (! empty($input->asArray('author')) && is_array($input->author->asArray())) {
-                $input->offsetSet('author', $input->asArray('author')[0]);
-            }
-            if (! empty($input->asArray('user')) && is_array($input->user->asArray())) {
-                $input->offsetSet('user', $input->asArray('user')[0]);
-            }
-            if (! empty($input->asArray('listtoalert')) && is_array($input->listtoalert->asArray())) {
-                $input->offsetSet('listtoalert', $input->asArray('listtoalert')[0]);
+            foreach (['galleryId', 'hit_limit', 'isbatch', 'deleteAfter', 'deleteAfter_unit', 'author', 'user', 'listtoalert'] as $arrayInputKey) {
+                if (! empty($input->asArray($arrayInputKey)) && $input->isArray($arrayInputKey)) {
+                    $input->offsetSet($arrayInputKey, $input->asArray($arrayInputKey)[0]);
+                }
             }
 
             $gal_info = $this->checkTargetGallery($input);
@@ -603,12 +597,17 @@ class Services_File_Controller
     {
         $id = $input->id->int();
         $galleryId = $input->galleryId->int() ?: 0;
-        $recurse = $input->recurse ?: true;
+        $recurse = isset($input['recurse']) ? (bool) $input->recurse->int() : true;
 
         $perms = Perms::get('file gallery', $galleryId);
 
         if (! $perms->admin_file_galleries) {
             throw new Services_Exception_Denied();
+        }
+
+        $info = TikiLib::lib('filegal')->get_file_gallery_info($id);
+        if (! $info) {
+            throw new Services_Exception_NotFound();
         }
 
         $fileGallery = TikiLib::lib('filegal');
@@ -635,9 +634,8 @@ class Services_File_Controller
             throw new Services_Exception_NotFound(tr('Requested file does not exist'));
         }
 
-        $perms = Perms::get('file gallery', $fileInfo['galleryId']);
-
-        if (! $perms->admin_file_galleries) {
+        // Shared delete check, consistent with the gallery view, elFinder and WebDAV.
+        if (! $fileGallery->userCanRemoveFile($fileInfo)) {
             throw new Services_Exception_Denied();
         }
 
@@ -667,7 +665,12 @@ class Services_File_Controller
 
         $fileGallery = TikiLib::lib('filegal');
 
-        return $fileGallery->get_file_gallery_info($galleryId);
+        $galleryInfo = $fileGallery->get_file_gallery_info($galleryId);
+        if (! $galleryInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
+        return $galleryInfo;
     }
 
     public function action_list_files($input)
@@ -687,6 +690,18 @@ class Services_File_Controller
         $fileGallery = TikiLib::lib('filegal');
 
         $result = $fileGallery->list_files($offset, $maxRecords, $sort_mode, $find, $galleryId);
+        if (! $result['data']) {
+            throw new Services_Exception_NotFound();
+        }
+
+        $files = $result['data'];
+        if ($input->omit_metadata->int()) {
+            // slimmer result: these fields can be huge
+            $files = array_map(function ($file) {
+                unset($file['metadata'], $file['search_data'], $file['ocr_data']);
+                return $file;
+            }, $files);
+        }
 
         return [
             'title' => tr('List files'),
@@ -694,7 +709,7 @@ class Services_File_Controller
             'offset' => $offset,
             'maxRecords' => $maxRecords,
             'count' => $result['count'],
-            'result' => $result['data'],
+            'result' => $files,
         ];
     }
 
@@ -810,8 +825,11 @@ class Services_File_Controller
         $fileGallery = TikiLib::lib('filegal');
         $moved = $fileGallery->move_file_gallery($galleryId, $new_parent_id);
 
+        // $moved returns a Tiki\TikiDb\PdoResult, so we need to check numrows.
+        $moved = $moved && $moved->numrows ?? false;
+
         if (! $moved) {
-            $msg = tr('An error occured while moving the file gallery: %0', $galleryId);
+            throw new Services_Exception_NotFound();
         } else {
             $msg = tr('The file gallery %0 has been moved', $galleryId);
         }
@@ -844,6 +862,11 @@ class Services_File_Controller
             }
         }
 
+        $fileInfo = $fileGallery->get_file_info($fileId);
+        if (! $fileInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
         $newFileId = $fileGallery->duplicate_file($fileId, $galleryId, $newName, $description);
 
         return [
@@ -874,6 +897,11 @@ class Services_File_Controller
         }
 
         $fileGallery = TikiLib::lib('filegal');
+        $galleryInfo = $fileGallery->get_file_gallery_info($galleryId);
+        if (! $galleryInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
         $newGalleryId = $fileGallery->duplicate_file_gallery($galleryId, $name, $description);
 
         return [
@@ -887,6 +915,10 @@ class Services_File_Controller
     {
         global $user;
         $fileIDs = $input->asArray('items');
+
+        if (empty($fileIDs)) {
+            throw new Services_Exception_MissingValue('items');
+        }
 
         $fileGallery = TikiLib::lib('filegal');
         $result = [];
@@ -912,6 +944,10 @@ class Services_File_Controller
     public function action_unlock_files($input)
     {
         $fileIDs = $input->asArray('items');
+
+        if (empty($fileIDs)) {
+            throw new Services_Exception_MissingValue('items');
+        }
 
         $fileGallery = TikiLib::lib('filegal');
         $result = [];
@@ -939,8 +975,8 @@ class Services_File_Controller
         // The file uploader sends galleryId as an array, while elFinder and older methods send it as an integer. This logic handles all cases.
 
         // First, check for the array format used by the file uploader.
-        $galleryIdFromInput = $input->galleryId->asArray();
-        if (! empty($galleryIdFromInput) && is_array($galleryIdFromInput) && isset($galleryIdFromInput[0])) {
+        $galleryIdFromInput = $input->asArray('galleryId');
+        if (! empty($galleryIdFromInput) && $input->isArray('galleryId') && isset($galleryIdFromInput[0])) {
             $galleryId = (int) $galleryIdFromInput[0];
         } elseif ($input->galleryId->int()) {
             // Second, check for an integer format, used by elFinder and other parts of Tiki.
@@ -1005,15 +1041,22 @@ class Services_File_Controller
         return $message;
     }
 
+    private function normalizeSubdirectoryBehavior(?string $behavior): string
+    {
+        if (in_array($behavior, ['subgalleries', 'flat', 'skip'], true)) {
+            return $behavior;
+        }
+
+        return 'subgalleries';
+    }
+
     private function buildFailedUploadErrorMessage()
     {
-        require_once __DIR__ . '/../../../smarty_tiki/modifier.kbsize.php';
-
         $tikilib = TikiLib::lib('tiki');
         $maxPostSize = $tikilib->return_bytes(ini_get('post_max_size'));
 
         if (isset($_SERVER['CONTENT_LENGTH']) && (int) $_SERVER['CONTENT_LENGTH'] > $maxPostSize) {
-            $message = tr('Uploaded data is larger than the max post size, uploaded data should not exceed %0', smarty_modifier_kbsize($maxPostSize, true, 0));
+            $message = tr('Uploaded data is larger than the max post size, uploaded data should not exceed %0', \SmartyTiki\Modifier\KbSize::apply($maxPostSize, true, 0));
         } else {
             $message = tr('File could not be uploaded.');
         }

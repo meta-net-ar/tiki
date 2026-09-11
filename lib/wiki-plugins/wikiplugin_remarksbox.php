@@ -142,9 +142,8 @@ function wikiplugin_remarksbox_info()
 function wikiplugin_remarksbox($data, $params)
 {
     $smarty = TikiLib::lib('smarty');
-    require_once('lib/smarty_tiki/block.remarksbox.php');
 
     $repeat = false;
-    $ret = smarty_block_remarksbox($params, '~/np~' . tra($data) . ' ~np~', $smarty->getEmptyInternalTemplate(), $repeat);
+    $ret = \SmartyTiki\BlockHandler\Remarksbox::render($params, '~/np~' . tra($data) . ' ~np~', $smarty->getEmptyInternalTemplate(), $repeat);
     return $ret;
 }

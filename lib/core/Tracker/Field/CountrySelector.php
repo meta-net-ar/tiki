@@ -197,13 +197,13 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
         }
 
         foreach ($current as $index => $value) {
-            $label = $flags[$value];
+            $label = is_array($flags) ? ($flags[$value] ?? '') : null;
             if ($context['list_mode'] != 'csv') {
                 if ($this->getOption('name_flag') != 1) {
                     $out .= $this->renderImage($value, $label);
                 }
                 if ($this->getOption('name_flag') == 0) {
-                    $out .= ' ';
+                    $out .= ' ';
                 }
             }
             $out .= $label;
@@ -215,10 +215,27 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
         return $out;
     }
 
+    /**
+     * Return plain text representation of selected countries
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $current = $this->getConfiguration('value');
+
+        if (empty($current)) {
+            return '';
+        }
+
+        return $current;
+    }
+
     private function renderImage($code, $label)
     {
         $smarty = TikiLib::lib('smarty');
-        return '<img src="img/flags/' . smarty_modifier_escape($code) . '.png" title="' . smarty_modifier_escape($label) . '" alt="' . smarty_modifier_escape($label) . '" />';
+        return '<img src="img/flags/' . \SmartyTiki\Modifier\Escape::apply($code) . '.png" title="' . \SmartyTiki\Modifier\Escape::apply($label) . '" alt="' . \SmartyTiki\Modifier\Escape::apply($label) . '" />';
     }
 
     public function renderInput($context = [])
@@ -363,7 +380,7 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
                 if (count($value)) {
                     return implode(',', array_map(function ($v) use ($possibilities) {
                         $label = $possibilities[$v];
-                        return $this->renderImage($v, $possibilities[$v]) . ' ' . smarty_modifier_escape($label);
+                        return $this->renderImage($v, $possibilities[$v]) . ' ' . \SmartyTiki\Modifier\Escape::apply($label);
                     }, $value));
                 }
             })

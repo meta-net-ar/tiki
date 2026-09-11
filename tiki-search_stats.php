@@ -18,6 +18,10 @@ require_once('tiki-setup.php');
 $searchstatslib = TikiLib::lib('searchstats');
 //get_strings tra('Search Stats')
 
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
+
 $access->check_feature('feature_search_stats');
 $access->check_permission('tiki_p_admin');
 

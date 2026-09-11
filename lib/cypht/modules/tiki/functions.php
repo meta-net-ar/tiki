@@ -468,19 +468,6 @@ if (! hm_exists('bind_tracker_item_update_event')) {
     }
 }
 
-/**
- * @subpackage tiki/functions
- * @return string ensure file was saved before removing it from remote mailbox
- */
-if (! hm_exists('append_to_msg_headers')) {
-    function append_to_msg_headers($headers, $link)
-    {
-        $headers = preg_replace('#</div><span id="extra-header-buttons"></span>#s', $link . "\\0", $headers, 1);
-
-        return $headers;
-    }
-}
-
 function find_relevant_tracker_items($keywords, $multivalueField = '', $searchArgs = [])
 {
     global $prefs;
@@ -750,9 +737,11 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
         }
 
         // Build message URL
-        $url = '?page=message&uid=' . $msg['fileId'] . '&list_path=' .
-                sprintf('tracker_folder_%s_%s', $msg['itemId'], $msg['fieldId']) .
-                '&list_parent=' . sprintf('tracker_%s', $msg['trackerId']);
+        $url = $output_module->build_page_url('message', [
+            'uid' => $msg['fileId'],
+            'list_path' => sprintf('tracker_folder_%s_%s', $msg['itemId'], $msg['fieldId']),
+            'list_parent' => sprintf('tracker_%s', $msg['trackerId']),
+        ]);
 
         if ($list_page) {
             $url .= '&list_page=' . $output_module->html_safe($list_page);

@@ -69,6 +69,14 @@ class PeerTubeLib
 
     private function makeRequest($method, $url, $data = [], $auth = true, $rawBody = false)
     {
+        // Prevent SSRF: validate the request URL before cURL opens the connection.
+        // PeerTube base URL is admin-configured, but CURLOPT_FOLLOWLOCATION could
+        // follow redirects to internal hosts if the remote instance is compromised.
+        $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+        if (! $ssrf->isUrlAllowed($url)) {
+            throw new \Exception('PeerTube request blocked: URL targets a private or reserved address.');
+        }
+
         $ch = curl_init();
         $method = strtoupper($method);
         curl_setopt($ch, CURLOPT_URL, $url);

@@ -5,8 +5,8 @@
                 <form id="search-module-form{$search_mod_usage_counter}" method="get" action="{$smod_params.search_action}"{if $smod_params.use_autocomplete eq 'y'} onsubmit="return submitSearch{$search_mod_usage_counter}()"{/if} style="position: relative;">
                     <div class="{if $smod_params.compact eq 'y'}input-group{else}mb-3{/if}{*d-flex flex-wrap mx-0 align-items-center*}">
                     {*    <div class="{*col-auto*}{*me-2"> *}
-                            <input style="min-width: 4rem;{if $smod_params.compact eq "y"}{*width:72%;border-bottom-right-radius:0;border-top-right-radius: 0;*}{/if}" placeholder="{tr}Find{/tr}" class="form-control my-1" id="search_mod_input_{$search_mod_usage_counter}" name="{if $smod_params.search_action eq 'tiki-searchindex.php'}filter~content{else}find{/if}" {if !empty($smod_params.input_size)}size="{$smod_params.input_size}" style="width: auto"{/if} type="text" accesskey="s" value="{$smod_params.input_value|escape}">
-                            <label class="sr-only" for="search_mod_input_{$search_mod_usage_counter}">Find</label>
+                            <input style="min-width: 4rem;{if $smod_params.compact eq "y"}{*width:72%;border-bottom-right-radius:0;border-top-right-radius: 0;*}{/if}" placeholder="{tr}Search{/tr}" class="form-control my-1" id="search_mod_input_{$search_mod_usage_counter}" name="{if $smod_params.search_action eq 'tiki-searchindex.php'}filter~content{else}find{/if}" {if !empty($smod_params.input_size)}size="{$smod_params.input_size}" style="width: auto"{/if} type="text" accesskey="s" value="{$smod_params.input_value|escape}">
+                            <label class="sr-only" for="search_mod_input_{$search_mod_usage_counter}">{tr}Search{/tr}</label>
                     {*    </div>*}
                             {if $smod_params.show_object_filter eq 'y'}
                                 <label class="col-form-label" for="filterType">
@@ -147,14 +147,35 @@ $("#search_mod_input_{{$search_mod_usage_counter}}")
                     }
                 {/jq}
                 {if $smod_params.use_autocomplete eq 'y'}
-                    {capture name="selectFn"}select: function(event, item) {ldelim}
-                        $('#search-module-form{$search_mod_usage_counter}').data('page_selected', item.item.value).find("input[name=exact_match]").val("y");
+                    {capture name="selectFn"}select: function(event) {ldelim}
+                        const item = event.detail[0];
+                        window.location.href = item.url;
                         {rdelim}, open: function(event, item) {ldelim}
                         $(".search_mod_buttons", "#search-module-form{$search_mod_usage_counter}").hide();
                         {rdelim}, close: function(event, item) {ldelim}
                         $(".search_mod_buttons", "#search-module-form{$search_mod_usage_counter}").show();
-                        {rdelim}{/capture}
-                    {autocomplete element="#search_mod_input_"|cat:$search_mod_usage_counter type="pagename" options=$smarty.capture.selectFn}
+                        {rdelim},
+                        excludeIdentifiers: (function() {ldelim}
+                            const ids = {ldelim}{rdelim};
+                            {if isset($smod_params.autocomplete_exclude_parent_ids)}
+                               {foreach from=$smod_params.autocomplete_exclude_parent_ids key=key item=id}
+                                    const pair{$key} = "{$id|escape:javascript}".split(':');
+                                    if (ids[pair{$key}[0]]) {ldelim}
+                                        if (Array.isArray(ids[pair{$key}[0]])) {ldelim}
+                                            ids[pair{$key}[0]].push(pair{$key}[1]);
+                                        {rdelim} else {ldelim}
+                                            ids[pair{$key}[0]] = [ids[pair{$key}[0]], pair{$key}[1]];
+                                        {rdelim}
+                                    {rdelim} else {ldelim}
+                                        ids[pair{$key}[0]] = pair{$key}[1];
+                                    {rdelim}
+                                {/foreach}
+                            {/if}
+                            return ids;
+                        {rdelim})(),
+                        types: [{if isset($smod_params.autocomplete_objecttypes)}{foreach from=$smod_params.autocomplete_objecttypes item=type}"{$type|escape:javascript}"{if !$smarty.foreach.type.last},{/if}{/foreach}{/if}]
+                    {/capture}
+                    {autocomplete element="#search_mod_input_"|cat:$search_mod_usage_counter type="search_module" options=$smarty.capture.selectFn}
                 {/if}
             {/if}
         {/tikimodule}

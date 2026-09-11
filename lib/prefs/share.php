@@ -6,11 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_share_list()
 {
+    $shareHelp = 'share';
+
     return [
         'share_display_links' => [
             'name' => tra('Display links on the share page'),
+            'description' => tra('Show the full and short links to the shared page on the share form.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $shareHelp,
         ],
         'share_token_notification' => [
             'name' => tra('Token notification'),
@@ -21,6 +25,7 @@ function prefs_share_list()
                 'auth_token_access'
             ],
             'default' => 'y',
+            'help' => $shareHelp,
         ],
         'share_contact_add_non_existant_contact' => [
             'name'  => tra('Add contact'),
@@ -31,12 +36,14 @@ function prefs_share_list()
                 'feature_contacts',
             ],
             'default' => 'n',
+            'help' => $shareHelp,
         ],
         'share_display_name_and_email' => [
             'name' => tra('Display name and email'),
             'description' => tra('If the user is connected, the name and email will display in the page.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $shareHelp,
         ],
         'share_can_choose_how_much_time_access' => [
             'name' => tra('Number of times accessed'),
@@ -46,6 +53,7 @@ function prefs_share_list()
                 'auth_token_access',
             ],
             'default' => 'n',
+            'help' => $shareHelp,
         ],
         'share_max_access_time' => [
             'name' => tra('Maximum number of times accessed'),
@@ -53,6 +61,7 @@ function prefs_share_list()
             'type' => 'text',
             'units' => tra('page hits'),
             'default' => '-1',
+            'help' => $shareHelp,
         ],
 
     ];

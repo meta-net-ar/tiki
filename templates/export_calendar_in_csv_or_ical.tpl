@@ -6,6 +6,7 @@
         <div class="dropdown-menu p-0" id="{$exportCal}" aria-labelledby="{$exportCal}_toggle">
             <form method="post" action="tiki-calendar_export_ical.php" name="f">
                 <input type="hidden" name="export" value="y">
+                <input type="hidden" name="exportAllEvents" value="y">
                 <h6 class="dropdown-header caltitle">{tr}Export calendars{/tr}</h6>
                 <div class="dropdown-divider"></div>
                 <div class="px-3 py-1 caltoggle">

@@ -366,6 +366,60 @@ class FileGalLib extends TikiLib
     }
 
     /**
+     * Single source of truth for "may the current user delete this file?".
+     *
+     * Every file-deletion entry point must go through here so the permission model
+     * cannot drift between views (gallery UI, elFinder, WebDAV, API, search action).
+     * The low-level remove_file() below performs no permission check of its own.
+     *
+     * A user may remove a file when any of the following is true:
+     *   - has tiki_p_admin_file_galleries on the gallery, or
+     *   - owns the gallery (their own user gallery), or
+     *   - owns (uploaded) the file, or
+     *   - has tiki_p_remove_files on the gallery.
+     *
+     * @param array      $fileInfo file row; needs at least fileId, user, galleryId
+     * @param array|null $galInfo  gallery row (needs user); loaded from galleryId if omitted
+     * @param array|null $perms    perm object for the gallery; loaded if omitted
+     * @return bool
+     */
+    public function userCanRemoveFile($fileInfo, $galInfo = null, $perms = null)
+    {
+        global $user;
+
+        if (! is_array($fileInfo) || empty($fileInfo['fileId'])) {
+            return false;
+        }
+
+        $galleryId = $fileInfo['galleryId'] ?? null;
+
+        if (! is_array($galInfo) || ! array_key_exists('user', $galInfo)) {
+            $galInfo = $galleryId ? $this->get_file_gallery_info($galleryId) : ['user' => ''];
+        }
+
+        if (! is_array($perms)) {
+            $perms = TikiLib::lib('tiki')->get_perm_object($galleryId, 'file gallery', $galInfo, false);
+        }
+
+        if (($perms['tiki_p_admin_file_galleries'] ?? 'n') === 'y') {
+            return true;
+        }
+
+        // Owners may delete their own files or files in their own user gallery.
+        if (! empty($user)) {
+            if (isset($galInfo['user']) && $user === $galInfo['user']) {
+                return true;
+            }
+            if (isset($fileInfo['user']) && $user === $fileInfo['user']) {
+                return true;
+            }
+        }
+
+        // Otherwise deleting a file requires the dedicated remove permission.
+        return ($perms['tiki_p_remove_files'] ?? 'n') === 'y';
+    }
+
+    /**
      * @param $fileInfo
      * @param string $galInfo
      * @param bool $disable_notifications
@@ -756,61 +810,106 @@ class FileGalLib extends TikiLib
     public function process_batch_file_upload($galleryId, $file, $user, $description, &$errors)
     {
         $extract_dir = 'temp/' . basename($file) . '/';
-        mkdir($extract_dir);
+        mkdir($extract_dir, 0777, true);
+
         $archive = new PclZip($file);
         $archive->extract(PCLZIP_OPT_PATH, $extract_dir, PCLZIP_OPT_REMOVE_ALL_PATH);
         unlink($file);
-        $h = opendir($extract_dir);
 
-        // check filters
-        $upl = 1;
         $errors = [];
-        while (($file = readdir($h)) !== false) {
-            if ($file != '.' && $file != '..' && is_file($extract_dir . '/' . $file)) {
-                if (! $this->is_filename_valid($file)) {
-                    $errors[] = tra('Invalid filename (using filters for filenames)') . ': ' . $file;
-                    $upl = 0;
+        $validFiles = [];
+
+        try {
+            $iterator = new \FilesystemIterator($extract_dir, \FilesystemIterator::SKIP_DOTS);
+        } catch (Exception $e) {
+            $errors[] = tra('Could not open extract directory');
+            return false;
+        }
+
+        // Validation Loop
+        foreach ($iterator as $fileInfo) {
+            if ($fileInfo->isFile()) {
+                $name = $fileInfo->getFilename();
+                $isValid = true;
+
+                if (! $this->is_filename_valid($name)) {
+                    $errors[] = tra('Invalid filename (using filters for filenames)') . ': ' . $name;
+                    $isValid = false;
                 }
 
                 try {
-                    $this->assertUploadedFileIsSafe($file);
+                    $this->assertUploadedFileIsSafe($name);
                 } catch (Exception $e) {
                     $errors[] = $e->getMessage();
-                    $upl = 0;
+                    $isValid = false;
                 }
 
-                if (! $this->checkQuota(filesize($extract_dir . $file), $galleryId, $error)) {
-                    $errors[] = $error;
-                    $upl = 0;
+                if (! $this->checkQuota($fileInfo->getSize(), $galleryId, $quotaError)) {
+                    $errors[] = $quotaError;
+                    $isValid = false;
+                }
+
+                if ($isValid) {
+                    $validFiles[] = $fileInfo; // Store the object for processing
                 }
             }
         }
-        if (! $upl) {
+
+        if (! empty($errors)) {
+            foreach ($iterator as $fileInfo) {
+                if ($fileInfo->isFile()) {
+                    @unlink($fileInfo->getPathname());
+                }
+            }
+            rmdir($extract_dir);
             return false;
         }
-        rewinddir($h);
-        while (($file = readdir($h)) !== false) {
-            if ($file != '.' && $file != '..' && is_file($extract_dir . '/' . $file)) {
-                if (false === $data = @file_get_contents($extract_dir . $file)) {
-                    $errors[] = tra('Cannot open this file:') . "temp/$file";
-                    return false;
-                }
-                $tikiFile = new TikiFile([
-                    'galleryId' => $galleryId,
-                    'description' => $description,
-                    'user' => $user,
-                ]);
-                $type = TikiLib::lib('mime')->from_path($file, $extract_dir . $file);
-                $fileId = $tikiFile->replace($data, $type, $file, $file);
-                unlink($extract_dir . $file);
+
+        foreach ($validFiles as $fileInfo) {
+            $name = $fileInfo->getFilename();
+            $path = $fileInfo->getPathname();
+
+            if (false === $data = @file_get_contents($path)) {
+                $errors[] = tra('Cannot open this file:') . " temp/$name";
+                return false;
             }
+
+            $tikiFile = new TikiFile([
+                'galleryId' => $galleryId,
+                'description' => $description,
+                'user' => $user,
+            ]);
+
+            $type = TikiLib::lib('mime')->from_path($name, $path);
+            $tikiFile->replace($data, $type, $name, $name);
+            unlink($path);
         }
 
-        closedir($h);
         rmdir($extract_dir);
         return true;
     }
 
+
+    /**
+     * Helper function to recursively remove directory
+     */
+    private function removeDirRecursive(string $dir): void
+    {
+        if (! is_dir($dir)) {
+            return;
+        }
+
+        foreach (
+            new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
+            ) as $fileInfo
+        ) {
+            $fileInfo->isDir() ? rmdir($fileInfo->getPathname()) : unlink($fileInfo->getPathname());
+        }
+
+        rmdir($dir);
+    }
     public function get_file_info($fileId, $include_search_data = true, $include_data = true, $use_draft = false)
     {
         global $prefs, $user;
@@ -965,6 +1064,10 @@ class FileGalLib extends TikiLib
 
     public function change_file_handler($mime_type, $cmd)
     {
+        if (! $this->isSafeHandlerCommand($cmd)) {
+            return false;
+        }
+
         $handlers = $this->table('tiki_file_handlers');
 
         $mime_type = trim($mime_type);
@@ -1004,38 +1107,72 @@ class FileGalLib extends TikiLib
         }
     }
 
+    /**
+     * Built-in MIME → candidate handler command templates.
+     * Partially duplicated in tiki-check.php for standalone mode checks.
+     */
+    private function getHandlerCommandPossibilities()
+    {
+        return [
+            'application/ms-excel' => ['xls2csv %1'],
+            'application/msexcel' => ['xls2csv %1'],
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => ['xlsx2csv.py %1'],
+            'application/ms-powerpoint' => ['catppt %1'],
+            'application/mspowerpoint' => ['catppt %1'],
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation' => ['pptx2txt.pl %1 -'],
+            'application/msword' => ['catdoc %1', 'strings %1'],
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => ['docx2txt.pl %1 -'],
+            'application/pdf' => ['pstotext %1', 'pdftotext %1 -'],
+            'application/postscript' => ['pstotext %1'],
+            'application/ps' => ['pstotext %1'],
+            'application/rtf' => ['catdoc %1'],
+            'application/sgml' => ['col -b %1', 'strings %1'],
+            'application/vnd.ms-excel' => ['xls2csv %1'],
+            'application/vnd.ms-powerpoint' => ['catppt %1'],
+            'application/x-msexcel' => ['xls2csv %1'],
+            'application/x-pdf' => ['pstotext %1', 'pdftotext %1 -'],
+            'application/x-troff-man' => ['man -l %1'],
+            'application/zip' => ['unzip -l %1'],
+            'text/enriched' => ['col -b %1', 'strings %1'],
+            'text/html' => ['elinks -dump -no-home %1'],
+            'text/richtext' => ['col -b %1', 'strings %1'],
+            'text/sgml' => ['col -b %1', 'strings %1'],
+            'text/tab-separated-values' => ['col -b %1', 'strings %1'],
+        ];
+    }
+
+    /**
+     * Binary basenames allowed in file-handler command templates.
+     * Derived from the built-in possibilities list.
+     */
+    private function getAllowedHandlerBinaries()
+    {
+        static $allowed;
+
+        if ($allowed !== null) {
+            return $allowed;
+        }
+
+        $allowed = [];
+        foreach ($this->getHandlerCommandPossibilities() as $options) {
+            foreach ($options as $opt) {
+                $optArray = explode(' ', $opt, 2);
+                $exec = reset($optArray);
+                if ($exec !== false && $exec !== '') {
+                    $allowed[$exec] = true;
+                }
+            }
+        }
+
+        return $allowed;
+    }
+
     public function get_file_handlers($for_execution = false)
     {
         $cachelib = TikiLib::lib('cache');
 
         if ($for_execution && ! $default = $cachelib->getSerialized('file_handlers')) {
-            // n.b. this array is partially duplicated in tiki-check.php for standalone mode checks
-            $possibilities = [
-                'application/ms-excel' => ['xls2csv %1'],
-                'application/msexcel' => ['xls2csv %1'],
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => ['xlsx2csv.py %1'],
-                'application/ms-powerpoint' => ['catppt %1'],
-                'application/mspowerpoint' => ['catppt %1'],
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation' => ['pptx2txt.pl %1 -'],
-                'application/msword' => ['catdoc %1', 'strings %1'],
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => ['docx2txt.pl %1 -'],
-                'application/pdf' => ['pstotext %1', 'pdftotext %1 -'],
-                'application/postscript' => ['pstotext %1'],
-                'application/ps' => ['pstotext %1'],
-                'application/rtf' => ['catdoc %1'],
-                'application/sgml' => ['col -b %1', 'strings %1'],
-                'application/vnd.ms-excel' => ['xls2csv %1'],
-                'application/vnd.ms-powerpoint' => ['catppt %1'],
-                'application/x-msexcel' => ['xls2csv %1'],
-                'application/x-pdf' => ['pstotext %1', 'pdftotext %1 -'],
-                'application/x-troff-man' => ['man -l %1'],
-                'application/zip' => ['unzip -l %1'],
-                'text/enriched' => ['col -b %1', 'strings %1'],
-                'text/html' => ['elinks -dump -no-home %1'],
-                'text/richtext' => ['col -b %1', 'strings %1'],
-                'text/sgml' => ['col -b %1', 'strings %1'],
-                'text/tab-separated-values' => ['col -b %1', 'strings %1'],
-            ];
+            $possibilities = $this->getHandlerCommandPossibilities();
 
             $default = [];
             $executables = [];
@@ -1134,6 +1271,10 @@ class FileGalLib extends TikiLib
         }
 
         return function (FileWrapper $wrapper) use ($command) {
+            if (! $this->isSafeHandlerCommand($command)) {
+                return false;
+            }
+
             $tmpfname = $wrapper->getReadableFile();
 
             $cmd = str_replace('%1', escapeshellarg($tmpfname), $command);
@@ -1148,6 +1289,60 @@ class FileGalLib extends TikiLib
 
             return false;
         };
+    }
+
+    /**
+     * Ensure a handler template is safe to pass to popen()/`/bin/sh -c`.
+     *
+     * The binary (first token, basename) must be one of the built-in
+     * extractors from getHandlerCommandPossibilities(). Absolute paths are
+     * allowed (including Windows paths with '\' and drive letters) as long as
+     * the basename matches. Shell metacharacters are rejected so DB-stored
+     * overrides cannot inject extra commands. The %1 file path is still
+     * escaped separately via escapeshellarg().
+     */
+    private function isSafeHandlerCommand($command)
+    {
+        $command = trim($command);
+        if ($command === '') {
+            return false;
+        }
+
+        // Deny shell control characters; allow '\' and ':' for Windows paths,
+        // and '=' / '~' for common tool flags and home-relative paths.
+        if (preg_match('/[;|&$`<>()\'"!\r\n]/', $command)) {
+            return false;
+        }
+
+        return $this->isAllowedHandlerBinary($this->getHandlerCommandBinary($command));
+    }
+
+    private function getHandlerCommandBinary($command)
+    {
+        $parts = preg_split('/\s+/', trim($command), 2);
+        $binary = $parts[0] ?? '';
+
+        return basename(str_replace('\\', '/', $binary));
+    }
+
+    private function isAllowedHandlerBinary($basename)
+    {
+        if ($basename === '') {
+            return false;
+        }
+
+        $allowed = $this->getAllowedHandlerBinaries();
+        if (isset($allowed[$basename])) {
+            return true;
+        }
+
+        // Windows executables: pdftotext.exe → pdftotext
+        if (preg_match('/\.(exe|bat|cmd)$/i', $basename)) {
+            $withoutExt = preg_replace('/\.(exe|bat|cmd)$/i', '', $basename);
+            return isset($allowed[$withoutExt]);
+        }
+
+        return false;
     }
 
     public function get_search_text_for_data($file)
@@ -1645,7 +1840,7 @@ class FileGalLib extends TikiLib
         $galleryIdentifier = is_null($galleryIdentifier) ? $prefs['fgal_root_id'] : $galleryIdentifier;
         $subGalleries = $this->getSubGalleries($galleryIdentifier, true, 'view_file_gallery', true);
 
-        $icon = '&nbsp;' . smarty_function_icon(['name' => 'file-archive-open'], $smarty->getEmptyInternalTemplate()) . '&nbsp;';
+        $icon = '&nbsp;' . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'file-archive-open'], $smarty->getEmptyInternalTemplate()) . '&nbsp;';
 
         $linkParameters = ['_script' => 'tiki-list_file_gallery.php', '_class' => 'fgalname'];
         if (! empty($_REQUEST['filegals_manager'])) {
@@ -1657,7 +1852,7 @@ class FileGalLib extends TikiLib
             $nodes[] = [
                 'id' => $subGallery['id'],
                 'parent' => $subGallery['parentId'],
-                'data' => smarty_block_self_link($linkParameters, $icon . htmlspecialchars($subGallery['name']), $smarty->getEmptyInternalTemplate()),
+                'data' => \SmartyTiki\BlockHandler\SelfLink::render($linkParameters, $icon . htmlspecialchars($subGallery['name']), $smarty->getEmptyInternalTemplate()),
             ];
         }
         $browseTreeMaker = new BrowseTreeMaker('Galleries');
@@ -2553,7 +2748,7 @@ class FileGalLib extends TikiLib
         $query = "select tf.*, tfg.galleryId as validGalleryId
                 from `tiki_files` tf
                 left join `tiki_file_galleries` tfg on (tf.`galleryId`=tfg.`galleryId`)
-                where tf.`filename`=? ORDER BY tf.created DESC LIMIT 1";
+                where tf.`filename`=? AND tf.`archiveId` = 0 ORDER BY tf.created DESC LIMIT 1";
         $result = $this->query($query, [$filename]);
         $file = $result->fetchRow();
         $this->verifyFileGalleryIntegrity($file);
@@ -2924,10 +3119,9 @@ class FileGalLib extends TikiLib
             $numQuery = preg_replace("/ ORDER BY .*$/", "", $query);
             $numQuery = "SELECT COUNT(*) FROM (" . $numQuery . ") AS grouped";
             $numResults = $this->getOne($numQuery, $bindvars);
-            $limit = $offset == -1 ? 0 : $offset;
-            $limit .= ', ' . ($maxRecords == -1 ? PHP_INT_MAX : $maxRecords);
-            $query .= " LIMIT $limit";
-            $result = $this->fetchAll($query, $bindvars);
+            $fetchOffset = ($offset == -1) ? -1 : (int)$offset;
+            $fetchMaxRecords = ($maxRecords == -1) ? -1 : (int)$maxRecords;
+            $result = $this->fetchAll($query, $bindvars, $fetchMaxRecords, $fetchOffset);
         } else {
             $result = $this->fetchAll($query, $bindvars);
             $numResults = count($result);
@@ -2990,6 +3184,17 @@ class FileGalLib extends TikiLib
             // add markup to be inserted onclick
             // add information for share column if is active
             if ($object_type === 'file') {
+                // Expose the shared "can this user delete this file?" decision so the
+                // listing/context-menu delete button matches what the server will allow.
+                if (! isset($galInfoCache[$res['galleryId']])) {
+                    $galInfoCache[$res['galleryId']] = $this->get_file_gallery_info($res['galleryId']);
+                }
+                $res['canRemove'] = $this->userCanRemoveFile(
+                    ['fileId' => $res['id'], 'galleryId' => $res['galleryId'], 'user' => $res['user'] ?? $res['creator'] ?? ''],
+                    $galInfoCache[$res['galleryId']],
+                    $res['perms']
+                );
+
                 $res['wiki_syntax'] = $this->process_fgal_syntax($wiki_syntax, $res);
 
                 if ($prefs['auth_token_access'] == 'y') {
@@ -3245,7 +3450,7 @@ class FileGalLib extends TikiLib
      */
     private function actionHandlerRemoveFile($params)
     {
-        global $prefs;
+        global $prefs, $user;
 
         // mandatory params: int fileId
         // optional params: boolean draft, array gal_info
@@ -3269,11 +3474,8 @@ class FileGalLib extends TikiLib
                 }
             }
 
-            global $tiki_p_admin_file_galleries, $user;
-            if ($tiki_p_admin_file_galleries != 'y' && ( ! $user || $user != $params['gal_info']['user'] )) {
-                if ($user != $info['user']) {
-                    Feedback::errorAndDie(tra('You do not have permission to remove files from this gallery'), \Laminas\Http\Response::STATUS_CODE_401);
-                }
+            if (! $this->userCanRemoveFile($info, $params['gal_info'])) {
+                Feedback::errorAndDie(tra('You do not have permission to remove files from this gallery'), \Laminas\Http\Response::STATUS_CODE_401);
             }
 
             $backlinks = $this->getFileBacklinks($params['fileId']);

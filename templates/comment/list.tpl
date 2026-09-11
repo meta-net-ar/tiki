@@ -58,9 +58,10 @@
                                             var targetId = hash.replace('=', '');
                                             var $target = $(targetId);
                                             if ($target.length) {
-                                                $('html, body').stop().animate({
-                                                    scrollTop: $target.offset().top - 150
-                                                }, 800);
+                                                $target[0].scrollIntoView({
+                                                    behavior: 'smooth',
+                                                    block: 'start'
+                                                });
                                                 $target.addClass('comment-highlight');
                                                 setTimeout(function() { $target.removeClass('comment-highlight'); }, 3000);
                                             }

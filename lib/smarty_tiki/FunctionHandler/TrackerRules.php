@@ -10,6 +10,7 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * \brief Smarty fn to contain generate a ui-predicate-vue component for tracker fields
@@ -27,8 +28,13 @@ use TikiLib;
  * @return string
  * @throws Exception
  */
-class TrackerRules extends Base
+class TrackerRules extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'trackerrules';
+    }
+
     public function handle($params, Template $template)
     {
         return TikiLib::lib('vuejs')->getFieldRules($params);

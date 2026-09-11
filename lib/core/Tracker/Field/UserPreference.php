@@ -13,7 +13,7 @@ use Tiki\Lib\TikiDate;
  * Letter key: ~p~
  *
  */
-class Tracker_Field_UserPreference extends \Tracker\Field\AbstractItemField
+class Tracker_Field_UserPreference extends \Tracker\Field\AbstractItemField implements \Tracker\Field\ExportableInterface
 {
     public static function getManagedTypesInfo(): array
     {
@@ -130,5 +130,24 @@ class Tracker_Field_UserPreference extends \Tracker\Field\AbstractItemField
         return [
             $baseKey => $typeFactory->plaintext($this->renderInnerOutput()),
         ];
+    }
+
+    public function getTabularSchema()
+    {
+        $schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());
+
+        $permName = $this->getConfiguration('permName');
+        $name = $this->getConfiguration('name');
+
+        $schema->addNew($permName, 'default')
+            ->setLabel($name)
+            ->setRenderTransform(function ($value) {
+                return $value;
+            })
+            ->setParseIntoTransform(function (&$info, $value) use ($permName) {
+                $info['fields'][$permName] = $value;
+            });
+
+        return $schema;
     }
 }

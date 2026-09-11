@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_wysiwyg_list()
 {
+    $wysiwygHelp = 'WYSIWYG';
 
     return [
         // TODO: Replace feature_wysiwyg and wysiwyg_optional with a single tri-state preference (allowing either just normal editor (default), just WYSIWYG or both) to clarify and avoid misinterpretation
@@ -18,6 +19,7 @@ function prefs_wysiwyg_list()
             ],
             'warning' => tra('Switching between HTML and wiki formats can cause problems for some pages.'),
             'default' => 'y',
+            'help' => $wysiwygHelp,
         ],
 
         'wysiwyg_default' => [
@@ -28,6 +30,7 @@ function prefs_wysiwyg_list()
                 'wysiwyg_optional',
             ],
             'default' => 'y',
+            'help' => $wysiwygHelp,
         ],
         'wysiwyg_memo' => [
             'name' => tra('Reopen with the same editor'),
@@ -37,6 +40,7 @@ function prefs_wysiwyg_list()
                 'feature_wysiwyg',
             ],
             'default' => 'y',
+            'help' => $wysiwygHelp,
         ],
 
         // FIXME: This is not actually a WYSIWYG preference. See https://sourceforge.net/p/tikiwiki/mailman/tikiwiki-devel/thread/F2DE8896807BF045932776107E2E783D3505E26D%40CT20SEXCHP02.FONCIERQC.INTRA/#msg36170373
@@ -48,6 +52,7 @@ function prefs_wysiwyg_list()
                 'feature_wiki_allowhtml',
             ],
             'default' => 'y',
+            'help' => $wysiwygHelp,
         ],
 
         // This preference is called "htmltowiki" because it involves conversion of the HTML code to "wiki syntax" (Tiki's syntax)... although it equally involves the opposite conversion.
@@ -63,6 +68,7 @@ function prefs_wysiwyg_list()
             'warning' => tra('Existing wiki pages remain in HTML, unless they are converted to non-WYSIWYG and back to WYSIWYG (one by one).') .
                 ' ' . tra('The HTML editor offers possibilities which may not be expressible in Tiki syntax.') . ' See issue #6518 for example',
             'default' => 'y',
+            'help' => $wysiwygHelp,
         ],
         'wysiwyg_fonts' => [
             'name' => tra('Typefaces'),
@@ -70,6 +76,7 @@ function prefs_wysiwyg_list()
             'type' => 'textarea',
             'size' => '3',
             'default' => 'sans serif;serif;monospace;Arial;Century Gothic;Comic Sans MS;Courier New;Tahoma;Times New Roman;Verdana',
+            'help' => $wysiwygHelp,
         ],
         'wysiwyg_inline_editing' => [
             'name' => tra('Inline WYSIWYG editor'),
@@ -80,6 +87,7 @@ function prefs_wysiwyg_list()
             'dependencies' => [
                 'feature_wysiwyg',
             ],
+            'help' => $wysiwygHelp,
         ],
     ];
 }

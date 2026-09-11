@@ -115,7 +115,9 @@ $inputConfiguration = [
         ],
         'staticKeyFiltersForArrays' => [
             'cat_categories' => 'digits',
-            'direct'         => 'digits',
+            // Direct mapping contains adapter/path/credentials, so a digits-only
+            // filter would corrupt values like "local" or "/tmp/data".
+            'direct'         => 'text',
             'ocr_lang'       => 'text',
         ],
     ],
@@ -326,11 +328,13 @@ if (isset($_REQUEST['movesel']) && $access->checkCsrf()) {
 
 if (isset($_REQUEST['fgal_actions'])) {
     if ($_REQUEST['fgal_actions'] === 'delsel_x') {
-        $access->check_permission_either(['admin_file_galleries', 'remove_files']);
         if (isset($_REQUEST['file']) && $access->checkCsrf(true)) {
             $failedFiles = $totalFiles = count($_REQUEST['file']);
             foreach (array_values($_REQUEST['file']) as $file) {
                 if ($info = $filegallib->get_file_info($file)) {
+                    if (! $filegallib->userCanRemoveFile($info)) {
+                        continue;
+                    }
                     $result = $filegallib->remove_file($info, $gal_info);
                     if ($result && $result->numRows()) {
                         $failedFiles--;
@@ -423,7 +427,7 @@ if (isset($_REQUEST['fgal_actions'])) {
         } else {
             foreach (array_values($_REQUEST['file']) as $file) {
                 $result = $filegallib->metadataAction($file, 'refresh');
-                if ($result && $result->numRows()) {
+                if ($result !== false) {
                     $failedFiles--;
                 }
             }
@@ -595,7 +599,7 @@ if (
     && $access->checkCsrf(true)
 ) {
     $result = $filegallib->metadataAction($_REQUEST['fileId'], 'refresh');
-    if ($result && $result->numRows()) {
+    if ($result !== false) {
         Feedback::success(tr('Metadata refreshed'));
     } else {
         Feedback::error(tr('Metadata not refreshed'));
@@ -1316,6 +1320,7 @@ if (isset($_GET['slideshow'])) {
                         }
                     }
                 }
+                unset($file);
             }
 
             $smarty->assign_by_ref('files', $files['data']);

@@ -59,7 +59,7 @@
                                 </a>
                             </action>
                             <action>
-                                {permission_link type=tabular id=$row.tabularId title=$row.name mode=text}
+                                {permission_link type='import-export' id=$row.tabularId title=$row.name mode=text}
                             </action>
                             <action>
                                 <a class="text-danger" href="{bootstrap_modal controller=tabular action=delete tabularId=$row.tabularId}">

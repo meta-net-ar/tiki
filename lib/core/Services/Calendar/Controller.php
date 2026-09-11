@@ -134,23 +134,19 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $calendarIdFromModuleOrPlugin = $input->calIds->string();
         if ($calendarIdFromModuleOrPlugin) {
             $splitCalendarIdFromModuleOrPlugin = explode(',', $calendarIdFromModuleOrPlugin);
-            $listevents = $this->calendarLib->list_raw_items(
+            $listevents = $this->calendarLib->listEventFeedItems(
                 array_intersect($splitCalendarIdFromModuleOrPlugin, array_keys($calendars)),
                 $user,
                 $viewstart,
-                $viewend,
-                0,
-                -1
+                $viewend
             );
         } else {
             if (isset($_SESSION['CalendarViewGroups']) && $_SESSION['CalendarViewGroups']) {
-                $listevents = $this->calendarLib->list_raw_items(
+                $listevents = $this->calendarLib->listEventFeedItems(
                     array_intersect($_SESSION['CalendarViewGroups'], array_keys($calendars)),
                     $user,
                     $viewstart,
-                    $viewend,
-                    0,
-                    -1
+                    $viewend
                 );
             } else {
                 $listevents = [];
@@ -158,6 +154,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         }
 
         $parserLib = TikiLib::lib('parser');
+        $timezone = new DateTimeZone($prefs['display_timezone']);
         $events = [];
 
         foreach ($listevents as $event) {
@@ -184,7 +181,6 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 ]);
             }
 
-            $timezone = new DateTimeZone($prefs['display_timezone']);
             $start = new DateTime('@' . $event['start']);
             $end   = new DateTime('@' . $event['end']);
 
@@ -279,6 +275,9 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 $calendarId = $calitem['calendarId'];
                 $calitem['calitemId'] = $calitemId;
                 $calitem['allday'] = empty($calitem['allday']) ? 0 : 1;
+                if (isset($calitem['sendReminder'])) {
+                    $calitem['sendReminder'] = (int) ! empty($calitem['sendReminder']);
+                }
                 $calitem['recurrenceId'] = $input->recurrenceId->int();
                 $calendar = $this->calendarLib->get_calendar($calendarId);
                 $calitem = $this->processParticipants($calitem);
@@ -301,10 +300,15 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                             if ($input->offsetExists('redirect')) {
                                 return ['url' => $input->redirect->url()];
                             } else {
-                                if ($return_url && ! $access->is_xml_http_request()) {
+                                $isAjaxRequest = $access->is_xml_http_request();
+                                if ($isAjaxRequest && (! defined('TIKI_API') || ! TIKI_API)) {
+                                    return $this->getRefreshEventsResponse();
+                                }
+
+                                if ($return_url && ! $isAjaxRequest) {
                                     $access->redirect($return_url, tr('The event was saved successfully'));
                                 }
-                                // Ensure AJAX modals redirects
+
                                 return ['url' => $return_url ?: 'tiki-calendar.php'];
                             }
                         } else {
@@ -412,18 +416,22 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 }
                 // set up default start and end
                 $dateNow->setTZbyID($displayTimezone);
+                $prefillAllDay = null;
                 if ($input->prefill_start->text()) {
                     $prefillStart = trim($input->prefill_start->text());
                     $prefillEnd = trim((string) $input->prefill_end->text());
                     $prefillTimezoneRequested = trim((string) $input->prefill_tz->text());
                     $prefillTimezone = $this->resolvePrefillTimezone($prefillTimezoneRequested, $displayTimezone);
+                    $prefillAllDay = $input->offsetExists('prefill_allday')
+                        ? $input->prefill_allday->int() === 1
+                        : null;
 
                     $start = $this->parsePrefillDateTime($prefillStart, $prefillTimezone);
                     if (! is_null($start) && $prefillEnd !== '') {
                         $end = $this->parsePrefillDateTime($prefillEnd, $prefillTimezone);
                         if (! is_null($end)) {
                             // convert exclusive all-day selection end to inclusive end
-                            if ($this->isPrefillStartOfDay($prefillEnd, $prefillTimezone)) {
+                            if ($prefillAllDay !== false && $this->isPrefillStartOfDay($prefillEnd, $prefillTimezone)) {
                                 $end -= 1;
                             }
                             if ($end <= $start) {
@@ -478,7 +486,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                     'end'                   => $end,
                     'duration'              => $duration,
                     'recurrenceId'          => 0,
-                    'allday'                => $calendar['allday'] == 'y' ? 1 : 0,
+                    'allday'                => $prefillAllDay ?? ($calendar['allday'] == 'y' ? 1 : 0),
                     'organizers'            => [$user],
                     'participants'          => $participants,
                     'returnURL'             => $return_url,
@@ -753,8 +761,12 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'daynames'             => $this->daynamesPlural,
             'monthnames'           => $this->monthnames,
             'preview'              => $preview,
+            'modal'                => $input->modal->int(),
             // related tracker items
             'trackerItems'        => ! empty($trackerItems) ? $trackerItems : [],
+            // legacy names expected by templates/calendar/view_item.tpl
+            'listroles'            => ['0' => '', '1' => tra('required'), '2' => tra('optional'), '3' => tra('non-participant')],
+            'listprioritycolors'   => ['fff', 'fdd', 'fcc', 'fbb', 'faa', 'f99', 'e88', 'd77', 'c66', 'b66', 'a66'],
         ];
     }
 
@@ -774,7 +786,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             Feedback::success(tr('Event deleted successfully.'));
         }
 
-        return [];
+        return $this->getRefreshEventsResponse();
     }
 
     public function action_remove_calendar(JitFilter $input): array
@@ -848,7 +860,22 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             }
         }
 
-        return [];
+        return $this->getRefreshEventsResponse();
+    }
+
+    /**
+     * Close the modal and reload the calendar event source.
+     */
+    private function getRefreshEventsResponse(): array
+    {
+        if ((defined('TIKI_API') && TIKI_API) || ! TikiLib::lib('access')->is_xml_http_request()) {
+            return [];
+        }
+
+        return array_merge(
+            Services_Utilities::closeModal(),
+            ['refreshEvents' => true]
+        );
     }
 
     /**
@@ -899,6 +926,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 }
 
                 $client = new \Tiki\SabreDav\CaldavClient();
+
                 $client->saveCalendarObject($calitem);
                 if (! empty($calitem['calitemId'])) {
                     $calitemId = $calitem['calitemId'];
@@ -922,7 +950,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                         'calendar event'
                     );
                 }
-                if ($prefs['feature_groupalert'] == 'y') {
+                if ($prefs['feature_groupalert'] == 'y' && $calitem['sendReminder']) {
                     if ($input->offsetExists('listtoalert')) {
                         TikiLib::lib('groupalert')->Notify(
                             $input->listtoalert->int(),
@@ -1001,6 +1029,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $recurrence->setLang(strLen($calitem['lang']) > 0 ? $calitem['lang'] : 'en');
         $recurrence->setName($calitem['name']);
         $recurrence->setDescription($calitem['description']);
+
+        $recurrence->setSendReminder($calitem['sendReminder']);
         $recurrence->setRecurenceDstTimezone($input->recurrenceDstTimezone->text());
         $recurrence->setUser($calitem['user']);
         $recurrence->setOrganizers($calitem['organizers']);

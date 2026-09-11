@@ -64,7 +64,7 @@ $skipDirs = [
     './' . TIKI_CUSTOMIZATIONS_SRC_DIST_PATH,
     './' . BIN_PATH,
     './' . PUBLIC_GENERATED_PATH, // generated files
-    './src/php/external_lib_sources' // External php codebases whose source code have been included in tiki.
+    './src/php/external_lib_sources', // External php codebases whose source code have been included in tiki.
 ];
 
 $safePaths = [
@@ -80,7 +80,6 @@ $safePaths = [
     '\./tiki-live_support_chat_frame.php',
     '\./tiki-login_scr.php',
     '\./tiki-channel.php',            // does its own checks
-
     /* This file is just comments */
     './about.php',
     './db/preconfiguration.php', // contains comments
@@ -89,6 +88,8 @@ $safePaths = [
 
     '/lib/Sheet/include/org/apicnet/io/OOo/objOOo/OOoCadre.php', // empty file
     '\./lib/test/.*/fixtures/.*\.php', // contains predefined data used in tests.
+    '\./lib/test/api/tiki-api-wrapper.php', // API wrapper for testing.
+    '\./lib/test/local.php', // contains database credentials for testing.
     '/lib/cypht/modules/tiki/modules.php', // bootstrap includes file.
     '/lib/cypht/modules/tiki/setup.php', // configuration file.
 
@@ -239,39 +240,37 @@ function tikisetup_pattern() // {{{
 function scanfiles($folder, &$files, &$filesHash)
 {
     global $safePaths, $skipDirs;
-    $handle = opendir($folder);
-    if (! $handle) {
+
+    try {
+        $iterator = new FilesystemIterator($folder, FilesystemIterator::SKIP_DOTS);
+    } catch (UnexpectedValueException $e) {
         printf("Could not open folder: %s\n", $folder);
         return;
     }
 
-    while (false !== $file = readdir($handle)) {
-        // Skip self and parent
-        if ($file[0] == '.' || $file[0] == '..') {
-            continue;
-        }
+    foreach ($iterator as $fileInfo) {
+        $path = $fileInfo->getPathname();
 
-        $path = "$folder/$file";
-
-        if (is_dir($path)) {
-            // Directory is safe, skip recursion
-            foreach ($skipDirs as $skipDir) {
-                if ($path === $skipDir) {
-                    continue 2; // skip this directory entirely
-                }
+        if ($fileInfo->isDir()) {
+            // Check if directory should be skipped
+            if (in_array($path, $skipDirs)) {
+                continue;
             }
+
             scanfiles($path, $files, $filesHash);
         } else {
             // Skip files that match safe paths
-            if (regex_match($path, $safePaths)) {
+            if (regex_match($path, $safePaths) || str_starts_with($path, '.')) {
                 continue;
             }
+
             $analysis = analyse_file_path($path);
             $files[] = $analysis;
             $filesHash[$path] = $analysis;
         }
     }
 }
+
 // }}}
 
 // TODO This is an inefficient function, but more flexible than in_array
@@ -793,6 +792,44 @@ include_once('lib/setup/twversion.class.php');
 $TWV = new TWVersion();
 $major = explode('.', $TWV->version)[0];
 
+function normalize_input_file($path)
+{
+    $path = ltrim($path, './');
+
+    return './' . $path;
+}
+
+function add_specified_files(array $inputFiles, array &$files, array &$filesHash)
+{
+    global $safePaths, $skipDirs;
+
+    foreach ($inputFiles as $path) {
+        $path = normalize_input_file($path);
+
+        if (! is_file($path) || is_link($path)) {
+            continue;
+        }
+
+        if (pathinfo($path, PATHINFO_EXTENSION) !== 'php') {
+            continue;
+        }
+
+        foreach ($skipDirs as $skipDir) {
+            if (str_starts_with($path, $skipDir)) {
+                continue 2; // skip this directory entirely
+            }
+        }
+
+        if (regex_match($path, $safePaths)) {
+            continue;
+        }
+
+        $analysis = analyse_file_path($path);
+        $files[] = $analysis;
+        $filesHash[$path] = $analysis;
+    }
+}
+
 /* Build Files structures */
 // a hash of filenames, each element is a hash of attributes of that file
 $filesHash = [];
@@ -804,7 +841,15 @@ $features = [];
 $files = [];
 
 // build these two files structures
-scanfiles('.', $files, $filesHash);
+// If files are passed as arguments, scan only those files.
+// Otherwise, scan the full repository.
+$inputFiles = array_slice($argv, 1);
+
+if (! empty($inputFiles)) {
+    add_specified_files($inputFiles, $files, $filesHash);
+} else {
+    scanfiles('.', $files, $filesHash);
+}
 
 /* Iterate each file, and perform checks */
 $unsafe = [];

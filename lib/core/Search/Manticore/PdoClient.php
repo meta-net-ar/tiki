@@ -330,10 +330,10 @@ class PdoClient
             $values .= ', ' . implode(', ', $array_values);
         }
         if ($this->dataBuffer) {
-            $this->dataBuffer->setPrefix("INSERT INTO $index ($keys) VALUES ");
+            $this->dataBuffer->setPrefix("REPLACE INTO $index ($keys) VALUES ");
             $this->dataBuffer->push('(' . $values . ')');
         } else {
-            $this->prepareAndExecuteWithRetry("INSERT INTO $index ($keys) VALUES (" . $values . ")");
+            $this->prepareAndExecuteWithRetry("REPLACE INTO $index ($keys) VALUES (" . $values . ")");
         }
     }
 
@@ -453,6 +453,9 @@ class PdoClient
         } else {
             $sql .= " ORDER BY weight() desc, id asc";
         }
+        // Cast to int to prevent SQL injection — SphinxQL LIMIT does not support bound parameters
+        $resultStart = (int)$resultStart;
+        $resultCount = (int)$resultCount;
         $sql .= " LIMIT $resultStart, $resultCount option not_terms_only_allowed=1,cutoff=0,expand_keywords=1";
         if ($resultStart + $resultCount > 1000) {
             $sql .= ',max_matches=' . ($resultStart + $resultCount);
@@ -599,10 +602,18 @@ class PdoClient
         }
     }
 
-    protected function query($sql)
+    protected function query($sql, $tries = 0)
     {
         $this->debug($sql);
-        return $this->pdo->query($sql);
+        try {
+            return $this->pdo->query($sql);
+        } catch (PDOException $e) {
+            if (strstr($e->getMessage(), "server has gone away") && $tries < self::QUERY_RETRIES) {
+                $this->connect(true);
+                return $this->query($sql, $tries + 1);
+            }
+            throw $e;
+        }
     }
 
     protected function prepareAndExecute($sql, $params = [])

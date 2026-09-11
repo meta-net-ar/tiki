@@ -1,3 +1,5 @@
+{$conveneUsernamePlaceholder = "{tr}Username...{/tr}"|escape:'attr'}
+{$conveneAddUserTitle = "{tr}Add User{/tr}"|escape:'attr'}
 <div class="card">
     <div class="card-header">
         <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{$params.title}</h3>
@@ -25,7 +27,7 @@
                                     </style>
                                     {$defautDate=$smarty.now+86400}
                                     <div style="display: flex; justify-content: space-around; flex-wrap: wrap;" class="divAddDate">
-                                        <span class="inputAddDate">{jscalendar date=$defautDate fieldname="conveneAddDate" showtime='y' showtimezone="n"}</span> 
+                                        <span class="inputAddDate" data-date="{$defautDate}">{jscalendar date=$defautDate fieldname="conveneAddDate" showtime='y' showtimezone="n"}</span>
                                         <button type="button" class="conveneAddDate btn btn-primary btn-sm" data-field="conveneAddDate">{tr}Add Date{/tr}</button>
                                     </div>          
                                 {/if}
@@ -89,7 +91,7 @@
                                     {$voteComment = $comments[$stamp][$voter]}
                                 {/if}
                                 <td class='align-middle flex-align-center {$class}'>
-                                    {icon name=$icon size=2 iclass="tips $iconClass" ititle="{tr}Vote value{/tr} $vote:$voteComment "  }
+                                    {icon name=$icon size=2 iclass="tips $iconClass" ititle="{tr}Vote value{/tr} $vote:$voteComment "}
                                     <input type='hidden' name='dates_{$stamp}_{$voter}' value='{$vote}' class='conveneUserVote' data-voter="{$voter}" data-date="{$stamp}" data-comment="{$voteComment}">
                                 </td>
                             {/foreach}
@@ -122,13 +124,13 @@
                             {if not $locked}
                                 {if $canAdmin}
                                     <div class='btn-group'>
-                                        <input class='conveneAddUser form-control' value='' placeholder='{tr}Username...{/tr}' style='float:left;width:72%;border-bottom-right-radius:0;border-top-right-radius:0;'>
-                                        <input type='button' value='+' title='{tr}Add User{/tr}' class='conveneAddUserButton btn btn-primary' />
+                                        <input class='conveneAddUser form-control' value='' placeholder="{$conveneUsernamePlaceholder}" style='float:left;width:72%;border-bottom-right-radius:0;border-top-right-radius:0;'>
+                                        <input type='button' value='+' title="{$conveneAddUserTitle}" class='conveneAddUserButton btn btn-primary' />
                                     </div>
                                 {elseif $canEdit}
                                     <div class='btn-group'>
                                         <input class='conveneAddUser form-control' value='{$user}' disabled='disabled' style='float:left;width:72%;border-bottom-right-radius:0;border-top-right-radius:0;'>
-                                        <input type='button' value='+' title='{tr}Add User{/tr}' class='conveneAddUserButton btn btn-primary' />
+                                        <input type='button' value='+' title="{$conveneAddUserTitle}" class='conveneAddUserButton btn btn-primary' />
                                     </div>
                                 {/if}
                             {/if}

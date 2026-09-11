@@ -1004,10 +1004,13 @@ span.plugin-mouseover {
     border-color: $dark !important;
     color: $dark !important;
 }
+.tiki .ui-dialog-titlebar-close .ui-icon {
+    display: none;
+}
 .tiki .ui-dialog-titlebar-close::before {
     content: 'X';
     position: relative;
-    top: -3px;
+    top: 0;
     font-weight: bold;
 }
 

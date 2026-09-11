@@ -10,7 +10,6 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
          bootstrap="lib/test/bootstrap.php"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutTodoAnnotatedTests="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          colors="true"
          stopOnFailure="false"
@@ -32,6 +31,18 @@
       <!-- Exclude files where all tests are marked as skipped -->
       <exclude>./lib/test/AcceptanceTests/</exclude>
       <exclude>./lib/test/Core/Reports/ReportsEndToEndTest.php</exclude>
+      <!-- Exclude abstract base test classes -->
+      <exclude>./lib/test/api/ApiTestCase.php</exclude>
+      <exclude>./lib/test/api/categories/ApiBaseCategoriesTest.php</exclude>
+      <exclude>./lib/test/api/comments/ApiBaseCommentsTest.php</exclude>
+      <exclude>./lib/test/api/galleries/ApiBaseGalleriesTest.php</exclude>
+      <exclude>./lib/test/api/groups/ApiBaseGroupsTest.php</exclude>
+      <exclude>./lib/test/api/search/ApiBaseSearchTest.php</exclude>
+      <exclude>./lib/test/api/tabulars/ApiBaseTabularsTest.php</exclude>
+      <exclude>./lib/test/api/trackers/ApiBaseTrackersTest.php</exclude>
+      <exclude>./lib/test/api/translations/ApiBaseTranslationsTest.php</exclude>
+      <exclude>./lib/test/api/users/ApiBaseUsersTest.php</exclude>
+      <exclude>./lib/test/api/wiki/ApiBaseWikiTest.php</exclude>
     </testsuite>
   </testsuites>
   <groups>
@@ -49,14 +60,14 @@
     <ini name="date.timezone" value="UTC"/>
   </php>
   <logging>
-    <junit outputFile="temp/phpunit.junit.xml"/>
+    <junit outputFile="temp/ci/phpunit-report.xml"/>
     <!--
         Coverage analysis more than double the time to run tests.
         Instead of enabling this, on the build server, use:
         1. Setup phpStorm integration http://dev.tiki.org/PhpStorm?latest=1#Set_up_PHPUnit_in_Run_Debug_Config
-        2. Run from the command line with with the option: coverage-clover temp/clover.xml
+        2. Run from the command line with with the option: coverage-clover temp/ci/clover.xml
         Note that you will need php-xdebug installed to run it.
-        <log type="coverage-clover" target="temp/clover.xml" />
+        <log type="coverage-clover" target="temp/ci/clover.xml" />
         <log type="coverage-text" target="php://stdout" showUncoveredFiles="false" showOnlySummary="true" />
       -->
   </logging>

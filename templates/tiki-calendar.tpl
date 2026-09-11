@@ -1,4 +1,18 @@
 {include file='token_view_actions.tpl'}
+{if !empty($calendarEmptyState)}
+{title admpage="calendar"}{tr}Calendar{/tr}{/title}
+<div id="calscreen">
+    {remarksbox type="info" title="{tr}No calendars available{/tr}" close="n"}
+        <p>{tr}You don't have any calendars yet.{/tr}</p>
+        {if $tiki_p_admin_calendar eq 'y' or $tiki_p_admin eq 'y' or $tiki_p_admin_private_calendar eq 'y'}
+            <p>{tr}Create a calendar to start adding and viewing events.{/tr}</p>
+            {button href="tiki-admin_calendars.php?cookietab=2" _type="primary" _icon_name="create" _text="{tr}Create Calendar{/tr}"}
+        {else}
+            <p>{tr}Please ask an administrator to create one.{/tr}</p>
+        {/if}
+    {/remarksbox}
+</div>
+{else}
 {title admpage="calendar"}
     {if $displayedcals|@count eq 1}
     {tr}Calendar:{/tr} {$calendars[$displayedcals[0]].displayName|escape}
@@ -101,15 +115,16 @@
         </div>
         <div class='col-md-12'>
             {if $viewlist eq 'list'}
-                {include file='tiki-calendar_listmode.tpl'}
+                <div class="calendar-list-compact">
+                    {include file='tiki-calendar_nav.tpl' module='y' ajax='n'}
+                    {include file='tiki-calendar_listmode.tpl'}
+                </div>
             {else}
                 {jq}
-                    let today = new Date();
                     var printingParams = {pdf_export: '{{$pdf_export}}', pdf_warning: '{{$pdf_warning}}', pref_print_pdf_from_url: '{{$prefs.print_pdf_from_url}}'};
-                    $('.calendar-container').defineParameterOfMultipleCalendar({{$eventCalendarParams|json_encode}}, printingParams, '.calendar-container', today.toISOString().split('T')[0], undefined, undefined, undefined);
+                    $('.calendar-container').defineParameterOfMultipleCalendar({{$eventCalendarParams|json_encode}}, printingParams, '.calendar-container', {{$eventCalendarParams.initialDate|json_encode}}, undefined, undefined, undefined, {{$defaultCalendarId}});
                 {/jq}
             {/if}
-            
             <div class='calendar-container'></div>
         </div>
         
@@ -117,4 +132,5 @@
 </div>
 {if $prefs.feature_jscalendar eq 'y'}
     {js_insert_icon type="jscalendar"}
+{/if}
 {/if}

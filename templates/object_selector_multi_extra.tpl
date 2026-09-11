@@ -30,18 +30,20 @@
                     {icon name=search}
                 </div>
                 <input type="text" placeholder="{$object_selector_multi.placeholder|escape}..." value="" class="filter form-control" autocomplete="off">
-                <input type="button" class="btn btn-info search" value="{tr}Find{/tr}">
+                <input type="button" class="btn btn-info search" value="{tr}Search{/tr}">
             </div>
         </div>
         <div class="card-body">
             <p class="too-many">{tr}Search and select what you are looking for from the options that appear.{/tr}</p>
-            <div class="results">
-                {foreach from=$object_selector_multi.current_selection item=object name=ix}
-                    <div class="form-check">
-                        <input id="{$object_selector_multi.id|escape}_selected_{$smarty.foreach.ix.index}" class="form-check-input" type="checkbox" value="{$object|escape}" checked>
-                        <label class="form-check-label" for="{$object_selector_multi.id|escape}_selected_{$smarty.foreach.ix.index}">{$object.title|escape}</label>
-                    </div>
-                {/foreach}
+            <div class="object-selector-result-scroll">
+                <div class="results">
+                    {foreach from=$object_selector_multi.current_selection item=object name=ix}
+                        <div class="form-check">
+                            <input id="{$object_selector_multi.id|escape}_selected_{$smarty.foreach.ix.index}" class="form-check-input" type="checkbox" value="{$object|escape}" checked>
+                            <label class="form-check-label" for="{$object_selector_multi.id|escape}_selected_{$smarty.foreach.ix.index}">{$object.title|escape}</label>
+                        </div>
+                    {/foreach}
+                </div>
             </div>
             <p class="no-results d-none">
                 {tr}No matching results.{/tr}

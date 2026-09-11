@@ -1,7 +1,7 @@
 {capture assign="viewuser"}{$userwatch|escape:"url"}{/capture}
 {title url="tiki-user_information.php?view_user=$viewuser"}{tr}User Information{/tr}{/title}
 
-{if "$userwatch" eq "$user" }
+{if "$userwatch" eq "$user"}
     {include file='tiki-mytiki_bar.tpl'}
 {/if}
 
@@ -125,6 +125,14 @@
                             <div class="row mb-3">
                                 <div class="col-sm-4">{tr}Last login:{/tr}</div>
                                 <div class="col-sm-8">{$userinfo.lastLogin|tiki_short_datetime}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">{tr}Current login:{/tr}</div>
+                                <div class="col-sm-8">{$userinfo.currentLogin|tiki_short_datetime}</div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-4">{tr}Last Activity:{/tr}</div>
+                                <div class="col-sm-8">{$userinfo.lastActivity|tiki_short_datetime}</div>
                             </div>
 
                             {* Custom database fields *}
@@ -354,12 +362,12 @@
                                 <label for="replytome" class="ms-2">
                                     <input type="checkbox" name="replytome" id="replytome">
                                     {tr}Reply-to my email{/tr}
-                                    {help url="User-Information" desc="{tr}Reply-to my email:{/tr}{tr}The user will be able to reply to you directly via email.{/tr}"}
+                                    {help url="#" desc="{tr}Reply-to my email:{/tr}{tr}The user will be able to reply to you directly via email.{/tr}"}
                                 </label>
                                 <label for="bccme" class="ms-2">
                                     <input type="checkbox" name="bccme" id="bccme">
                                     {tr}Send me a copy{/tr}
-                                    {help url="User-Information" desc="{tr}Send me a copy:{/tr}{tr}You will be sent a copy of this email.{/tr}"}
+                                    {help url="#" desc="{tr}Send me a copy:{/tr}{tr}You will be sent a copy of this email.{/tr}"}
                                 </label>
                             </div>
                         </div>

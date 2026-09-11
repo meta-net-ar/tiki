@@ -1,0 +1,39 @@
+---
+description: Response from POST /trackers/{trackerId}/items.
+type: object
+required:
+  - itemId
+  - status
+  - fields
+  - itemTitle
+  - processedFields
+  - nextTicket
+properties:
+  itemId:
+    type: integer
+  status:
+    type: string
+  fields:
+    type: object
+    description: Map of field permName to scalar value.
+    additionalProperties:
+      oneOf:
+        - type: string
+        - type: integer
+        - type: number
+        - type: boolean
+      nullable: true
+  itemTitle:
+    type: string
+  processedFields:
+    type: object
+    description: Map of permName to processed/formatted value.
+    additionalProperties:
+      oneOf:
+        - type: string
+        - type: integer
+        - type: number
+        - type: boolean
+      nullable: true
+  nextTicket:
+    type: string

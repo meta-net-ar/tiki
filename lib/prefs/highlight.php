@@ -10,6 +10,7 @@ function prefs_highlight_list($partial = false)
     return [
         'highlight_group' => [
             'name' => tra('Highlight group'),
+            'description' => tra('Group whose members are visually highlighted in user information displays (None to disable).'),
             'help' => 'Groups',
             'type' => 'list',
             'options' => highlight_group_values($partial),

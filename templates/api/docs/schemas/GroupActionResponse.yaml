@@ -1,0 +1,17 @@
+---
+description: Response from group create/update/delete actions.
+type: object
+required:
+  - type
+  - icon
+  - title
+  - mes
+properties:
+  type:
+    type: string
+  icon:
+    type: string
+  title:
+    type: string
+  mes:
+    type: array

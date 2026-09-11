@@ -19,7 +19,6 @@ $inputConfiguration = [
             'my'                 => 'username',      //get
             'ours'               => 'word',          //get
             'status'             => 'word',          //get
-            'sort_mode'          => 'alnumdash',     //get
             'remove'             => 'int',           //get
             'force'              => 'bool',          //get
             'batchaction'        => 'word',          //get
@@ -30,14 +29,14 @@ $inputConfiguration = [
             'offset'             => 'int',           //get
             'maxRecords'         => 'int',           //get
             'filterfield'        => 'word',          //get
-            'filtervalue_other'  => 'word',          //get
+            'filtervalue_other'  => 'text',          //get
             'displayedFields'    => 'word',          //get
         ],
         'staticKeyFiltersForArrays' => [
             'action'                => 'string',    //get
             'vals'                  => 'none',      //get
-            'sort_mode'             => 'string',    //get
-            'filtervalue'           => 'word',
+            'sort_mode'             => 'alnumdash', //get
+            'filtervalue'           => 'text',
         ],
     ],
 ];
@@ -378,7 +377,7 @@ if (! empty($_REQUEST['remove'])) {
     // redirect to the tracker item list of the last item deleted
     if (isset($item_info) && ! empty($item_info['trackerId'])) {
         if (! isset($_REQUEST['sort_mode']) && ! isset($_REQUEST['offset'])) {
-            $access->redirect(smarty_modifier_sefurl($item_info['trackerId'], 'tracker'));
+            $access->redirect(\SmartyTiki\Modifier\Sefurl::apply($item_info['trackerId'], 'tracker'));
         }
     }
 } elseif (isset($_REQUEST['batchaction']) and ($_REQUEST['batchaction'] == 'o' || $_REQUEST['batchaction'] == 'p' || $_REQUEST['batchaction'] == 'c')) {
@@ -525,6 +524,13 @@ if (isset($_REQUEST["filtervalue"]) and is_array($_REQUEST["filtervalue"]) and i
 if (! empty($_REQUEST['filtervalue_other'])) {
     $filtervalue = $_REQUEST['filtervalue_other'];
 }
+if (is_array($filtervalue)) {
+    $filtervalue = array_map(static function ($value) {
+        return is_string($value) ? trim($value) : $value;
+    }, $filtervalue);
+} elseif (is_string($filtervalue)) {
+    $filtervalue = trim($filtervalue);
+}
 
 if (! empty($filterfield)) {
     $field = $trackerDefinition->getField($filterfield);
@@ -567,7 +573,8 @@ if (isset($_REQUEST["sort_mode"])) {
     }
 }
 if (empty($sort_mode_full)) {
-    $sort_mode_full = ['itemId_asc'];
+    // Preserve the default sort order computed from tracker properties above
+    $sort_mode_full = ! empty($sort_mode) ? [$sort_mode] : ['itemId_asc'];
 }
 
 // Expose primary sort to template
@@ -620,13 +627,6 @@ if (isset($tracker_info['useComments']) && $tracker_info['useComments'] == 'y' &
             $l = $trklib->list_last_comments($items['data'][$itkey]['trackerId'], $items['data'][$itkey]['itemId'], 0, 1);
             $items['data'][$itkey]['lastComment'] = ! empty($l['count']) ? $l['data'][0] : '';
         }
-    }
-}
-if ((isset($tracker_info['useAttachments']) && $tracker_info['useAttachments'] == 'y') && (isset($tracker_info['showAttachments']) && $tracker_info['showAttachments'] == 'y')) {
-    foreach ($items["data"] as $itkey => $oneitem) {
-        $res = $trklib->get_item_nb_attachments($items["data"][$itkey]['itemId']);
-        $items["data"][$itkey]['attachments'] = $res['attachments'];
-        $items["data"][$itkey]['hits'] = $res['hits'];
     }
 }
 foreach ($fields['data'] as $fd) {  // add field info for searchable fields not shown in the list

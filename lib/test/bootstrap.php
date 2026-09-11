@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 const TIKI_IN_TEST = 1;
 
 define('TIKI_PATH', dirname(dirname(__DIR__)) . '/');
+
 chdir(TIKI_PATH);
 
 ini_set('display_errors', 'on');
@@ -58,6 +59,9 @@ $tikilib = new TikiLib();
 
 // update db if needed
 require_once 'lib/init/initlib.php';
+// tr()/tra() must be defined before the installer runs: schema patches load libs
+// (e.g. TrackerLib) whose constructors call tr()
+require_once 'lib/init/tra.php';
 $installer = Installer::getInstance();
 
 $output = new ConsoleOutput();
@@ -84,7 +88,6 @@ $cachelib = TikiLib::lib('cache');
 $wikilib = TikiLib::lib('wiki');
 $userlib = TikiLib::lib('user');
 $headerlib = TikiLib::lib('header');
-require_once 'lib/init/tra.php';
 $access = TikiLib::lib('access');
 
 $_SESSION = [
@@ -95,6 +98,7 @@ $_SESSION = [
 
 require_once(__DIR__ . '/TikiTestCase.php');
 require_once(__DIR__ . '/TestableTikiLib.php');
+require_once(__DIR__ . '/api/ApiTestCase.php');
 
 global $systemConfiguration;
 $systemConfiguration = new Config(['preference' => [], 'rules' => []], true);

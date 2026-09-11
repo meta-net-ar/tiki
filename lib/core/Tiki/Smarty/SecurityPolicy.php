@@ -110,12 +110,20 @@ class SecurityPolicy extends \Smarty\Security
         $this->disabled_tags = $disabled_tags;
         $this->allowed_modifiers = $allowed_modifiers;
         $this->disabled_modifiers = $disabled_modifiers;
-        $this->secure_dir = array_merge($this->secure_dir, $dirs);
+        // Add WEBSERVICE_TEMPLATES_PATH to secure_dir for dynamically generated webservice templates
+        $webserviceTemplatesPath = defined('WEBSERVICE_TEMPLATES_PATH') ? WEBSERVICE_TEMPLATES_PATH : null;
+        $this->secure_dir = array_merge(
+            $this->secure_dir,
+            $dirs,
+            $webserviceTemplatesPath ? [$webserviceTemplatesPath] : []
+        );
     }
 
     public function isTrustedModifier($modifier_name, $compiler)
     {
-        if ($tikilib = TikiLib::lib('tiki')) {
+        // TikiLib is absent when templates are compiled outside a full Tiki bootstrap
+        // (doc/devtools/check_smarty_syntax.php): fall back to the default policy.
+        if (class_exists('TikiLib') && ($tikilib = TikiLib::lib('tiki'))) {
             $allowed_builtin_php_functions = array_filter($tikilib->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
             if (in_array($modifier_name, $allowed_builtin_php_functions)) {
                 return true;

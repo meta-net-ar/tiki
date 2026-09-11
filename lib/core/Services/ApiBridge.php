@@ -207,6 +207,10 @@ class Services_ApiBridge
         $routes->add('galleries-files-lock', (new Route('galleries/files/lock', ['controller' => 'file', 'action' => 'lock_files', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('galleries-files-unlock', (new Route('galleries/files/unlock', ['controller' => 'file', 'action' => 'unlock_files', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('galleries-files-delete', (new Route('galleries/files/{fileId}/delete', ['controller' => 'file', 'action' => 'remove_file', 'confirmForm' => 'y']))->setMethods(['DELETE']));
+        $routes->add('articles', (new Route('articles', ['controller' => 'article', 'action' => 'list_articles', 'offset' => 0, 'maxRecords' => -1]))->setMethods(['GET']));
+        $routes->add('articles-create', (new Route('articles', ['controller' => 'article', 'action' => 'create_article']))->setMethods(['POST']));
+        $routes->add('articles-view', (new Route('articles/{articleId}', ['controller' => 'article', 'action' => 'get_article']))->setMethods(['GET']));
+        $routes->add('articles-update', (new Route('articles/{articleId}', ['controller' => 'article', 'action' => 'update_article']))->setMethods(['POST']));
         return $routes;
     }
 
@@ -236,7 +240,13 @@ class Services_ApiBridge
 
     protected function renderVersion()
     {
-        global $TWV;
+        global $TWV, $prefs;
+
+        if (($prefs['auth_api_tiki_version'] ?? 'y') !== 'y') {
+            TikiLib::lib('access')->display_error('API', tra('The version endpoint is disabled.'), 403);
+            return;
+        }
+
         echo json_encode(['version' => $TWV->version]);
     }
 }

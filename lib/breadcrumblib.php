@@ -221,7 +221,7 @@ function breadcrumb_buildStructureTrail($structure_path, $cnt, $loclass, $showLi
         if ($len != $cnt) {
             $ret = '';
             if ($showLinks && ($crumb['pageName'] != $page || $crumb['page_alias'] != $page)) {
-                $url = smarty_function_sefurl(['page' => $crumb['pageName'], 'structure' => $structure_path[0]['pageName']], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                $url = \SmartyTiki\FunctionHandler\Sefurl::render(['page' => $crumb['pageName'], 'structure' => $structure_path[0]['pageName']], TikiLib::lib('smarty')->getEmptyInternalTemplate());
                 $ret .= '<a class="' . $loclass . '" accesskey="' . ($cnt) . '" href="' . $url . '">';
             }
             if ($crumb['page_alias']) {
@@ -323,7 +323,7 @@ function _breadcrumb_getTitle($crumbs, $loc)
         $metadata = '';
 
         if ($current = current_object()) {
-            $escapedHref = smarty_modifier_escape(smarty_modifier_sefurl($current['object'], $current['type']));
+            $escapedHref = \SmartyTiki\Modifier\Escape::apply(\SmartyTiki\Modifier\Sefurl::apply($current['object'], $current['type']));
 
             if ($coordinates = TikiLib::lib('geo')->get_coordinates($current['type'], $current['object'])) {
                 $class = ' geolocated primary';
@@ -369,14 +369,13 @@ function _breadcrumb_getTitle($crumbs, $loc)
         }
     }
     if (! empty($prefs['wiki_pagename_strip']) || $prefs['namespace_indicator_in_page_title'] == 'y') {
-        include_once('lib/smarty_tiki/modifier.pagename.php');
-        $ret .= tra(smarty_modifier_pagename($cur_title)) . '</a>';
+        $ret .= tra(\SmartyTiki\Modifier\PageName::apply($cur_title)) . '</a>';
     } else {
         $ret .= htmlentities(tra($cur_title), ENT_QUOTES, 'UTF-8') . '</a>';
     }
     $ret .= help_doclink(['crumb' => $crumbs[$len - 1]]);
     if (isset($info['flag']) && $info['flag'] == 'L' && $print_page != 'y') {
-        $ret .= smarty_function_icon(['name' => 'lock', 'iclass' => 'tips', 'ititle' => ':' . tr('Locked by %0', $info['user']) ], $smarty->getEmptyInternalTemplate());
+        $ret .= \SmartyTiki\FunctionHandler\Icon::render(['name' => 'lock', 'iclass' => 'tips', 'ititle' => ':' . tr('Locked by %0', $info['user']) ], $smarty->getEmptyInternalTemplate());
     }
     return $ret;
 }

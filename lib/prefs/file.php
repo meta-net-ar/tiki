@@ -6,11 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_file_list()
 {
+    $commentsHelp = 'Comments';
+
     return [
         'file_galleries_comments_per_page' => [
             'name' => tra('Number per page'),
             'description' => tra('Number of comments per page'),
             'type' => 'text',
+            'help' => $commentsHelp,
             'size' => '5',
             'units' => tra('comments'),
             'default' => 10,
@@ -19,6 +22,7 @@ function prefs_file_list()
             'name' => tra('Default order'),
             'description' => tra('Default order of comments.'),
             'type' => 'list',
+            'help' => $commentsHelp,
             'options' => [
                 'commentDate_desc' => tra('Newest first'),
                 'commentDate_asc' => tra('Oldest first'),
@@ -31,6 +35,7 @@ function prefs_file_list()
             'description' => tra('If enabled, redirect all requests to images that were migrated from the image gallery to the corresponding file in the file gallery'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'File-Gallery-General-Settings',
         ],
     ];
 }

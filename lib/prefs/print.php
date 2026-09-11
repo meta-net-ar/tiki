@@ -39,6 +39,7 @@ function prefs_print_list()
             'size' => 50,
             'dependencies' => ['auth_token_access'],
             'default' => '',
+            'help' => 'PluginArchiveBuilder#Requirements',
         ],
         'print_pdf_webkit_path' => [
             'name' => tra('WebKit path'),
@@ -62,8 +63,8 @@ function prefs_print_list()
             'name' => tra('Print Friendly PDF'),
             'description' => tra('Useful for dark themes, enabling this option will change the theme background color to white and the color of text to black. If not activated, theme colors will be retained in the pdf file.'),
             'type' => 'flag',
-            'default' => 'y'
-
+            'default' => 'y',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_orientation' => [
             'name' => tra('PDF Orientation'),
@@ -75,6 +76,7 @@ function prefs_print_list()
                 'L' => tra('Landscape'),
             ],
             'default' => 'P',
+            'help' => 'mPDF#Configuration',
             'packages_required' => ['mpdf/mpdf' => 'Mpdf\\Mpdf'],
         ],
         'print_pdf_mpdf_size' => [
@@ -95,28 +97,30 @@ function prefs_print_list()
                 'A6' => tra('A6'),
             ],
             'default' => 'A4',
+            'help' => 'mPDF#Configuration',
         ],
 
         'print_pdf_mpdf_toc' => [
             'name' => tra('Table of contents'),
             'description' => tra('Generate auto table of contents with PDF'),
             'type' => 'flag',
-            'default' => 'n'
-
+            'default' => 'n',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_toclinks' => [
             'name' => tra('Link TOC with content'),
             'description' => tra('Link table of contents headings with content in the PDF'),
             'type' => 'flag',
-            'default' => 'n'
+            'default' => 'n',
+            'help' => 'mPDF',
 
         ],
         'print_pdf_mpdf_tocheading' => [
             'name' => tra('TOC heading'),
             'description' => tra('Heading to be displayed above the table of contents'),
             'type' => 'text',
-            'default' => 'Table of Contents'
-
+            'default' => 'Table of Contents',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_toclevels' => [
             'name' => tra('PDF TOC levels'),
@@ -124,6 +128,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'text',
             'default' => 'H1|H2|H3',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_pagetitle' => [
             'name' => tra('Show Page title'),
@@ -136,6 +141,7 @@ function prefs_print_list()
 
             ],
             'default' => '',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_header' => [
             'name' => tra('PDF header text'),
@@ -144,6 +150,7 @@ function prefs_print_list()
             'type' => 'textarea',
             'size' => 5,
             'default' => '',
+            'help' => 'mPDF#Configuration',
             'shorthint' => tr('HTML / Wiki Syntax / ') . tr('Left text') . ' | ' . tr('Center Text') . ' | ' . tr('Right Text')
         ],
         'print_pdf_mpdf_footer' => [
@@ -153,6 +160,7 @@ function prefs_print_list()
             'type' => 'textarea',
             'size' => 5,
             'default' => '',
+            'help' => 'mPDF#Configuration',
             'shorthint' => tr('HTML / Wiki Syntax / ') . tr('Left text') . ' | ' . tr('Center Text') . ' | ' . tr('Right Text')
         ],
         'print_pdf_mpdf_margin_left' => [
@@ -162,6 +170,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'text',
             'default' => '10',
+            'help' => 'mPDF#Configuration',
             'size' => '2',
             'filter' => 'digits',
 
@@ -175,7 +184,7 @@ function prefs_print_list()
             'default' => '10',
             'size' => '2',
             'filter' => 'digits',
-
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_margin_top' => [
             'name' => tra('Top margin'),
@@ -186,7 +195,7 @@ function prefs_print_list()
             'default' => '10',
             'size' => '2',
             'filter' => 'digits',
-
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_margin_bottom' => [
             'name' => tra('Bottom margin'),
@@ -197,7 +206,7 @@ function prefs_print_list()
             'default' => '10',
             'size' => '2',
             'filter' => 'digits',
-
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_margin_header' => [
             'name' => tra('Header margin from top of document'),
@@ -206,6 +215,7 @@ function prefs_print_list()
             'units' => tra('pixels'),
             'type' => 'text',
             'default' => '5',
+            'help' => 'mPDF#Configuration',
             'size' => '2',
             'filter' => 'digits',
             'shorthint' => tra('Warning: Header can overlap text if top margin is not set properly')
@@ -217,6 +227,7 @@ function prefs_print_list()
             'units' => tra('pixels'),
             'type' => 'text',
             'default' => '5',
+            'help' => 'mPDF#Configuration',
             'size' => '2',
             'filter' => 'digits',
             'shorthint' => tra('Warning: Footer can overlap text if bottom margin is not set properly')
@@ -226,6 +237,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'list',
             'default' => '',
+            'help' => 'mPDF#Configuration',
             'options' => [
                 '' => tra('Default'),
                 'off' => tra('Off (Links will be removed)'),
@@ -238,6 +250,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'text',
             'default' => 'H1|H2|H3',
+            'help' => 'mPDF#Configuration',
             'shorthint' => tra('H1-H6, separated by |.For example: H1|H2|H3')
         ],
         'print_pdf_mpdf_columns' => [
@@ -245,6 +258,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'list',
             'default' => '',
+            'help' => 'mPDF#Configuration',
             'options' => [
                 '' => tra('Default - 1 Column'),
                 '2' => tra('2 Columns'),
@@ -259,6 +273,7 @@ function prefs_print_list()
             'type' => 'password',
             'autocomplete' => 'off',
             'default' => '',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_watermark' => [
             'name' => tra('Watermark text'),
@@ -266,6 +281,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'text',
             'default' => '',
+            'help' => 'mPDF'
         ],
         'print_pdf_mpdf_watermark_image' => [
             'name' => tra('Watermark Image URL'),
@@ -273,6 +289,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'text',
             'default' => '',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_background' => [
             'name' => tra('PDF page background color'),
@@ -280,6 +297,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'text',
             'default' => '',
+            'help' => 'mPDF',
         ],
         'print_pdf_mpdf_background_image' => [
             'name' => tra('PDF page background image'),
@@ -287,6 +305,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'text',
             'default' => '',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_coverpage_text_settings' => [
             'name' => tra('CoverPage text settings'),
@@ -294,6 +313,7 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'type' => 'text',
             'default' => '',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_coverpage_wiki' => [
             'name' => tra('CoverPage wiki'),
@@ -301,6 +321,7 @@ function prefs_print_list()
             'tags' => ['advanced', 'experimental'],
             'type' => 'text',
             'default' => '',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_coverpage_settings' => [
             'name' => tra('CoverPage settings'),
@@ -308,6 +329,7 @@ function prefs_print_list()
             'tags' => ['advanced', 'experimental'],
             'type' => 'text',
             'default' => '',
+            'help' => 'mPDF',
         ],
         'print_pdf_mpdf_coverpage_image_settings' => [
             'name' => tra('Coverpage image URL'),
@@ -315,6 +337,7 @@ function prefs_print_list()
             'type' => 'text',
             'tags' => ['advanced'],
             'default' => '',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_allow_unsafe_ssl_requests' => [
             'name' => tra('Allow Unsafe SSL Requests'),
@@ -322,6 +345,7 @@ function prefs_print_list()
             'type' => 'flag',
             'tags' => ['advanced'],
             'default' => 'y',
+            'help' => 'mPDF#Configuration',
         ],
         'print_pdf_mpdf_debug' => [
             'name' => tra('Debug mPDF output'),
@@ -332,6 +356,7 @@ function prefs_print_list()
             'type' => 'flag',
             'tags' => ['advanced'],
             'default' => 'n',
+            'help' => 'mPDF',
         ],
         'print_wiki_authors' => [
             'name' => tra('Print wiki authors'),
@@ -341,6 +366,7 @@ function prefs_print_list()
                 'feature_wiki',
             ],
             'default' => 'n',
+            'help' => 'Print',
         ],
         'print_pdf_modules' =>
         [
@@ -352,7 +378,7 @@ function prefs_print_list()
             'dependencies' => [
                 'feature_wiki_print',
             ],
-        ],
+        ], // TODO add help page or create if none exists
         'print_original_url_wiki' => [
             'name' => tra('Print original wiki URL'),
             'description' => tra('Include original wiki page URL in print versions of wiki pages.'),

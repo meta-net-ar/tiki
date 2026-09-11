@@ -479,8 +479,12 @@ class ParserLib extends TikiDb_Bridge
 
         $start = -1;
         while (false !== $start = strpos($data, '~np~', $start + 1)) {
-            if (false !== $end = strpos($data, '~/np~', $start)) {
+            $nested = false;
+            if (false !== $end = $this->findUnparsedBlockEnd($data, $start, $nested)) {
                 $content = substr($data, $start + 4, $end - $start - 4);
+                if ($nested) {
+                    $content = str_replace(['~np~', '~/np~'], '', $content);
+                }
                 if ($protect) {
                     $content = $this->protectSpecialChars($content, $this->option['is_html']);
                 }
@@ -492,6 +496,37 @@ class ParserLib extends TikiDb_Bridge
                 $data = substr($data, 0, $start) . $key . substr($data, $end + 5);
             }
         }
+    }
+
+    private function findUnparsedBlockEnd($data, $start, &$nested = false)
+    {
+        $search = $start + 4;
+        $depth = 1;
+        $firstClose = false;
+        $nested = false;
+
+        while (false !== $nextClose = strpos($data, '~/np~', $search)) {
+            if ($firstClose === false) {
+                $firstClose = $nextClose;
+            }
+
+            $nextOpen = strpos($data, '~np~', $search);
+            if ($nextOpen !== false && $nextOpen < $nextClose) {
+                $depth++;
+                $search = $nextOpen + 4;
+                continue;
+            }
+
+            $depth--;
+            if ($depth === 0) {
+                $nested = $nextClose !== $firstClose;
+                return $nextClose;
+            }
+
+            $search = $nextClose + 5;
+        }
+
+        return $firstClose;
     }
 
     //
@@ -989,11 +1024,14 @@ class ParserLib extends TikiDb_Bridge
     //*
     protected function convert_plugin_for_html_editor($name, $args, $plugin_result, $data, $info = [])
     {
-        $html_editor_plugin = '{' . (empty($data) ? $name : TikiLib::strtoupper($name) . '(') . ' ';
+        $html_editor_plugin = '{' . (empty($data) ? $name . ' ' : TikiLib::strtoupper($name) . '(');
         $arg_str = '';      // not using http_build_query() as it converts spaces into +
         if (! empty($args)) {
             foreach ($args as $argKey => $argValue) {
-                if (is_array($argValue)) {
+                $default = $info['params'][$argKey]['default'] ?? null;
+                if ((empty($argValue) && empty($default)) || $argValue === (string) $default) {
+                    continue;
+                } elseif (is_array($argValue)) {
                     if (isset($info['params'][$argKey]['separator'])) {
                         $sep = $info['params'][$argKey]['separator'];
                     } else {
@@ -1399,8 +1437,7 @@ class ParserLib extends TikiDb_Bridge
             }
             if ($prefs['feature_wiki_ext_icon'] == 'y') {
                 $attrib .= 'class="wiki external" ';
-                include_once(__DIR__ . '/../smarty_tiki/function.icon.php');
-                $ext_icon = smarty_function_icon(['name' => 'link-external'], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                $ext_icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'link-external'], TikiLib::lib('smarty')->getEmptyInternalTemplate());
             } else {
                 $attrib .= 'class="wiki" ';
                 $ext_icon = "";
@@ -1512,7 +1549,26 @@ class ParserLib extends TikiDb_Bridge
         if ($this->core_options) {
             $option = array_merge($this->option, $option);
         }
-        return (new WikiParser_Parsable($data))->parse($option, empty($this->core_options));
+
+        // Set context flag for translations to auto-detect wiki parsing context
+        // This is passed via parser params so plugins and blocks can access it
+        // even when Smarty is not available
+        $option['wiki_parse_context'] = true;
+
+        // Save the previous state so we can restore it after parsing
+        $previousWikiContext = $this->option['wiki_parse_context'] ?? false;
+
+        $result = (new WikiParser_Parsable($data))->parse($option, empty($this->core_options));
+
+        // Restore the previous wiki_parse_context state to prevent it from leaking
+        // into non-wiki contexts (like menu rendering)
+        if ($previousWikiContext) {
+            $this->option['wiki_parse_context'] = true;
+        } else {
+            unset($this->option['wiki_parse_context']);
+        }
+
+        return $result;
     }
 
     /**
@@ -1605,10 +1661,10 @@ class ParserLib extends TikiDb_Bridge
                     $type = $file['filetype'];
 
                     if (str_starts_with($type, 'audio/')) {
-                        return smarty_function_inline_audio_player(['fileId' => $fileId, 'type' => $type], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                        return \SmartyTiki\FunctionHandler\InlineAudioPlayer::render(['fileId' => $fileId, 'type' => $type], TikiLib::lib('smarty')->getEmptyInternalTemplate());
                     }
 
-                    $icon = smarty_function_icon(['name' => 'paperclip'], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                    $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'paperclip'], TikiLib::lib('smarty')->getEmptyInternalTemplate());
                     return "<span class='badge rounded-pill bg-secondary' role='button' data-file-ref-type='$type' data-file-ref-id='$fileId'>$icon $filename</span>";
                 }
                 return $matches[0];
@@ -1743,8 +1799,7 @@ class ParserLib extends TikiDb_Bridge
                 $class = 'class="wiki external"';
                 if ($prefs['feature_wiki_ext_icon'] == 'y' && ! ($this->option['suppress_icons'] || $suppress_icons)) {
                     $smarty = TikiLib::lib('smarty');
-                    include_once('lib/smarty_tiki/function.icon.php');
-                    $ext_icon = smarty_function_icon(['name' => 'link-external'], $smarty->getEmptyInternalTemplate());
+                    $ext_icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'link-external'], $smarty->getEmptyInternalTemplate());
                 }
                 $rel = 'external';
                 if ($prefs['feature_wiki_ext_rel_nofollow'] == 'y') {
@@ -2026,7 +2081,7 @@ class ParserLib extends TikiDb_Bridge
             return;
         }
 
-        if ($prefs['feature_wiki_argvariable'] == 'y' && ! $this->option['wysiwyg']) {
+        if ($prefs['feature_wiki_argvariable'] == 'y' && (! isset($this->option['wysiwyg']) || ! $this->option['wysiwyg'])) {
             if (preg_match_all("/\\{\\{((\w+)(\\|([^\\}]*))?)\\}\\}/", $data ?? '', $args, PREG_SET_ORDER)) {
                 $needles = [];
                 $replacements = [];
@@ -2941,7 +2996,6 @@ class ParserLib extends TikiDb_Bridge
                                 (empty($this->option['print']) || ! $this->option['print']) && ! $this->option['suppress_icons']
                         ) {
                             $smarty = TikiLib::lib('smarty');
-                            include_once('lib/smarty_tiki/function.icon.php');
 
                             if ($prefs['wiki_edit_icons_toggle'] == 'y' && ! isset($_COOKIE['wiki_plugin_edit_view'])) {
                                 $iconDisplayStyle = ' style="display:none;"';
@@ -2952,7 +3006,7 @@ class ParserLib extends TikiDb_Bridge
                             if (! empty($this->option['page'])) {
                                 $button .= 'page=' . urlencode($this->option['page']) . '&amp;';
                             }
-                            $button .= 'hdr=' . $nb_hdrs . '">' . smarty_function_icon(['name' => 'edit'], $smarty->getEmptyInternalTemplate()) . '</a></div>';
+                            $button .= 'hdr=' . $nb_hdrs . '">' . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'edit'], $smarty->getEmptyInternalTemplate()) . '</a></div>';
                         } else {
                             $button = '';
                         }
@@ -2967,17 +3021,18 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         $style = $do_center ? ' style="text-align: center;"' : '';
+                        $justify = $do_center ? 'justify-content-center' : 'justify-content-start';
                         if ($prefs['wiki_heading_links'] !== 'n' && ($prefs['wiki_heading_links'] >= $hdrlevel || $prefs['wiki_heading_links'] === 'y' ) && (! isset($this->option['html_editor']) || ! $this->option['html_editor'])) {
                             $smarty = TikiLib::lib('smarty');
-                            $headingLink = '<a href="#' . $thisid . '" class="heading-link" aria-label="heading link">' . smarty_function_icon(['name' => 'link'], $smarty->getEmptyInternalTemplate()) . '</a>';
+                            $headingLink = '<a href="#' . $thisid . '" class="heading-link" aria-label="heading link">' . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'link'], $smarty->getEmptyInternalTemplate()) . '</a>';
                         } else {
                             $headingLink = '';
                         }
 
                         if ($prefs['feature_wiki_show_hide_before'] == 'y') {
-                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex justify-content-start" id="' . $thisid . '">' . $aclose . ' ' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose2;
+                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex ' . $justify . '" id="' . $thisid . '">' . $aclose . ' ' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose2;
                         } else {
-                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex justify-content-start" id="' . $thisid . '">' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose . $aclose2;
+                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex ' . $justify . '" id="' . $thisid . '">' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose . $aclose2;
                         }
                     } elseif (! strcmp($line, $prefs['wiki_page_separator'])) {
                         // Close open paragraph, lists, and div's
@@ -3292,12 +3347,11 @@ class ParserLib extends TikiDb_Bridge
                 ! $this->option['print'])  && strpos($data, '<div class="icon_edit_section">') != 0 && ! $this->option['suppress_icons']
         ) {
             $smarty = TikiLib::lib('smarty');
-            include_once('lib/smarty_tiki/function.icon.php');
             $button = '<div class="icon_edit_section"><a title="' . tra('Edit Section') . '" href="tiki-editpage.php?';
             if (! empty($this->option['page'])) {
                 $button .= 'page=' . urlencode($this->option['page']) . '&amp;';
             }
-            $button .= 'hdr=0">' . smarty_function_icon(['name' => 'edit'], $smarty->getEmptyInternalTemplate()) . '</a></div>';
+            $button .= 'hdr=0">' . \SmartyTiki\FunctionHandler\Icon::render(['name' => 'edit'], $smarty->getEmptyInternalTemplate()) . '</a></div>';
             $data = $button . $data;
         }
     }

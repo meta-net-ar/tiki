@@ -1,6 +1,15 @@
 <a name="list_filter{$filterCounter}"></a>
 <div class="list_filter" id="list_filter{$filterCounter}">
-    <form action="{$filterUrl}#list_filter{$filterCounter}" method="post">
+    <form action="{$filterUrl}#list_filter{$filterCounter}" method="get" id="list_filter{$filterCounter}_form">
+        {foreach from=$filterHiddenParams key=k item=v}
+            {if is_array($v)}
+                {foreach from=$v key=vk item=vv}
+                    <input type="hidden" name="{$k|escape}[{$vk|escape}]" value="{$vv|escape}">
+                {/foreach}
+            {else}
+                <input type="hidden" name="{$k|escape}" value="{$v|escape}">
+            {/if}
+        {/foreach}
         <div class="row">
             {foreach from=$filterFields item=field}
                 <div class="col-lg-6 col-12 mb-3">
@@ -27,14 +36,24 @@
         <div class="row mb-3 justify-content-center">
             <div class="col-auto">
                 <input class="button submit btn btn-primary" type="submit" name="filter" value="{tr}Filter{/tr}">
-                <input class="button submit btn btn-primary" type="reset" name="reset_filter" value="{tr}Reset{/tr}">
+                <input class="button submit btn btn-secondary" type="button" name="reset_filter" value="{tr}Reset{/tr}" id="list_filter{$filterCounter}_reset">
             </div>
         </div>
     </form>
 </div>
 
 {jq}
-$('#list_filter{{$filterCounter}} input[name=reset_filter]').off('click').on('click', function() {
-    window.location.href = $(this).closest('form').attr('action').replace('#list_filter{{$filterCounter}}', '');
+$('#list_filter{{$filterCounter}}_reset').off('click').on('click', function() {
+    const $form = $('#list_filter{{$filterCounter}}_form');
+    $form.find(':input')
+    .not(':hidden, :submit, :button, :reset')
+    .each(function() {
+        if ($(this).is(':checkbox, :radio')) {
+            this.checked = false;
+        } else {
+            $(this).val('');
+        }
+    });
+    $form[0].submit();
 });
 {/jq}

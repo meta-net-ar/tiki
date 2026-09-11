@@ -25,13 +25,13 @@
 
 {$p.pages}
 
-{if isset($pref_filters) and not $pref_filters.advanced.selected and in_array('advanced', $p.tags)}
-    <span class="badge bg-warning tips" title=":{tr}Change your preference filter settings in order to view advanced preferences by default{/tr}">
+{if isset($pref_filters) and in_array('advanced', $p.tags)}
+    <span class="badge bg-warning tips pref-tag-badge pref-tag-advanced" title=":{tr}Change your preference filter settings in order to view advanced preferences by default{/tr}"{if $pref_filters.advanced.selected} style="display:none"{/if}>
         {tr}advanced{/tr}
     </span>
 {/if}
-{if isset($pref_filters) and not $pref_filters.experimental.selected and in_array('experimental', $p.tags)}
-    <span class="badge bg-danger tips" title=":{tr}Change your preference filter settings in order to view experimental preferences by default{/tr}">
+{if isset($pref_filters) and in_array('experimental', $p.tags)}
+    <span class="badge bg-danger tips pref-tag-badge pref-tag-experimental" title=":{tr}Change your preference filter settings in order to view experimental preferences by default{/tr}"{if $pref_filters.experimental.selected} style="display:none"{/if}>
         {tr}experimental{/tr}
     </span>
 {/if}
@@ -39,20 +39,20 @@
 <div class="d-inline-flex flex-column">
     {if !empty($p.conflicts)}
         {foreach from=$p.conflicts.active item=conflict}
-            <div class="alert alert-danger pref_conflict d-inline-block alert-sm">
+            <div class="alert alert-danger pref_conflict d-none alert-sm" data-conflict="{$conflict.name|escape}" data-preference="{$p.preference|escape}">
                 {if isset($conflict.message)}
                     {$conflict.message} <br/>
                 {else}
-                    {tr}Conflict:{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a> {tr}must be disabled first.{/tr}
+                    {tr}Conflict: this preference is incompatible with{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a>. {tr} Please disable one!{/tr}
                 {/if}
             </div>
         {/foreach}
         {foreach from=$p.conflicts.inactive item=conflict}
-            <div class="alert alert-warning pref_conflict d-inline-block alert-sm">
+            <div class="alert alert-warning pref_conflict d-none alert-sm" data-conflict="{$conflict.name|escape}" data-preference="{$p.preference|escape}">
                 {if isset($conflict.message)}
                     {$conflict.message} <br/>
                 {else}
-                    {tr}Incompatibility detected with:{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a>
+                    {tr}This preference is incompatible with{/tr} <a href="{$conflict.link|escape}" class="alert-link">{$conflict.label|escape}</a>. {tr}Please disable one!{/tr}
                 {/if}
             </div>
         {/foreach}
@@ -84,7 +84,7 @@
             {icon name="ok" class="pref_dependency tips text-success" title="{tr}Requires package:{/tr} "|cat:$dep.label|escape|cat:" (OK)"}
         {else}
             <div class="alert alert-warning pref_dependency d-inline-block"{if not $p.modified and not $p.value} style="display:none;"{/if}>
-                {tr}A Tiki package is missing:{/tr} <a href="tiki-admin.php?page=packages" class="alert-link">{$dep.label|escape}</a>
+                {tr}A Tiki package is missing:{/tr} <a href="tiki-admin.php?page=packages&amp;package_highlight={$dep.label|escape:'url'}" class="alert-link">{$dep.label|escape}</a>
             </div>
         {/if}
     {/foreach}

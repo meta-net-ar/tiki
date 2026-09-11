@@ -124,7 +124,7 @@
     {if isset($first) and $first eq 'y'}
     <h2 class=" card-title">
         <span>{$comment.title|escape}</span>
-        {if ($prefs.feature_sefurl eq 'y') }
+        {if ($prefs.feature_sefurl eq 'y')}
         <a class="heading-link" href="{$comments_parentId|sefurl:'forum post'}{if ($comment.threadId neq $comments_parentId)}#threadId{$comment.threadId}{/if}" aria-label="{tr}Heading link{/tr}">{icon name="link"}</a>
         {else}
         <a class="heading-link" href="?tiki-view_forum_thread.php?comments_parentId={$comments_parentId}#threadId{$comment.threadId}" aria-label="{tr}Heading link{/tr}>{icon name="link"}</a>

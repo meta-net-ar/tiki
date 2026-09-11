@@ -44,6 +44,8 @@ if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     exit;
 }
 
+use Tiki\Process\Process;
+
 class OpenPGPLib
 {
     //PGP/MIME HEADER CONSTANTS
@@ -104,7 +106,7 @@ class OpenPGPLib
     * gpg trust
     * depending on which version of GnuPG we're using there
     * are two different ways to specify "always trust"
-    * @var string
+    * @var array
     * @access protected
     */
     private $gpg_trust;
@@ -126,7 +128,7 @@ class OpenPGPLib
             $this->gpg_sgn_passfile_path = '';
             $this->gpg_sgn_passphrase = $prefs['openpgp_gpg_signer_passphrase'];
         }
-        $this->gpg_trust = '';
+        $this->gpg_trust = [];
 
         $this->setCrlf();
     }
@@ -160,15 +162,13 @@ class OpenPGPLib
 
         ///////////////////////////////
         // open the GnuPG process and get the reply
-        // we're only concerned with the first line of output, so use "false" as last argument
-        $commandline = $this->gpg_path
-                    . ' --version';
-        $ret = $this->gpgExecProc($commandline, null, false);
+        // we're only concerned with the first line of output
+        $command = [$this->gpg_path, '--version'];
+        $ret = $this->gpgExecProc($command);
 
         /////////////////////////////////////////////////////
-        // get the version (we are only concerned with the first line of output,
-        // which was read from gpg-process-output as single-line-read into $ret[1]
-        $gpg_version_output = $ret[0];
+        // get the version (we are only concerned with the first line of output)
+        $gpg_version_output = strtok($ret[0], "\n");
 
         ///////////////////////////////////////////////
         // sanity check - see if we're working with gpg
@@ -189,17 +189,16 @@ class OpenPGPLib
         // depending on which version of GnuPG we're using there
         // are two different ways to specify "always trust"
         if ("$gpg_gpg_version" < '1.2.3') {
-            $this->gpg_trust = '--always-trust';       // the old way
+            $this->gpg_trust = ['--always-trust'];          // the old way
         } else {
-            $this->gpg_trust = '--trust-model always'; // the new way
+            $this->gpg_trust = ['--trust-model', 'always']; // the new way
         }
 
         /////////////////////////////////////////////
         // unset variables that we don't need anymore
         unset(
             $gpg_version_output,
-            $gpg_gpg_version,
-            $commandline
+            $gpg_gpg_version
         );
 
         ////////////////////////////////////////
@@ -211,102 +210,42 @@ class OpenPGPLib
     /**
      * Gnupg process call function
      *
-     * @param string    $gpg_proc_call
-     * @param string    $gpg_proc_input
-     * @param boolean   $read_multilines
+     * @param array     $command        Array of command and arguments (no shell escaping needed)
+     * @param string    $gpg_proc_input Optional input to send to GnuPG via STDIN
      * @access protected
      * @return array
      *      0 => process call output (STDOUT)
      *      1 => warnings and notices (STDERR)
      *      2 => exit status
      */
-    protected function gpgExecProc($gpg_proc_call = '', $gpg_proc_input = null, $read_multilines = true)
+    protected function gpgExecProc(array $command, $gpg_proc_input = null)
     {
-
-        if ($gpg_proc_call == '') {
+        if (empty($command)) {
             die;
         }
 
-        //////////////////////////////////////////////
-        // set up pipes for handling I/O to/from GnuPG
-        $gpg_descriptorspec = [
-            0 => ["pipe", "r"],  // STDIN is a pipe that GnuPG will read from
-            1 => ["pipe", "w"],  // STDOUT is a pipe that GnuPG will write to
-            2 => ["pipe", "w"]   // STDERR is a pipe that GnuPG will write to
-        ];
-
         ///////////////////////////////
         // this opens the GnuPG process
-        $gpg_process = proc_open(
-            $gpg_proc_call,
-            $gpg_descriptorspec,
-            $gpg_pipes
-        );
+        $process = new Process($command);
 
         //////////////////////////////////////////////////////////////////
-        // this writes the "$gpg_encrypt_secret_message" to GnuPG on STDIN
-        if (is_resource($gpg_process)) {
-            if ($gpg_proc_input != null) {
-                fwrite($gpg_pipes[0], $gpg_proc_input);
-            }
-            fclose($gpg_pipes[0]);
-
-            /////////////////////////////////////////////////////////
-            // this reads the output from GnuPG from STDOUT
-            $gpg_proc_output = '';
-            if ($read_multilines) {
-                while (! feof($gpg_pipes[1])) {
-                    $gpg_proc_output .= fgets($gpg_pipes[1], 1024);
-                }
-                fclose($gpg_pipes[1]);
-            } else {
-                $gpg_proc_output = fgets($gpg_pipes[1], 1024);
-            }
-
-            /////////////////////////////////////////////////////////
-            // this reads warnings and notices from GnuPG from STDERR
-            $gpg_error_message = '';
-            while (! feof($gpg_pipes[2])) {
-                $gpg_error_message .= fgets($gpg_pipes[2], 1024);
-            }
-            fclose($gpg_pipes[2]);
-
-            /////////////////////////////////////////
-            // this collects the exit status of GnuPG
-            $gpg_exit_status = proc_close($gpg_process);
-
-            ////////////////////////////////////////////
-            // unset variables that are no longer needed
-            // and can only cause trouble
-            unset(
-                $gpg_descriptorspec,
-                $gpg_process,
-                $gpg_pipes
-            );
-
-            ////////////////////////////////////
-            // this returns an array containing:
-            // [0] encrypted output (STDOUT)
-            // [1] warnings and notices (STDERR)
-            // [2] exit status
-            return [$gpg_proc_output, $gpg_error_message,  $gpg_exit_status];
-        } else {
-            ////////////////////////////////////////////
-            // unset variables that are no longer needed
-            // and can only cause trouble
-            unset(
-                $gpg_descriptorspec,
-                $gpg_process,
-                $gpg_pipes
-            );
-
-            //////////////////////////////
-            // set output as otherwise nothing
-            $gpg_proc_output = '';
-            $gpg_error_message = 'Fatal process call error: Process call failed!';
-            $gpg_exit_status = 99;
-            return [$gpg_proc_output, $gpg_error_message,  $gpg_exit_status];
+        // this writes the "$gpg_proc_input" to GnuPG on STDIN
+        if ($gpg_proc_input !== null) {
+            $process->setInput($gpg_proc_input);
         }
+
+        $process->run();
+
+        ////////////////////////////////////
+        // this returns an array containing:
+        // [0] encrypted output (STDOUT)
+        // [1] warnings and notices (STDERR)
+        // [2] exit status
+        return [
+            $process->getOutput(),
+            $process->getErrorOutput(),
+            $process->getExitCode()
+        ];
     }
 
 
@@ -352,57 +291,52 @@ class OpenPGPLib
         ///////////////////////////////////////////////////////////////////////
         // make sure that each recipient has the message encrypted to their key
         // the 2nd argument, and any subsequent arguments, are key IDs
-        $gpg_recipient_list = '';
+        $gpg_recipient_args = [];
         foreach ($gpg_args as $gpg_recipient) {
             if (is_array($gpg_recipient)) {
-                foreach ($gpg_recipient as &$item) {
-                    $gpg_recipient_list .= ' -r ' . $item;
+                foreach ($gpg_recipient as $item) {
+                    $gpg_recipient_args[] = '-r';
+                    $gpg_recipient_args[] = $item;
                 }
             } else {
-                $gpg_recipient_list .= " -r " . $gpg_recipient;
+                $gpg_recipient_args[] = '-r';
+                $gpg_recipient_args[] = $gpg_recipient;
             }
         }
 
         //////////////////////////////////////////
         // find which version of GnuPG we're using
         //////////////////////////////////////////
-        if ($this->gpg_trust == '') {
+        if (empty($this->gpg_trust)) {
             $this->gpgCheckVersion();
         }
 
         ///////////////////////////////
         // open the GnuPG process and get the reply
-        $commandline = '';
         if ($prefs['openpgp_gpg_signer_passphrase_store'] == 'file') {
             // get signer-key passphrase from a file
-            $commandline .= $this->gpg_path
-                    . ' --no-random-seed-file'
-                    . ' --homedir ' . $this->gpg_home
-                    . ' ' . $this->gpg_trust
-                    . ' --batch'
-                    . ' --local-user ' . $this->gpg_sgn_id
-                    . ' --passphrase-file ' . $this->gpg_sgn_passfile_path
-                    . ' -sea ' . $gpg_recipient_list
-                    . ' ';
+            $command = array_merge(
+                [$this->gpg_path, '--no-random-seed-file', '--homedir', $this->gpg_home],
+                $this->gpg_trust,
+                ['--batch', '--local-user', $this->gpg_sgn_id, '--passphrase-file', $this->gpg_sgn_passfile_path, '-sea'],
+                $gpg_recipient_args
+            );
         } else {
             // get signer-key passphrase from preferences
-            $commandline .= $this->gpg_path
-                    . ' --no-random-seed-file'
-                    . ' --homedir ' . $this->gpg_home
-                    . ' ' . $this->gpg_trust
-                    . ' --batch'
-                    . ' --local-user ' . $this->gpg_sgn_id
-                    . ' --passphrase ' . $this->gpg_sgn_passphrase
-                    . ' -sea ' . $gpg_recipient_list
-                    . ' ';
+            $command = array_merge(
+                [$this->gpg_path, '--no-random-seed-file', '--homedir', $this->gpg_home],
+                $this->gpg_trust,
+                ['--batch', '--local-user', $this->gpg_sgn_id, '--passphrase', $this->gpg_sgn_passphrase, '-sea'],
+                $gpg_recipient_args
+            );
         }
-        $ret = $this->gpgExecProc($commandline, $gpg_secret_message);
+        $ret = $this->gpgExecProc($command, $gpg_secret_message);
 
         unset(
             $gpg_args,
             $gpg_secret_message,
-            $gpg_recipient_list,
-            $commandline
+            $gpg_recipient_args,
+            $command
         );
 
         ////////////////////////////////////
@@ -455,23 +389,22 @@ class OpenPGPLib
         //////////////////////////////////////////
         // find which version of GnuPG we're using
         //////////////////////////////////////////
-        if ($this->gpg_trust == '') {
+        if (empty($this->gpg_trust)) {
             $this->gpgCheckVersion();
         }
 
         ///////////////////////////////
         // open the GnuPG process and get the reply
-        $commandline = $this->gpg_path
-                    . ' --homedir ' . $this->gpg_home
-                    . ' ' . $this->gpg_trust
-                    . ' --fingerprint'
-                    . ' --list-sigs ' . $gpg_key_id_to_return
-                    . ' ';
-        $ret = $this->gpgExecProc($commandline);
+        $command = array_merge(
+            [$this->gpg_path, '--homedir', $this->gpg_home],
+            $this->gpg_trust,
+            ['--fingerprint', '--list-sigs', $gpg_key_id_to_return]
+        );
+        $ret = $this->gpgExecProc($command);
 
         unset(
             $gpg_key_id_to_return,
-            $commandline
+            $command
         );
 
         ////////////////////////////////////
@@ -524,22 +457,22 @@ class OpenPGPLib
         //////////////////////////////////////////
         // find which version of GnuPG we're using
         //////////////////////////////////////////
-        if ($this->gpg_trust == '') {
+        if (empty($this->gpg_trust)) {
             $this->gpgCheckVersion();
         }
 
         ///////////////////////////////
         // open the GnuPG process and get the reply
-        $commandline = $this->gpg_path
-                    . ' --homedir ' . $this->gpg_home
-                    . ' ' . $this->gpg_trust
-                    . ' --export --armor ' . $gpg_key_id_to_return
-                    . ' ';
-        $ret = $this->gpgExecProc($commandline);
+        $command = array_merge(
+            [$this->gpg_path, '--homedir', $this->gpg_home],
+            $this->gpg_trust,
+            ['--export', '--armor', $gpg_key_id_to_return]
+        );
+        $ret = $this->gpgExecProc($command);
 
         unset(
             $gpg_key_id_to_return,
-            $commandline
+            $command
         );
 
         ////////////////////////////////////

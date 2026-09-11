@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\BruteForce\BruteForce;
+
 class Services_User_Controller
 {
     /**
@@ -90,7 +93,7 @@ class Services_User_Controller
         }
 
         if ($pass !== $passAgain) {
-            throw new Services_Exception(tr('Passwords do not match.'));
+            throw new Services_Exception(tr('Passwords do not match.'), 422);
         }
 
         $regResult = TikiLib::lib('registration')->register_new_user(
@@ -103,6 +106,11 @@ class Services_User_Controller
                 'email' => $email,
             ]
         );
+
+        if (is_array($regResult) && ! empty($regResult)) {
+            $messages = implode(', ', array_column($regResult, 'msg'));
+            throw new Services_Exception($messages, 422);
+        }
 
         if (TIKI_API && empty($regResult)) {
             $regResult = tra('User account created but pending confirmation.');
@@ -273,9 +281,9 @@ class Services_User_Controller
                 }
 
                 if ($prefs['feature_community_mouseover_lastlogin'] == 'y') {
-                    $result['lastSeen'] = $info['currentLogin'] ? $info['currentLogin'] : null;
+                    $result['currentLogin'] = $info['currentLogin'] ? $info['currentLogin'] : null;
                 }
-
+                $result['lastActivity'] = $info['lastActivity'] ? $info['lastActivity'] : null;
 
                 if ($prefs['feature_community_mouseover_picture'] == 'y') {
                     $result['avatarHtml'] = $tikilib->get_user_avatar($other_user);
@@ -952,6 +960,15 @@ class Services_User_Controller
             Feedback::error(tra('No user was selected.'));
             return Services_Utilities::closeModal();
         }
+        // ensures the user selected to send a message to exists.
+        if (! $userlib->user_exists($userwatch)) {
+            if (TIKI_API) {
+                throw new Services_Exception_NotFound('The selected user does not exist.');
+            }
+            Feedback::error(tra('The selected user does not exist.'));
+            return Services_Utilities::closeModal();
+        }
+
         //sets default priority for the message to 3 if no priority was given
         if (! empty($input->priority->text())) {
             $priority = $input->priority->text();
@@ -1100,6 +1117,7 @@ class Services_User_Controller
                 $avatarName = $input->avatarName->text();
                 $avatarType = $input->avatarType->text();
                 TikiLib::lib('userprefs')->set_user_avatar($userwatch, $avatarType, $avatarLibName, $avatarName, null, null, null, false);
+                TikiLib::lib('userprefs')->remove_file_gallery_image($userwatch);
                 return true;
             }
             if (empty($_FILES['userfile']['name'])) {
@@ -1107,11 +1125,22 @@ class Services_User_Controller
                 throw new Services_Exception($errormsg, 400);
             }
             $name = $_FILES['userfile']['name'];
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile']['tmp_name'], $_FILES['userfile']['name']);
+            } catch (Exception $e) {
+                throw new Services_Exception($e->getMessage(), 403);
+            }
+
             /**
              * @var $avatarlib AvatarLib
              */
             $avatarlib = TikiLib::lib('avatar');
-            $avatarlib->set_avatar_from_url($_FILES['userfile']['tmp_name'], $userwatch, $name);
+            try {
+                $avatarlib->setAvatarFromFile($_FILES['userfile']['tmp_name'], $userwatch, $name);
+            } catch (Exception $e) {
+                throw new Services_Exception($e->getMessage(), 400);
+            }
             return true;
         } else {
             return [
@@ -1130,9 +1159,7 @@ class Services_User_Controller
         $action = $input->timezone_action->text();
 
         if ($action === 'never') {
-            if ($tikilib->set_preference('user_localtimezonesync', 'n')) {
-                $tikilib->set_user_preference($user, 'localtimezonesync', 'n');
-            }
+            $tikilib->set_user_preference($user, 'user_localtimezonesync', 'n');
             $access->redirect($_SERVER['HTTP_REFERER']);
             return [];
         }
@@ -1232,7 +1259,10 @@ class Services_User_Controller
 
     private function redirectAndReturn($data = []): array
     {
-        header("Location:" . $_SERVER['HTTP_REFERER']);
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        if ($referer !== '') {
+            TikiLib::lib('access')->redirect($referer);
+        }
         return $data;
     }
 
@@ -1412,13 +1442,79 @@ class Services_User_Controller
         return true;
     }
 
+    /**
+     * Pre-check credentials for interactive login flows (e.g. 2FA step).
+     *
+     * Keep endpoint pre-auth but hardened: POST + CSRF (single-use ticket),
+     * and the same brute-force policy as tiki-login.
+     *
+     * @param JitFilter $input
+     * @return array{valid: bool, ticket: string|false}
+     * @throws Services_Exception
+     */
     public function actionValidateUser($input)
     {
+        global $prefs;
+
+        $access = TikiLib::lib('access');
+        $tikilib = TikiLib::lib('tiki');
+
+        if (! $access->requestIsPost()) {
+            throw new Services_Exception(tra('Method not allowed'), 405);
+        }
+
+        if (empty($_POST['ticket'])) {
+            throw new Services_Exception(tra('Missing security ticket'), 401);
+        }
+
+        $access->checkCsrf(false, true, 'hostTicket', true, '', 'services');
+        $access->setTicket();
+
         $username = $input->username->text();
         $password = $input->password->text();
+        $bruteForceProperties = ['ip' => $tikilib->get_ip_address()];
+
+        if ($username === '' || $password === '') {
+            return [
+                'valid' => false,
+                'ticket' => $access->getTicket(),
+            ];
+        }
+
+        if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+            $bruteForce = new BruteForce();
+            if (! $bruteForce->isOperationAllowed('login', $bruteForceProperties, false)) {
+                $waitTime = $bruteForce->getWaitTime('login', $bruteForceProperties);
+                if ($waitTime > 60) {
+                    $message = sprintf(
+                        tra('Too many login attempts. Please try again in %d minutes and %d seconds.'),
+                        floor($waitTime / 60),
+                        $waitTime % 60
+                    );
+                } else {
+                    $message = sprintf(tra('Too many login attempts. Please try again in %d seconds.'), $waitTime);
+                }
+                throw new Services_Exception($message, 429);
+            }
+        }
+
         $userlib = TikiLib::lib('user');
-        $ret = $userlib->validate_user($username, $password);
-        return $ret[0];
+        $ret = $userlib->validate_user($username, $password, false, null, false);
+        $valid = (bool) $ret[0];
+
+        if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+            $bruteForce = $bruteForce ?? new BruteForce();
+            if ($valid) {
+                $bruteForce->success('login', $bruteForceProperties);
+            } else {
+                $bruteForce->attempt('login', $bruteForceProperties);
+            }
+        }
+
+        return [
+            'valid' => $valid,
+            'ticket' => $access->getTicket(),
+        ];
     }
 
     public function action_save_column_prefs($input)

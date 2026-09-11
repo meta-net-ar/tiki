@@ -27,6 +27,8 @@ $inputConfiguration = [[
         'watch' => 'alpha',         //post  templates/comment/post.tpl:58
         'confirmForm' => 'alpha',   // \Services_Utilities::isConfirmPost
         'itemId' => 'int',          // often used in \ParserLib::parse_wiki_argvariable
+        'data' => 'none',           // post JSON payloads (structure save, menu save, etc.)
+        'params' => 'none',         // post JSON payloads (structure save, etc.)
     ],
 ]];
 
@@ -155,6 +157,27 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         }
 
         $access->output_serialized($finalusers);
+    } elseif ($listonly == 'usersautocomplete') {
+        $names_array = explode(',', str_replace(';', ',', $query));
+        $last_name = trim(end($names_array));
+        $groups = $jitRequest->groups->text();
+        $groups = $groups ? explode(',', $groups) : [];
+        $listusers = $userlib->get_users_light(0, -1, 'login_asc', $last_name, $groups);
+
+        $finalusers = [];
+        foreach ($listusers as $usrId => $usr) {
+            if (isset($last_name)) {
+                $longusr = $usr . ' (' . $usrId . ')';
+                if (stripos($longusr, $last_name) !== false) {
+                    $finalusers[] = [
+                        'username' => $usrId,
+                        'realname' => $usr != $usrId ? $usr : '',
+                        'avatar' => $userlib->get_user_avatar($usrId, '', 'xSmall'),
+                    ];
+                }
+            }
+        }
+        $access->output_serialized($finalusers);
     } elseif ($listonly == 'tags') {
         $freetaglib = TikiLib::lib('freetag');
 
@@ -218,15 +241,29 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
  */
 function read_icon_dir($dir, &$icons, $max, $query)
 {
-    $fp = opendir($dir);
-    while (false !== ($f = readdir($fp))) {
-        preg_match('/^([^\.].*)\..*$/', $f, $m);
+    if (! is_dir($dir)) {
+        return;
+    }
+    $iterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+
+    foreach ($iterator as $fileInfo) {
+        if (count($icons) >= $max) {
+            break;
+        }
+
+        $filename = $fileInfo->getFilename();
+        $path = $fileInfo->getPathname();
+
+        // Get name without extension
+        $nameOnly = pathinfo($filename, PATHINFO_FILENAME);
+
         if (
-            count($m) > 0 && count($icons) < $max &&
-                stripos($m[1], $query) !== false &&
-                ! in_array($dir . '/' . $f, $icons)
+            $fileInfo->isFile() &&
+            ! str_starts_with($filename, '.') &&
+            stripos($nameOnly, $query) !== false &&
+            ! in_array($path, $icons)
         ) {
-            $icons[] = $dir . '/' . $f;
+            $icons[] = $path;
         }
     }
 }

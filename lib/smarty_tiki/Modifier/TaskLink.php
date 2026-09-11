@@ -8,9 +8,15 @@
 namespace SmartyTiki\Modifier;
 
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class TaskLink
+class TaskLink implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tasklink';
+    }
+
     public function handle($taskId, $class_name = "link", $offset = "0", $sort_mode = "priority_desc")
     {
         global $tasklib, $user, $prefs, $smarty;
@@ -21,13 +27,28 @@ class TaskLink
         $info = $tasklib->get_task($user, $taskId);
         $description = "";
 
-        $my_length = strlen($info['description']);
+        if (empty($info)) {
+            // Bypass permission checks to see if the task exists but the user lacks access,
+            // returning an appropriate translated message instead of silently hiding the link.
+            $adminInfo = $tasklib->get_task($user, $taskId, null, true);
+            if (empty($adminInfo)) {
+                return '<span class="tasklink-missing">[' . tra("Task missing") . ']</span>';
+            } else {
+                return '<span class="tasklink-denied">[' . tra("Task access denied") . ']</span>';
+            }
+        }
+        $info_description = '';
+        if (isset($info['description']) && $info['description'] !== null) {
+            $info_description = $info['description'];
+        }
+
+        $my_length = strlen($info_description);
         $my_pos = 0;
         $line = 0;
         if ($my_length > 0) {
             do {
                 $line++;
-                $my_pos = strpos($info['description'], "\n", ($my_pos + 1));
+                $my_pos = strpos($info_description, "\n", ($my_pos + 1));
             } while (($line <= 15) && ($my_pos != ''));
         }
 
@@ -35,10 +56,10 @@ class TaskLink
             if ($line < 15) {
                 $my_pos = 1300;
             }
-            $description .= substr($info['description'], 0, min(1300, $my_pos + 1));
+            $description .= substr($info_description, 0, min(1300, $my_pos + 1));
             $append = "<br /><center><span class=\'highlight\'>" . tra("Text cut here") . "</span></center>";
         } else {
-            $description = $info['description'];
+            $description = $info_description;
             $append = '';
         }
 
@@ -63,7 +84,7 @@ class TaskLink
 
         $tooltipContent .= "<hr />" . $description;
 
-        $popupAttributes = smarty_function_popup(['text' => $tooltipContent, 'fullhtml' => true], $smarty->getEmptyInternalTemplate());
+        $popupAttributes = \SmartyTiki\FunctionHandler\Popup::render(['text' => $tooltipContent, 'fullhtml' => true], $smarty->getEmptyInternalTemplate());
         $content = "<a class='" . $class_name . "' " . $popupAttributes . " href='tiki-user_tasks.php?taskId=" . $taskId . "&amp;tiki_view_mode=view&amp;offset=" .
         $offset . "&amp;sort_mode=" . $sort_mode . "' ";
         if ($info['status'] == 'c') {

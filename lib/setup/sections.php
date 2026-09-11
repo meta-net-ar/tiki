@@ -14,10 +14,6 @@ use Tiki\Sections;
 
 $sections = Sections::getSections();
 
-if (! isset($section)) {
-    $section = '';
-}
-
 $sections_enabled = [];
 
 foreach ($sections as $sec => $dat) {
@@ -29,16 +25,14 @@ foreach ($sections as $sec => $dat) {
 
 ksort($sections_enabled);
 $smarty->assign_by_ref('sections_enabled', $sections_enabled);
-if (! empty($section)) {
-    $smarty->assign('section', $section);
-}
 
-if (! empty($section_class)) {
-    $smarty->assign('section_class', $section_class);
-} elseif (! empty($section)) {
-    $section_class = 'tiki_' . str_replace(' ', '_', $section);
-    $smarty->assign('section_class', $section_class);
-}
+Sections::onSectionChange(function ($section) use ($smarty) {
+    if (! empty($section)) {
+        $smarty->assign('section', $section);
+        $section_class = 'tiki_' . str_replace(' ', '_', $section);
+        $smarty->assign('section_class', $section_class);
+    }
+});
 
 function current_object()
 {

@@ -320,7 +320,7 @@ if ( \$('#$id') ) {
 
                 $ret .= '~np~' .
                         '<a id="' . $id . '" href="javascript:void(1)" class="editplugin"' . ' aria-label="Edit plugin" ' . ($displayIcon ? '' : ' style="display:none;"') . '>' .
-                        smarty_function_icon(['name' => 'plugin', 'iclass' => 'tips', 'ititle' => tra('Edit plugin') . ':' . ucfirst($plugin_name)], $smarty->getEmptyInternalTemplate()) .
+                        \SmartyTiki\FunctionHandler\Icon::render(['name' => 'plugin', 'iclass' => 'tips', 'ititle' => tra('Edit plugin') . ':' . ucfirst($plugin_name)], $smarty->getEmptyInternalTemplate()) .
                         '</a>' .
                         '~/np~';
             }
@@ -435,9 +435,9 @@ if ( \$('#$id') ) {
         global $prefs;
 
         if ($this->option['is_markdown'] && $prefs['markdown_enabled'] === 'y') {
-            $parsable = new WikiParser_ParsableMarkdown($data);
+            $parsable = new WikiParser_ParsableMarkdown();
         } else {
-            $parsable = new WikiParser_ParsableWiki($data);
+            $parsable = new WikiParser_ParsableWiki();
         }
         $parsable->setOptions($this->option);
         return $parsable->wikiParse($data, $noparsed);

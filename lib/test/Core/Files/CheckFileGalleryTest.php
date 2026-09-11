@@ -28,6 +28,10 @@ class CheckFileGalleryTest extends TestCase
     protected $galleryPodcastId;
     protected $galleryPodcast;
 
+    /** backupGlobals is off, so tearDown() restores these globals by hand */
+    protected ?array $prefsBackup = null;
+    protected ?string $userBackup = null;
+
     protected function setUp(): void
     {
         $this->testImage = TIKI_PATH . '/img/tiki/tikilogo.png';
@@ -36,6 +40,9 @@ class CheckFileGalleryTest extends TestCase
         }
 
         global $prefs, $user;
+
+        $this->prefsBackup = $prefs;
+        $this->userBackup = $user;
 
         // impersonate admin
         $user = 'admin';
@@ -81,6 +88,42 @@ class CheckFileGalleryTest extends TestCase
         $this->galleryPodcast = $fileGalleryLib->get_file_gallery_info($this->galleryPodcastId);
 
         $this->check = new CheckFileGallery();
+    }
+
+    protected function tearDown(): void
+    {
+        global $prefs, $user;
+
+        if ($this->prefsBackup !== null) {
+            $prefs = $this->prefsBackup;
+            $user = $this->userBackup;
+        }
+
+        // Restore the system galleries setUp() deleted
+        $systemGalleries = [
+            [1, 'File Galleries'],
+            [2, 'Users File Galleries'],
+            [3, 'Wiki Attachments'],
+            [4, 'Trash Files'],
+        ];
+
+        TikiLib::lib('filegal')->table('tiki_files')->deleteMultiple([]);
+        TikiLib::lib('filegal')->table('tiki_file_galleries')->deleteMultiple([]);
+        TikiLib::lib('filegal')->cleanGalleriesParentIdsCache();
+        foreach ($systemGalleries as [$id, $name]) {
+            TikiLib::lib('filegal')->table('tiki_file_galleries')->insert([
+                'galleryId' => $id,
+                'name' => $name,
+                'type' => 'system',
+                'description' => '',
+                'visible' => 'y',
+                'user' => 'admin',
+                'public' => 'y',
+                'parentId' => -1,
+            ]);
+        }
+
+        parent::tearDown();
     }
 
     public function testFileGalleryEmptyReportsNoProblemOnDB()

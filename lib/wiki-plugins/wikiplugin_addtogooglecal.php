@@ -78,6 +78,6 @@ function wikiplugin_addtogooglecal($data, $params)
     $date_to = date('Ymd', $calitem['end']) . 'T' . date('His', $calitem['end']) . 'Z';
     date_default_timezone_set($old_tz);
     $gcal_dates = $date_from . '/' . $date_to;
-    return '<a target="_blank" title="' . tr('Add Event to Google Calendar') . '" class="btn btn-primary" href="https://www.google.com/calendar/event?action=' . $gcal_action . '&text=' . $gcal_text . '&dates=' . $gcal_dates . '&location=' . $gcal_location . '&details=' . $gcal_details . '">
-            <i class="fas fa-calendar-plus"></i></a>';
+    return '<a target="_blank" title="' . tr('Add Event to Google Calendar') . '" class="btn btn-primary btn-sm" href="https://www.google.com/calendar/event?action=' . $gcal_action . '&text=' . $gcal_text . '&dates=' . $gcal_dates . '&location=' . $gcal_location . '&details=' . $gcal_details . '">
+            <i class="fas fa-calendar-plus"></i> ' . tr('Add Event to Google Calendar') . '</a>';
 }

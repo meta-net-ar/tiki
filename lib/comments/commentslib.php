@@ -1935,7 +1935,7 @@ class Comments extends TikiLib
 
         foreach ($fieldsToMaks as $field) {
             if (isset($data[$field])) {
-                $data[$field] = smarty_modifier_forummaskemail($data[$field]);
+                $data[$field] = \SmartyTiki\Modifier\ForumMaskEmail::apply($data[$field]);
             }
         }
 
@@ -2413,7 +2413,7 @@ class Comments extends TikiLib
             ];
 
             return '"' .
-                    smarty_modifier_truncate(
+                    \SmartyTiki\Modifier\Truncate::apply(
                         strip_tags(TikiLib::lib('parser')->parse_data($comment['data'], $options)),
                         $commentlength
                     ) . '"';
@@ -2673,11 +2673,6 @@ class Comments extends TikiLib
                         0,
                         ['version' => $ret[$key]['version']]
                     );
-
-                    foreach ($history['data'] as &$hist) {
-                        $field_info = TikiLib::lib('trk')->get_field_info($hist['fieldId']);
-                        $hist['fieldName'] = $field_info['name'];
-                    }
 
                     if (! empty($history['data'])) {
                         $ret[$key]['diffInfo'] = $history['data'];
@@ -3986,7 +3981,7 @@ class Comments extends TikiLib
             }
 
             if ($threadId = $this->check_for_topic($params['comments_title'], $forum_info['forumId'])) {
-                $url = smarty_modifier_sefurl($threadId, 'forumthread');
+                $url = \SmartyTiki\Modifier\Sefurl::apply($threadId, 'forumthread');
                 $link = sprintf('<a href="%s">%s</a>', $url, htmlspecialchars($params['comments_title']));
                 $errors[] = tr('This topic already exists in this forum. Visit: %0', $link);
             }

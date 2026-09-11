@@ -116,6 +116,7 @@ function prefs_wikiplugin_list($partial = false)
         $out['wikiplugin_list_gui'] = ['default' => 'y'];
         $out['wikiplugin_list_convert_trackerlist'] = ['default' => 'n'];
         $out['wikiplugin_maximum_passes'] = ['default' => 500];
+        $out['wikiplugin_fade_default_expanded'] = ['default' => 'n'];
 
         return $out;
     }
@@ -158,7 +159,8 @@ function prefs_wikiplugin_list($partial = false)
         'dependencies' => ['wikiplugin_snarf'],
         'filter' => 'int',
         'units' => tra('seconds'),
-        'type' => 'text'
+        'type' => 'text',
+        'help' => 'Pluginsnarf',
     ];
 
     // temporary pref for developpment of the list plugin GUI
@@ -169,7 +171,8 @@ function prefs_wikiplugin_list($partial = false)
         'default' => 'y',
         'dependencies' => ['wikiplugin_list'],
         'filter' => 'alpha',
-        'type' => 'flag'
+        'type' => 'flag',
+        'help' => 'Pluginlist',
     ];
 
     // temporary pref for developpment of the list plugin converter from trackerlist
@@ -181,7 +184,8 @@ function prefs_wikiplugin_list($partial = false)
         'default' => 'n',
         'dependencies' => ['wikiplugin_list', 'wikiplugin_trackerlist'],
         'filter' => 'alpha',
-        'type' => 'flag'
+        'type' => 'flag',
+        'help' => 'PluginTrackerList-To-PluginList-Converter',
     ];
 
     $prefs['wikiplugin_maximum_passes'] = [
@@ -194,6 +198,26 @@ function prefs_wikiplugin_list($partial = false)
         'units' => tr('passes'),
         'tags' => ['experimental'],
         'warning' => tr('Setting this to a higher value than the default of 500 may have performance implications.'),
+        'help' => 'Plugins',
+    ];
+
+    $prefs['wikiplugin_fileaccess_allowed_paths'] = [
+        'name' => tr('Allowed filesystem roots for file-access wiki plugins'),
+        'description' => tr('Comma-separated allowlist of absolute filesystem roots for LSDIR and LOCALFILES plugins. Access is denied by default when empty.'),
+        'type' => 'text',
+        'separator' => ',',
+        'default' => '',
+        'tags' => ['advanced'],
+        'warning' => tr('Security-sensitive setting. Keep this list minimal and avoid allowing the Tiki installation directory.'),
+        'hint' => tr('Set this using system configuration (tiki.ini/local.ini) so it can be forced by host policy.'),
+    ];
+
+    $prefs['wikiplugin_fade_default_expanded'] = [
+        'name' => tra('Fade plugin default expanded'),
+        'description' => tra('When wiki authors omit the expanded parameter, start Fade plugin sections open (expanded) or closed (collapsed).'),
+        'type' => 'flag',
+        'default' => 'n',
+        'dependencies' => ['wikiplugin_fade'],
     ];
 
     return $prefs;

@@ -15,6 +15,7 @@ function prefs_restrict_list()
             'shorthint' => tr('Use Ctrl+Click to select multiple languages.'),
             'default' => 'n',
             'tags' => ['basic'],
+            'help' => 'i18n',
         ],
     ];
 }

@@ -139,10 +139,10 @@ class Search_Formatter
                         $finalValue = $translatedValue;
                     }
                 }
-                if (! $finalValue && $rawValue) {
+                if (is_null($finalValue) && ! is_null($rawValue)) {
                     $finalValue = $rawValue;
                 }
-                if ($finalValue || ! isset($row[$k])) {
+                if (! is_null($finalValue) || ! isset($row[$k])) {
                     // Only set if not a blank value so the defaults prevail but make sure to set it if default is not specified
                     $row[$k] = $finalValue;
                 }
@@ -229,19 +229,19 @@ class Search_Formatter
         }
 
         $url = parse_url($_SERVER["REQUEST_URI"] ?? '', PHP_URL_PATH);
-        $filters = [];
-        foreach ($_GET as $key => $val) {
-            if (! str_starts_with($key, 'tf_')) {
-                $filters[$key] = $val;
+        $hiddenParams = [];
+        foreach ($_REQUEST as $key => $val) {
+            if (! str_starts_with($key, 'tf_') && $key !== 'filter' && $key !== 'reset_filter') {
+                $hiddenParams[$key] = $val;
             }
         }
-        $url .= '?' . http_build_query($filters);
 
         if ($fields) {
             $smarty = TikiLib::lib('smarty');
             $smarty->assign('filterFields', $fields);
             $smarty->assign('filterCounter', $this->counter);
             $smarty->assign('filterUrl', $url);
+            $smarty->assign('filterHiddenParams', $hiddenParams);
             return '~np~' . $smarty->fetch('templates/search/list/filter.tpl') . '~/np~';
         }
 

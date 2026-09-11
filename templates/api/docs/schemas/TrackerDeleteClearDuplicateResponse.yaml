@@ -1,0 +1,17 @@
+---
+description: Response from clear/duplicate/delete tracker operations.
+type: object
+required:
+  - trackerId
+  - name
+  - message
+properties:
+  trackerId:
+    oneOf:
+      - type: integer
+      - type: string
+  name:
+    type: string
+    nullable: true
+  message:
+    type: string

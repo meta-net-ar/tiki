@@ -7,6 +7,9 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
 /**
  * \brief Smarty modifier to create user links with optional mouseover info
  *
@@ -24,8 +27,15 @@ namespace SmartyTiki\Modifier;
  *
  * Example: {$userinfo.login|userlink:'link':::25}
  */
-class UserLink
+class UserLink implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'userlink';
+    }
+
     public function handle($other_user, $class = 'userlink', $idletime = 'not_set', $fullname = '', $max_length = 0, $popup = '')
     {
         global $prefs;
@@ -38,7 +48,7 @@ class UserLink
                 $other_user = array_map(
                     function ($username) use ($class, $idletime, $popup) {
                         $username = \TikiLib::lib('user')->distinguish_anonymous_users($username);
-                        return smarty_modifier_userlink($username, $class, $idletime, '', 0, $popup);
+                        return \SmartyTiki\Modifier\UserLink::apply($username, $class, $idletime, '', 0, $popup);
                     },
                     $other_user
                 );
@@ -55,7 +65,7 @@ class UserLink
             $fullname = \TikiLib::lib('user')->clean_user($other_user);
         }
         if ($max_length) {
-            $fullname = smarty_modifier_truncate($fullname, $max_length, '...', true);
+            $fullname = \SmartyTiki\Modifier\Truncate::apply($fullname, $max_length, '...', true);
         }
         $popup = 'y';
         return \TikiLib::lib('user')->build_userinfo_tag($other_user, htmlspecialchars($fullname, ENT_QUOTES), $class, $popup);

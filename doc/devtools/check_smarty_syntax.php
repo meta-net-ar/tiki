@@ -47,10 +47,6 @@ function check_smarty_syntax(): int
 
     define('TIKI_PATH', getcwd());
 
-    require_once ROOT . '/lib/smarty_tiki/prefilter.tr.php';
-    require_once ROOT . '/lib/smarty_tiki/prefilter.jq.php';
-    require_once ROOT . '/lib/smarty_tiki/prefilter.log_tpl.php';
-
     $smarty = new SmartyTiki();
 
     set_error_handler('check_smarty_syntax_error_handler');
@@ -58,7 +54,20 @@ function check_smarty_syntax(): int
     $templates_dir = TIKI_PATH . '/' . SMARTY_TEMPLATES_PATH;
 
     $entries = [];
-    get_files_list($templates_dir, $entries, '/\.tpl$/');
+    $specifiedFiles = array_slice($_SERVER['argv'], 1);
+    if (! empty($specifiedFiles)) {
+        foreach ($specifiedFiles as $file) {
+            if (is_link($file)) {
+                continue;
+            }
+            if (pathinfo($file, PATHINFO_EXTENSION) !== 'tpl') {
+                continue;
+            }
+            $entries[] = $file;
+        }
+    } else {
+        get_files_list($templates_dir, $entries, '/\.tpl$/');
+    }
 
     $errors_found = false;
     $total = count($entries);
@@ -69,9 +78,10 @@ function check_smarty_syntax(): int
             continue;
         }
 
-        $template_file = substr($entry, strlen($templates_dir) + 1);
+        $template_file = get_template_name($entry, $templates_dir);
 
         try {
+            echo $template_file . PHP_EOL;
             $template = $smarty->createTemplate($template_file);
             $template->compileTemplateSource();
         } catch (Throwable $e) {
@@ -91,6 +101,22 @@ function check_smarty_syntax(): int
 
     echo color("Smarty syntax check passed successfully.", 'green') . PHP_EOL;
     return 0;
+}
+
+function get_template_name(string $entry, string $templates_dir): string
+{
+    $entry = str_replace('\\', '/', $entry);
+    $templates_dir = str_replace('\\', '/', $templates_dir);
+
+    if (str_starts_with($entry, $templates_dir . '/')) {
+        return substr($entry, strlen($templates_dir) + 1);
+    }
+
+    if (str_starts_with($entry, 'templates/')) {
+        return substr($entry, strlen('templates/'));
+    }
+
+    return $entry;
 }
 
 /**

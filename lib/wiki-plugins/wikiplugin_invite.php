@@ -79,7 +79,7 @@ function wikiplugin_invite($data, $params)
             $email = $_REQUEST['email'];
             if (! ($invite = $userlib->get_user_by_email($email))) {
                 $new_user = true;
-                $password = 'toto';//$tikilib->genPass();
+                $password = $tikilib->genPass();
                 $codedPassword = md5($password);
                 if ($prefs['login_autogenerate'] == 'y') {
                     $uname = '';

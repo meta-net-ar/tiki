@@ -11,6 +11,7 @@ function prefs_generate_list()
             'name' => tra('Generate password'),
             'description' => tra('Display a button on the registration form to automatically generate a very secure password for the user.'),
             'type' => 'flag',
+            'help' => 'Login-General-Preferences',
             'hint' => tra('The generated password may not include any restrictions (such as minimum/maximum length.'),
             'default' => 'n',
         ],

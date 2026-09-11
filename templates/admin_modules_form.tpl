@@ -131,6 +131,12 @@
 
                                     {elseif $param.type eq 'textarea'}
                                         <textarea type="text" id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]"{if !empty($param.filter)} class="{$param.filter} form-control"{else} class="{$param.filter} form-control"{/if}>{$param.value|escape}</textarea>
+                                    {elseif $param.type eq 'select' and isset($param.options) and is_array($param.options)}
+                                        <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]{if isset($param.separator)}[]{/if}" class="form-control" {if isset($param.separator)}multiple="multiple"{/if}>
+                                            {foreach from=$param.options key=optionKey item=optionValue}
+                                                <option value="{$optionKey|escape}" {if (is_array($param.value) and in_array($optionKey, $param.value)) or $param.value eq $optionKey}selected="selected"{/if}>{$optionValue|escape}</option>
+                                            {/foreach}
+                                        </select>
                                     {else}
                                         <input type="text" id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" value="{$param.value|escape}"{if !empty($param.filter)} class="{$param.filter} form-control"{else} class="{$param.filter} form-control"{/if}>
                                     {/if}
@@ -150,7 +156,7 @@
                         <label for="assign_params">{tr}Parameters{/tr}</label>
                     </a>
                     <textarea id="assign_params" name="assign_params"s="1" cols="60" class="form-control">{$assign_params|escape}</textarea>
-                    {help url="Module+Parameters" desc="{tr}Enter the parameters in URL format, e.g. 'nobox=y&class=rbox-data'{/tr}"}
+                    {help url="Module-Settings-Parameters" desc="{tr}Enter the parameters in URL format, e.g. 'nobox=y&class=rbox-data'{/tr}"}
                     {self_link um_edit=$assign_name cookietab="2" _anchor="editcreate"}{tr}Edit custom module{/tr} {icon name="next"}{/self_link}
                 </div>
             {/if}
@@ -162,3 +168,7 @@
 {/if}
 
 </div>
+
+<script type="module">
+    import "@tiki/modules/search";
+</script>

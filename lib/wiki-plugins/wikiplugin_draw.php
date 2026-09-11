@@ -138,7 +138,7 @@ EOF;
         . '">' . $fileInfo['data'] . '</div>';
 
         if ($globalperms->upload_files == 'y') {
-            $editicon = smarty_function_icon(['name' => 'edit'], $smarty->getEmptyInternalTemplate());
+            $editicon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'edit'], $smarty->getEmptyInternalTemplate());
             $ret .= "<a title='$label' href='tiki-ajax_services.php?controller=draw&action=edit&modal=1&fileId=$id&page=$page&index=$drawIndex" .
                 (! is_null($width) ? "&width=$width" : "") . (! is_null($height) ? "&height=$height" : "") .
                 "' data-tiki-bs-toggle=\"modal\" data-bs-backdrop=\"static\" data-bs-target=\".footer-modal.fade:not(.show):first\" data-size='modal-fullscreen'  title='Edit: " . $fileInfo['filename'] . "'>" .

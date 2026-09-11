@@ -8,6 +8,8 @@
 namespace SmartyTiki\Modifier;
 
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
 
 /**
  * Smarty plugin
@@ -26,8 +28,15 @@ use TikiLib;
  * @throws Exception
  * @throws \Smarty\Exception
  */
-class Iconify
+class Iconify implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'iconify';
+    }
+
     public function handle($string, $filetype = '', $fileId = null, $size = 1, $return = 'icon')
     {
         $smarty = \TikiLib::lib('smarty');
@@ -38,8 +47,8 @@ class Iconify
         if ($fileId && substr($filetype, 0, 6) == 'image/') {
             // Special handling for file gallery images,
             // display thumbnail
-            $icon = smarty_modifier_sefurl($fileId, 'thumbnail');
-            $icon = smarty_modifier_escape($icon);
+            $icon = \SmartyTiki\Modifier\Sefurl::apply($fileId, 'thumbnail');
+            $icon = \SmartyTiki\Modifier\Escape::apply($icon);
             $width = 16 * $size;
 
             return "<img src=\"$icon\" width=\"$width\"/>";
@@ -65,7 +74,7 @@ class Iconify
                 if ($return === 'filetype') {
                     return $m;
                 } elseif ($return === 'icon') {
-                    return smarty_function_icon(
+                    return \SmartyTiki\FunctionHandler\Icon::render(
                         [
                             '_id' => 'img/icons/mime/' . $icon . '.png',
                             'alt' => ( $filetype === null ? $icon : $filetype ),
@@ -154,7 +163,7 @@ class Iconify
                 if ($return === 'filetype') {
                     return $type;
                 } else {
-                    return smarty_function_icon(['name' => $iconname, 'size' => $size], $smarty->getEmptyInternalTemplate());
+                    return \SmartyTiki\FunctionHandler\Icon::render(['name' => $iconname, 'size' => $size], $smarty->getEmptyInternalTemplate());
                 }
             }
         }

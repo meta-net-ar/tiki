@@ -94,33 +94,30 @@ class BOMChecker_Scanner
         $sourceDir = $this->fixDirSlash($sourceDir);
 
         // Copy files and directories.
-        $sourceDirHandler = opendir($sourceDir);
+        $dirIterator = new FilesystemIterator($sourceDir, FilesystemIterator::SKIP_DOTS);
 
-        while ($file = readdir($sourceDirHandler)) {
-            // Skip ".", ".." .
-            if ($file == '.' || $file == '..') {
+        foreach ($dirIterator as $fileInfo) {
+            $path = $fileInfo->getPathname();
+
+            // If it's a directory, check it recursively
+            if ($fileInfo->isDir()) {
+                $this->checkDir($path);
                 continue;
             }
 
-            $sourcefilePath = $sourceDir . $file;
-
-            if (is_dir($sourcefilePath)) {
-                $this->checkDir($sourcefilePath);
-            }
-
-            if (
-                ! is_file($sourcefilePath)
-                || ! in_array($this->getFileExtension($sourcefilePath), $this->scanExtensions)
-            ) {
+            // Only process files with allowed extensions
+            if (! $fileInfo->isFile() || ! in_array($this->getFileExtension($path), $this->scanExtensions)) {
                 continue;
             }
 
-            if (! $type = $this->checkUtfBom($sourcefilePath)) {
-                $this->withoutBomFiles[] = $sourcefilePath;
+            // Check UTF BOM
+            if (! $type = $this->checkUtfBom($path)) {
+                $this->withoutBomFiles[] = $path;
                 continue;
             }
 
-            $this->bomFiles[$type][] = str_replace($this->sourceDir . '/', '', $sourcefilePath);
+            // Save files with BOM by type
+            $this->bomFiles[$type][] = str_replace($this->sourceDir . '/', '', $path);
         }
     }
 

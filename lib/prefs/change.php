@@ -11,6 +11,7 @@ function prefs_change_list()
             'name' => tra('Users can choose the language of their interface'),
             'description' => tra('Allow users to change the language of the menus and labels.'),
             'type' => 'flag',
+            'help' => 'i18n',
             'dependencies' => [
                 'feature_multilingual',
                 'feature_userPreferences',
@@ -22,6 +23,7 @@ function prefs_change_list()
             'name' => tra('Users can change theme'),
             'warning' => tra('Users can override the theme with this setting.'),
             'type' => 'flag',
+            'help' => 'Themes',
             'default' => 'y',
         ],
         'change_password' => [

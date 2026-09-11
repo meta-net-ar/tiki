@@ -1,0 +1,25 @@
+@charset "UTF-8";
+/*!
+ * The "Kingdom" theme for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2026 Olivier Kango and contributors
+ * Licensed under MIT
+ */
+/*!
+ * Bootstrap (https://getbootstrap.com/)
+ * Copyright 2011-2025 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
+
+@import "../../base_files/scss/_tiki-bootstrap_functions";
+
+@import "../../base_files/scss/_tiki-variables.scss";
+@import "../scss/variables";
+
+@import "../../default/scss/variables-dark";
+@import "../scss/variables-dark";
+
+@import "../../base_files/scss/_tiki-bootstrap_layout_and_components";
+@import "../../base_files/scss/_tiki-selectors.scss";
+@import "../../base_files/scss/_tiki-pagetop_colors.scss";
+
+@import "../scss/css-variables";

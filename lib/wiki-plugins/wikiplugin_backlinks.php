@@ -49,7 +49,7 @@ class WikiPluginBackLinks extends PluginsLib
         //Format the backlink using object link
         $smarty = TikiLib::lib('smarty');
 
-        $backlink = smarty_function_object_link(
+        $backlink = \SmartyTiki\FunctionHandler\ObjectLink::render(
             [
                 'type' => 'trackeritem',
                 'id' => $itemId,

@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class LangName
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class LangName implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'langname';
+    }
+
     public function handle($lang)
     {
         if (empty($lang)) {

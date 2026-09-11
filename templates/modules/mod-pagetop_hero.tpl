@@ -6,7 +6,7 @@
             <h1 class="pagetop-hero-title">{tr}{$pagetitle|escape}{/tr}</h1>
             {if count($breadcrumbs) gt 0}
                 <ol class="breadcrumb">
-                    {foreach from=$breadcrumbs item=item name=object }
+                    {foreach from=$breadcrumbs item=item name=object}
                         {if $smarty.foreach.object.last}
                             <li class="breadcrumb-item active" aria-current="page">{tr}{$item.text}{/tr}</li>
                         {else}

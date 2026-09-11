@@ -45,6 +45,7 @@
     --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-top-border: solid #1a1a1a;
+    --tiki-top-border-width: 0 0 4px 0;
     --tiki-top-box-shadow: none;
 }
 
@@ -57,7 +58,7 @@
     --tiki-topbar-active-bg: transparent;
     --tiki-topbar-text-color: #{$navbar-light-hover-color};
     --tiki-topbar-border: solid #1a1a1a;
-    --tiki-topbar-border-width: 0 0.75rem 0.75rem 0.75rem;
+    --tiki-topbar-border-width: 0 4px 4px 4px;
     --tiki-topbar-box-shadow: none;
 }
 
@@ -96,11 +97,6 @@
 //        @include topbar-nav-light;
 //    }
 //}
-
-.tiki-top-nav-light, .tiki-top-nav-dark {
-    --tiki-top-border-width: 0 0 0.75rem 0;
-    --tiki-topbar-border-width: 0 0.75rem 0.75rem 0.75rem;
-}
 
 // - - - - - New admin pages (Unified Admin Backend) - - - - - - - //
 

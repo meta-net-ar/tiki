@@ -52,6 +52,7 @@
                     {preference name=xmpp_domain_users}
                     {preference name=xmpp_domain_guest}
                     {preference name=xmpp_anonymous_mode}
+                    {preference name=xmpp_anonymous_allow_custom_nickname}
                     {preference name=xmpp_anonymous_room}
                     {preference name=xmpp_anonymous_support_room}
                     {preference name=xmpp_registered_room}
@@ -70,6 +71,7 @@
                 <fieldset>
                     <legend class="h3">{tr}ConverseJS options (common){/tr}</legend>
                     {preference name=xmpp_conversejs_always_load}
+                    {preference name=xmpp_chat_button}
                     {preference name=xmpp_conversejs_debug}
                     {preference name=xmpp_conversejs_init_json}
                 </fieldset>

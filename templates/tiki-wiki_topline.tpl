@@ -34,7 +34,7 @@
             <div class="btn-group ms-2" style="min-width: 6rem;">
                 {* Show language dropdown only if there is more than 1 language or user has right to edit *}
                 {if ($tiki_p_admin eq 'y' or $tiki_p_admin_wiki eq 'y' or $tiki_p_edit eq 'y' or $tiki_p_edit_inline eq 'y') or (isset($translationsCount) and $translationsCount gt 1)}
-                    {if $prefs.feature_multilingual eq 'y' && $prefs.show_available_translations eq 'y' && $machine_translate_to_lang eq '' }
+                    {if $prefs.feature_multilingual eq 'y' && $prefs.show_available_translations eq 'y' && $machine_translate_to_lang eq ''}
                         {*span class="btn-i18n" *}
                         {include file='translated-lang.tpl' object_type='wiki page'}
                         {*/span *}
@@ -79,11 +79,7 @@
                                 {capture name=backlink_title}{object_title id=$backlinks[back].objectId type=$backlinks[back].type}{/capture}
                                 {*<li role="presentation">*}
                                     <span class="dropdown-item" role="menuitem" tabindex="-1">
-                                        {if $backlinks[back].type eq 'wiki page'}
-                                            <span class="me-1">{icon name="notepad"}</span>
-                                        {elseif $backlinks[back].type eq 'trackeritemfield'}
-                                            <span class="me-1">{icon name="database"}</span>
-                                        {/if}
+                                        <span class="me-1">{icon name=$backlinks[back].icon}</span>
                                         {if $prefs.wiki_backlinks_name_len ge '1'}
                                             {object_link id=$backlinks[back].objectId type=$backlinks[back].type title=$smarty.capture.backlink_title|truncate:$prefs.wiki_backlinks_name_len:"...":true}
                                         {else}
@@ -188,7 +184,7 @@
                                         }
                                         return false;
                                         });
-                                        if (!getCookie("wiki_plugin_edit_view")) {$(".editplugin, .icon_edit_section").hide(); } else { $("#wiki_plugin_edit_view").trigger("click"); }
+                                        if (!getCookie("wiki_plugin_edit_view")) {$(".editplugin, .icon_edit_section").hide();} else { $("#wiki_plugin_edit_view").trigger("click");}
                                     {/jq}
                                     <a class="dropdown-item" href="#" role="button" id="wiki_plugin_edit_view" title="{tr}Click to toggle on/off{/tr}">
                                         <span class="align-items-center text-with-toggle"><span class="text">{icon name='plugin' iclass="d-inline"} <span class="mx-1">{tr}Edit icons{/tr}</span> </span> {icon iclass="toggle-icon" name="toggle-off"}</span>

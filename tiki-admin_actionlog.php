@@ -603,10 +603,9 @@ if (isset($_REQUEST['graph'])) {
         $background = new GDGRenderer(max($widthUser, $widthWeek) + 80, 9 * $height, $ext);
         $legendWidth = 400;
     }
-    include_once('lib/smarty_tiki/modifier.tiki_short_date.php');
-    $period = ' (' . smarty_modifier_tiki_short_date($startDate);
-            $s = smarty_modifier_tiki_short_date($startDate);
-            $e = smarty_modifier_tiki_short_date($endDate);
+    $period = ' (' . \SmartyTiki\Modifier\TikiShortDate::apply($startDate);
+            $s = \SmartyTiki\Modifier\TikiShortDate::apply($startDate);
+            $e = \SmartyTiki\Modifier\TikiShortDate::apply($endDate);
             $period = ($s != $e) ? " ($s-$e)" : " ($s)";
             $accumulated = isset($_REQUEST['barPlot']) && $_REQUEST['barPlot'] == 'acc';
             $series = $logslib->draw_contribution_user($userContributions, 'add', $contributions);

@@ -708,7 +708,7 @@ class WikiLib extends TikiLib
         return $res;
     }
 
-    public function get_parse($page, &$canBeRefreshed = false, $suppress_icons = false)
+    public function get_parse($page, &$canBeRefreshed = false, $suppress_icons = false, $skipCache = false)
     {
         global $prefs, $user;
         $tikilib = TikiLib::lib('tiki');
@@ -746,7 +746,7 @@ class WikiLib extends TikiLib
 
         $wiki_cache = ($prefs['feature_wiki_icache'] == 'y' && ! is_null($info['wiki_cache'])) ? $info['wiki_cache'] : $prefs['wiki_cache'];
 
-        if ($wiki_cache > 0 && empty($_REQUEST['offset']) && empty($_REQUEST['itemId']) && (empty($user) || $prefs['wiki_cache'] == 0)) {
+        if (! $skipCache && $wiki_cache > 0 && empty($_REQUEST['offset']) && empty($_REQUEST['itemId']) && (empty($user) || $prefs['wiki_cache'] == 0)) {
             $cache_info = $this->get_cache_info($page);
             if (! empty($cache_info['cache_timestamp']) && $cache_info['cache_timestamp'] + $wiki_cache >= $this->now) {
                 $content = $cache_info['cache'];
@@ -759,27 +759,41 @@ class WikiLib extends TikiLib
 
                 $headerlib->add_js(implode("\n", $headerlib->getJsFromHTML($content)));
 
+                foreach ($headerlib->getJsModulesFromHTML($content) as $jsModule) {
+                    $headerlib->add_js_module($jsModule);
+                }
+
                 // now remove all the js from the source
                 $content = $headerlib->removeJsFromHtml($content);
+                $content = $headerlib->removeJsModulesFromHTML($content);
 
                 $canBeRefreshed = true;
             } else {
                 $jsFile1 = $headerlib->getJsFilesWithScriptTags();
                 $js1 = $headerlib->getJs();
+                $jsModule1 = $headerlib->js_modules;
                 $info['outputType'] = $tikilib->getOne("SELECT `outputType` FROM `tiki_output` WHERE `entityId` = ? AND `objectType` = ? AND `version` = ?", [$info['pageName'], 'wikiPage', $info['version']]);
                 $content = (new WikiLibOutput($info, $info['data'], $parse_options))->parsedValue;
 
                 // get any JS added to headerlib during parse_data and add to the bottom of the data to cache
                 $jsFile2 = $headerlib->getJsFilesWithScriptTags();
                 $js2 = $headerlib->getJs();
+                $jsModule2 = $headerlib->js_modules;
 
                 $jsFile = array_diff($jsFile2, $jsFile1);
                 $js = array_diff($js2, $js1);
 
+                $jsModuleOutput = '';
+                foreach ($jsModule2 as $rank => $scripts) {
+                    foreach (array_diff($scripts, $jsModule1[$rank] ?? []) as $script) {
+                        $jsModuleOutput .= $headerlib->wrap_js($script, true);
+                    }
+                }
+
                 $jsFile = implode("\n", $jsFile);
                 $js = $headerlib->wrap_js(implode("\n", $js));
 
-                $this->update_cache($page, $content . $jsFile . $js);
+                $this->update_cache($page, $content . $jsFile . $js . $jsModuleOutput);
             }
         } else {
             $content = (new WikiLibOutput($info, $info['data'], $parse_options, $info['version']))->parsedValue;
@@ -1283,7 +1297,7 @@ class WikiLib extends TikiLib
                 $newQueryStr = http_build_query($queryArray, '', '&');
                 $with_next = (empty($newQueryStr) ? '' : $newQueryStr);
 
-                $new_url = smarty_modifier_sefurl($newPage, '', $with_next);
+                $new_url = \SmartyTiki\Modifier\Sefurl::apply($newPage, '', $with_next);
             }
             // redirect to the new url
             $access->redirect($new_url);
@@ -1356,47 +1370,65 @@ class WikiLib extends TikiLib
     {
         global $user, $tikilib;
 
-        $query = 'update `tiki_pages` set `flag`=?, `lockedby`=? where `pageName`=?';
-        $result = $this->query($query, ['L', $user, $page]);
-
-        if (! empty($user)) {
-            $info = $tikilib->get_page_info($page);
-
-            $query = 'update `tiki_pages` set `user`=?, `comment`=?, `version`=? where `pageName`=?';
-            $this->query($query, [$user, tra('Page locked'), $info['version'] + 1, $page]);
-
-            $query = 'insert into `tiki_history`(`pageName`, `version`, `lastModif`, `user`, `ip`, `comment`, `data`, `description`)' .
-                ' values(?,?,?,?,?,?,?,?)';
-            $this->query(
-                $query,
-                [
-                    $page,
-                    (int) $info['version'] + 1,
-                    (int) $info['lastModif'],
-                    $user,
-                    $info['ip'],
-                    tra('Page locked'),
-                    $info['data'],
-                    $info['description']
-                ]
-            );
+        // Missing page: a history row here collides with the (pageName, version) key on retry
+        $info = $tikilib->get_page_info($page);
+        if (! $info) {
+            return false;
         }
 
-        return $result;
+        try {
+            $this->beginTransaction();
+
+            $query = 'update `tiki_pages` set `flag`=?, `lockedby`=? where `pageName`=?';
+            $result = $this->query($query, ['L', $user, $page]);
+
+            if (! empty($user)) {
+                $query = 'update `tiki_pages` set `user`=?, `comment`=?, `version`=? where `pageName`=?';
+                $this->query($query, [$user, tra('Page locked'), $info['version'] + 1, $page]);
+
+                $query = 'insert into `tiki_history`(`pageName`, `version`, `lastModif`, `user`, `ip`, `comment`, `data`, `description`)' .
+                    ' values(?,?,?,?,?,?,?,?)';
+                $this->query(
+                    $query,
+                    [
+                        $page,
+                        (int) $info['version'] + 1,
+                        (int) $info['lastModif'],
+                        $user,
+                        $info['ip'],
+                        tra('Page locked'),
+                        $info['data'],
+                        $info['description']
+                    ]
+                );
+            }
+
+            $this->commit();
+
+            // Result object, not bool: tiki-admin_polls.php reads numRows() off it
+            return $result;
+        } catch (Exception $e) {
+            $this->rollBack();
+            return false;
+        }
     }
 
     public function unlock_page($page)
     {
         global $user;
         $tikilib = TikiLib::lib('tiki');
+
+        $info = $tikilib->get_page_info($page);
+        if (! $info) {
+            return false;
+        }
+
         try {
             $this->beginTransaction();
             $query = "update `tiki_pages` set `flag`='' where `pageName`=?";
             $this->query($query, [$page]);
 
             if (isset($user)) {
-                $info = $tikilib->get_page_info($page);
-
                 $query = "update `tiki_pages` set `user`=?, `comment`=?, `version`=? where `pageName`=?";
                 $this->query($query, [$user, tra('Page unlocked'), $info['version'] + 1, $page]);
 
@@ -1435,6 +1467,16 @@ class WikiLib extends TikiLib
         $result = $this->query($query, [$page]);
         $ret = [];
 
+        $backlinkIcons = [
+            'wiki page' => 'notepad',
+            'trackeritemfield' => 'database',
+            'article' => 'articles',
+            'post' => 'blog',
+            'forum post' => 'comments',
+            'calendar event' => 'calendar',
+        ];
+        $seenTrackerItems = [];
+
         while ($res = $result->fetchRow()) {
             $is_wiki_page = substr($res['fromPage'], 0, 11) != 'objectlink:';
             if ($is_wiki_page) {
@@ -1461,6 +1503,10 @@ class WikiLib extends TikiLib
                 if (! $itemObject->canView() || ! $itemObject->canViewField($fieldId)) {
                     continue;
                 }
+                if (isset($seenTrackerItems[$itemId])) {
+                    continue;
+                }
+                $seenTrackerItems[$itemId] = true;
             } else {
                 $objectperms = Perms::get(['type' => $type, 'object' => $objectId]);
                 if (! $objectperms->view) {
@@ -1469,6 +1515,7 @@ class WikiLib extends TikiLib
             }
             $aux["type"] = $type;
             $aux["objectId"] = $objectId;
+            $aux["icon"] = $backlinkIcons[$type] ?? (str_ends_with($type, 'comment') ? 'comment' : 'link');
             $ret[] = $aux;
         }
 
@@ -1829,6 +1876,89 @@ class WikiLib extends TikiLib
     public function set_page_hide_title($pageName, $isHideTitle)
     {
         TikiLib::lib('attribute')->set_attribute('wiki page', $pageName, 'tiki.wiki.page_hide_title', $isHideTitle);
+    }
+
+    /**
+     * Create the default home page, with the introduction content shown on a brand new Tiki.
+     *
+     * @param string $pageName  The page to create. Defaults to the wikiHomePage preference.
+     * @return bool             True when the page was created, false when it already exists or no name is known.
+     */
+    public function createDefaultHomePage($pageName = '')
+    {
+        global $prefs;
+
+        $tikilib = TikiLib::lib('tiki');
+
+        if (empty($pageName)) {
+            $pageName = $prefs['wikiHomePage'];
+        }
+
+        if (empty($pageName) || $tikilib->page_exists($pageName)) {
+            return false;
+        }
+
+        $homePageLang = Language::getCurrentLanguage();
+
+        // Default HomePage content
+        $homePageContent = '';
+        $is_html = false;
+        if (($prefs['feature_wysiwyg'] === 'y') && $prefs['wysiwyg_htmltowiki'] !== 'y') {
+            $is_html = true;
+
+            // FIXME: Still relies on wiki syntax not parsed, in particular if wysiwyg_wiki_parsed is disabled
+            $homePageContent .= '<h1>' . tr('Congratulations') . "</h1>\n";
+            $homePageContent .= tr('This is the default homepage for your Tiki. If you are seeing this page, your installation was successful.') . "\n\n<br>";
+            $homePageContent .= tr('You can change this page after logging in. Please review the [http://doc.tiki.org/Wiki-syntax|wiki syntax] for editing details.') . "\n\n\n<br>";
+            $homePageContent .= '<h2>' . tr('Get started') . ".</h2>\n";
+            $homePageContent .= tr('To begin configuring your site:') . "\n";
+            $homePageContent .= "<ul>\n";
+            $homePageContent .= "<li>" . tr('1) Log in with your newly created password.') . "</li>\n";
+            $homePageContent .= "<li>" . tr('2) Manually [tiki-admin.php?page=features|Enable specific Tiki features] that you didn\'t enable with the Admin wizard.') . "</li>\n";
+            $homePageContent .= "<li>" . tr('3) Run [tiki-admin.php?page=profiles|Tiki Profiles] to quickly get up and running.') . "</li>\n";
+            $homePageContent .= "</ul>\n\n<br>";
+            $homePageContent .= '<h2>' . tr('Need help?') . "</h2>\n";
+            $homePageContent .= tr('For more information:') . "\n<br>";
+            $homePageContent .= '*' . tr('[https://tiki.org/Introduction|Learn more about Tiki].') . "\n<br>";
+            $homePageContent .= '*' . tr('[https://tiki.org/|Get help], including the [http://doc.tiki.org|official documentation] and [http://tiki.org/forums|support forums].') . "\n<br>";
+            $homePageContent .= '*' . tr('[https://tiki.org/Join|Join the Tiki community].') . "\n<br>";
+        } else {
+            $homePageContent .= '!' . tr('Congratulations') . "\n";
+            $homePageContent .= tr('This is the default homepage for your Tiki. If you are seeing this page, your installation was successful.') . "\n\n";
+            $homePageContent .= tr('You can change this page after logging in. Please review the [http://doc.tiki.org/Wiki-syntax|wiki syntax] for editing details.') . "\n\n\n";
+            $homePageContent .= '!!' . tr('Get started.') . "\n";
+            $homePageContent .= tr('To begin configuring your site:') . "\n";
+            $homePageContent .= "{FANCYLIST()}\n";
+            $homePageContent .= tr('1) Log in with your newly created password.') . "\n";
+            $homePageContent .= tr('2) Manually [tiki-admin.php?page=features|Enable specific Tiki features] that you didn\'t enable with the Admin wizard.') . "\n";
+            $homePageContent .= tr('3) Run [tiki-admin.php?page=profiles|Tiki Profiles] to quickly get up and running.') . "\n";
+            $homePageContent .= "{FANCYLIST}\n\n";
+            $homePageContent .= '!!' . tr('Need help?') . "\n";
+            $homePageContent .= tr('For more information:') . "\n";
+            $homePageContent .= '*' . tr('[https://tiki.org/Introduction|Learn more about Tiki].') . "\n";
+            $homePageContent .= '*' . tr('[https://tiki.org/|Get help], including the [http://doc.tiki.org|official documentation] and [http://tiki.org/forums|support forums].') . "\n";
+            $homePageContent .= '*' . tr('[https://tiki.org/Join|Join the Tiki community].') . "\n";
+        }
+
+        $tikilib->create_page(
+            $pageName,
+            0,
+            $homePageContent,
+            $tikilib->now,
+            'Tiki initialization',
+            'admin',
+            '0.0.0.0',
+            '',
+            $homePageLang,
+            $is_html,   // is_html
+            null,
+            $is_html ? 'y' : 'n',   // wysiwyg,
+            ''
+        );
+
+        $this->set_page_hide_title($pageName, 0);   // set the page title of the Home Page to hidden
+
+        return true;
     }
 
     public function get_without_namespace($pageName)

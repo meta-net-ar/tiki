@@ -44,5 +44,5 @@ function wikiplugin_package($data, $params)
     // Explicitly passing "true" to $repeat to match the Smarty's behavior
     // Since we are calling this directly.
     $tmp = true;
-    return "~np~" . smarty_block_packageplugin($params, $data, $smarty->getEmptyInternalTemplate(), $tmp) . "~/np~";
+    return "~np~" . \SmartyTiki\BlockHandler\PackagePlugin::render($params, $data, $smarty->getEmptyInternalTemplate(), $tmp) . "~/np~";
 }

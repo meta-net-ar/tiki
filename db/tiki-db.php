@@ -93,6 +93,7 @@ if (! empty($_SERVER['TIKI_INI_FILE']) && is_readable($_SERVER['TIKI_INI_FILE'])
     try {
         $envIni = new Ini();
         $envData = $envIni->fromFile($_SERVER['TIKI_INI_FILE'], $_SERVER['TIKI_INI_IDENTIFIER'] ?? null);
+        $envData = Config::normalizeDirectoryPrefs($envData);
         $systemConfiguration->mergeAddOnly($envData);
     } catch (\Throwable $e) {
         $fail('Failed to load ' . $_SERVER['TIKI_INI_FILE'] . ': ' . $e->getMessage());
@@ -117,6 +118,7 @@ foreach ($system_configuration_files as $configFile) {
         try {
             $ini = new Ini();
             $baseData = $ini->fromFile($configFile, $system_configuration_identifier ?? null);
+            $baseData = Config::normalizeDirectoryPrefs($baseData);
             $systemConfiguration->merge($baseData);
         } catch (\Throwable $e) {
             $fail('Failed to load ' . $configFile . ': ' . $e->getMessage());
@@ -203,6 +205,7 @@ class TikiDbLegacyErrorHandler implements TikiDb_ErrorHandler
         if (defined('TIKI_CONSOLE')) {
             throw new ConsoleSetupException($msg, 1001);
         }
+        http_response_code(500);
         $smarty->display('database-connection-error.tpl');
         $this->log($msg . ' - ' . $q);
 

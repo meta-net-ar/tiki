@@ -53,7 +53,11 @@
                             {if isset($other_columns)}
                                 {$other_columns}
                             {/if}
-                            {self_link sort_mode=$propname|cat:'_asc'}{$fgal_listing_conf.$propname.name}{/self_link}<br>
+                            {if !empty($item.description)}
+                                {self_link sort_mode=$propname|cat:'_asc' _title=$item.description _class='tips'}{$fgal_listing_conf.$propname.name}{/self_link}<br>
+                            {else}
+                                {self_link sort_mode=$propname|cat:'_asc'}{$fgal_listing_conf.$propname.name}{/self_link}<br>
+                            {/if}
                         {/capture}
                     {/if}
                 {/if}
@@ -61,7 +65,7 @@
                 {if isset($gal_info.$key_name) and ( $gal_info.$key_name eq 'y' or $gal_info.$key_name eq 'i'
                     or $gal_info.$key_name eq 'a' or $propname eq 'name' )}
                     {$propval=$item.name}
-                    {$link_title=''}
+                    {$link_title=$item.description|default:''}
                     {$td_args=''}
 
                     {if $gal_info.$key_name eq 'i' or $propname eq 'type' or ( $propname eq 'lockedby'
@@ -90,7 +94,8 @@
 
                     {if !(empty($galleryId) and $propname eq 'lockedby') and ($propname neq 'name'
                         or ( $gal_info.show_name eq 'a' or $gal_info.show_name eq 'n' )) and ($propname neq 'description'
-                        or $gal_info.show_name neq 'n')}
+                        or $gal_info.show_name neq 'n'
+                        or $gal_info.show_description eq 'y' or $gal_info.show_description eq 'a')}
                         {if isset($nbCols)}
                             {$nbCols=$nbCols+1}
                         {else}
@@ -128,9 +133,15 @@
                     {$nbCols=1}
                 {/if}
                 <th>
-                    {self_link _sort_arg=$sort_arg _sort_field=$other_columns_selected _title=$fgal_listing_conf.$other_columns_selected.name}
-                        {$fgal_listing_conf.$other_columns_selected.name}
-                    {/self_link}
+                    {if !empty($fgal_listing_conf.$other_columns_selected.description)}
+                        {self_link _sort_arg=$sort_arg _sort_field=$other_columns_selected _title=$fgal_listing_conf.$other_columns_selected.description _class='tips'}
+                            {$fgal_listing_conf.$other_columns_selected.name}
+                        {/self_link}
+                    {else}
+                        {self_link _sort_arg=$sort_arg _sort_field=$other_columns_selected _title=$fgal_listing_conf.$other_columns_selected.name}
+                            {$fgal_listing_conf.$other_columns_selected.name}
+                        {/self_link}
+                    {/if}
                 </th>
             {/if}
 
@@ -146,7 +157,7 @@
                 </th>
             {/if}
             
-            {if ( $prefs.feature_categories eq 'y')}
+            {if ( $prefs.feature_categories eq 'y') and empty($from_wiki_page)}
                 {if isset($nbCols)}
                     {$nbCols=$nbCols+1}
                 {else}
@@ -237,15 +248,15 @@
                                     {$propval=$propval|kbsize:true}
                                 {elseif $propname eq 'ocr_state'}
                                     {if $propval === '1'}
-                                        {$propval='{tr}Finished processing{/tr}'}
+                                        {$propval="{tr}Finished processing{/tr}"}
                                     {elseif $propval === '2'}
-                                        {$propval='{tr}Currently processing{/tr}'}
+                                        {$propval="{tr}Currently processing{/tr}"}
                                     {elseif $propval === '3'}
-                                        {$propval='{tr}Queued for processing{/tr}'}
+                                        {$propval="{tr}Queued for processing{/tr}"}
                                     {elseif $propval === '4'}
-                                        {$propval='{tr}Processing stalled{/tr}'}
+                                        {$propval="{tr}Processing stalled{/tr}"}
                                     {else}
-                                        {$propval='{tr}No scheduled processing{/tr}'}
+                                        {$propval="{tr}No scheduled processing{/tr}"}
                                     {/if}
                                 {elseif $propname eq 'backlinks' and ! empty($files[changes].nbBacklinks)}
                                     {$propval=$files[changes].nbBacklinks}
@@ -399,7 +410,7 @@
                             {else}
                                 {$propval="<a class='fgalname' $link>$propval</a>"}
                             {/if}
-                            {if $propname eq 'name' and $gal_info.show_name eq 'n' and $gal_info.show_description neq 'n'}
+                            {if $propname eq 'name' and $gal_info.show_name eq 'n' and $gal_info.show_description eq 'o'}
                                 {if $gal_info.max_desc gt 0}
                                     {$desc=$files[changes].description|truncate:$gal_info.max_desc:"...":false|nl2br}
                                 {else}
@@ -433,15 +444,15 @@
                             {$propval=$propval|nl2br}
                         {elseif $propname eq 'ocr_state'}
                             {if $propval === '1'}
-                                {capture assign=propval}{icon style='outline' name='check-circle' title='{tr}Finished processing{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='check-circle' title="{tr}Finished processing{/tr}"}{/capture}
                             {elseif $propval === '2'}
-                                {capture assign=propval}{icon style='outline' name='sync' title='{tr}Currently processing{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='sync' title="{tr}Currently processing{/tr}"}{/capture}
                             {elseif $propval === '3'}
-                                {capture assign=propval}{icon style='outline' name='circle' title='{tr}Queued for processing{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='circle' title="{tr}Queued for processing{/tr}"}{/capture}
                             {elseif $propval === '4'}
-                                {capture assign=propval}{icon style='outline' name='pause-circle' title='{tr}Processing stalled{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='pause-circle' title="{tr}Processing stalled{/tr}"}{/capture}
                             {else}
-                                {capture assign=propval}{icon style='outline' name='times-circle' title='{tr}No scheduled processing{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='times-circle' title="{tr}No scheduled processing{/tr}"}{/capture}
                             {/if}
                         {elseif $propname eq 'lockedby' and $propval neq ''}
                             {if $gal_info.show_lockedby eq 'i' or $gal_info.show_lockedby eq 'a'}
@@ -504,7 +515,8 @@
                         {else}
                             {if !(empty($galleryId) and $propname eq 'lockedby') and ($propname neq 'name'
                                 or ( $gal_info.show_name eq 'a' or $gal_info.show_name eq 'n' ))
-                                and ($propname neq 'description' or $gal_info.show_name neq 'n')}
+                                and ($propname neq 'description' or $gal_info.show_name neq 'n'
+                                    or $gal_info.show_description eq 'y' or $gal_info.show_description eq 'a')}
                                 <td>{$propval}</td>
                             {/if}
                         {/if}
@@ -523,7 +535,7 @@
                     {$file=$files[changes]}{* For fgal_context_menu.tpl. Cannot be an include parameter, because "file" is a reserved name. *}
                     <td>{include file='fgal_context_menu.tpl'}</td>
                 {/if}
-                {if ( $prefs.feature_categories eq 'y')}
+                {if ( $prefs.feature_categories eq 'y') and empty($from_wiki_page)}
                     <td>
                     {if !empty($files[changes].categories)}
                         {foreach from=$files[changes].categories item=cat name=cat}
@@ -537,7 +549,7 @@
                     </td>
                 {/if}
 
-                {if isset($other_columns) and isset($other_columns_selected) and ( $other_columns neq '' or $other_columns_selected neq '' )}
+                {if (isset($other_columns) and $other_columns neq '') or (isset($other_columns_selected) and $other_columns_selected neq '')}
                     <td>
                         {if $show_infos eq 'y'}
                             {if $over_infos eq ''}

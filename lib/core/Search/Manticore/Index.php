@@ -135,7 +135,19 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         }
         $normalData['tracker_fields_json'] = json_encode($jsonFields);
 
+        $normalData['id'] = self::generateDocumentId($normalData['object_type'], $normalData['object_id']);
+
         return $normalData;
+    }
+
+    /**
+     * Generate document ID from unique representation of object_type and object_id.
+     * Used to fix duplicate document insertion bugs using REPLACE INTO.
+     */
+    public static function generateDocumentId(string $objectType, string $objectId): int
+    {
+        $hash = hash('xxh128', "$objectType $objectId", true);
+        return unpack('J', substr($hash, 0, 8))[1] & 0x7FFFFFFFFFFFFFFF;
     }
 
     private function generateMapping($type, $data)

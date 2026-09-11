@@ -61,7 +61,7 @@ function module_login_box_info()
             ],
             'allowNone' => [
                 'name' => tra('Allow None'),
-                'description' => tra('Allow user selection field to be empty (without any users selected) when enabled.') . ' (y/n)',
+                'description' => tra('Show a non-selectable placeholder in the Switch User dropdown. Set to "n" to hide it entirely.') . ' (y/n)',
                 'filter' => 'alpha',
             ],
             'show_user_avatar' => [
@@ -119,6 +119,7 @@ function module_login_box($mod_reference, &$module_params)
     $smarty->assign('login_text_explanation', $tikilib->get_preference('login_text_explanation'));
     $smarty->assign('EMAIL_2FA', TwoFactorAuth::EMAIL_2FA);
     $smarty->assign('TOTP_2FA', TwoFactorAuth::TOTP_2FA);
+    $smarty->assign('login_text_below_login_box', TikiLib::lib('parser')->parse_data($prefs['login_text_below_login_box']));
 
     $urlPrefix = in_array($prefs['https_login'], ['encouraged', 'required', 'force_nocheck']) ? $base_url_https : $base_url;
     $smarty->assign('registration', 'n');   // stops the openid form appearing in the module, only on tiki-login_scr.php
@@ -175,8 +176,5 @@ function module_login_box($mod_reference, &$module_params)
     }
     if (! isset($module_params['allowNone'])) {
         $module_params['allowNone'] = 'y';
-    }
-    if (! isset($module_params['show_user_avatar'])) {
-        $module_params['show_user_avatar'] = 'y';
     }
 }

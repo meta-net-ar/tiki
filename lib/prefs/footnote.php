@@ -12,6 +12,7 @@ function prefs_footnote_list()
             'name' => tra('Display footnote content in popover'),
             'description' => tra('When the mouse is over the footnote reference, show footnote content in a popover window.'),
             'type' => 'flag',
+            'help' => 'PluginFootnote',
             'default' => 'y',
             'dependencies' => [
                 'wikiplugin_footnote'

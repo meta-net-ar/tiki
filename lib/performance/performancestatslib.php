@@ -19,13 +19,17 @@ class PerformanceStatsLib extends TikiLib
      * Insert a performance record on the table
      * @param string $url
      * @param int $time_taken
+     * @param int|null $backend_time
+     * @param int|null $frontend_time
      * @return array|bool|mixed
      */
-    public function addRecord(string $url, int $time_taken)
+    public function addRecord(string $url, int $time_taken, ?int $backend_time = null, ?int $frontend_time = null)
     {
         return $this->table('tiki_performance')->insert([
             'url' => $url,
-            'time_taken' => $time_taken
+            'time_taken' => $time_taken,
+            'backend_time' => $backend_time,
+            'frontend_time' => $frontend_time,
         ]);
     }
 
@@ -48,10 +52,14 @@ class PerformanceStatsLib extends TikiLib
      */
     public function getRequestsBasedOnAverageRequestTime(int $amount = 25, int $offset = 0, string $find = '', string $order = 'DESC', string $orderType = '')
     {
+        $order = strtoupper($order);
+        if (! in_array($order, ['ASC', 'DESC'])) {
+            $order = 'DESC';
+        }
         if ($orderType == 'no_of_requests') {
-            return $this->query("SELECT url, round(AVG(time_taken)) AS average_time_taken, COUNT(url) AS number_of_requests FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY number_of_requests $order LIMIT $amount OFFSET $offset", ["%$find%"]);
+            return $this->query("SELECT url, round(AVG(time_taken)) AS average_time_taken, COUNT(url) AS number_of_requests FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY number_of_requests $order", ["%$find%"], $amount, $offset);
         } else {
-            return $this->query("SELECT url, round(AVG(time_taken)) AS average_time_taken, COUNT(url) AS number_of_requests FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY average_time_taken $order LIMIT $amount OFFSET $offset", ["%$find%"]);
+            return $this->query("SELECT url, round(AVG(time_taken)) AS average_time_taken, COUNT(url) AS number_of_requests FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY average_time_taken $order", ["%$find%"], $amount, $offset);
         }
     }
 
@@ -65,7 +73,11 @@ class PerformanceStatsLib extends TikiLib
      */
     public function getRequestsBasedOnMaximumProcessingTime(int $amount = 25, int $offset = 0, string $find = '', string $order = 'DESC')
     {
-        return $this->query("SELECT url, MAX(time_taken) AS maximum_time_taken FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY maximum_time_taken $order LIMIT $amount OFFSET $offset", ["%$find%"]);
+        $order = strtoupper($order);
+        if (! in_array($order, ['ASC', 'DESC'])) {
+            $order = 'DESC';
+        }
+        return $this->query("SELECT url, MAX(time_taken) AS maximum_time_taken FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY maximum_time_taken $order", ["%$find%"], $amount, $offset);
     }
 
     /**
@@ -75,7 +87,56 @@ class PerformanceStatsLib extends TikiLib
      */
     public function getRequestsGroupedByAmount(string $find = '')
     {
+        if ($find !== '') {
+            return $this->getOne('SELECT COUNT(DISTINCT(url)) FROM tiki_performance WHERE url LIKE ?', ["%$find%"]);
+        }
         return $this->getOne('SELECT COUNT(DISTINCT(url)) FROM tiki_performance');
+    }
+
+    /**
+     * Get aggregate timings for a specific URL
+     *
+     * @param string $url
+     * @return array|false
+     */
+    public function getRequestDetailsByUrl(string $url): array|false
+    {
+        $result = $this->query(
+            "SELECT
+                url,
+                COUNT(*) AS number_of_requests,
+                ROUND(AVG(time_taken)) AS average_time_taken,
+                MIN(time_taken) AS minimum_time_taken,
+                MAX(time_taken) AS maximum_time_taken,
+                ROUND(AVG(CASE WHEN backend_time IS NOT NULL THEN backend_time END)) AS average_backend_time,
+                ROUND(AVG(CASE WHEN frontend_time IS NOT NULL THEN frontend_time END)) AS average_frontend_time,
+                SUM(CASE WHEN backend_time IS NOT NULL OR frontend_time IS NOT NULL THEN 1 ELSE 0 END) AS breakdown_samples
+            FROM tiki_performance
+            WHERE url = ?
+            GROUP BY url",
+            [$url]
+        );
+
+        return $result ? $result->fetchRow() : false;
+    }
+
+    /**
+     * Get the slowest samples for a specific URL
+     *
+     * @param string $url
+     * @param int $amount
+     * @return array
+     */
+    public function getSlowestSamplesByUrl(string $url, int $amount = 25): array
+    {
+        return $this->fetchAll(
+            "SELECT id, time_taken, backend_time, frontend_time
+            FROM tiki_performance
+            WHERE url = ?
+            ORDER BY time_taken DESC",
+            [$url],
+            $amount
+        );
     }
 
     /**

@@ -153,7 +153,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
         }
         $value = parent::renderInnerOutput($context);
         if ($this->getConfiguration('type') === 't' && $context['list_mode'] !== 'csv') {   // not TextAreas or csv output
-            $value = smarty_modifier_escape($value);
+            $value = \SmartyTiki\Modifier\Escape::apply($value);
         }
         if (
             $this->getConfiguration('isMultilingual') == 'y' &&
@@ -173,6 +173,21 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
         } else {
             return parent::renderOutput($context);
         }
+    }
+
+    public function renderText($context = [])
+    {
+        $value = $this->getValue();
+
+        if ($this->getConfiguration('isMultilingual') == 'y') {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                $language = Language::getCurrentLanguage();
+                $value = $decoded[$language] ?? (reset($decoded) ?: '');
+            }
+        }
+
+        return trim(strip_tags((string) $value));
     }
 
     protected function processMultilingual($requestData, $id_string)
@@ -437,7 +452,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                 }
 
                 if ($value) {
-                    return smarty_function_object_link([
+                    return \SmartyTiki\FunctionHandler\ObjectLink::render([
                         'type' => 'trackeritem',
                         'id' => $extra['itemId'],
                         'title' => $value,
@@ -576,6 +591,18 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
 
                         if ($value) {
                             $query->filterIdentifier($value, $baseKey . '_exact');
+                        }
+                    })
+                    ;
+
+                $filters->addNew($permName, 'multiexact')
+                    ->setLabel($name)
+                    ->setHelp(tr('Search for one or more precise values separated by OR.'))
+                    ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_mem"))
+                    ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
+                        $value = $control->getValue();
+                        if ($value) {
+                            $query->filterMultiIdentifier($value, $baseKey . '_exact');
                         }
                     })
                     ;

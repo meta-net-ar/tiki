@@ -59,7 +59,7 @@
                     <div class="form-text">{tr}You can add several email addresses by separating them with commas.{/tr}</div>
                 </div>
             </div>
-            {if  $inputValues['action'] == 'manager_backup' }
+            {if  $inputValues['action'] == 'manager_backup'}
             <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
                     {tr}Max number of backups to keep{/tr}

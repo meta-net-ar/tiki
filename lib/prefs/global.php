@@ -8,12 +8,26 @@ use Tiki\Package\VendorHelper;
 
 function prefs_global_list($partial = false)
 {
+    $dateAndTimeDateAndTimeFormatsHelp = 'Date-and-Time#Date_and_Time_Formats';
+    $loginGeneralPreferencesHelp = 'Login-General-Preferences';
+    $wikiGeneralPreferencesHelp = 'Wiki-General-Preferences';
+    $generalLayoutOptionsHelp = 'General-Layout-Options';
+    $generalPreferencesHelp = 'General-Preferences';
+    $wikiSyntaxLinksHelp = 'Wiki-Syntax-Links';
+    $navigationHelp = 'Navigation';
+    $copyrightHelp = 'Copyright';
+    $groupsHelp = 'Groups';
+    $mapsHelp = 'Maps';
+    $moduleSettingsParametersHelp = 'Module-Settings-Parameters';
+    $ldapAuthenticationHelp = 'LDAP-authentication';
+
     return [
         'browsertitle' => [
             'name' => tra('Browser title'),
             'description' => tra('Visible label in the browser\'s title bar on all pages. Also appears in search engine results.'),
             'type' => 'text',
             'default' => '',
+            'help' => $generalPreferencesHelp,
             'tags' => ['basic'],
             'public' => true,
             'translatable' => true,
@@ -23,6 +37,7 @@ function prefs_global_list($partial = false)
             'description' => tra('The full URL to the Tiki base URL including protocol, domain and path (example: https://example.org/tiki/), used when the current URL can not be determined, example, when executing from the command line.'),
             'type' => 'text',
             'default' => '',
+            'help' => $generalPreferencesHelp,
             'tags' => ['basic'],
             'public' => true,
         ],
@@ -30,6 +45,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Validate new user registrations by email'),
             'description' => tra('Tiki will send an email message to the user. The message contains a link that must be clicked to validate the registration. After clicking the link, the user will be validated. You can use this option to limit false registrations or fake email addresses.'),
             'type' => 'flag',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'sender_email',
             ],
@@ -41,6 +57,7 @@ function prefs_global_list($partial = false)
             'description' => tra('The default home page of the wiki when no other page is specified. The page will be created if it does not already exist.'),
             'keywords' => 'homepage',
             'type' => 'text',
+            'help' => $wikiGeneralPreferencesHelp,
             'size' => 20,
             'default' => 'HomePage',
             'tags' => ['basic'],
@@ -50,13 +67,14 @@ function prefs_global_list($partial = false)
             'name' => tra('Use group homepages'),
             'description' => tra('Users can be directed to different pages upon logging in, depending on their default group.'),
             'type' => 'flag',
-            'help' => 'Groups',
+            'help' => $groupsHelp,
             'keywords' => 'group home page pages',
             'default' => 'n',
         ],
         'limitedGoGroupHome' => [
             'name' => tra('Go to the group homepage only if logging in from the default homepage'),
             'type' => 'flag',
+            'help' => $wikiGeneralPreferencesHelp,
             'dependencies' => [
                 'useGroupHome',
             ],
@@ -66,11 +84,13 @@ function prefs_global_list($partial = false)
         'cachepages' => [
             'name' => tra('Cache external pages'),
             'type' => 'flag',
+            'help' => $wikiSyntaxLinksHelp,
             'default' => 'n',
         ],
         'cacheimages' => [
             'name' => tra('Cache external images'),
             'type' => 'flag',
+            'help' => 'Cache-External-Images',
             'default' => 'n',
         ],
         'tmpDir' => [
@@ -78,6 +98,7 @@ function prefs_global_list($partial = false)
             'description' => tra('Directory on your server, relative to your Tiki installation, for storing temporary files. Tiki must have full read and write access to this directory.'),
             'keywords' => 'tmp temp path',
             'type' => 'text',
+            'help' => 'General-Settings',
             'size' => 30,
             'default' => sys_get_temp_dir(),  // note: this gets overridden in lib/setup/prefs.php
             'perspective' => false,
@@ -99,11 +120,13 @@ function prefs_global_list($partial = false)
             'type' => 'flag',
             'description' => tr('Open links to external sites in a new browser tab or window.'),
             'default' => 'y',
+            'help' => $wikiSyntaxLinksHelp,
             'tags' => ['basic'],
         ],
         'allowImageLazyLoad' => [
             'name' => tra('Allow image lazy loading'),
             'type' => 'flag',
+            'help' => 'UI-Effects',
             'description' => tr('Allow that images are loaded in a lazy way'),
             'default' => 'n',
             'tags' => ['advanced'],
@@ -112,6 +135,7 @@ function prefs_global_list($partial = false)
             'name' => tra('License page'),
             'description' => tra('The wiki page where the license information is written.'),
             'type' => 'text',
+            'help' => $copyrightHelp,
             'size' => '30',
             'default' => '',
         ],
@@ -119,29 +143,33 @@ function prefs_global_list($partial = false)
             'name' => tra('Submit notice'),
             'description' => tra('Text to appear when content is being submitted'),
             'type' => 'text',
+            'help' => $copyrightHelp,
             'size' => '30',
             'default' => '',
         ],
         'gdaltindex' => [
             'name' => tra('Full path to gdaltindex'),
+            'description' => tra('Full filesystem path to the GDAL gdaltindex utility, used to build raster tile indexes for map imagery.'),
             'type' => 'text',
             'size' => '50',
-            'help' => 'Maps',
+            'help' => $mapsHelp,
             'perspective' => false,
             'default' => '',
         ],
         'ogr2ogr' => [
             'name' => tra('Full path to ogr2ogr'),
+            'description' => tra('Full filesystem path to the GDAL ogr2ogr utility, used to convert between vector geospatial data formats.'),
             'type' => 'text',
             'size' => '50',
-            'help' => 'Maps',
+            'help' => $mapsHelp,
             'perspective' => false,
             'default' => '',
         ],
         'mapzone' => [
             'name' => tra('Map Zone'),
+            'description' => tra('Longitude range used for map coordinates: -180 to 180, or 0 to 360.'),
             'type' => 'list',
-            'help' => 'Maps',
+            'help' => $mapsHelp,
             'options' => [
                 '180' => '[-180 180]',
                 '360' => '[0 360]',
@@ -153,40 +181,47 @@ function prefs_global_list($partial = false)
             'type' => 'flag',
             'description' => tr('Any setting for the Groups parameter will be ignored and the module will be displayed to all users.'),
             'default' => 'n',
-            'help' => 'Module-Setttings-Parameters',
+            'help' => $moduleSettingsParametersHelp,
         ],
         'modseparateanon' => [
             'name' => tra('Hide anonymous-only modules from registered users'),
             'type' => 'flag',
             'description' => tr('If an individual module is assigned to the Anonymous group, the module will be displayed only to anonymous visitors. Registered users will not see the module.'),
             'default' => 'n',
+            'help' => $moduleSettingsParametersHelp,
         ],
         'modhideanonadmin' => [
             'name' => tra('Hide anonymous-only modules from Admins'),
+            'description' => tra('Hide modules assigned only to the Anonymous group from administrators, so admins see the site as registered users would.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $moduleSettingsParametersHelp,
         ],
         'maxArticles' => [
             'name' => tra('Maximum number of articles on the articles homepage'),
             'type' => 'text',
             'description' => tr('The number of articles to show on each page of the Articles homepage.'),
             'size' => '5',
+            'help' => 'Articles-General-Settings',
             'filter' => 'digits',
             'units' => tra('articles'),
             'default' => 10,
         ],
         'sitead' => [
             'name' => tra('Site Ads and Banners Content'),
+            'description' => tra('Wiki-formatted content for site-wide ads and banners, typically using the banner plugin to display banner zones.'),
             'hint' => tra('Example:') . ' ' . "{banner zone='" . tra('Test') . "'}",
             'type' => 'textarea',
             'size' => '5',
             'default' => '',
+            'help' => 'Site-Ads-and-Banners',
         ],
         'urlOnUsername' => [
             'name' => tra('URL to go to when clicking on a username'),
             'type' => 'text',
-            'description' => tra('URL to go to when clicking on a username.') . ' ' . tra('Default') . ': tiki-user_information.php?userId=%userId% <em>(' . tra('Use %user% for login name and %userId% for userId)') . ')</em>',
+            'description' => tr('URL to go to when clicking on a username. Default: %0 Use %user% for login name and %userId% for userId) %1', ': tiki-user_information.php?userId=%userId% <em>(', ')</em>'),
             'default' => '',
+            'help' => $navigationHelp,
         ],
         'forgotPass' => [
             'name' => tra('Forgot password'),
@@ -194,6 +229,7 @@ function prefs_global_list($partial = false)
             'type' => 'flag',
             'detail' => tra("Since passwords are stored securely, it's not possible to tell the user what the password is. It's only possible to change it."),
             'default' => 'y',
+            'help' => $loginGeneralPreferencesHelp,
             'tags' => ['basic'],
         ],
         'twoFactorAuth' => [
@@ -207,6 +243,7 @@ function prefs_global_list($partial = false)
             'name' => tra('2FA Type'),
             'description' => tra('Type of 2FA to be used.'),
             'type' => 'list',
+            'help' => $loginGeneralPreferencesHelp,
             'options' => [
                 \Tiki\TwoFactorAuth\TwoFactorAuth::TOTP_2FA => tra('Authenticator App (TOTP)'),
                 \Tiki\TwoFactorAuth\TwoFactorAuth::EMAIL_2FA => tra('Email 2FA'),
@@ -218,6 +255,7 @@ function prefs_global_list($partial = false)
             'description' => tra('The token length generated by Tiki for email 2FA.'),
             'type' => 'text',
             'default' => '6',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'twoFactorAuth',
             ],
@@ -227,6 +265,7 @@ function prefs_global_list($partial = false)
             'description' => tra('The list of characters used to generate the email token. Specify as a regex character class, e.g. 0-9 for numbers only.'),
             'type' => 'text',
             'default' => '',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'twoFactorAuth',
             ],
@@ -236,6 +275,7 @@ function prefs_global_list($partial = false)
             'description' => tra('The time-to-live for the token generated by Tiki for email 2FA.'),
             'type' => 'text',
             'default' => '30',
+            'help' => $loginGeneralPreferencesHelp,
             'units' => tra('minutes'),
             'dependencies' => [
                 'twoFactorAuth',
@@ -246,6 +286,7 @@ function prefs_global_list($partial = false)
             'description' => tra('A value of zero (default) means always, a value bigger than zero requires a user to go through the MFA challenge every X days.'),
             'type' => 'text',
             'default' => '0',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'twoFactorAuth',
             ],
@@ -254,6 +295,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Force all users to use 2FA'),
             'description' => tra('This will force all users to activate 2FA.'),
             'type' => 'flag',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'twoFactorAuth',
             ],
@@ -264,6 +306,7 @@ function prefs_global_list($partial = false)
             'description' => tra('Number of days to allow users to access the site without 2FA before forcing them to set it up. Note: this applies globally. If you want specific periods per groups, visit the groups settings.'),
             'type' => 'text',
             'default' => '0',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'twoFactorAuth',
             ],
@@ -275,6 +318,7 @@ function prefs_global_list($partial = false)
             'separator' => ';',
             'filter' => 'groupname',
             'profile_reference' => 'group',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'twoFactorAuth',
             ],
@@ -286,6 +330,7 @@ function prefs_global_list($partial = false)
             'type' => 'text',
             'separator' => ';',
             'filter' => 'username',
+            'help' => $loginGeneralPreferencesHelp,
             'profile_reference' => 'user',
             'dependencies' => [
                 'twoFactorAuth',
@@ -298,6 +343,7 @@ function prefs_global_list($partial = false)
             'type' => 'text',
             'separator' => ';',
             'filter' => 'groupname',
+            'help' => $loginGeneralPreferencesHelp,
             'profile_reference' => 'group',
             'dependencies' => [
                 'twoFactorAuth',
@@ -311,6 +357,7 @@ function prefs_global_list($partial = false)
             'separator' => ';',
             'filter' => 'username',
             'profile_reference' => 'user',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'twoFactorAuth',
             ],
@@ -320,6 +367,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Group theme'),
             'description' => tra('Enable groups to each have their own visual theme.'),
             'type' => 'flag',
+            'help' => 'Look-and-Feel-Theme',
             'default' => 'n',
         ],
         'sitetitle' => [
@@ -328,6 +376,7 @@ function prefs_global_list($partial = false)
             'description' => tr('The displayed title of the website.'),
             'size' => '50',
             'default' => '',
+            'help' => $generalLayoutOptionsHelp,
             'tags' => ['basic'],
             'public' => true,
         ],
@@ -337,21 +386,26 @@ function prefs_global_list($partial = false)
             'description' => tr('A short phrase that, for example, describes the site.'),
             'size' => '50',
             'default' => '',
+            'help' => $generalLayoutOptionsHelp,
             'tags' => ['basic'],
             'public' => true,
         ],
         'maxRecords' => [
             'name' => tra('Maximum number of records in listings'),
+            'description' => tra('Default maximum number of items shown per page in paginated listings across the site.'),
             'type' => 'text',
             'size' => '3',
             'units' => tra('records'),
             'default' => 25,
+            'help' => 'Pagination-Links',
             'tags' => ['basic'],
             'public' => true,
         ],
         'maxVersions' => [
             'name' => tra('Maximum number of versions:'),
+            'description' => tra('Maximum number of previous versions kept in wiki page history. Older versions are removed when the limit is exceeded.'),
             'type' => 'text',
+            'help' => 'Wiki-Features',
             'units' => tra('versions'),
             'size' => '5',
             'hint' => tra('0 for unlimited'),
@@ -362,6 +416,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Users can register'),
             'description' => tra('Allow site visitors to register, using the registration form. The log-in module will include a "Register" link. If this is not activated, new users will have to be added manually by the admin on the Admin-Users page.'),
             'type' => 'flag',
+            'help' => $loginGeneralPreferencesHelp,
             'default' => 'n',
             'tags' => ['basic'],
         ],
@@ -369,6 +424,7 @@ function prefs_global_list($partial = false)
             'name' => tra("Validate user's email server"),
             'description' => tra('Tiki will attempt to validate the user’s email address by examining the syntax of the email address. It must be a string of letters, or digits or _ or . or - follows by a @ follows by a string of letters, or digits or _ or . or -. Tiki will perform a DNS lookup and attempt to open a SMTP session to validate the email server.'),
             'type' => 'list',
+            'help' => $loginGeneralPreferencesHelp,
             'tip' => tra('Some web servers may disable this functionality, thereby disabling this feature. If you are not in in a high security site or if you are on an open users site, do not use this option.'),
             'options' => [
                 'n' => tra('No'),
@@ -381,6 +437,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Require validation by Admin'),
             'description' => tra('The administrator will receive an email for each new user registration, and must validate the user before the user can log in.'),
             'type' => 'flag',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'sender_email',
             ],
@@ -390,6 +447,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Require passcode to register'),
             'description' => tra('Users must enter an alphanumeric code to register.  The site administrator must inform users of this code. This is to restrict registration to invited users.'),
             'type' => 'flag',
+            'help' => $loginGeneralPreferencesHelp,
             'default' => 'n',
             'tags' => ['basic'],
         ],
@@ -397,6 +455,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Passcode'),
             'type' => 'text',
             'size' => 15,
+            'help' => $loginGeneralPreferencesHelp,
             'hint' => tra('Alphanumeric code required to complete the registration'),
             'default' => '',
             'tags' => ['basic'],
@@ -405,6 +464,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Show passcode on registration form'),
             'description' => tra("Displays the required passcode on the registration form. This is helpful for legitimate users who want to register while making it difficult for automated robots because the passcode is unique for each site and because it is displayed in JavaScript."),
             'type' => 'flag',
+            'help' => $loginGeneralPreferencesHelp,
             'default' => 'n',
             'tags' => ['basic'],
         ],
@@ -414,6 +474,7 @@ function prefs_global_list($partial = false)
             'description' => tra('To register, users need to go to, for example: tiki-register.php?key=yourregistrationkeyvalue'),
             'type' => 'text',
             'size' => 15,
+            'help' => $loginGeneralPreferencesHelp,
             'default' => '',
             'tags' => ['basic'],
         ],
@@ -422,6 +483,7 @@ function prefs_global_list($partial = false)
             'description' => tra('Display a tracker form for the user to complete as part of the registration process. This tracker will receive and store additional information about each user.'),
             'type' => 'flag',
             'help' => 'User-Tracker',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'feature_trackers',
             ],
@@ -429,8 +491,9 @@ function prefs_global_list($partial = false)
             'default' => 'n',
         ],
         'groupTracker' => [
-            'name' => tra('Use tracker to collect more group information'),
+            'name' => tra('Use a tracker to collect more group information'),
             'type' => 'flag',
+            'help' => $loginGeneralPreferencesHelp,
             'help' => 'Group-Tracker',
             'dependencies' => [
                 'feature_trackers',
@@ -443,21 +506,25 @@ function prefs_global_list($partial = false)
             'description' => tra('Automatically create a group for each user in order to, for example, assign permissions on the individual-user level.'),
             'type' => 'flag',
             'hint' => tra("The group name will be the same as the user's username"),
-            'help' => 'Groups',
+            'help' => $groupsHelp,
             'default' => 'n',
             'keywords' => 'eponymous groups',
         ],
         'syncGroupsWithDirectory' => [
             'name' => tra('Synchronize Tiki groups with a directory'),
+            'description' => tra('Synchronize Tiki group membership with LDAP directory groups on user login and during bulk sync.'),
             'type' => 'flag',
             'hint' => tra('Define the directory within the "LDAP" tab'),
             'default' => 'n',
+            'help' => $ldapAuthenticationHelp,
         ],
         'syncUsersWithDirectory' => [
             'name' => tra('Synchronize Tiki users with a directory'),
+            'description' => tra('Synchronize Tiki user profile data with LDAP directory entries on user login and during bulk sync.'),
             'type' => 'flag',
             'hint' => tra('Define the directory within the "LDAP" tab'),
             'default' => 'n',
+            'help' => $ldapAuthenticationHelp,
         ],
         'rememberme' => [
             'name' => tra('Remember me'),
@@ -476,6 +543,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Duration'),
             'description' => tra('The length of time before the user will need to log in again.'),
             'type' => 'list',
+            'help' => $loginGeneralPreferencesHelp,
             'options' => [
                 '300'       => '5 ' . tra('minutes'),
                 '900'       => '15 ' . tra('minutes'),
@@ -499,6 +567,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Homepage Browser title'),
             'description' => tra('Customize Browser title for the custom homepage'),
             'type' => 'text',
+            'help' => $navigationHelp,
             'size' => 50,
             'default' => tra('Homepage'),
             'tags' => ['basic'],
@@ -508,9 +577,11 @@ function prefs_global_list($partial = false)
         ],
         'urlIndex' => [
             'name' => tra('Homepage URL'),
+            'description' => tra('URL used as the site homepage when "Use custom homepage" is enabled.'),
             'type' => 'text',
             'size' => 50,
             'default' => '',
+            'help' => $navigationHelp,
             'tags' => ['basic'],
             'dependencies' => [
                 'useUrlIndex',
@@ -521,6 +592,7 @@ function prefs_global_list($partial = false)
             'description' => tra('Use the top page of a Tiki feature or another homepage'),
             'warning' => tra('This option will override the Use Tiki feature as homepage setting.'),
             'type' => 'flag',
+            'help' => $navigationHelp,
             'default' => 'n',
             'tags' => ['basic'],
         ],
@@ -530,34 +602,41 @@ function prefs_global_list($partial = false)
             'type' => 'list',
             'options' => feature_home_pages($partial),
             'default' => 'tiki-index.php',
+            'help' => $navigationHelp,
             'tags' => ['basic'],
         ],
         'maxRowsGalleries' => [
             'name' => tra('Maximum rows per page'),
+            'description' => tra('Default maximum number of rows shown per page in file gallery listings.'),
             'type' => 'text',
+            'help' => 'Gallery-Listings',
             'units' => tra('rows'),
             'default' => '10',
         ],
         'rowImagesGalleries' => [
             'name' => tra('Images per row'),
+            'description' => tra('Default number of image thumbnails displayed per row in file gallery.'),
             'type' => 'text',
             'units' => tra('images'),
             'default' => '6',
         ],
         'thumbSizeXGalleries' => [
             'name' => tra('Thumbnail width'),
+            'description' => tra('Default width in pixels for image thumbnails in file gallery.'),
             'type' => 'text',
             'units' => tra('pixels'),
             'default' => '80',
         ],
         'thumbSizeYGalleries' => [
             'name' => tra('Thumbnail height'),
+            'description' => tra('Default height in pixels for image thumbnails in file gallery.'),
             'type' => 'text',
             'units' => tra('pixels'),
             'default' => '80',
         ],
         'scaleSizeGalleries' => [
             'name' => tra('Default scale size'),
+            'description' => tra('Default maximum size in pixels for scaled images displayed in file gallery.'),
             'type' => 'text',
             'units' => tra('pixels'),
             'default' => '',
@@ -567,12 +646,14 @@ function prefs_global_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
             'description' => tra('If enabled, a message will be displayed to users during search re-index.'),
+            'help' => $generalPreferencesHelp,
         ],
         'maintenanceReindexMessage' => [
             'name' => tra('Search re-index message'),
             'type' => 'text',
             'default' => tra('The search index is currently rebuilding. You can continue using the site normally, but please be aware that it could be slower than usual.'),
             'size' => 300,
+            'help' => $generalPreferencesHelp,
             'description' => tra('The message displayed during search re-indexing. You can customize this message if needed.'),
         ],
         'maintenanceTimeBeforeDisplayMessage' => [
@@ -580,12 +661,14 @@ function prefs_global_list($partial = false)
             'description' => tra('The time will be used for display warning message before start maintenance.'),
             'type' => 'text',
             'size' => 3,
+            'help' => $generalPreferencesHelp,
             'default' => '60',
             'tags' => ['advanced'],
         ],
         'maintenanceRecurrentEnable' => [
             'name' => tra('Recurrent Maintaine Enabled'),
             'description' => tra('Enable notification during maintenance.'),
+            'help' => $generalPreferencesHelp,
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced'],
@@ -596,6 +679,7 @@ function prefs_global_list($partial = false)
             'type' => 'text',
             'size' => 300,
             'default' => tra('This website will be under maintenance in TIME minutes and will be unavailable for DOWN minutes.'),
+            'help' => $generalPreferencesHelp,
             'tags' => ['advanced'],
         ],
         'maintenanceRecurrentDuringMessage' => [
@@ -603,15 +687,17 @@ function prefs_global_list($partial = false)
             'description' => tra('Message to display during maintenance. Use DOWN for remaining minutes of downtime.'),
             'type' => 'text',
             'size' => 300,
+            'help' => $generalPreferencesHelp,
             'default' => tra('This website is under maintenance and will be back in DOWN minutes.'),
             'tags' => ['advanced'],
         ],
         'maintenanceRecurrentStartTime' => [
             'name' => tra('Start Time'),
             'description' => tra('It is for set when the maintenance will be started (24H format hh:mm)'),
-            'help' => 'Date-and-Time#Date_and_Time_Formats',
+            'help' => $dateAndTimeDateAndTimeFormatsHelp,
             'type' => 'text',
             'size' => '30',
+            'help' => $generalPreferencesHelp,
             'default' => '%H:%M',
             'tags' => ['advanced'],
         ],
@@ -620,11 +706,13 @@ function prefs_global_list($partial = false)
             'description' => tra('Period to display message while maintenance.'),
             'type' => 'text',
             'size' => 3,
+            'help' => $generalPreferencesHelp,
             'default' => '60',
             'tags' => ['advanced'],
         ],
         'maintenanceEnableWeekdays' => [
             'name' => tra('Enable notifitication during maintenance on weekdays'),
+            'description' => tra('Days of the week when recurring maintenance warnings and site closure are enabled.'),
             'type' => 'multilist',
             'options' => [
                 0 => tra('Sunday'),
@@ -636,12 +724,14 @@ function prefs_global_list($partial = false)
                 6 => tra('Saturday'),
             ],
             'default' => [0, 1, 2, 3, 4, 5, 6],
+            'help' => $generalPreferencesHelp,
             'tags' => ['advanced'],
         ],
         'maintenanceOnceOffEnable' => [
             'name' => tra('Once off notification maintenance enabled'),
             'description' => tra('Enable notifitication once off maintenance.'),
             'type' => 'flag',
+            'help' => $generalPreferencesHelp,
             'default' => 'n',
             'tags' => ['advanced'],
         ],
@@ -649,6 +739,7 @@ function prefs_global_list($partial = false)
             'name' => tra('Before Once-Off Maintenance Message'),
             'description' => tra('Message to display before once-off maintenance starts. Use TIME for minutes until maintenance and DOWN for duration.'),
             'type' => 'text',
+            'help' => $generalPreferencesHelp,
             'size' => 300,
             'default' => tra('This website will be under once-off maintenance in TIME minutes and will be unavailable for DOWN minutes.'),
             'tags' => ['advanced'],
@@ -657,6 +748,7 @@ function prefs_global_list($partial = false)
             'name' => tra('During Once-Off Maintenance Message'),
             'description' => tra('Message to display during once-off maintenance. Use DOWN for remaining minutes of downtime.'),
             'type' => 'text',
+            'help' => $generalPreferencesHelp,
             'size' => 300,
             'default' => tra('This website is under once-off maintenance and will be back in DOWN minutes.'),
             'tags' => ['advanced'],
@@ -664,7 +756,8 @@ function prefs_global_list($partial = false)
         'maintenanceOnceOffStartDate' => [
             'name' => tra('Start Date'),
             'description' => tra('It is for set date the maintenance will be off'),
-            'help' => 'Date-and-Time#Date_and_Time_Formats',
+            'help' => $generalPreferencesHelp,
+            'help' => $dateAndTimeDateAndTimeFormatsHelp,
             'type' => 'text',
             'size' => '30',
             'default' => '%Y-%m-%d',
@@ -673,7 +766,7 @@ function prefs_global_list($partial = false)
         'maintenanceOnceOffStartTime' => [
             'name' => tra('Start Time'),
             'description' => tra('It is for set when the maintenance will be off (24H format hh:mm)'),
-            'help' => 'Date-and-Time#Date_and_Time_Formats',
+            'help' => $dateAndTimeDateAndTimeFormatsHelp,
             'type' => 'text',
             'size' => '30',
             'default' => '%H:%M',
@@ -684,12 +777,14 @@ function prefs_global_list($partial = false)
             'description' => tra('Period to display message while maintenance once off.'),
             'type' => 'text',
             'size' => 3,
+            'help' => $generalPreferencesHelp,
             'default' => '60',
             'tags' => ['advanced'],
         ],
         'scheduledTasksReport' => [
             'name' => tra('Report when scheduled tasks do not run successfully'),
             'description' => tr('Scheduler report'),
+            'help' => $generalPreferencesHelp,
             'type' => 'list',
             'options' => [
                 'do_not_report' => tra('Do not report'),
@@ -703,6 +798,7 @@ function prefs_global_list($partial = false)
             'name' => tr('Nº of hours'),
             'description' => tr('Number of hours to show scheduler logs'),
             'type' => 'text',
+            'help' => $generalPreferencesHelp,
             'size' => 100,
             'filter' => 'int',
             'units' => tra('hours'),
@@ -715,6 +811,7 @@ function prefs_global_list($partial = false)
             'name' => tr('Do not report failures older than (days)'),
             'description' => tr('failure report days'),
             'type' => 'text',
+            'help' => $generalPreferencesHelp,
             'size' => 5,
             'filter' => 'int',
             'units' => tra('Days'),

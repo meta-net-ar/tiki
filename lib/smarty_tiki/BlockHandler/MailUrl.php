@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty plugin mailurl
@@ -19,8 +20,13 @@ use Smarty\Template;
  * works also with: {mailurl}{wiki_page|sefurl}{/mailurl}
  * and: {mailurl}absolute-url{/mailurl}
  */
-class MailUrl extends Base
+class MailUrl extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'mailurl';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {

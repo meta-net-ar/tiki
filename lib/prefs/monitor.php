@@ -6,13 +6,16 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_monitor_list()
 {
+    $notificationsHelp = 'Notifications';
+    $monitoringHelp = 'Monitoring';
+
     return [
         'monitor_enabled' => [
             'name' => tra('Notifications'),
             'description' => tra('Allow users to control the notifications they receive based on content changes.'),
             'type' => 'flag',
             'default' => 'n',
-            'help' => 'Notifications',
+            'help' => $notificationsHelp,
         ],
         'monitor_digest' => [
             'name' => tra('Notification digests'),
@@ -26,6 +29,7 @@ function prefs_monitor_list()
             'description' => tra('Allow users to selectively clear notifications instead of simply having a clear-all button.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $notificationsHelp,
         ],
         'monitor_count_refresh_interval' => [
             'name' => tra('Notification count refresh interval'),
@@ -33,6 +37,7 @@ function prefs_monitor_list()
             'type' => 'text',
             'filter' => 'int',
             'default' => 0,
+            'help' => $notificationsHelp,
             'units' => tra('seconds'),
             'size' => 5,
             'hint' => tr('0 to disable, every refresh causes a hit on the server, try to leave this above 60 seconds.'),
@@ -45,19 +50,21 @@ function prefs_monitor_list()
             'default' => '',
             'hint' => tr('noreply+PLACEHOLDER@example.com'),
             'dependencies' => ['feature_mailin'],
-        ],
+        ], // TODO: Add help page for this preference
         'monitor_restricted_ips' => [
             'name' => tra('List of IPs that can connect for monitoring'),
             'description' => tra('Allows tiki-monitor.php restricting access to a list of IPs ( comma separated)'),
             'type' => 'textarea',
             'size' => 3,
             'default' => '',
+            'help' => $monitoringHelp,
         ],
         'monitor_token' => [
             'name' => tra('Integration token to authenticate requests'),
             'description' => tra('Token can be passed to the script as GET, POST or HTTP Header parameter'),
             'type' => 'text',
             'default' => '',
+            'help' => $monitoringHelp,
         ],
         'monitor_rules' => [
             'name' => tra('Monitor permissions rules'),
@@ -65,6 +72,7 @@ function prefs_monitor_list()
             'type' => 'textarea',
             'size' => 5,
             'default' => '',
+            'help' => $monitoringHelp,
         ],
         'monitor_probes' => [
             'name' => tra('Monitor probes'),
@@ -73,6 +81,7 @@ function prefs_monitor_list()
             'size' => 5,
             'default' => '',
             'tags' => ['experimental'],
+            'help' => $monitoringHelp,
         ],
     ];
 }

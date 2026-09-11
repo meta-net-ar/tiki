@@ -73,12 +73,12 @@
             <label for="replytome" class="form-label ms-2">
                 <input type="checkbox" name="replytome" id="replytome">
                 {tr}Reply-to my email{/tr}
-                {help url="User-Information" desc="{tr}Reply-to my email{/tr}{tr}The user will be able to reply to you directly via email.{/tr}"}
+                {help url="#" desc="{tr}Reply-to my email{/tr}{tr}The user will be able to reply to you directly via email.{/tr}"}
             </label>
             <label for="bccme" class="form-label ms-2">
                 <input type="checkbox" name="bccme" id="bccme">
                 {tr}Send me a copy{/tr}
-                {help url="User-Information" desc="{tr}Send me a copy:{/tr}{tr}You will be sent a copy of this email.{/tr}"}
+                {help url="#" desc="{tr}Send me a copy:{/tr}{tr}You will be sent a copy of this email.{/tr}"}
             </label>
         </div>
     </div>

@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class InitialsFilterLinks extends Base
+class InitialsFilterLinks extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'initials_filter_links';
+    }
+
     public function handle($params, Template $template)
     {
         $html = '';
@@ -34,9 +40,10 @@ class InitialsFilterLinks extends Base
         // Include smarty functions used below
         $smarty = \TikiLib::lib('smarty');
 
-        $tag_start = "\n" . '<a class="' . $params['_class'] . '" ' . smarty_block_ajax_href(
+        $repeat = false;
+        $tag_start = "\n" . '<a class="' . $params['_class'] . '" ' . \SmartyTiki\BlockHandler\AjaxHref::render(
             ['template' => $params['_template'], 'htmlelement' => $params['_htmlelement']],
-            smarty_function_query(
+            \SmartyTiki\FunctionHandler\Query::render(
                 [
                     '_type' => $default_type,
                     $params['_initial'] => 'X',
@@ -46,7 +53,7 @@ class InitialsFilterLinks extends Base
                 $template
             ),
             $template,
-            false
+            $repeat
         ) . '>';
 
         $alpha = explode(',', tra('a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z'));

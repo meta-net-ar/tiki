@@ -10,6 +10,7 @@
         <div class="btn-group">
             <a href="{service controller=tracker action=add_field trackerId=$trackerId}" class="btn btn-primary add-field">{icon name="create"} {tr}Add Field{/tr}</a>
             <a href="{bootstrap_modal controller=tracker action=import_fields trackerId=$trackerId}" class="btn btn-primary">{icon name="import"} {tr}Import Fields{/tr}</a>
+            <a href="{service controller=tracker action=config_history trackerId=$trackerId}" class="btn btn-outline-info">{icon name="history"} {tr}Config History{/tr}</a>
         </div>
         {include file="tracker_actions.tpl"}
     </div>

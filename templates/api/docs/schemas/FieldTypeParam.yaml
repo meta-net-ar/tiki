@@ -1,0 +1,20 @@
+---
+description: A single configuration parameter for a tracker field type.
+type: object
+required:
+  - name
+  - description
+  - filter
+properties:
+  name:
+    type: string
+  description:
+    type: string
+  filter:
+    type: string
+  default:
+    type: string
+  options:
+    type: array
+  legacy_index:
+    type: integer

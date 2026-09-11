@@ -121,6 +121,9 @@ class HeaderLib
      */
     public $js_modules = [];
 
+    /** @var array External JS files to load as <script type="module" src="...">. */
+    public $js_module_files = [];
+
     /**
      * Do NOT manipulate this directly.  The only reason this is public is so PageCache.php has access to it.
      *
@@ -147,12 +150,15 @@ class HeaderLib
     public $forceJsRankLate = false;
 
 
-    public $jquery_version = '3.7.1';
-    public $jqueryui_version = '1.13.2';
-    public $jquerymigrate_version = '3.4.1';
+    public $jquery_version = '4.0.0';
+    public $jqueryui_version = '1.14.2';
+    public $jquerymigrate_version = '4.0.2';
 
     private ?string $outputHeadersWasStartedBy = null;
     private ?string $outputStaticJSFooterWasStartedBy = null;
+
+    /** Tracks if `add_map` has been called, only needed once */
+    private bool $mapAdded = false;
 
     private $outputHasBeenCalledCount = 0;
 
@@ -220,6 +226,208 @@ class HeaderLib
     public function set_title($string)
     {
         $this->title = urlencode($string);
+    }
+
+    /**
+     * Add security headers. By default these headers are not sent.
+     * To change go to admin > security > site access
+     */
+    public function addSecurityHeaders()
+    {
+        global $prefs;
+
+        if (! headers_sent()) {
+            if (! isset($prefs['http_header_frame_options'])) {
+                $frame = false;
+            } else {
+                $frame = $prefs['http_header_frame_options'];
+            }
+            if (! isset($prefs['http_header_xss_protection'])) {
+                $xss = false;  // prevent smarty E_NOTICE
+            } else {
+                $xss = $prefs['http_header_xss_protection'];
+            }
+
+            if (! isset($prefs['http_header_content_type_options'])) {
+                $content_type_options = false;  // prevent smarty E_NOTICE
+            } else {
+                $content_type_options = $prefs['http_header_content_type_options'];
+            }
+            if (! isset($prefs['http_header_access_control_allow_credentials'])) {
+                $access_control_allow_credentials = false;
+            } else {
+                $access_control_allow_credentials = $prefs['http_header_access_control_allow_credentials'];
+            }
+            if (! isset($prefs['http_header_access_control_allow_methods'])) {
+                $access_control_allow_methods = false;
+            } else {
+                $access_control_allow_methods = $prefs['http_header_access_control_allow_methods'];
+            }
+            if (! isset($prefs['http_header_access_control_allow_headers'])) {
+                $access_control_allow_headers = false;
+            } else {
+                $access_control_allow_headers = $prefs['http_header_access_control_allow_headers'];
+            }
+            if (! isset($prefs['http_header_cross_origin_embedder_policy'])) {
+                $cross_origin_embedder_policy = false;
+            } else {
+                $cross_origin_embedder_policy = $prefs['http_header_cross_origin_embedder_policy'];
+            }
+            if (! isset($prefs['http_header_cross_origin_resource_policy'])) {
+                $cross_origin_resource_policy = false;
+            } else {
+                $cross_origin_resource_policy = $prefs['http_header_cross_origin_resource_policy'];
+            }
+            if (! isset($prefs['http_header_cross_origin_opener_policy'])) {
+                $cross_origin_opener_policy = false;
+            } else {
+                $cross_origin_opener_policy = $prefs['http_header_cross_origin_opener_policy'];
+            }
+            if (! isset($prefs['http_header_content_security_policy'])) {
+                $content_security_policy = false;  // prevent smarty E_NOTICE
+            } else {
+                $content_security_policy = $prefs['http_header_content_security_policy'];
+            }
+
+            if (! isset($prefs['http_header_strict_transport_security'])) {
+                $strict_transport_security = false;  // prevent smarty E_NOTICE
+            } else {
+                $strict_transport_security = $prefs['http_header_strict_transport_security'];
+            }
+
+            if (! isset($prefs['http_header_public_key_pins'])) {
+                $public_key_pins = false;  // prevent smarty E_NOTICE
+            } else {
+                $public_key_pins = $prefs['http_header_public_key_pins'];
+            }
+
+            if (! isset($prefs['http_header_referrer_policy'])) {
+                $referrer_policy = false;
+            } else {
+                $referrer_policy = $prefs['http_header_referrer_policy'];
+            }
+
+            if (! isset($prefs['http_header_permitted_cross_domain_policies'])) {
+                $permitted_cross_domain_policies = false;
+            } else {
+                $permitted_cross_domain_policies = $prefs['http_header_permitted_cross_domain_policies'];
+            }
+
+            if ($frame == 'y') {
+                    $header_value = $prefs['http_header_frame_options_value'];
+                    header('X-Frame-Options: ' . $header_value);
+            }
+            if ($xss == 'y') {
+                    $header_value = $prefs['http_header_xss_protection_value'];
+                    header('X-XSS-Protection: ' . $header_value);
+            }
+            if ($content_type_options == 'y') {
+                header('X-Content-Type-Options: nosniff');
+            }
+            if ($access_control_allow_credentials === 'y') {
+                header('Access-Control-Allow-Credentials: true');
+            }
+            if ($access_control_allow_methods === 'y') {
+                $header_value = trim($prefs['http_header_access_control_allow_methods_value']);
+                if ($access_control_allow_credentials === 'y' && $header_value === '*') {
+                    Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Methods when http_header_access_control_allow_credential is enabled"));
+                    header_remove('Access-Control-Allow-Methods');
+                } else {
+                    header('Access-Control-Allow-Methods: ' . $header_value);
+                }
+            }
+            if ($access_control_allow_headers === 'y') {
+                $headers_value = trim($prefs['http_header_access_control_allow_headers_value']);
+                if ($access_control_allow_credentials === 'y' && $headers_value === '*') {
+                    Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Headers when Access-Control-Allow-Credentials is enabled."));
+                    header_remove('Access-Control-Allow-Headers');
+                } else {
+                    header('Access-Control-Allow-Headers: ' . $headers_value);
+                }
+            }
+            if ($cross_origin_embedder_policy === 'y') {
+                switch (trim($prefs['http_header_cross_origin_embedder_policy_value'])) {
+                    case 'require-corp':
+                        header('Cross-Origin-Embedder-Policy: require-corp');
+                        break;
+                    case 'credentialless':
+                        header('Cross-Origin-Embedder-Policy: credentialless');
+                        break;
+                    case 'unsafe-none':
+                        header('Cross-Origin-Embedder-Policy: unsafe-none');
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if ($cross_origin_resource_policy === 'y') {
+                switch (trim($prefs['http_header_cross_origin_resource_policy_value'])) {
+                    case 'same-origin':
+                        header('Cross-Origin-Resource-Policy: same-origin');
+                        break;
+                    case 'same-site':
+                        header('Cross-Origin-Resource-Policy: same-site');
+                        break;
+                    case 'cross-origin':
+                        header('Cross-Origin-Resource-Policy: cross-origin');
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if ($cross_origin_opener_policy === 'y') {
+                switch (trim($prefs['http_header_cross_origin_opener_policy_value'])) {
+                    case 'same-origin':
+                        header('Cross-Origin-Opener-Policy: same-origin');
+                        break;
+                    case 'same-origin-allow-popups':
+                        header('Cross-Origin-Opener-Policy: same-origin-allow-popups');
+                        break;
+                    case 'same-origin-plus-coep':
+                        header('Cross-Origin-Opener-Policy: same-origin-plus-coep');
+                        break;
+                    case 'unsafe-none':
+                        header('Cross-Origin-Opener-Policy: unsafe-none');
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if ($content_security_policy == 'y') {
+                $header_value = trim($prefs['http_header_content_security_policy_value']);
+                if ($header_value !== '') {
+                    header('Content-Security-Policy: ' . $header_value);
+                }
+            }
+
+            if ($strict_transport_security == 'y') {
+                $header_value = trim($prefs['http_header_strict_transport_security_value']);
+                if ($header_value !== '') {
+                    header('Strict-Transport-Security: ' . $header_value);
+                }
+            }
+
+            if ($public_key_pins == 'y') {
+                $header_value = trim($prefs['http_header_public_key_pins_value']);
+                if ($header_value !== '') {
+                    header('Public-Key-Pins: ' . $header_value);
+                }
+            }
+
+            if ($referrer_policy === 'y') {
+                $header_value = trim($prefs['http_header_referrer_policy_value']);
+                if ($header_value !== '') {
+                    header('Referrer-Policy: ' . $header_value);
+                }
+            }
+
+            if ($permitted_cross_domain_policies === 'y') {
+                $header_value = trim($prefs['http_header_permitted_cross_domain_policies_value']);
+                if ($header_value !== '') {
+                    header('X-Permitted-Cross-Domain-Policies: ' . $header_value);
+                }
+            }
+        }
     }
 
     /**
@@ -425,6 +633,16 @@ class HeaderLib
         return $this;
     }
 
+    /** Adds an external javascript file to load as a module. */
+    public function addJsfileModule($file, $rank = 0)
+    {
+        $this->throwIfJSFooterAlreadyOutput();
+        if (empty($this->js_module_files[$rank]) or ! in_array($file, $this->js_module_files[$rank])) {
+            $this->js_module_files[$rank][] = $file;
+        }
+        return $this;
+    }
+
     public function add_cssfile($file, $rank = 0)
     {
         $this->throwIfHeadersAlreadyOutput();
@@ -539,7 +757,7 @@ class HeaderLib
         $back = generateJsImportmapScripts();
         $back .= "\n";
         if ($this->title) {
-            $back = '<title>' . smarty_modifier_escape($this->title) . "</title>\n\n";
+            $back = '<title>' . \SmartyTiki\Modifier\Escape::apply($this->title) . "</title>\n\n";
         }
 
         if ($this->rawhtml) {
@@ -550,7 +768,7 @@ class HeaderLib
             foreach ($this->metatags as $n => $m) {
                 // check if the meta name starts with OpenGraph protocol prefix and use property instead of name if true
                 $nameattrib = preg_match('/^og\:/', $n) ? 'property' : 'name';
-                $back .= '<meta ' . $nameattrib . '="' . smarty_modifier_escape($n) . '" content="' . smarty_modifier_escape($m) . "\">\n";
+                $back .= '<meta ' . $nameattrib . '="' . \SmartyTiki\Modifier\Escape::apply($n) . '" content="' . \SmartyTiki\Modifier\Escape::apply($m) . "\">\n";
             }
             $back .= "\n";
         }
@@ -589,7 +807,7 @@ class HeaderLib
             foreach ($this->rssfeeds as $x => $rssf) {
                 $back .= "<!-- rss $x -->\n";
                 foreach ($rssf as $rsstitle => $rssurl) {
-                    $back .= "<link rel=\"alternate\" type=\"application/rss+xml\" title=\"" . smarty_modifier_escape($this->convert_cdn($rsstitle)) . "\" href=\"" . smarty_modifier_escape($rssurl) . "\">\n";
+                    $back .= "<link rel=\"alternate\" type=\"application/rss+xml\" title=\"" . \SmartyTiki\Modifier\Escape::apply($this->convert_cdn($rsstitle)) . "\" href=\"" . \SmartyTiki\Modifier\Escape::apply($rssurl) . "\">\n";
                 }
             }
             $back .= "\n";
@@ -632,7 +850,7 @@ class HeaderLib
          foreach ($customCdns as $entry) {
          trim($entry);
          if (!empty($entry)) {
-         $output[$rank] .= "<script type=\"text/javascript\" src=\"".smarty_modifier_escape($entry)."\"></script>\n";
+         $output[$rank] .= "<script type=\"text/javascript\" src=\"".\SmartyTiki\Modifier\Escape::apply($entry)."\"></script>\n";
          }
          }
          }
@@ -658,7 +876,7 @@ class HeaderLib
         foreach ($ranks as $rank) {
             if (isset($jsfiles[$rank])) {
                 foreach ($jsfiles[$rank] as $entry) {
-                    $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                    $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
                 }
             }
         }
@@ -674,7 +892,7 @@ class HeaderLib
                 if (isset($jsfiles[$rank])) {
                     foreach ($jsfiles[$rank] as $entry) {
                         $entry = $this->convert_cdn($entry, $rank);
-                        $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                        $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
                     }
                 }
             }
@@ -687,23 +905,23 @@ class HeaderLib
 
             $ranks = ['30dependency', '40external', '50standard'];
             $entry = $this->minifyJSFiles($jsfiles, $ranks);
-            $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+            $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
 
             $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y';
             $rank = '60late';
             if ($minifyLateActive) {
                 foreach ($jsfiles[$rank] as $index => $file) {
                     if (isset($this->skip_minify[$file]) && $this->skip_minify[$file] === true) {
-                        $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($file) . '"></script>';
+                        $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($file) . '"></script>';
                         unset($jsfiles[$rank][$index]);
                     }
                 }
                 // handling of user defined cdn servers is done inside minifyJSFiles()
                 $entry = $this->minifyJSFiles($jsfiles, [$rank]);
-                $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
             } else {
                 foreach ($jsfiles[$rank] as $entry) {
-                    $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                    $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
                 }
             }
         }
@@ -854,6 +1072,11 @@ class HeaderLib
         return md5($hash);
     }
 
+    private function stripCacheBuster(string $file): string
+    {
+        return strtok($file, '?') ?: $file;
+    }
+
 
     /**
      * Output script tags for all javascript files being used.
@@ -905,6 +1128,15 @@ class HeaderLib
             $output .= $b;
         }
 
+        if (count($this->js_module_files)) {
+            ksort($this->js_module_files);
+            foreach ($this->js_module_files as $rank => $files) {
+                foreach ($files as $file) {
+                    $output .= "\n" . '<script type="module" src="' . \SmartyTiki\Modifier\Escape::apply($file) . '"></script>';
+                }
+            }
+        }
+
         // we get one sorted array with script tags
         $js_files = $this->getJsFilesWithScriptTags();
 
@@ -950,6 +1182,7 @@ class HeaderLib
         $this->js_modules = [];
         if ($clear_js_files) {
             $this->jsfiles = [];
+            $this->js_module_files = [];
         }
         return $this;
     }
@@ -1103,6 +1336,17 @@ class HeaderLib
         return $html;
     }
 
+    public function getJsModulesFromHTML($html)
+    {
+        preg_match_all('/<script[^>]*type=[\'"]?module[\'"]?[^>]*>\s*?(.*)(?:\s*<\/script>)/Umis', $html, $jsarr);
+        return array_filter($jsarr[1] ?? []);
+    }
+
+    public function removeJsModulesFromHTML($html)
+    {
+        return preg_replace('/<script[^>]*type=[\'"]?module[\'"]?[^>]*>\s*?(.*)(?:\s*<\/script>)/Umis', '', $html);
+    }
+
     public function get_all_css_content()
     {
         $files = $this->collect_css_files();
@@ -1155,9 +1399,9 @@ class HeaderLib
 
         foreach ($files as $file) {
             $file = $this->convert_cdn($file);
-            $back .= "<link rel=\"stylesheet\" href=\"" . smarty_modifier_escape($file) . "\" type=\"text/css\"";
+            $back .= "<link rel=\"stylesheet\" href=\"" . \SmartyTiki\Modifier\Escape::apply($file) . "\" type=\"text/css\"";
             if (! empty($media)) {
-                $back .= " media=\"" . smarty_modifier_escape($media) . "\"";
+                $back .= " media=\"" . \SmartyTiki\Modifier\Escape::apply($media) . "\"";
             }
             $back .= ">\n";
         }
@@ -1173,6 +1417,7 @@ class HeaderLib
         foreach ($files as $originalFile) {
             /* This does not use the same cachelib-based caching strategy as get_minified_css_single() since I could not see any improvement.
             I tested on Windows 8 with an HDD and a filesystem-based Tiki\Lib\Cache\Lib\Base. Tiki\Cache\FileSystem::getCached() may be inefficient. The strategy may still improve performance for other setups, such as those using Tiki\Lib\Cache\Lib\Memcache. Chealer 2018-08-31 */
+            $originalFile = $this->stripCacheBuster($originalFile);
             $fileContentsHash = md5_file($originalFile);
             $minimalFilePath = $publicDirectory . "minified_$fileContentsHash.css";
             if (! file_exists($minimalFilePath)) {
@@ -1207,11 +1452,7 @@ class HeaderLib
 
             foreach ($files as $originalFile) {
                 // remove cache-buster parameters from the end of the filename
-                $pos = strpos($originalFile, '?');
-                if ($pos !== false) {
-                    $originalFile = substr($originalFile, 0, $pos);
-                }
-                $minifier->add($originalFile);
+                $minifier->add($this->stripCacheBuster($originalFile));
             }
 
             $minifier->minify($minimalFilePath);
@@ -1275,6 +1516,12 @@ class HeaderLib
 
     public function add_map()
     {
+        if ($this->mapAdded) {
+            return $this;
+        }
+
+        $this->mapAdded = true;
+
         global $prefs;
 
         $tikilib = TikiLib::lib('tiki');
@@ -1313,21 +1560,20 @@ window.onload = loadScript;');
         }
         */
 
+        $mapsJs = "\$(\".map-container:not(.done)\").addClass(\"done\").visible(function() {\$(this).createMap();});\n";
+
+        // Set the zoom option after searching for a location
+        $zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
+        $mapsJs .= 'var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . "\";\n";
+
         $this->add_jsfile_external(OL_PATH . '/dist/ol.js', true)
             ->add_cssfile(OL_PATH . '/ol.css')
             ->add_jsfile_external(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
             ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
-            ->add_js(
-                ''
-            );
+            ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps.js")
+            ->add_js($mapsJs);
 
-        $this->add_js(
-            '$(".map-container:not(.done)")
-                .addClass("done")
-                .visible(function() {
-                    $(this).createMap();
-            });'
-        );
+        $this->mapAdded = true;
 
         return $this;
     }

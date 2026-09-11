@@ -374,6 +374,17 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         return $this->attemptParse($this->getConfiguration('page_data'));
     }
 
+    /**
+     * Render the field value as plain text.
+     * @param mixed $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $data = $this->getFieldData();
+        return $this->attemptParse($data['page_data']);
+    }
+
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
     {
         $data = [];

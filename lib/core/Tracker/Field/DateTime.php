@@ -207,8 +207,13 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
 
         if ($value) {
             if ($this->getOption('datetime') === 'd') {
-                // offset the UTC-stored timestamp of the date by current display timezone, so we actually display the correct date entered by user
-                $value -= TikiDate::tzServerOffset(TikiLib::lib('tiki')->get_display_timezone(), $value);
+                if (is_string($value) && is_numeric($value)) {
+                    $value = intval($value);
+                }
+                if (is_numeric($value)) {
+                    // offset the UTC-stored timestamp of the date by current display timezone, so we actually display the correct date entered by user
+                    $value -= TikiDate::tzServerOffset(TikiLib::lib('tiki')->get_display_timezone(), $value);
+                }
             }
             if (isset($context['list_mode']) && $context['list_mode'] == 'csv') {
                 if ($this->getOption('datetime') == 'd') {

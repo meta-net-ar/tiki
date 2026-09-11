@@ -167,4 +167,17 @@ class Tracker_Field_BarCode extends Tracker_Field_Text
         }
         return true;
     }
+
+    /**
+    * Return a plain text representation of the barcode
+    *
+    * @param array $context
+    * @return string
+    */
+    public function renderText($context = [])
+    {
+        $data = $this->getValueAndFormat($this->getValue());
+
+        return isset($data['value']) ? (string) $data['value'] : '';
+    }
 }

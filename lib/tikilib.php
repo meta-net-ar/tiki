@@ -147,6 +147,56 @@ class TikiLib extends TikiDb_Bridge
             : $encoded_value;
     }
 
+    /**
+     * Secure, HttpOnly and SameSite flags aligned with the PHP session cookie parameters.
+     * Shared by remember-me handling and auxiliary cookies such as the session validation cookie.
+     *
+     * @return array
+     */
+    public function getSetcookieSecurityAttributesFromSession()
+    {
+        $session_params = session_get_cookie_params();
+        $secure = ! empty($session_params['secure'])
+            || (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] === 'https');
+
+        $samesite = trim((string)($session_params['samesite'] ?? '')) ?: 'Lax';
+        if (strcasecmp($samesite, 'None') === 0) {
+            $samesite = 'None';
+            $secure = true;
+        } elseif (strcasecmp($samesite, 'Strict') === 0) {
+            $samesite = 'Strict';
+        } elseif (strcasecmp($samesite, 'Lax') === 0) {
+            $samesite = 'Lax';
+        }
+
+        $httponly = isset($session_params['httponly']) ? (bool)$session_params['httponly'] : true;
+
+        return [
+            'secure' => $secure,
+            'httponly' => $httponly,
+            'samesite' => $samesite,
+        ];
+    }
+
+    /**
+     * Set a cookie with explicit path and domain plus session-aligned Secure, HttpOnly and SameSite.
+     * Used for the extra session validation cookie in tiki-setup_base.
+     *
+     * @param int $expires Unix timestamp
+     */
+    public function setCookieWithSessionSecurityAttributes($name, $value, $expires, $path, $domain)
+    {
+        setcookie($name, $value, array_merge(
+            [
+                'expires' => $expires,
+                'path' => $path,
+                'domain' => $domain,
+            ],
+            $this->getSetcookieSecurityAttributesFromSession()
+        ));
+    }
+
     // DB param left for interface compatibility, although not considered
     /**
      * @param null $db
@@ -596,7 +646,7 @@ class TikiLib extends TikiDb_Bridge
                 $dbhost = $info['host'];
                 $database = $info['database'];
 
-                require TIKI_CONFIG_FILE_PATH;
+                require TikiInit::getCredentialsFile();
                 $dbsqlplugin = new PDO("$dbdriver:host=$dbhost;dbname=$database", $dbuserid, $dbpassword);
                 $connectionMap[$name] = new PdoDb($dbsqlplugin);
             }
@@ -916,6 +966,39 @@ class TikiLib extends TikiDb_Bridge
 
         return $this->table('tiki_user_watches')->fetchOne('user', ['watchId' => $id]);
     }
+
+    /**
+     * Generate an HMAC hash for a watch unsubscribe link.
+     *
+     * The hash binds the watchId to its owner so that only someone who
+     * received the original email notification can use the link.
+     *
+     * @param int    $watchId
+     * @param string $user  Owner of the watch
+     * @return string  Hex-encoded HMAC-SHA256
+     */
+    public function generateWatchUnsubscribeHash($watchId, $user)
+    {
+        $key = $this->get_site_hash();
+        return hash_hmac('sha256', $watchId . ':' . $user, $key);
+    }
+
+    /**
+     * Verify an HMAC hash for a watch unsubscribe link.
+     *
+     * @param int    $watchId
+     * @param string $hash   Hash received from the request
+     * @return bool  True if the hash is valid for this watchId
+     */
+    public function verifyWatchUnsubscribeHash($watchId, $hash)
+    {
+        $owner = $this->get_user_notification($watchId);
+        if (! $owner) {
+            return false;
+        }
+        $expected = $this->generateWatchUnsubscribeHash($watchId, $owner);
+        return hash_equals($expected, $hash);
+    }
     /*shared*/
     /**
      * @param $id
@@ -1118,7 +1201,7 @@ class TikiLib extends TikiDb_Bridge
     public function removeInlineSyntaxTags($text)
     {
         if (str_starts_with($text, '{syntax')) {
-            return preg_replace('/^\{syntax[^}]*}/i', '', $text);
+            return preg_replace('/^\{syntax[^}]*}\n?/i', '', $text);
         }
         return $text;
     }
@@ -1502,6 +1585,49 @@ class TikiLib extends TikiDb_Bridge
         return $this->table('tiki_score')->fetchFullRow(['event' => $event]);
     }
 
+    /**
+     * Build a query returning one row per user with their current score.
+     *
+     * @param int $scoreExpiryDays
+     * @return array
+     */
+    protected function getLatestUserScoresQuery($scoreExpiryDays = 0)
+    {
+        $params = [];
+
+        if (! empty($scoreExpiryDays)) {
+            $params[] = $scoreExpiryDays;
+            $query = "
+                SELECT `current_score`.`recipientObjectId`,
+                    `current_score`.`pointsBalance` - IFNULL(`expired_score`.`pointsBalance`, 0) AS `score`
+                FROM (
+                    SELECT `recipientObjectId`, MAX(`id`) AS `currentId`,
+                        MAX(CASE
+                            WHEN `date` < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY)) THEN `id`
+                        END) AS `expiredId`
+                    FROM `tiki_object_scores`
+                    WHERE `recipientObjectType` = 'user'
+                    GROUP BY `recipientObjectId`
+                ) `latest_score`
+                INNER JOIN `tiki_object_scores` `current_score`
+                    ON `current_score`.`id` = `latest_score`.`currentId`
+                LEFT JOIN `tiki_object_scores` `expired_score`
+                    ON `expired_score`.`id` = `latest_score`.`expiredId`";
+        } else {
+            $query = "
+                SELECT `current_score`.`recipientObjectId`, `current_score`.`pointsBalance` AS `score`
+                FROM `tiki_object_scores` `current_score`
+                INNER JOIN (
+                    SELECT `recipientObjectId`, MAX(`id`) AS `id`
+                    FROM `tiki_object_scores`
+                    WHERE `recipientObjectType` = 'user'
+                    GROUP BY `recipientObjectId`
+                ) `latest_score` ON `latest_score`.`id` = `current_score`.`id`";
+        }
+
+        return [$query, $params];
+    }
+
     // List users by best scoring
     // shared
     /**
@@ -1518,31 +1644,11 @@ class TikiLib extends TikiDb_Bridge
             $start = "0";
         }
 
-        if (empty($score_expiry_days)) {
-            // score does not expire
-            $query = "select `recipientObjectId` as `login`,
-                `pointsBalance` as `score`
-                from `tiki_object_scores` tos
-                where `recipientObjectType`='user'
-                and tos.`id` = (select max(id) from `tiki_object_scores` where `recipientObjectId` = tos.`recipientObjectId` and `recipientObjectType`='user' group by `recipientObjectId`)
-                group by `recipientObjectId`, `pointsBalance` order by `score` desc";
-
-            $result = $this->fetchAll($query, null, $limit, $start);
-        } else {
-            // score expires
-            $query = "select `recipientObjectId` as `login`,
-                `pointsBalance` - ifnull((select `pointsBalance` from `tiki_object_scores`
-                    where `recipientObjectId`=tos.`recipientObjectId`
-                    and `recipientObjectType`='user'
-                    and `date` < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL ? DAY))
-                    order by id desc limit 1), 0) as `score`
-                from `tiki_object_scores` tos
-                where `recipientObjectType`='user'
-                and tos.`id` = (select max(id) from `tiki_object_scores` where `recipientObjectId` = tos.`recipientObjectId` and `recipientObjectType`='user' group by `recipientObjectId`)
-                group by `recipientObjectId`, `pointsBalance` order by `score` desc";
-
-            $result = $this->fetchAll($query, $score_expiry_days, $limit, $start);
-        }
+        [$latestUserScoresQuery, $params] = $this->getLatestUserScoresQuery($score_expiry_days);
+        $query = "SELECT `recipientObjectId` AS `login`, `score`
+            FROM ({$latestUserScoresQuery}) `user_scores`
+            ORDER BY `score` DESC";
+        $result = $this->fetchAll($query, $params, $limit, $start);
 
         foreach ($result as & $res) {
             $res['position'] = ++$start;
@@ -1578,7 +1684,7 @@ class TikiLib extends TikiDb_Bridge
                 $star = "<img src='img/icons/$star' height='11' width='11' alt='$alt' />&nbsp;";
             } else {
                 $smarty = TikiLib::lib('smarty');
-                $star = smarty_function_icon(['name' => 'star', 'istyle' => 'color:' . $color, 'iclass' => 'tips',
+                $star = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'star', 'istyle' => 'color:' . $color, 'iclass' => 'tips',
                     'ititle' => ':' . $alt], $smarty->getEmptyInternalTemplate()) . "&nbsp;";
             }
         }
@@ -1646,6 +1752,9 @@ class TikiLib extends TikiDb_Bridge
         switch ($type) {
             case 'l':
                 if (str_starts_with($libname, 'dicebear')) {
+                    if ($prefs['user_dicebear_avatar'] !== 'y') {
+                        return '';
+                    }
                     $seed = $res['avatarName'];
                     if ($seed === 'admin') {
                         return '<i class="fa fa-user-tie fa-2xl admin-icon" title="' . tra("Administrator") . '"></i>';
@@ -3122,8 +3231,8 @@ class TikiLib extends TikiDb_Bridge
                     $objectLink = ! empty($sheet['title']) ? '[' . $uri . '|' . $sheet['title'] . ']' : '';
                     break;
                 case str_starts_with($slug, 'survey'):
-                    include_once('lib/surveys/surveylib.php');
                     $surveyId = substr($slug, 6);
+                    $srvlib = TikiLib::lib('survey');
                     $survey = $srvlib->get_survey($surveyId);
                     $objectLink = ! empty($survey['name']) ? '[' . $uri . '|' . $survey['name'] . ']' : '';
                     break;
@@ -3623,8 +3732,9 @@ class TikiLib extends TikiDb_Bridge
         }
         //  Deal with mail notifications.
         include_once(__DIR__ . '/notifications/notificationemaillib.php');
-        $foo = parse_url($_SERVER["REQUEST_URI"]);
-        $machine = self::httpPrefix(true) . dirname($foo["path"]);
+        $requestUri = $_SERVER["REQUEST_URI"] ?? '';
+        $foo = parse_url($requestUri);
+        $machine = self::httpPrefix(true) . dirname($foo["path"] ?? '/');
         sendWikiEmailNotification('wiki_page_deleted', $page, $user, $comment, 1, $page_info['data'], $machine);
 
         //Remove the bibliography references for this page
@@ -4517,14 +4627,20 @@ class TikiLib extends TikiDb_Bridge
             return false;
         }
 
+        if ($definition && $definition['in_conflict']) {
+            return false;
+        }
+
         $preferences = $this->table('tiki_preferences');
         $preferences->insertOrUpdate(['value' => is_array($value) ? serialize($value) : $value], ['name' => $name]);
 
         if (isset($prefs)) {
+            // PHP 8.5 deprecates null as an array offset; normalize to ''.
+            $userKey = $user ?? '';
             if (isset($user_overrider_prefs) && in_array($name, $user_overrider_prefs)) {
                 $prefs['site_' . $name] = $value;
-            } elseif (isset($user_preferences[$user][$name])) {
-                $prefs[$name] = $user_preferences[$user][$name];
+            } elseif (isset($user_preferences[$userKey][$name])) {
+                $prefs[$name] = $user_preferences[$userKey][$name];
             } else {
                 $prefs[$name] = $value;
             }
@@ -5562,8 +5678,9 @@ class TikiLib extends TikiDb_Bridge
                 include_once(__DIR__ . '/notifications/notificationemaillib.php');
                 $histlib = TikiLib::lib('hist');
                 $old = $histlib->get_version($pageName, $old_version);
-                $foo = parse_url($_SERVER["REQUEST_URI"]);
-                $machine = self::httpPrefix(true) . dirname($foo["path"]);
+                $requestUri = $_SERVER["REQUEST_URI"] ?? '';
+                $foo = parse_url($requestUri);
+                $machine = self::httpPrefix(true) . dirname($foo["path"] ?? '/');
 
                 $oldPagePlugins = WikiParser_PluginMatcher::match($old["data"]);
                 $editedPagePlugins = WikiParser_PluginMatcher::match($edit_data);
@@ -6483,15 +6600,7 @@ class TikiLib extends TikiDb_Bridge
             return $data;
         }
 
-        $flags = [];
-        $h = opendir("img/flags/");
-        while ($file = readdir($h)) {
-            if (str_contains($file, ".png")) {
-                $parts = explode('.', $file);
-                $flags[] = $parts[0];
-            }
-        }
-        closedir($h);
+        $flags = \Tiki\CountryFlagHelper::getCountries();
         if ($langsort) {
             foreach ($flags as $flagname => $flagtra) {
                 unset($flags[$flagname]);
@@ -6556,7 +6665,13 @@ class TikiLib extends TikiDb_Bridge
         $defaultOptions = ['indexing' => false, 'is_html' => false];
         $options = array_merge($defaultOptions, $options);
 
-        if ($prefs['search_parsed_snippet'] == 'y') {
+        // Parsing multi-MB indexed contents through PluginMatcher to keep ~240
+        // characters exceeds max_execution_time (seen on tiki.org). Skip wiki parse
+        // when the source is larger than a normal snippet needs.
+        $snippetParseLimit = 32768;
+        $skipParse = is_string($data) && mb_strlen($data) > $snippetParseLimit;
+
+        if ($prefs['search_parsed_snippet'] == 'y' && ! $skipParse) {
             $data = preg_replace('/{(:?make)?toc[^}]*}/', '', $data);
 
             $_REQUEST['redirectpage'] = 'y'; //do not interpret redirect
@@ -7192,7 +7307,7 @@ class TikiLib extends TikiDb_Bridge
 
             $url = [];
             foreach ($conflictPages as $pageName) {
-                $url[] = sprintf('<a href="%s">%s</a>', smarty_modifier_sefurl($pageName, 'wiki'), $pageName);
+                $url[] = sprintf('<a href="%s">%s</a>', \SmartyTiki\Modifier\Sefurl::apply($pageName, 'wiki'), $pageName);
             }
 
             $errors[] = tr('Alias <b>%0</b> link already present in %1 page(s)', $pointedPage, implode(', ', $url));
@@ -7485,14 +7600,29 @@ function detect_browser_language()
     $available_aprox = [];
 
     if (is_dir("lang")) {
-        $dh = opendir("lang");
-        while ($lang = readdir($dh)) {
-            if (! str_contains($lang, '.') and is_dir("lang/$lang") and file_exists("lang/$lang/language.php") and ($prefs['restrict_language'] === 'n' || empty($prefs['available_languages']) || in_array($lang, $prefs['available_languages']))) {
-                $available[strtolower($lang)] = $lang;
-                $available_aprox[substr(strtolower($lang), 0, 2)] = $lang;
+        $iterator = new FilesystemIterator("lang", FilesystemIterator::SKIP_DOTS);
+        foreach ($iterator as $fileInfo) {
+            if (! $fileInfo->isDir()) {
+                continue;
+            }
+            $lang = $fileInfo->getFilename();
+
+            if (! file_exists($fileInfo->getPathname() . '/language.php')) {
+                continue;
+            }
+
+            if (
+                $prefs['restrict_language'] === 'n' ||
+                empty($prefs['available_languages']) ||
+                in_array($lang, $prefs['available_languages'])
+            ) {
+                $langLower = strtolower($lang);
+                $available[$langLower] = $lang;
+                $available_aprox[substr($langLower, 0, 2)] = $lang;
             }
         }
     }
+
 
     // Check better language
     // Priority has been changed in 2.0 to that defined in RFC 4647

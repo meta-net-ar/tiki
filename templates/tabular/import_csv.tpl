@@ -51,9 +51,9 @@
                 <div class="form-group">
                     <label for="separator">{tr}Select separator:{/tr}</label>
                     <select name="separator" class="form-select" aria-label="CSV File delimiter">
-                        <option value=",">{tr}Comma{/tr}(,)</option>
+                        <option value="," selected>{tr}Comma{/tr}(,)</option>
                         <option value=";">{tr}Semicolon{/tr}(;)</option>
-                        <option value="\t">{tr}Tab{/tr}(\t)</option>
+                        <option value="tab">{tr}Tab{/tr}(\t)</option>
                     </select>
                 </div>
             {/if}     

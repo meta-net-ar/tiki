@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty modifier plugin to convert a string suitable for a URL using the current SEFURL slug settings wiki_url_scheme
  *
@@ -26,8 +28,13 @@ namespace SmartyTiki\Modifier;
  *
  * @throws \Smarty\Exception
  */
-class Slug
+class Slug implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'slug';
+    }
+
     public function handle($string, $maxLength = 70, $mixedCase = false, $breakWords = false)
     {
         global $prefs;
@@ -39,7 +46,7 @@ class Slug
                 $maxLength = $offset;
             }
         }
-        $string = substr(smarty_modifier_nonp($string), 0, $maxLength);
+        $string = substr(\SmartyTiki\Modifier\Nonp::apply($string), 0, $maxLength);
         if (! $mixedCase) {
             $string = mb_strtolower($string);
         }

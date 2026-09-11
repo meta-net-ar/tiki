@@ -35,32 +35,77 @@ if (empty($_REQUEST['user']) || ! $userlib->user_exists($_REQUEST['user'])) {
     Feedback::errorAndDie(tra('Invalid username'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
+if (! isset($_REQUEST['change']) && ! empty($_REQUEST['actpass']) && ! $userlib->isValidActivationCode($_REQUEST['user'], $_REQUEST['actpass'])) {
+    $smarty->assign('msg', tra('Invalid username or activation code. Maybe this code has already been used.'));
+    $smarty->assign('errortype', 'no_redirect_login');
+    $smarty->display('error.tpl');
+    die;
+}
+
 if (! isset($_REQUEST["oldpass"])) {
     $_REQUEST["oldpass"] = '';
 }
 
 $user = $_REQUEST["user"];
 $secure_token = $_REQUEST["token"] ?? '';
+$bruteForceProperties = function () use ($tikilib) {
+    return ['ip' => $tikilib->get_ip_address()];
+};
 
-if (isset($_REQUEST["newuser"]) && $_REQUEST["newuser"] == 'y') {
+$pass_confirm = $userlib->getOne('select `pass_confirm` from `users_users` where binary `login`=?', [$user]);
+$must_change_password = ($pass_confirm === 0 || $pass_confirm === null);
+
+/**
+ * New-user password setup is only allowed after a server-side validation step
+ * (email/admin validation) that stored a session marker for this exact user.
+ * Never trust client-supplied new_user_validation / newuser alone.
+ */
+$getPendingNewUserPasswordUser = static function (): ?string {
+    $pending = $_SESSION['pending_new_user_password']['user'] ?? null;
+    if (is_string($pending) && $pending !== '') {
+        return $pending;
+    }
+    $fromValidation = $_SESSION['last_validation']['user'] ?? null;
+    if (is_string($fromValidation) && $fromValidation !== '') {
+        return $fromValidation;
+    }
+    return null;
+};
+
+$pending_new_user = $getPendingNewUserPasswordUser();
+$server_new_user_validation = $must_change_password
+    && $pending_new_user !== null
+    && hash_equals($pending_new_user, (string) $user);
+
+if ($server_new_user_validation) {
+    $smarty->assign('new_user_validation', 'y');
+} elseif (isset($_REQUEST["newuser"]) && $_REQUEST["newuser"] == 'y' && $must_change_password) {
     $smarty->assign('new_user_validation', 'y');
 }
 
 $smarty->assign('userlogin', $_REQUEST["user"]);
-$smarty->assign('oldpass', $_REQUEST["oldpass"]);
+if (
+    empty($_REQUEST['oldpass'])
+    && $server_new_user_validation
+    && ! empty($_SESSION['last_validation']['pass'])
+) {
+    $smarty->assign('oldpass', $_SESSION['last_validation']['pass']);
+} else {
+    $smarty->assign('oldpass', $_REQUEST["oldpass"]);
+}
 $smarty->assign('secure_token', $secure_token);
 
-if (isset($_REQUEST["change"])) {
-    $access->checkCsrf();
+if (isset($_REQUEST["change"]) && $access->checkCsrf()) {
+    $changePasswordProperties = $bruteForceProperties();
     if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
-        if (! $bruteForce->isOperationAllowed('change_password', ['ip' => $tikilib->get_ip_address()])) {
-            $nextAllowedTime = $bruteForce->getNextAllowedTime('change_password', ['ip' => $tikilib->get_ip_address()]);
-            $waitTime = $nextAllowedTime - time();
+        if (! $bruteForce->isOperationAllowed('change_password', $changePasswordProperties)) {
+            $waitTime = $bruteForce->getWaitTime('change_password', $changePasswordProperties);
             if ($waitTime > 60) {
                 $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
             } else {
                 $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d seconds.'), $waitTime);
             }
+            http_response_code(429);
             $smarty->assign('msg', $waitMessage);
             $smarty->display('error.tpl');
             die;
@@ -71,9 +116,6 @@ if (isset($_REQUEST["change"])) {
     $is_authenticated = false;
     $authenticated_oldpass = null;
     $can_change_password = false;
-    $is_new_user_validation = isset($_REQUEST["new_user_validation"]) && $_REQUEST["new_user_validation"] === 'y';
-    $pass_confirm = $userlib->getOne('select `pass_confirm` from `users_users` where binary `login`=?', [$user]);
-    $must_change_password = ($pass_confirm === 0 || $pass_confirm === null);
 
     // Method 1: Activation code
     if (! empty($_REQUEST['actpass'])) {
@@ -108,11 +150,16 @@ if (isset($_REQUEST["change"])) {
             $is_authenticated = true;
             $can_change_password = true;
             $authenticated_oldpass = $_REQUEST['oldpass'];
+        } elseif ($server_new_user_validation) {
+            // After email validation, provpass may be present in the form but not yet a login hash
+            $is_authenticated = true;
+            $can_change_password = true;
         } else {
             Feedback::error(tra("Invalid old password"));
         }
-    } elseif ($is_new_user_validation) {
-        // Method 4: New user validation (no authentication required - legitimate exception)
+    } elseif ($server_new_user_validation) {
+        // Method 4: New user validation — session-bound after real account validation only
+        $is_authenticated = true;
         $can_change_password = true;
     } elseif ($must_change_password) {
         // Method 5: User must change password - old password is required
@@ -160,9 +207,23 @@ if (isset($_REQUEST["change"])) {
             if ($res && $prefs['pass_history_management'] === 'y') {
                 $userlib->addPasswordHistory($user, $_REQUEST["pass"]);
             }
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                $bruteForce->success('change_password', $changePasswordProperties);
+            }
+
+            // One-time marker: do not allow reuse of the validation session for another change
+            unset($_SESSION['pending_new_user_password'], $_SESSION['last_validation']);
+            if ($res) {
+                // Invalidate remember-me cookies after password change
+                $userInfo = $userlib->get_user_info($user);
+                if (! empty($userInfo['userId'])) {
+                    $userlib->delete_user_cookie((int)$userInfo['userId']);
+                }
+                $userlib->clearRememberMeCookieForSite();
+            }
 
             // Mark reset token as used only after successful password change
-            if (! empty($secure_token) && ! $is_new_user_validation && ! $must_change_password) {
+            if (! empty($secure_token) && ! $server_new_user_validation && ! $must_change_password) {
                 $passwordResetLib = new \Tiki\Lib\Auth\PasswordResetLib();
                 $passwordResetLib->markPasswordResetTokenUsed($user, $secure_token);
             }
@@ -187,7 +248,7 @@ if (isset($_REQUEST["change"])) {
             $wizardlib->onLogin($user, $homePageUrl, $force);
             $accesslib = TikiLib::lib('access');
             if (! empty($prefs['url_after_validation']) && ! empty($_REQUEST['new_user_validation'])) {
-                $access->redirect($prefs['url_after_validation']);
+                $access->redirect($prefs['url_after_validation'], allowExternal: true);
             } else {
                 $accesslib->redirect($homePageUrl);
             }

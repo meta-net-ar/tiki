@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once(__DIR__ . '/../../wiki-plugins/wikiplugin_translationof.php');
-require_once(__DIR__ . '/../../test/TestHelpers.php');
 
 class WikiPlugin_TranslationOfTest extends TikiTestCase
 {
@@ -15,8 +13,10 @@ class WikiPlugin_TranslationOfTest extends TikiTestCase
 
     protected function setUp(): void
     {
-        global $user, $prefs;
+        global $user, $prefs, $testhelpers;
         $this->orig_user = $user;
+
+        $testhelpers = new TestHelpers();
 
         $prefs['site_language'] = 'en';
 

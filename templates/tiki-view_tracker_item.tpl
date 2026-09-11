@@ -106,7 +106,7 @@
                     {/if}
                     {if $prefs.user_favorites eq 'y' and isset($itemId)}
                         <li class="dropdown-item">
-                            {favorite button_classes="favorite-icon" label="{tr}Favorite{/tr}"  type="trackeritem" object=$itemId }
+                            {favorite button_classes="favorite-icon" label="{tr}Favorite{/tr}"  type="trackeritem" object=$itemId}
                         </li>
                     {/if}
                 </ul>
@@ -198,13 +198,6 @@
                     $(document).on("ajaxComplete", function(){$(id).tiki_popover();});
                 {/jq}
 
-            {/tab}
-        {/if}
-
-        {* ---------------------------------------- tab with attachments --- *}
-        {if $tracker_info.useAttachments eq 'y' and $tiki_p_tracker_view_attachments eq 'y'}
-            {tab name="{tr}Attachments{/tr} (`$attCount`)" print=n}
-                {include file='attachments_tracker.tpl'}
             {/tab}
         {/if}
 

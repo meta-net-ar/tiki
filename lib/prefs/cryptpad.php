@@ -7,11 +7,13 @@
 
 function prefs_cryptpad_list($partial = false)
 {
+    $cryptpadHelp = 'CryptPad';
+
     return [
         'cryptpad_feature' => [
             'name' => tra('CryptPad Office Documents'),
             'description' => tra('CryptPad enables viewing and editing Microsoft Office and OpenDocument Format files (.docx, .xlsx, .pptx, .odt, .ods, .odp)'),
-            'help' => 'CryptPad',
+            'help' => $cryptpadHelp,
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => [
@@ -23,6 +25,7 @@ function prefs_cryptpad_list($partial = false)
             'name' => tra('CryptPad base URL'),
             'description' => tra('Base URL of your CryptPad instance (e.g., https://cryptpad.example.org). Required for embedding the editor.'),
             'type' => 'text',
+            'help' => $cryptpadHelp,
             'size' => '60',
             'filter' => 'url',
             'default' => '',

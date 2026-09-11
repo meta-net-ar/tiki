@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 //copy this file to lib/smarty_tiki
 //create a new module and put the following
@@ -16,8 +17,13 @@ use Smarty\Template;
 //id for structure id, or page_ref_id
 //detail if you only wanna display subbranches of the open node within the structure
 // assign your moduleß
-class WikiStructure extends Base
+class WikiStructure extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'wikistructure';
+    }
+
     public function handle($params, Template $template)
     {
         include_once('lib/wiki-plugins/wikiplugin_toc.php');

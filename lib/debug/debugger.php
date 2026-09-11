@@ -45,16 +45,17 @@ class Debugger extends ResultType
     {
         $files = [];
         if (is_dir(DBG_PLUGINS_DIR)) {
-            if ($dh = opendir(DBG_PLUGINS_DIR)) {
-                while (($file = readdir($dh)) !== false) {
-                    if (preg_match("/^debug-command_.*\.php$/", $file)) {
-                        array_push($files, $file);
-                    }
+            $iterator = new FilesystemIterator(DBG_PLUGINS_DIR, FilesystemIterator::SKIP_DOTS);
+
+            foreach ($iterator as $fileInfo) {
+                $filename = $fileInfo->getFilename();
+                if (str_starts_with($filename, 'debug-command_') && str_ends_with($filename, '.php')) {
+                    $files[] = $filename;
                 }
-                closedir($dh);
             }
         }
-      // Refresh object in commands array
+
+        // Refresh object in commands array
         $this->commands = [];
         foreach ($files as $file) {
             include_once(DBG_PLUGINS_DIR . '/' . $file);

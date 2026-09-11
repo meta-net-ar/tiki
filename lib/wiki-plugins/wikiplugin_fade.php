@@ -18,6 +18,40 @@ function wikiplugin_fade_info()
         'introduced' => 3,
         'tags' => [ 'basic' ],
         'params' => [
+            'summary' => [
+                'required' => false,
+                'name' => tra('Summary'),
+                'filter' => 'wikicontent',
+                'description' => tra('Optional visible summary that stays shown above the collapsible details (Wiki syntax). It is displayed under the label as a subtitle; if no label is set, it becomes the heading of the block.'),
+                'default' => '',
+                'since' => '30.2',
+            ],
+            'expanded' => [
+                'required' => false,
+                'name' => tra('Expanded'),
+                'filter' => 'alpha',
+                'description' => tra('Start with details shown (y) or hidden (n). If not set, the site preference for the Fade plugin applies.'),
+                'default' => '',
+                'since' => '30.2',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+            ],
+            'fade_group' => [
+                'required' => false,
+                'name' => tra('Fade Group'),
+                'filter' => 'text',
+                'description' => tr(
+                    'Optional group name (letters, digits, underscore and hyphen) to be used with PluginButton params
+                    such as %0_fade_group%1 and %0_fade_action%1.',
+                    '<code>',
+                    '</code>'
+                ),
+                'default' => '',
+                'since' => '30.2',
+            ],
             'label' => [
                 'required' => true,
                 'name' => tra('Label'),
@@ -98,90 +132,174 @@ function wikiplugin_fade($body, $params)
 {
     static $id = 0;
 
-    //validate speed parameters
     $params['show_speed'] = validate_speed($params['show_speed']);
     $params['hide_speed'] = validate_speed($params['hide_speed']);
 
     $unique = 'wpfade-' . ++$id;
     $unique_link = $unique . '-link';
 
-    if ($params['icon'] == 'y') {
-        $span_class = 'wpfade-span-icon';
-        $a_class_hidden = '\'wpfade-hidden\'';
-        $a_class_shown = '\'wpfade-shown\'';
-        $div_class = 'wpfade-div-icon';
-    } else {
-        $span_class = 'wpfade-span-plain';
-        $a_class_hidden = '';
-        $a_class_shown = '';
-        $div_class = 'wpfade-div-plain';
-    }
+    $headerlib = TikiLib::lib('header');
+    $headerlib->add_js_module('import "@tiki/plugins/fade";');
 
-      // We specify format html, so parse the contained wiki text
     $body = trim($body);
     $body = TikiLib::lib('parser')->parse_data($body);
 
-    // Both variants will need $headerlib
-    $headerlib = TikiLib::lib('header');
+    $groupNorm = wikiplugin_fade_normalize_group($params['fade_group'] ?? '');
+    $isExpanded = wikiplugin_fade_resolve_expanded($params);
 
-    if ($params['bootstrap'] == 'y') {
+    $summaryRaw = trim((string) ($params['summary'] ?? ''));
+    $hasSummary = $summaryRaw !== '';
+    $summaryHtml = '';
+    if ($hasSummary) {
+        $summaryHtml = TikiLib::lib('parser')->parse_data($summaryRaw);
+    }
+    $dataAttrs = wikiplugin_fade_format_data_attrs($unique, $groupNorm, $params);
+    $useBootstrap = ($params['bootstrap'] ?? 'n') === 'y';
+
+    $defaultLabel = tra('Unspecified label');
+    $userLabelRaw = (string) ($params['label'] ?? '');
+    $userSetCustomLabel = trim($userLabelRaw) !== '' && $userLabelRaw !== $defaultLabel;
+    $toggleEsc = htmlspecialchars((string) $params['label'], ENT_QUOTES, 'UTF-8');
+    $fadeSummaryAriaLabel = htmlspecialchars(tra('Show or hide details'), ENT_QUOTES, 'UTF-8');
+    $fadeSummaryAriaAttr = $hasSummary ? ' aria-label="' . $fadeSummaryAriaLabel . '"' : '';
+
+    if ($params['icon'] == 'y') {
+        $span_class = 'wpfade-span-icon';
+        $div_class = 'wpfade-div-icon';
+    } else {
+        $span_class = 'wpfade-span-plain';
+        $div_class = 'wpfade-div-plain';
+    }
+
+    $ae = $isExpanded ? 'true' : 'false';
+
+    if ($useBootstrap) {
         $unique_outer = $unique . '-outer';
         $unique_inner = $unique . '-inner';
+        $collapseClass = 'collapse' . ($isExpanded ? ' show' : '');
 
-      // The java script is used to toggle the chevron icon from down to up.
-      //
-      // It is based on the suggestion by zessz here
-      // http://stackoverflow.com/a/18337268/1626109
-      // and the working example here
-      // http://jsfiddle.net/zessx/R6EAW/12/
-      //
-      // It might not be necessary to go back to the 'card-header' before
-      // going forward to the icon.
+        // icon unset keeps the historical right-hand chevron, icon=y switches to the left arrow
+        // used by the legacy mode, icon=n removes it altogether.
+        $iconParam = (string) ($params['icon'] ?? '');
+        $showLeftArrow = $iconParam === 'y';
+        $showChevron = $iconParam === '';
 
-        $jq = "function toggleChevron(e) 
-             {
-               $(e.target)
-                  .prev('.card-header')
-                  .find('span.icon')
-                  .toggleClass('fa-chevron-down fa-chevron-up');
-             }
-             $('#" . $unique_outer . "').on('hide.bs.collapse', toggleChevron);
-             $('#" . $unique_outer . "').on('show.bs.collapse', toggleChevron);" ;
+        $wrapperClass = 'wikiplugin-fade card ' . trim($params['class'] ?? '');
+        if ($showLeftArrow) {
+            $wrapperClass .= ' wikiplugin-fade--icon';
+        }
+        if ($hasSummary) {
+            $wrapperClass .= ' wikiplugin-fade--summary';
+            if ($userSetCustomLabel) {
+                $wrapperClass .= ' wikiplugin-fade--summary-labeled';
+            }
+        }
+        if ($isExpanded) {
+            $wrapperClass .= ' wikiplugin-fade--initial-open';
+        }
+        $wrapperClass = trim($wrapperClass);
 
-        $headerlib->add_jq_onready($jq);
+        if ($hasSummary && $userSetCustomLabel) {
+            $headerInner = '<div class="wikiplugin-fade__summary-stack flex-grow-1 min-w-0">'
+                . '<div class="wikiplugin-fade__label-text">' . $toggleEsc . '</div>'
+                . '<div class="wikiplugin-fade__summary-text small text-muted">' . $summaryHtml . '</div>'
+                . '</div>';
+        } elseif ($hasSummary) {
+            $headerInner = '<div class="wikiplugin-fade__summary-text flex-grow-1 me-2">' . $summaryHtml . '</div>';
+        } else {
+            $headerInner = '<span class="flex-grow-1 me-2">' . $toggleEsc . '</span>';
+        }
 
-        return "<div id='" . $unique_outer . "' class='card " . ($params['class']) . "'>"
-                . "<div class='card-header'>"
-                  . "<a data-bs-toggle='collapse' class='d-block' href='#" . $unique_inner . "'>" . htmlspecialchars($params['label']) . "<span class='icon icon-menu-extra fas fa-chevron-down fa-fw' style='float:right'></span>" . "</a>"
-                . "</div>"
-                . "<div id='" . $unique_inner . "' class='panel-collapse collapse'>"
-                  . "<div class='card-body'>" . $body . "</div>"
-                . "</div>"
-              . "</div>" ;
-    } else {
-        $jq = '
-                $(function() {
-                    $(\'#' . $unique_link . '\').on("click", 
-                        function() {
-                            if ( $(\'#' . $unique . '\').is(":hidden") ) {
-                                $(\'#' . $unique . '\').show(\'blind\', {}, \'' . $params['show_speed'] . '\');
-                                $(\'#' . $unique_link . '\').addClass(' . $a_class_shown . ').removeClass(' . $a_class_hidden . ');
-                            } else {
-                                $(\'#' . $unique . '\').hide(\'blind\', {}, \'' . $params['hide_speed'] . '\');
-                                $(\'#' . $unique_link . '\').addClass(' . $a_class_hidden . ').removeClass(' . $a_class_shown . ');
-                            }
-                        }
-                    );
-                    return false;
-                });';
-        $headerlib->add_jq_onready($jq);
-    //wrapping in an extra div makes animation smoother
-        return (($params['class']) ? "<div class='" . $params['class'] . "'>" : "<div>" )
-            . "\r\t" . '<span class="' . $span_class . '">' . "\r\t\t"
-        . '<a id="' . $unique_link . '" class=' . $a_class_hidden . '>' . "\r\t\t\t" . htmlspecialchars($params['label']) . "\r\t\t"
-        . '</a>' . "\r\t" . '</span>' . "\r\t" . '<div id="' . $unique . '" class="' . $div_class . '">' . "\r\t\t\t"
-        . $body . "\r\t" . '</div>' . "\r" . '</div>' . "\r";
+        if ($showChevron) {
+            $headerInner .= '<span class="wikiplugin-fade__chevron icon fas fa-chevron-down fa-fw" aria-hidden="true"></span>';
+        }
+
+        return '<div id="' . htmlspecialchars($unique_outer, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($wrapperClass, ENT_QUOTES, 'UTF-8') . '"'
+            . $dataAttrs
+            . '><div class="card-header wikiplugin-fade__header p-0">'
+                . '<a data-bs-toggle="collapse" class="d-flex align-items-start w-100 text-decoration-none text-body px-3 py-2" role="button" href="#' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '" aria-expanded="' . $ae . '" aria-controls="' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '"' . $fadeSummaryAriaAttr . '>'
+                . $headerInner
+                . '</a>'
+            . '</div>'
+                . '<div id="' . htmlspecialchars($unique_inner, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($collapseClass, ENT_QUOTES, 'UTF-8') . '">'
+                  . '<div class="card-body">' . $body . '</div>'
+                . '</div>'
+              . '</div>';
     }
+
+    $outerClass = 'wikiplugin-fade';
+    if ($hasSummary) {
+        $outerClass .= ' wikiplugin-fade--summary';
+        if ($userSetCustomLabel) {
+            $outerClass .= ' wikiplugin-fade--summary-labeled';
+        }
+    }
+    if ($isExpanded) {
+        $outerClass .= ' wikiplugin-fade--initial-open';
+    }
+    if (trim($params['class'] ?? '') !== '') {
+        $outerClass .= ' ' . trim($params['class']);
+    }
+
+    $linkClasses = 'wpfade-legacy-toggle';
+    if ($params['icon'] == 'y') {
+        $linkClasses .= $isExpanded ? ' wpfade-shown' : ' wpfade-hidden';
+    }
+
+    if ($hasSummary && $userSetCustomLabel) {
+        $legacyLinkInner = '<span class="wikiplugin-fade__summary-stack">'
+            . '<span class="wikiplugin-fade__label-text d-block">' . $toggleEsc . '</span>'
+            . '<span class="wikiplugin-fade__summary-text small text-muted d-block">' . $summaryHtml . '</span>'
+            . '</span>';
+    } elseif ($hasSummary) {
+        $legacyLinkInner = '<span class="wikiplugin-fade__summary-text d-block">' . $summaryHtml . '</span>';
+    } else {
+        $legacyLinkInner = $toggleEsc;
+    }
+
+    return '<div class="' . htmlspecialchars($outerClass, ENT_QUOTES, 'UTF-8') . '"' . $dataAttrs . '>'
+        . '<span class="' . htmlspecialchars($span_class, ENT_QUOTES, 'UTF-8') . ' wikiplugin-fade__legacy-header">' . "\r\t\t"
+        . '<a id="' . htmlspecialchars($unique_link, ENT_QUOTES, 'UTF-8') . '" href="#" class="' . htmlspecialchars($linkClasses, ENT_QUOTES, 'UTF-8') . '" aria-expanded="' . $ae . '"' . $fadeSummaryAriaAttr . '>' . "\r\t\t\t"
+        . $legacyLinkInner . "\r\t\t" . '</a>' . "\r\t" . '</span>' . "\r\t"
+        . '<div id="' . htmlspecialchars($unique, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($div_class, ENT_QUOTES, 'UTF-8') . '">' . "\r\t\t\t"
+        . $body . "\r\t" . '</div>' . "\r" . '</div>' . "\r";
+}
+
+function wikiplugin_fade_normalize_group($group)
+{
+    $group = trim((string) $group);
+    if ($group === '') {
+        return '';
+    }
+    $group = preg_replace('/[^a-zA-Z0-9_-]+/', '', $group);
+
+    return substr($group, 0, 120);
+}
+
+function wikiplugin_fade_resolve_expanded(array $params)
+{
+    global $prefs;
+    $ex = trim((string) ($params['expanded'] ?? ''));
+    if ($ex === 'y') {
+        return true;
+    }
+    if ($ex === 'n') {
+        return false;
+    }
+
+    return ! empty($prefs['wikiplugin_fade_default_expanded']) && $prefs['wikiplugin_fade_default_expanded'] === 'y';
+}
+
+function wikiplugin_fade_format_data_attrs($fadeId, $group, array $params)
+{
+    $out = ' data-fade-id="' . htmlspecialchars($fadeId, ENT_QUOTES, 'UTF-8') . '"';
+    if ($group !== '') {
+        $out .= ' data-fade-group="' . htmlspecialchars($group, ENT_QUOTES, 'UTF-8') . '"';
+    }
+    $out .= ' data-fade-show-speed="' . htmlspecialchars((string) $params['show_speed'], ENT_QUOTES, 'UTF-8') . '"';
+    $out .= ' data-fade-hide-speed="' . htmlspecialchars((string) $params['hide_speed'], ENT_QUOTES, 'UTF-8') . '"';
+
+    return $out;
 }
 
 function validate_speed($speed_param)

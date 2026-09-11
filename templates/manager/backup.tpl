@@ -25,8 +25,8 @@
                     <div class="row">
                     {foreach item=type from=$inputValues['backup_process']}
                         <div class="col-sm-3">
-                            <input type="radio" class="form-check-input" id="backup_process" name="backup_process" value="{$type|escape}" {if  $type eq 'full backup'}checked{/if}>
-                            <label class="form-check-label" for="backup_process">{$type|upper}</label>
+                            <input type="radio" class="form-check-input" id="backup_process_{$type|lower|replace:' ':'_'}" name="backup_process" value="{$type|escape}" {if $type eq 'full backup'}checked{/if}>
+                            <label class="form-check-label" for="backup_process_{$type|lower|replace:' ':'_'}">{$type|upper}</label>
                         </div>
                     {/foreach}
                     </div>

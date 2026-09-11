@@ -77,7 +77,6 @@ body.tiki-admin {
     background: var(--tiki-admin-top-nav-bg);
     border: var(--tiki-admin-top-border); // Style and color, for example, solid black
     border-width: var(--tiki-admin-top-border-width); // For example, 1px, or 0px 0px 4px 0px
-    box-shadow: var(--tiki-admin-top-box-shadow);
 }
 
 // Top links
@@ -162,8 +161,16 @@ body.tiki-admin {
     z-index: 1050;
 }
 
+/* Add some padding so the module on the left/right-most end is not "glued" to the edge of the viewport */
+.layout_admin #page-header .top_modules {
+    padding-right: calc(var(--bs-gutter-x) * 0.5);
+    padding-left: calc(var(--bs-gutter-x) * 0.5);
+}
+
 .tiki-admin .top_modules {
     justify-content: flex-end !important;
+    position: sticky;
+    top: 0;
 }
 
 .tiki-admin aside.admin-nav .navbar-light,
@@ -787,14 +794,14 @@ body.sidebar_collapsed .admin-menu-collapser .expand-text {
     }
 }
 
-body.tiki-admin .container.container-std {
+body.tiki-admin .container-std {
     overflow: visible !important;
 }
 
 // Fix: Properly position container to account for fixed sidebar
 // When sidebar is expanded, shift the container to center content in the remaining space
 @media (min-width: 993px) {
-    body.tiki-admin.uab:not(.sidebar_collapsed) .container.container-std {
+    body.tiki-admin.uab:not(.sidebar_collapsed) .container-std {
         margin-left: var(--tiki-admin-offcanvas-width, 300px);
         max-width: calc(100% - var(--tiki-admin-offcanvas-width, 300px));
         padding-left: 2rem;
@@ -1226,7 +1233,6 @@ body.tiki-admin .container.container-std {
     background-size: 2rem;
     color: transparent !important;
     text-shadow: none;
-    margin: .5rem .5rem 0 1rem !important;
     height: 2.1rem;
     background-position: right;
     width: 2rem;

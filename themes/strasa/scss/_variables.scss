@@ -33,6 +33,7 @@ $theme-colors: (
 :root {
     --tiki-strasa-darkblue-bg: linear-gradient(to bottom, #214d68 0%, #204c67 51%, #262f36 100%);
     --tiki-strasa-lightblue-bg: linear-gradient(to bottom, #2498c7 0%, #047aa8 4%, #1b98c6 39%, #32b5e1 65%, #32bbe9 70%, #44d1fe 100%);
+    --tiki-strasa-lightblue-bg-inverted: linear-gradient(to bottom, #44d1fe 0%, #32bbe9 4%, #32b5e1 39%, #1b98c6 65%, #047aa8 100%);
 }
 
 // Options

@@ -333,7 +333,7 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
     }
 
     if (! $isprefixed && ! empty($prefs['url_anonymous_page_not_found']) && empty($user)) {
-        $access->redirect($prefs['url_anonymous_page_not_found']);
+        $access->redirect($prefs['url_anonymous_page_not_found'], allowExternal: true);
     }
 
     if ($user && $prefs['feature_wiki_userpage'] == 'y' && strcasecmp($prefs['feature_wiki_userpage_prefix'], $page) == 0) {
@@ -392,6 +392,8 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
                     $_REQUEST['page'] = $newPage;
                     $_GET['itemId'] = $suffix;  // \ParserLib::parse_wiki_argvariable uses $_GET
                     $_GET['page'] = $newPage;
+                    $jitGet = new JitFilter($_GET);
+                    $jitRequest = new JitFilter($_REQUEST);
                     $smarty->assign('canonical_ending', urlencode(trim(substr($page, strlen($newPage)))));
                     $page = $newPage;
                     $info = $tikilib->get_page_info($_REQUEST['page']);
@@ -532,6 +534,32 @@ if ($page_ref_id) {
 // Now check permissions to access this page
 if (! $pageRenderer->canView) {
     $access->display_error($page, tra('You do not have permission to view this page.'), '401');
+}
+
+$smarty->assign('structuresToAdd', []);
+$smarty->assign('showAddToStructureBar', false);
+if (
+    $prefs['feature_wiki_structure'] === 'y'
+    && $prefs['wiki_structure_add_to_structure_bar'] === 'y'
+    && empty($page_ref_id)
+    && strtolower($page) !== 'sandbox'
+    && $tikilib->page_exists($page)
+    && $tiki_p_edit_structures === 'y'
+) {
+    $pageStructureNames = array_fill_keys(array_column($structs_with_perm, 'pageName'), true);
+    $structuresToAdd = [];
+    $structuresList = $structlib->list_structures(0, -1, 'pageName_asc');
+    foreach ($structuresList['data'] ?? [] as $struct) {
+        if (($struct['edit_structure'] ?? 'n') !== 'y') {
+            continue;
+        }
+        if (isset($pageStructureNames[$struct['pageName']])) {
+            continue;
+        }
+        $structuresToAdd[] = $struct;
+    }
+    $smarty->assign('structuresToAdd', $structuresToAdd);
+    $smarty->assign('showAddToStructureBar', count($structuresToAdd) > 0);
 }
 
 // Convert page to structure

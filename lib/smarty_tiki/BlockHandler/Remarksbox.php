@@ -9,6 +9,8 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\BlockHandlerInterface;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\BlockHandlerStaticFacadeTrait;
 
 /**
  * Smarty plugin remarksbox
@@ -40,13 +42,20 @@ use Smarty\Template;
  *          errors|error|danger: Error message (or extremely important warning?)
  *  - title         Text as a label. Leave out for no label (or icon)
  *  - highlight     "y|n" default=n
- *  - icon          Override default icons. See function.icon.php for more info (use empty string for no icon)
+ *  - icon          Override default icons. See FunctionHandler\Icon for more info (use empty string for no icon)
  *  - close         "y|n" default=y (close button)
  *  - width         e.g. "50%", "200px" default=""
  *  - store_cookie  "y|n" default y, set to n to not store closed state in a cookie
  */
-class Remarksbox implements BlockHandlerInterface
+class Remarksbox implements BlockHandlerInterface, TikiSmartyExtensionInterface
 {
+    use BlockHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'remarksbox';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs;

@@ -193,12 +193,12 @@
  </form>
 
 {if $items}
-    <h2>{tr}Find{/tr}</h2>
+    <h2>{tr}Search{/tr}</h2>
     <form method="post" action="tiki-admin_banning.php">
         {ticket}
         <input type="hidden" name="offset" value="{$offset|escape}">
         <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
-        <label for="banning-find">{tr}Find:{/tr}</label><input type="text" name="find" id="banning-find" value="{$find|escape}">
+        <label for="banning-find">{tr}Search:{/tr}</label><input type="text" name="find" id="banning-find" value="{$find|escape}">
     </form>
 {/if}
 <h2>{tr}Current rules{/tr}</h2>

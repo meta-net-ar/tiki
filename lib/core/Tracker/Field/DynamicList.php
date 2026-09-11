@@ -185,10 +185,19 @@ class Tracker_Field_DynamicList extends \Tracker\Field\AbstractItemField impleme
     public function getFieldData(array $requestData = []): array
     {
         $ins_id = $this->getInsertId();
+
+        if (isset($requestData[$ins_id])) {
+            $value = $requestData[$ins_id];
+        } elseif (isset($requestData[$ins_id . '_old'])) {
+            // the field was in the form but nothing was selected: an empty multiple select submits no key at all
+            $value = $this->canHaveMultipleValues() ? [] : '';
+        } else {
+            // the field was not part of this form, keep the stored value
+            $value = $this->getValue();
+        }
+
         $data = [
-            'value' => (isset($requestData[$ins_id]))
-                ? $requestData[$ins_id]
-                : $this->getValue(),
+            'value' => $value,
         ];
 
         if ($this->trackerField->getOption('selectMultipleValues') && ! is_array($data['value'])) {
@@ -320,9 +329,7 @@ $("body").on("change", "input[name=\'' . $filterFieldHereName . '\'], select[nam
 
                 const elementPlusTransfer = document.querySelector("el-transfer[field-name=\'" + data.request.insertId + "\']");
                 if (elementPlusTransfer) {
-                    const elementPlusTransferCopy = elementPlusTransfer.cloneNode(true);
-                    elementPlusTransferCopy.setAttribute("data", JSON.stringify(transferData));
-                    elementPlusTransfer.replaceWith(elementPlusTransferCopy);
+                    elementPlusTransfer.setAttribute("data", JSON.stringify(transferData));
                 }
                     
                 if (data.request.originalValue) {
@@ -331,6 +338,9 @@ $("body").on("change", "input[name=\'' . $filterFieldHereName . '\'], select[nam
                     });
                 }
             }
+                
+            // tell the document we are ready
+            $(document).trigger("ready.dynamic_list", [$ddl]);
 
             $ddl.trigger("change");
             $ddl.parent().tikiModal();
@@ -348,10 +358,14 @@ if( $("input[name=\'' . $filterFieldHereName . '\'], select[name=\'' . $filterFi
 $("input[name=\'' . $filterFieldHereName . '\'], select[name=\'' . $filterFieldHereName . '\']").trigger("change", "initial");
 ', 1);
 
+        // an empty multiple select (or transfer list) submits no key at all, which getFieldData() would otherwise read as
+        // "field not in the request" and restore the stored value. This marker tells it the field was in the form.
+        $oldMarker = '<input type="hidden" name="' . $this->getInsertId() . '_old" value="1">';
+
         if ($this->trackerField->getOption('inputtype') === 't') {
             $smarty = TikiLib::lib('smarty');
 
-            return smarty_function_jstransfer_list([
+            return $oldMarker . \SmartyTiki\FunctionHandler\JsTransferList::render([
                 'fieldName' => $insertId,
                 'data' => [],
                 'defaultSelected' => $this->getValue(),
@@ -365,7 +379,7 @@ $("input[name=\'' . $filterFieldHereName . '\'], select[name=\'' . $filterFieldH
             ], $smarty->getEmptyInternalTemplate());
         }
 
-        return '<select class="form-control"' . $multiple . ' name="' . $insertId . '"></select>';
+        return $oldMarker . '<select class="form-control"' . $multiple . ' name="' . $insertId . '"></select>';
     }
 
 
@@ -426,6 +440,7 @@ $("input[name=\'' . $filterFieldHereName . '\'], select[name=\'' . $filterFieldH
                 case 'e':
                 case 'd':
                 case 'D':
+                case 'M': // multi-select dropdown
                     //$listFieldThere = array_merge($listFieldThere, array('value' => $remoteItemId));
                     $handler = $trklib->get_field_handler($listFieldThere, $itemInfo);
                     // array selected_categories etc.

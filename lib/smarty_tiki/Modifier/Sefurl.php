@@ -7,8 +7,18 @@
 
 namespace SmartyTiki\Modifier;
 
-class Sefurl
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
+class Sefurl implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'sefurl';
+    }
+
     public function handle($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
     {
 
@@ -129,6 +139,16 @@ class Sefurl
                 }
                 if ($replacementpage) {
                     $href = \TikiLib::tikiUrlOpt($wikilib->sefurl($replacementpage, $with_next, $all_langs));
+                    if ($prefs['feature_sefurl'] === 'y') {
+                        if (preg_match('/' . preg_quote($href) . '[\W]/', $replacementpage)) {
+                            // you can use "product-" with a trailing hyphen, for example, as your alias,
+                            // so the url would be: pagenme-id-title-as-slug
+                            $href = $replacementpage;
+                        }
+                        $href .= $source;
+                    } else {
+                        $href .= "&itemId=$source";
+                    }
                     if ($prefs['feature_sefurl_title_trackeritem'] == 'y') {
                         $title = $trklib->get_title_sefurl($source);
                     }

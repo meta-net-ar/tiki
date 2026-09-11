@@ -7,12 +7,18 @@ export function observeSelectElementMutations(select, elementPlusUi) {
                     do not alter the Element Plus select options, as those already exist
                     in the UI element and would only disrupt the UI picker options.
                 */
+                const rawVal = $(select).val() ?? [];
+                const selectedVals = Array.isArray(rawVal) ? rawVal : [rawVal];
                 const newOptions = $(select)
                     .find("option")
-                    .filter((_, option) => $(option).val() && !$(select).val().includes($(option).val()));
+                    .filter((_, option) => $(option).val() && !selectedVals.includes($(option).val()));
                 if (newOptions.length) {
                     syncSelectOptions(elementPlusUi, select);
                 }
+            }
+
+            if (mutation.removedNodes.length) {
+                syncSelectOptions(elementPlusUi, select);
             }
 
             // jquery-validation error highlighting
@@ -25,7 +31,6 @@ export function observeSelectElementMutations(select, elementPlusUi) {
             } else if (mutation.attributeName) {
                 let attributeValue = mutation.target.getAttribute(mutation.attributeName);
                 const attributeName = mutation.attributeName.replace("data-", "");
-                // skip "display: none;" value in the style attribute change
                 if (mutation.attributeName === "style") {
                     attributeValue = mutation.target
                         .getAttribute(mutation.attributeName)
@@ -51,21 +56,27 @@ export function syncSelectOptions(elementPlusSelect, select) {
         })
         .get();
     $(elementPlusSelect).attr("options", JSON.stringify(options));
-    const value = [...select.selectedOptions].map((option) => option.value);
-    $(elementPlusSelect).attr("value", $(select).prop("multiple") ? JSON.stringify(value) : value[0]);
-    if (options.find((option) => option.group)) {
+
+    const $select = $(select);
+    if ($select.prop("multiple")) {
+        $(elementPlusSelect).attr("value", JSON.stringify($select.val() || []));
+    } else {
+        $(elementPlusSelect).attr("value", $select.val());
+    }
+
+    if (options.some((option) => option.group)) {
         $(elementPlusSelect).attr("group", true);
     }
 }
 
 export function attachChangeEventHandler(elementPlusSelect, select) {
+    $(select).on("change.nativeEpSync", () => syncSelectOptions(elementPlusSelect, select));
+
     $(elementPlusSelect).on("select-change", function (event) {
         const selectedValues = event.detail[0].value;
-        // Adding new items to the select list
         const appendOption = (value) => {
             if (!$(select).find(`option[value="${value}"]`).length) {
-                const option = $("<option></option>").val(value).text(value);
-                $(select).append(option);
+                $(select).append($("<option></option>").val(value).text(value));
             }
         };
         if (Array.isArray(selectedValues)) {
@@ -73,8 +84,6 @@ export function attachChangeEventHandler(elementPlusSelect, select) {
         } else {
             appendOption(selectedValues);
         }
-
-        $(select).val(selectedValues);
-        $(select).trigger("change");
+        $(select).val(selectedValues).trigger("change");
     });
 }

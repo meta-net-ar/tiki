@@ -55,7 +55,7 @@
     //    --tiki-topbar-hover-bg:;
     --tiki-topbar-active-bg: #ff7900;
     --tiki-topbar-text-color: #000;
-    --tiki-topbar-border: solid #000;
+    --tiki-topbar-border: solid #cccccc;
     //    --tiki-topbar-box-shadow:;
 }
 
@@ -142,8 +142,10 @@
 }
 
 // Improve appearance when two areas with same background color meet
-.navbar-wrapper:has(.tiki-admin-aside-nav-light) {
-    box-shadow: 5px 0 10px -5px #e3e1e1;
+@media (min-width: 992px) {
+    .navbar-wrapper:has(.tiki-admin-aside-nav-light, .tiki-admin-aside-nav-dark) {
+        box-shadow: 5px 0 10px -5px #e3e1e1;
+    }
 }
 
 // Dark navbar minus top nav

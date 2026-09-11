@@ -203,6 +203,8 @@ class FileMetadata
     /**
      * Used to create a temporary path to a file when only the contents are available
      * Necessary because some php functions used to extract metadata require a file path
+     * Creates a temporary file in a secure location with a cryptographically secure random name
+     *
      * @param       string          $content        contents of a file
      *
      * @return      bool|string     $temppath       path to a temporary file in the temp directory or false if $content is
@@ -210,19 +212,56 @@ class FileMetadata
      */
     private function temppathFromContent($content)
     {
-        if (! empty($content)) {
-            $cwd = getcwd();
-            $temppath = tempnam("$cwd/temp", 'temp_file_');
-            if (! is_writeable($temppath)) {
-                return false;
-            }
-            $temphandle = fopen($temppath, 'w');
-            fwrite($temphandle, $content);
-            fclose($temphandle);
-            return $temppath;
-        } else {
+        if (empty($content)) {
             return false;
         }
+
+        // Always prefer Tiki's temp directory
+        $tempDir = TIKI_PATH . '/' . TEMP_PATH;
+
+        // Only fall back to system temp directory if Tiki's temp is not available
+        if (! is_dir($tempDir) || ! is_writable($tempDir)) {
+            $tempDir = sys_get_temp_dir();
+
+            if (! is_dir($tempDir) || ! is_writable($tempDir)) {
+                return false;
+            }
+        }
+
+        // Generate a cryptographically secure random filename
+        $randomName = 'temp_file_' . bin2hex(random_bytes(16));
+
+        $temppath = $tempDir . DIRECTORY_SEPARATOR . $randomName;
+
+        // Ensure the generated filename doesn't already exist
+        $counter = 0;
+        while (file_exists($temppath) && $counter < 100) {
+            $randomName = 'temp_file_' . bin2hex(random_bytes(16));
+            $temppath = $tempDir . DIRECTORY_SEPARATOR . $randomName;
+            $counter++;
+        }
+
+        if (file_exists($temppath)) {
+            // Could not generate unique filename after 100 attempts
+            return false;
+        }
+
+        // Write content to the temporary file
+        $temphandle = fopen($temppath, 'w');
+        if ($temphandle === false) {
+            return false;
+        }
+
+        $writeResult = fwrite($temphandle, $content);
+        fclose($temphandle);
+
+        if ($writeResult === false) {
+            // Clean up failed file
+            unlink($temppath);
+            return false;
+        }
+
+        return $temppath;
     }
 
     /**

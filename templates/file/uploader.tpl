@@ -7,9 +7,10 @@
 {block name="content"}
     {if $uploadInModal}
 
-        <form class="file-uploader" enctype="multipart/form-data" method="post" action="{service controller=file action=upload galleryId=$galleryId image_max_size_x=$image_max_size_x image_max_size_y=$image_max_size_y}" data-gallery-id="{$galleryId|escape}" data-image_max_size_x="{$image_max_size_x|escape}" data-image_max_size_y="{$image_max_size_y|escape}" data-ticket="{ticket mode=get}" data-directory-pattern="{$directoryPattern|escape}">
+        <form class="file-uploader" enctype="multipart/form-data" method="post" action="{service controller=file action=upload galleryId=$galleryId image_max_size_x=$image_max_size_x image_max_size_y=$image_max_size_y}" data-gallery-id="{$galleryId|escape}" data-image_max_size_x="{$image_max_size_x|escape}" data-image_max_size_y="{$image_max_size_y|escape}" data-ticket="{ticket mode=get}" data-directory-pattern="{$directoryPattern|escape}" data-subdirectory-behavior="{$subdirectoryBehavior|default:'subgalleries'|escape}">
             <input type="hidden" name="directoryPattern" value="{$directoryPattern|escape}">
-            {if $image_max_size_x || $image_max_size_y }
+            <input type="hidden" name="subdirectoryBehavior" value="{$subdirectoryBehavior|default:'subgalleries'|escape}">
+            {if $image_max_size_x || $image_max_size_y}
                 {remarksbox type="note" title="{tr}Note{/tr}"}
                     {if $image_max_size_x and $image_max_size_y}{tr _0=$image_max_size_x _1=$image_max_size_y}Images will be resized to %0px in width and %1px in height{/tr}
                     {elseif $image_max_size_x}{tr _0=$image_max_size_x}Images will be resized to %0px in width{/tr}
@@ -56,8 +57,8 @@
 
     {else}{* not $uploadInModal *}
 
-        <div class="file-uploader inline" data-action="{service controller=file action=upload galleryId=$galleryId image_max_size_x=$image_max_size_x image_max_size_y=$image_max_size_y}" data-gallery-id="{$galleryId|escape}" data-image_max_size_x="{$image_max_size_x|escape}" data-image_max_size_y="{$image_max_size_y|escape}" data-ticket="{ticket mode=get}" data-directory-pattern="{$directoryPattern|escape}">
-            {if $image_max_size_x || $image_max_size_y }
+        <div class="file-uploader inline" data-action="{service controller=file action=upload galleryId=$galleryId image_max_size_x=$image_max_size_x image_max_size_y=$image_max_size_y}" data-gallery-id="{$galleryId|escape}" data-image_max_size_x="{$image_max_size_x|escape}" data-image_max_size_y="{$image_max_size_y|escape}" data-ticket="{ticket mode=get}" data-directory-pattern="{$directoryPattern|escape}" data-subdirectory-behavior="{$subdirectoryBehavior|default:'subgalleries'|escape}">
+            {if $image_max_size_x || $image_max_size_y}
                 {remarksbox type="note" title="{tr}Note{/tr}"}
                     {if $image_max_size_x and $image_max_size_y}{tr _0=$image_max_size_x _1=$image_max_size_y}Images will be resized to %0px in width and %1px in height{/tr}
                     {elseif $image_max_size_x}{tr _0=$image_max_size_x}Images will be resized to %0px in width{/tr}

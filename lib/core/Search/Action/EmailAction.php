@@ -80,7 +80,7 @@ class Search_Action_EmailAction implements Search_Action_Action
 
             if ($from = $data->from->raw()) {
                 $fromEmail = $this->dereference($from);
-                $fromName = $this->dereferenceName($from);
+                $fromName = $this->dereferenceName($from) ?: '';
                 if (! empty($fromEmail[0])) {
                     $mail->setFrom($fromEmail[0], $fromName);
                     $mail->setSender($fromEmail[0], $fromName);

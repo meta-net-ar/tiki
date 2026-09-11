@@ -268,7 +268,7 @@
                                 <label for="highlight" class="find_content sr-only">{tr}Search in content{/tr}</label>
                                 <div class="input-group">
                                     <input name="highlight" size="30" type="text" placeholder="{tr}Search in content{/tr}..." class="form-control tips bottom" title="|{tr}Search for text within files in all galleries{/tr}">
-                                    <input type="submit" class="wikiaction btn btn-info" name="search" value="{tr}Go{/tr}">
+                                    <input type="submit" class="wikiaction btn btn-info" name="search" value="{tr}Search{/tr}">
                                 </div>
                             </form>
                         {/if}
@@ -276,7 +276,7 @@
                             <form id="search-by-id" class="form" method="get" action="tiki-list_file_gallery.php">
                                 <div class="input-group">
                                     <input class="form-control tips bottom" type="text" name="fileId" id="fileId" {if isset($fileId)} value="{$fileId}"{/if} placeholder="{tr}Search by identifier{/tr}..." title="|{tr}Search for the file with this number, in all galleries{/tr}">
-                                    <button type="submit" class="btn btn-info">{tr}Go{/tr}</button>
+                                    <button type="submit" class="btn btn-info">{tr}Search{/tr}</button>
                                 </div>
                             </form>
                         {/if}

@@ -232,11 +232,13 @@ class ObjectLib extends TikiLib
             'article_type',
             'blog',
             'calendar',
+            'calendaritem',
             'directory',
             'faq',
             'file',
             'file gallery',
             'forum',
+            'forum post',
             'perspective',
             'poll',
             'quiz',
@@ -291,6 +293,60 @@ class ObjectLib extends TikiLib
         } else {
             return false;
         }
+    }
+
+    /**
+     * Returns all possible parent objects of the given object types.
+     * @param array $objectTypes
+     * @return array
+     */
+    public function getSemanticParentObjects($objectTypes = [])
+    {
+        $mappedChildParent = [
+            // object type => [parent_object_id_field => parent_object_type]
+            'trackeritem' => ['tracker_id' => 'tracker'],
+            'calendaritem' => ['calendar_id' => 'calendar'],
+            'file' => ['gallery_id' => 'file gallery'],
+            'file gallery' => ['gallery_id' => 'file gallery'],
+            'forum post' => ['forum_id' => 'forum'],
+            'forum' => ['forum_section' => 'forum'],
+            'user' => ['groups' => 'group'],
+            'trackerfield' => ['tracker_id' => 'tracker'],
+            'structure' => ['structure_parent_id' => 'structure'],
+            'article' => ['topic_id' => 'article_topic'],
+        ];
+
+        $mappedChildParent = array_intersect_key($mappedChildParent, array_flip($objectTypes));
+
+        if (empty($mappedChildParent)) {
+            return [];
+        }
+
+        $parentTypes = array_values(array_map(function ($item) {
+            return reset($item);
+        }, $mappedChildParent));
+
+        $lib = TikiLib::lib('unifiedsearch');
+        $query = $lib->buildQuery([
+            'type' => $parentTypes,
+        ]);
+
+        $result = $query->search($lib->getIndex());
+
+        $out = [];
+
+        foreach ($result as $res) {
+            $out[] = [
+                'object_id' => $res['object_id'],
+                'type' => $res['object_type'],
+                'title' => $res['title'],
+                'parent_object_id_field' => key(array_values(array_filter($mappedChildParent, function ($item) use ($res) {
+                    return reset($item) === $res['object_type'];
+                }))[0]),
+            ];
+        }
+
+        return $out;
     }
 
     public function insert_object($type, $itemId, $description = '', $name = '', $href = '')
@@ -434,16 +490,6 @@ class ObjectLib extends TikiLib
                     case 'view':
                     case 'read':
                         return 'tiki_p_view_trackers';
-
-                    case 'edit':
-                        return 'tiki_p_modify_tracker_items';
-                }
-                // no return
-            case 'trackeritemattachments':
-                switch ($action) {
-                    case 'view':
-                    case 'read':
-                        return 'tiki_p_tracker_view_attachments';
 
                     case 'edit':
                         return 'tiki_p_modify_tracker_items';
@@ -714,24 +760,6 @@ class ObjectLib extends TikiLib
                     $itemInfo['status']
                 );
                 break;
-            case 'trackeritemattachments':
-                $trklib = TikiLib::lib('trk');
-                $info = $trklib->get_item_attachment($object);
-                $info = array_merge($info, $data);
-
-                $trklib->replace_item_attachment(
-                    $object,
-                    $info['filename'],
-                    $info['filetype'],
-                    $info['filesize'],
-                    $info['data'],
-                    $info['comment'],
-                    $info['user'],
-                    null,
-                    $info['version'],
-                    $info['longdesc'],
-                );
-                break;
             case 'article':
             case 'articles':
                 $artlib = TikiLib::lib('art');
@@ -966,6 +994,40 @@ class ObjectLib extends TikiLib
     }
 
     /**
+     * Fetch the index entries of a list of objects.
+     *
+     * The lookup is split in batches, both because a single query can only hold a limited
+     * number of clauses and because a query only returns as many results as its range allows.
+     *
+     * @param array $objects list of ['type' => ..., 'id' => ...]
+     * @param array $selectionFields index fields to return, all of them when empty
+     * @return array
+     */
+    private function searchObjects(array $objects, array $selectionFields = [])
+    {
+        $lib = TikiLib::lib('unifiedsearch');
+        $index = $lib->getIndex();
+        $rows = [];
+
+        foreach (array_chunk($objects, Search_Query::MAX_OBJECTS_PER_QUERY) as $chunk) {
+            $query = $lib->buildQuery([]);
+            foreach ($chunk as $object) {
+                $query->addObject($object['type'], $object['id']);
+            }
+            if ($selectionFields) {
+                $query->setSelectionFields($selectionFields);
+            }
+            $query->setRange(0, count($chunk));
+
+            foreach ($query->search($index) as $row) {
+                $rows[] = $row;
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
      * Optimized way to get relation object values that are used in a format descriptor
      * @param array $objects
      * @param string $format
@@ -996,28 +1058,22 @@ class ObjectLib extends TikiLib
         if (TikiLib::lib('tiki')->isMemoryLow()) {
             ObjectLib::$titleCache = [];
         }
-        $lib = TikiLib::lib('unifiedsearch');
         $metaItemIds = [];
-        $query = $lib->buildQuery([]);
         foreach ($objects as $object) {
-            $query->addObject($object['type'], $object['id']);
             if (! empty($object['metaItemId'])) {
                 $metaItemIds[$object['type'] . ':' . $object['id']] = $object['metaItemId'];
             }
         }
         $format_pattern = '/\{([\w\.]+)\}/';
-        if (preg_match_all($format_pattern, $format, $m)) {
-            $query->setSelectionFields($m[1]);
-        }
-        $result = $query->search($lib->getIndex());
+        $selectionFields = preg_match_all($format_pattern, $format, $m) ? $m[1] : [];
+
+        $result = $this->searchObjects($objects, $selectionFields);
         $metadata = [];
         if ($metaItemIds) {
-            $query = $lib->buildQuery([]);
-            foreach ($metaItemIds as $metaItemId) {
-                $query->addObject('trackeritem', $metaItemId);
-            }
-            $metaResult = $query->search($lib->getIndex());
-            foreach ($metaResult as $row) {
+            $metaObjects = array_map(function ($metaItemId) {
+                return ['type' => 'trackeritem', 'id' => $metaItemId];
+            }, $metaItemIds);
+            foreach ($this->searchObjects($metaObjects) as $row) {
                 $key = array_search($row['object_id'], $metaItemIds);
                 if ($key !== false) {
                     $metadata[$key] = $row;
@@ -1286,8 +1342,8 @@ class ObjectLib extends TikiLib
 
     public function get_metadata($type, $object, &$classList)
     {
-        $escapedType = smarty_modifier_escape($type);
-        $escapedObject = smarty_modifier_escape($object);
+        $escapedType = \SmartyTiki\Modifier\Escape::apply($type);
+        $escapedObject = \SmartyTiki\Modifier\Escape::apply($object);
         $metadata = ' data-type="' . $escapedType . '" data-object="' . $escapedObject . '"';
 
         if ($coordinates = TikiLib::lib('geo')->get_coordinates($type, $object)) {
@@ -1303,7 +1359,7 @@ class ObjectLib extends TikiLib
         $attributes = $attributelib->get_attributes($type, $object);
 
         if (isset($attributes['tiki.icon.src'])) {
-            $escapedIcon = smarty_modifier_escape($attributes['tiki.icon.src']);
+            $escapedIcon = \SmartyTiki\Modifier\Escape::apply($attributes['tiki.icon.src']);
             $metadata .= " data-icon-src=\"$escapedIcon\"";
         }
 
@@ -1371,8 +1427,6 @@ class ObjectLib extends TikiLib
                 return ['tiki_articles', 'articleId'];
             case 'post':
                 return ['tiki_blog_posts', 'postId'];
-            case 'trackeritemattachments':
-                return ['tiki_tracker_item_attachments', 'attId'];
             case 'surveys':
             case 'survey':
                 return ['tiki_surveys', 'surveyId'];

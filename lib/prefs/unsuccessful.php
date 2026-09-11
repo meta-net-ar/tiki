@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_unsuccessful_list()
 {
+    $loginGeneralPreferencesHelp = 'Login-General-Preferences';
+
     return [
         'unsuccessful_logins' => [
             'name' => tra('Re-validate user by email after'),
@@ -17,6 +19,7 @@ function prefs_unsuccessful_list()
             'description' => tra('After a certain number of consecutive unsuccessful log-in attempts, the user will receive an email with instruction to validate his or her account. However, the user can still log in with the old password.'),
             'default' => 20,
             'keywords' => tra('brute force, brute-force, login failure, login-failure, failed logins'),
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'unsuccessful_logins_invalid' => [
             'name' => tra('Suspend/lockout account after'),
@@ -28,6 +31,7 @@ function prefs_unsuccessful_list()
             'hint' => tra('Use "-1" for never'),
             'default' => 50,
             'keywords' => tra('brute force, brute-force, login failure, login-failure, failed logins'),
+            'help' => $loginGeneralPreferencesHelp,
         ],
     ];
 }

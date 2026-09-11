@@ -1,3 +1,5 @@
+{assign var=sharedAdminLayout value=($prefs.theme_unified_admin_backend eq 'y' && (($prefs.site_layout_admin|default:$prefs.site_layout) eq 'admin'))}
+{if !$sharedAdminLayout}
 <div class="admin-wrapper highlightable{* {if $prefs.theme_unified_admin_backend eq 'y'} overflow-auto{/if} *}">
     {if $prefs.theme_unified_admin_backend eq 'y'}
         <aside class="admin-nav">
@@ -13,11 +15,11 @@
                     <div class="d-flex flex-row justify-content-between was-toggle-unified-admin-panel">
                         <div class="pe-4">
                             {if $prefs.theme_unified_admin_backend eq 'y'}
-                                {tr}You are currently using the <strong>Unified Admin Backend</strong>.{/tr} <a class="alert-link" target="_blank" href="https://doc.tiki.org/VideoTutorial-2750-%20%20New%20Unified%20Admin%20Backend%20in%20Tiki">{tr}Learn more.{/tr}</a><br/>
+                                {tr}You are currently using the <strong>Unified Admin Backend</strong>.{/tr} <a class="alert-link" target="_blank" href="https://doc.tiki.org/Look-and-Feel-Theme">{tr}Learn more.{/tr}</a><br/>
                                 <span class="d-none d-sm-block">{tr}Toggle the switch to change the administration interface to the legacy control panels.{/tr}</span>
                             {else}
                                 <span>{tr}A new modern layout for admin UI is available.{/tr}</span>
-                                <a target="_blank" href="https://doc.tiki.org/VideoTutorial-2750-%20%20New%20Unified%20Admin%20Backend%20in%20Tiki">{tr}Learn more.{/tr}</a><br/>
+                                <a target="_blank" href="https://doc.tiki.org/Look-and-Feel-Theme">{tr}Learn more.{/tr}</a><br/>
                                 <span class="d-none d-sm-block">{tr}Toggle the switch to change the administration interface to the Unified Admin Backend.{/tr}</span>
                             {/if}
                         </div>
@@ -34,6 +36,7 @@
             </form>
         {/if} *}
         {include file="admin/admin_navbar.tpl"}
+{/if}
         {if $prefs.sender_email eq ''}
             {remarksbox type=warning title="{tr}Warning{/tr}" close="y"}
                 {tr _0='<a href="tiki-admin.php?page=general&highlight=sender_email" class="alert-link">' _1="</a>"}Your sender email is not set. You can set it %0in the general admin panel%1.{/tr}
@@ -88,7 +91,7 @@
                 {remarksbox type="error" title="{tr}Database Version Problem{/tr}"}
                     {tr _0='<a class="alert-link" href="tiki-install.php">' _1="</a>"}Your database requires an update to match the current Tiki version. Please proceed to %0the installer%1. Using Tiki with an incorrect database version usually provokes errors{/tr}
                     {tr}If you have shell (SSH) access, you can also use the following, on the command line, from the root of your Tiki installation:{/tr}
-                    <kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:update</kbd>
+                    {tr _0="<kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:update</kbd>" _1="<kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:patch patch_name</kbd>"}%0 or apply the missing patches one by one with %1 in version order.{/tr}
                     <p class="mt-3"> {tr _0='<a class="alert-link" href="tiki-check.php">' _1="</a>"}Please note that the Tiki schema does not support downgrading the database. It can only perform upgrades. For more info, you may check the database status by opening the %0tiki-check page%1.{/tr}</p>
                     <div class="h6 mt-3">
                         <a class="collapse-toggle alert-link" data-bs-toggle="collapse" href="#missingpatches">
@@ -105,7 +108,7 @@
                 {/remarksbox}
             {/if}
 
-            {if ! empty($scheduler_failure_logs) }
+            {if ! empty($scheduler_failure_logs)}
                 {remarksbox type="error" title="{tr}Scheduler tasks failure logs{/tr}"}
                     <p>
                     {if ! empty($prefs.scheduledTasksReport) && $prefs.scheduledTasksReport === 'last_number_of_hours'}
@@ -137,7 +140,7 @@
             {/if}
 
             {if $htaccess_global_warning}
-                {remarksbox type="warning" title="{tr}.htaccess differs from the bundled _htaccess{/tr}"}
+                {remarksbox type="info" title="{tr}.htaccess differs from the bundled _htaccess{/tr}"}
                     <p class="mb-2">
                         {tr}Your active <code>.htaccess</code> does not match the reference <code>_htaccess</code> shipped with Tiki.{/tr}
                     </p>
@@ -334,5 +337,7 @@
             {/if}
             {include file="admin/include_$include.tpl"}
         {/if}
+{if !$sharedAdminLayout}
+        </div>
     </div>
-</div>
+{/if}

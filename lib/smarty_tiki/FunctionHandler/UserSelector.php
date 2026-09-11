@@ -10,6 +10,8 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /* {user_selector
  *     user = $user
@@ -30,8 +32,15 @@ use TikiLib;
  * an input box with autocomplete if there are more users
  * than $prefs['user_selector_threshold']
  */
-class UserSelector extends Base
+class UserSelector extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'user_selector';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs, $user, $tiki_p_admin;
@@ -46,6 +55,7 @@ class UserSelector extends Base
             'group' => 'all',
             'groupIds' => '',
             'contact' => 'false',
+            'allowcreate' => 'n',
             'name' => 'user',
             'id' => 'user_selector_' . $iUserSelector,
             'multiple' => 'false',
@@ -55,9 +65,11 @@ class UserSelector extends Base
             'user_selector_threshold' => $prefs['user_selector_threshold'],
             'allowNone' => 'y',
             'noneLabel' => 'None',
-            'realnames' => 'y',
+            'realnames' => $prefs['user_show_realnames'],
             'class' => 'form-control',
-            'lazyload' => 'false'
+            'lazyload' => 'false',
+            'noneSelectable' => 'y',
+            'exclude' => '',
         ];
 
         $params = array_merge($defaults, $params);
@@ -123,8 +135,11 @@ class UserSelector extends Base
             foreach ($selectedValues as $selected) {
                 $options .= "<option value=\"$selected\" selected>$selected</option>";
             }
+            // Let a field opt into free-text entry (Element Plus allow-create) without
+            // changing the global elementplus_select_allow_create preference.
+            $allowCreateAttr = $params['allowcreate'] === 'y' ? ' data-allow-create="true"' : '';
             return <<<HTML
-                <select name="{$params['name']}" id="{$params['id']}" class="form-control" data-remote-source-url="{$remoteUrl}" $mt>{$options}</select>
+                <select name="{$params['name']}" id="{$params['id']}" class="form-control" data-remote-source-url="{$remoteUrl}"$allowCreateAttr $mt>{$options}</select>
             HTML;
         }
 
@@ -143,14 +158,22 @@ class UserSelector extends Base
             }
             $usrs = array_unique($usrs);
             foreach ($usrs as $usr) {
-                $users["$usr"] = $params['realnames'] === 'y' ? smarty_modifier_username($usr) : $usr;
+                $users["$usr"] = $params['realnames'] === 'y' ? \SmartyTiki\Modifier\Username::apply($usr) : $usr;
             }
         }
 
         if ($params['group'] == 'all' && empty($params['groupIds'])) {
             $usrs = $tikilib->list_users(0, -1, 'login_asc');
             foreach ($usrs['data'] as $usr) {
-                $users["{$usr['login']}"] = $params['realnames'] === 'y' ? smarty_modifier_username($usr['login']) : $usr['login'];
+                $users["{$usr['login']}"] = $params['realnames'] === 'y' ? \SmartyTiki\Modifier\Username::apply($usr['login']) : $usr['login'];
+            }
+        }
+
+        if (! empty($params['exclude'])) {
+            $excludeUsers = is_array($params['exclude']) ? $params['exclude'] : explode(',', $params['exclude']);
+            $excludeUsers = array_map('trim', $excludeUsers);
+            foreach ($excludeUsers as $excludeUser) {
+                unset($users[$excludeUser]);
             }
         }
 
@@ -176,7 +199,7 @@ class UserSelector extends Base
         asort($users, SORT_NATURAL | SORT_FLAG_CASE);
 
         if (! empty($params['inputtype']) && $params['inputtype'] === 't') {
-            return smarty_function_jstransfer_list([
+            return \SmartyTiki\FunctionHandler\JsTransferList::render([
                 'fieldName' => $params['name'],
                 'data' => $users,
                 'defaultSelected' => $params['select'],
@@ -190,9 +213,22 @@ class UserSelector extends Base
             ], $template);
         }
 
-        $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . ' style="' . $params['style'] . '" class="form-control">';
-        if ($params['allowNone'] === 'y') {
-            $ret .= '<option value=""' . (empty($params['user']) ? ' selected="selected"' : '') . ' >' . tra($params['noneLabel']) . '</option>';
+        $placeholder = '';
+        if ($params['allowNone'] === 'y' && $params['multiple'] === 'true' && $params['noneLabel'] !== '') {
+            // When selecting several users, "None" is not a value: the hidden input below already
+            // submits the empty value. Render it as a placeholder, which clears itself once a user
+            // is picked, instead of an option that can be selected alongside real users.
+            $placeholder = ' placeholder="' . htmlspecialchars(tra($params['noneLabel'])) . '"';
+        }
+
+        $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . $placeholder . ' style="' . $params['style'] . '" class="form-control">';
+        if ($params['allowNone'] === 'y' && $params['multiple'] !== 'true') {
+            $noneOptionAttributes = (empty($params['user']) ? ' selected="selected"' : '');
+            if ($params['noneSelectable'] !== 'y') {
+                $noneOptionAttributes .= ' disabled="disabled" hidden';
+            }
+
+            $ret .= '<option value=""' . $noneOptionAttributes . ' >' . tra($params['noneLabel']) . '</option>';
         }
         foreach ($users as $usr => $usersname) {
             $selected = isset($params['select']) && ($params['select'] === $usr || (is_array($params['select']) && in_array($usr, $params['select'])));

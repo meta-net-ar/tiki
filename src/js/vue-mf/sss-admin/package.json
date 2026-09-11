@@ -1,0 +1,14 @@
+{
+    "name": "sss-admin",
+    "version": "0.1.0",
+    "scripts": {
+        "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+        "format": "prettier .  --write"
+    },
+    "dependencies": {
+    },
+    "devDependencies": {
+    },
+    "description": "Encryption key management admin for Tiki",
+    "author": ""
+}

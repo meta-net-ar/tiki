@@ -66,6 +66,7 @@ class CookieConsentLib
     {
 
         $requestedCategories = self::getCookieCategories();
+        $currentCategories = self::getConsentPreferences()['categories'];
 
         $disabledCategories = self::getDisabledCookieCategoryKeys();
         if ($disabledCategories) {
@@ -77,6 +78,9 @@ class CookieConsentLib
                     \Feedback::error(tr("Category %0 from pref cookie_consent_disable_builtin_categories not found in: %1", $disabledCategoryKey, implode(', ', array_keys($requestedCategories))));
                 }
             }
+        }
+        foreach ($requestedCategories as $key => & $value) {
+            $value['consent'] = $currentCategories[$key];
         }
         return $requestedCategories;
     }
@@ -93,7 +97,7 @@ class CookieConsentLib
         $defaultConsentPreferences = [
             'action' => 'customized',
             'consentGiven' => false, // Helps determine if the user has given consent or not
-            'categories' => array_map(fn() => false, array_keys(self::getCookieCategories())) // Default to false for all categories
+            'categories' => array_fill_keys(array_keys(self::getCookieCategories()), false) // Default to false for all categories
         ];
         $consentPreferences = null;
         /* FIXME:  This is incomplete.  There are at least the following cases to deal with:
@@ -303,7 +307,13 @@ class CookieConsentLib
                 // See note at the begining of fucntion.  As far as I can tell, this is unreachable code - benoitg - 2026-06-25
                 $_SESSION['tiki_cookie_jar'][$name] = $value;
             } else {
-                setcookie($name, $value, $expire, $path, $domain, $secure);
+                $options = [
+                    'expires' => $expire,
+                    'path' => $path,
+                    'domain' => $domain,
+                    'secure' => $secure
+                ];
+                setcookie_obeySetCookieParams($name, $value, $options);
             }
         }
     }

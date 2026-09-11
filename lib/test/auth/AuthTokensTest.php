@@ -40,6 +40,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
         global $prefs;
         $prefs['feature_sefurl'] = 'n'; // default
+        $prefs['auth_token_secret'] = 'test-auth-token-secret';
 
         parent::setUp();
     }
@@ -57,7 +58,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
             ->getTable('tiki_auth_tokens');
 
         $token = $this->obj->createToken('tiki-index.php', ['page' => 'HomePage'], ['Registered'], ['timeout' => 5], ['destination' => 'message']);
-        $this->db->query("UPDATE tiki_auth_tokens SET creation = '2012-02-03 15:25:07', token = '0ae3b4b86286ab68f5a66fb8c49da163', user = 'admin' WHERE token = '$token'");
+        $this->db->query("UPDATE tiki_auth_tokens SET creation = '2012-02-03 15:25:07', token = '3e688670095cba622a5390a39c8c23b0ca641faf6bdff0cfccd7b3c35253fe85', user = 'admin' WHERE token = '$token'");
 
         $queryTable = $this->getConnection()->createQueryTable('tiki_auth_tokens', 'SELECT * FROM tiki_auth_tokens');
 
@@ -66,11 +67,12 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
     public function testTokenMatchesCompleteHash(): void
     {
+        global $prefs;
         $token = $this->obj->createToken('tiki-index.php', ['page' => 'HomePage'], ['Registered']);
 
         $row = $this->db->query('SELECT `tokenId`, `creation`, `timeout`, `entry`, `parameters`, `groups` FROM `tiki_auth_tokens` ORDER BY `creation` desc')->fetchRow();
 
-        $this->assertEquals(md5(implode('', $row)), $token);
+        $this->assertEquals(hash_hmac('sha256', implode('', $row), $prefs['auth_token_secret']), $token);
     }
 
     public function testConvertToStandardUrl(): void
@@ -184,7 +186,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
         $url = 'http://example.com/tiki/tiki-index.php?page=SomePage';
         $new = $this->obj->includeToken($url);
 
-        $this->assertMatchesRegularExpression('/TOKEN=[a-z0-9]{32}/i', $new);
+        $this->assertMatchesRegularExpression('/TOKEN=[a-z0-9]{64}/i', $new);
         $this->assertStringContainsString('http://example.com/tiki/tiki-index.php', $new);
         $this->assertStringContainsString('page=SomePage', $new);
     }
@@ -194,7 +196,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
         $url = 'http://example.com/tiki-index.php';
         $new = $this->obj->includeToken($url);
 
-        $this->assertMatchesRegularExpression('/TOKEN=[a-z0-9]{32}/i', $new);
+        $this->assertMatchesRegularExpression('/TOKEN=[a-z0-9]{64}/i', $new);
         $this->assertStringContainsString('http://example.com/tiki-index.php', $new);
     }
 
@@ -203,7 +205,7 @@ class AuthTokensTest extends TikiDatabaseTestCase
         $url = 'http://example.com/tiki-index.php#Test';
         $new = $this->obj->includeToken($url);
 
-        $this->assertMatchesRegularExpression('/TOKEN=[a-z0-9]{32}#Test/i', $new);
+        $this->assertMatchesRegularExpression('/TOKEN=[a-z0-9]{64}#Test/i', $new);
     }
 
     public function testGetTokensShouldReturnEmptyArrayIfNoToken(): void
@@ -234,6 +236,42 @@ class AuthTokensTest extends TikiDatabaseTestCase
         $this->obj->deleteToken($tokenId);
 
         $this->assertEmpty($this->table->fetchRow(['entry'], ['tokenId' => $tokenId]));
+    }
+
+    public function testRotateSigningSecretRevokesExistingTokens(): void
+    {
+        global $prefs;
+
+        $this->db->query('TRUNCATE tiki_auth_tokens');
+
+        $token = $this->obj->createToken('tiki-index.php', ['page' => 'HomePage'], ['Registered']);
+        $oldSecret = $prefs['auth_token_secret'];
+
+        $revokedCount = $this->obj->rotateSigningSecret();
+
+        $this->assertSame(1, $revokedCount);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $prefs['auth_token_secret']);
+        $this->assertNotSame($oldSecret, $prefs['auth_token_secret']);
+        $this->assertSame('0', (string) $this->db->getOne('SELECT COUNT(*) FROM tiki_auth_tokens'));
+        $this->assertNull($this->obj->getGroups($token, 'tiki-index.php', ['page' => 'HomePage']));
+    }
+
+    public function testRotateSigningSecretCanSkipRevokingTokenRows(): void
+    {
+        global $prefs;
+
+        $this->db->query('TRUNCATE tiki_auth_tokens');
+
+        $token = $this->obj->createToken('tiki-index.php', ['page' => 'HomePage'], ['Registered']);
+        $oldSecret = $prefs['auth_token_secret'];
+
+        $revokedCount = $this->obj->rotateSigningSecret(false);
+
+        $this->assertSame(0, $revokedCount);
+        $this->assertMatchesRegularExpression('/^[a-f0-9]{64}$/', $prefs['auth_token_secret']);
+        $this->assertNotSame($oldSecret, $prefs['auth_token_secret']);
+        $this->assertSame('1', (string) $this->db->getOne('SELECT COUNT(*) FROM tiki_auth_tokens'));
+        $this->assertNull($this->obj->getGroups($token, 'tiki-index.php', ['page' => 'HomePage']));
     }
 
     public function testGetGroupsShouldDeleteExpiredTokens(): void

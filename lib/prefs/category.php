@@ -6,12 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_category_list()
 {
+    $categoryHelp = 'Category';
+
     return [
         'category_jail' => [
             'name' => tra('Category jail'),
             'description' => tra('Limits the visibility of objects to those in these category IDs. Used mainly for creating workspaces from perspectives.'),
             'separator' => ',',
             'type' => 'text',
+            'help' => $categoryHelp,
             'filter' => 'int',
             'default' => [''], //empty string needed to keep preference from setting unexpectedly
             'detail' => tra('This should only be set for perspectives, and not globally.'),
@@ -22,6 +25,7 @@ function prefs_category_list()
             'description' => tra('Always display categories outside of the jail root, which would be for normal categorization.'),
             'separator' => ',',
             'type' => 'text',
+            'help' => $categoryHelp,
             'filter' => 'int',
             'default' => [0], //empty string needed to keep preference from setting unexpectedly
             'detail' => tra('This should only be set for perspectives, and not globally.'),
@@ -31,6 +35,7 @@ function prefs_category_list()
             'name' => tra('Category defaults'),
             'description' => tra('Require certain categories to be present. If none of the categories in a given set is provided, assign a category by default.') . ' ' . tra('Use *7 to specify all the categories in the subtree of 7 + category 7.') . ' ' . tra('Can do only this for objectname matching the regex (Example: /^RND_/ = name beginning by RND_)(Optional)') . ' ' . tra('Can do for wiki only (optional).') . ' ' . tra('Rename will only reassign the categories for wiki pages.'),
             'type' => 'textarea',
+            'help' => $categoryHelp,
             'filter' => 'striptags',
             'hint' => tra('One per line, for example: 1,4,6,*7/4:/^RND_/:wiki page'),
             'size' => 5,
@@ -47,6 +52,7 @@ function prefs_category_list()
             'name' => tra('Synchronize multilingual categories'),
             'description' => tra('Make sure that the categories of the translations are synchronized when modified on any version.'),
             'type' => 'list',
+            'help' => $categoryHelp,
             'dependencies' => [ 'feature_multilingual' ],
             'options' => [
                 'n' => tra('None'),
@@ -59,6 +65,7 @@ function prefs_category_list()
             'name' => tra('Synchronized categories'),
             'description' => tra('List of categories affected by the multilingual synchronization. Depending on the parent feature, this list will be used as a white list (the only categories allowed) or as a black list (all categories allowed except those specified).'),
             'type' => 'text',
+            'help' => $categoryHelp,
             'dependencies' => ['category_i18n_sync'],
             'filter' => 'digits',
             'separator' => ',',
@@ -68,12 +75,14 @@ function prefs_category_list()
             'name' => tra('Sort categories case insensitively'),
             'description' => tra('Ignore case and accents when listing categories. Disable to use the "locale" sort settings.'),
             'type' => 'flag',
+            'help' => $categoryHelp,
             'default' => 'n',
         ],
         'category_autogeocode_within' => [
             'name' => tra('Automatically geocode items with this category'),
             'description' => tra('Automatically geocode items based on category name when categorized in the sub-categories of this category ID'),
             'type' => 'text',
+            'help' => $categoryHelp,
             'filter' => 'digits',
             'size' => 3,
             'default' => '',
@@ -82,17 +91,21 @@ function prefs_category_list()
             'name' => tra('Replace any existing geocode'),
             'description' => tra('When automatically geocoding items based on category name, replace existing geocode, if any'),
             'type' => 'flag',
+            'help' => $categoryHelp,
             'default' => 'n',
         ],
         'category_autogeocode_fudge' => [
             'name' => tra('Use approximate geocode location'),
             'description' => tra('When automatically geocoding items based on category name, use randomly approximated location instead of precise location'),
             'type' => 'flag',
+            'help' => $categoryHelp,
             'default' => 'n',
         ],
         'category_morelikethis_algorithm' => [
             'name' => tra('"More Like This" algorithm for categories'),
+            'description' => tra('Leave blank to disable. Choose how related items are ranked by shared categories (Basic or Weighted).'),
             'type' => 'list',
+            'help' => $categoryHelp,
             'options' => [
                                '' => '',
                 'basic' => tra('Basic'),
@@ -102,7 +115,9 @@ function prefs_category_list()
         ],
         'category_morelikethis_mincommon' => [
             'name' => tra('Minimum number of categories in common'),
+            'description' => tra('Only suggest items with at least this many shared categories (may be relaxed by other settings).'),
             'type' => 'list',
+            'help' => $categoryHelp,
             'units' => tra('categories'),
             'options' => [
                 '1' => '1',
@@ -122,12 +137,14 @@ function prefs_category_list()
             'name' => tra('List objects with most categories in common'),
             'description' => tra('No minimum is applied.'),
             'type' => 'flag',
+            'help' => $categoryHelp,
             'default' => 'y',
         ],
         'category_morelikethis_mincommon_max' => [
             'name' => tra('Maximum number of "more like this" objects'),
-            'description' => tra('The default maximum records setting for the site is used of this is set to 0.'),
+            'description' => tra('Maximum number of related items to show. Use 0 for the site default.'),
             'type' => 'text',
+            'help' => $categoryHelp,
             'size' => 3,
             'filter' => 'int',
             'units' => tra('objects'),
@@ -137,6 +154,7 @@ function prefs_category_list()
             'name' => tr('Generate custom facets from categories'),
             'description' => tr('Comma-separated list of category IDs.'),
             'type' => 'text',
+            'help' => $categoryHelp,
             'size' => 15,
             'filter' => 'int',
             'separator' => ',',
@@ -148,12 +166,14 @@ function prefs_category_list()
             'description' => tra('Show object count when browsing categories, complying with search and type filters'),
             'warning' => tra('Can slow the loading of the categories page on large sites.'),
             'type' => 'flag',
+            'help' => $categoryHelp,
             'default' => 'y',
         ],
         'category_browse_show_categids' => [
             'name' => tra("Show category id's"),
             'description' => tra("Show object id's when browsing categories"),
             'type' => 'flag',
+            'help' => $categoryHelp,
             'default' => 'n',
         ],
     ];

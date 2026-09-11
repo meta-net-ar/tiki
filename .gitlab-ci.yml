@@ -3,6 +3,7 @@ stages:
   - code-quality
   - tiki-check
   - unit-tests
+  - e2e-tests
   - package-tiki
   - vendors-security
   - vendors_update
@@ -30,7 +31,9 @@ variables:
   MARIADB_IMAGE_NEWEST_SUPPORTED: mariadb:11.8.5
   MYSQL_IMAGE_OLDEST_SUPPORTED: mysql:8.0.29
   MYSQL_IMAGE_NEWEST_SUPPORTED: mysql:8.4.7
-  MANTICORE_NEWEST_SUPPORTED: 15.1.0
+  MANTICORE_IMAGE_NEWEST_SUPPORTED: manticoresearch/manticore:15.1.0
+  ELASTICSEARCH_IMAGE_NEWEST_SUPPORTED: elasticsearch:5
+
   #Only for older version upgrade tests these days
   MYSQL_5_IMAGE: mysql:5.7.44
   NODE_IMAGE: node:24
@@ -87,7 +90,7 @@ node_modules:
   stage: build
   needs: []
   script:
-    - npm ci --prefer-offline
+    - src/ci/build_frontend.sh install
   extends: .node_dependencies_cache
   cache:
     policy: pull-push
@@ -101,15 +104,13 @@ node_modules:
 node_build:
   stage: build
   needs:
-    - node_modules  
+    - node_modules
     #This is only because we still have some scss files installed from composer - 2023-11-17
-    - composer
+    #- composer
   image:
     name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
   script:
-    - free -h
-    - NODE_OPTIONS="--max-old-space-size=4096" npm run build
-    - free -h
+    - src/ci/build_frontend.sh build
   artifacts:
     expire_in: 2 days
     paths:
@@ -162,6 +163,8 @@ composer:
     paths:
       - vendor_bundled/vendor/
       - bin/
+      # Post-install hook output (Smarty extension map): templates cannot compile without it.
+      - private/generated/
     expire_in: 2 days
 
 composer-dbdiff:
@@ -233,9 +236,21 @@ smarty-lint:
 
 smarty-syntax-check:
   stage: code-quality
+  needs:
+    - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
+    - php console.php smarty:generate-mapping
     - php doc/devtools/check_smarty_syntax.php
+
+smarty-mapping-check:
+  stage: code-quality
+  needs:
+    - composer
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php console.php smarty:generate-mapping
+    - php console.php smarty:generate-mapping --check
 
 eslint:
   stage: code-quality
@@ -296,8 +311,8 @@ rector:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    # If rector would have changed any files, it will return a non-zero code
     - php bin/rector process --dry-run
+
   cache:
     - key:
         prefix: "rector"
@@ -315,7 +330,7 @@ check-platform-binaries:
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - sh doc/devtools/check_platform_binaries.sh
+    - php doc/devtools/check_platform_binaries.php
 
 sql-engine:
   stage: tiki-check
@@ -389,7 +404,6 @@ composer-could-update-lock:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer update -d vendor_bundled --dry-run
@@ -424,29 +438,30 @@ composer-could-update-lock:
   allow_failure:
       exit_codes: 1
 
-.template-tiki-schema-upgrade: &template-tiki-schema-upgrade
+.template-tiki-schema-upgrade:
   stage: tiki-check
   needs:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  variables:
+    MYSQL_SERVICE_ALIAS: mysql-${CI_JOB_ID}
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
-      alias: mysql,
+      alias: ${MYSQL_SERVICE_ALIAS}
       command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
   script:
-    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode);SET GLOBAL log_bin_trust_function_creators = 1;"'
-    - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
+    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode);SET GLOBAL log_bin_trust_function_creators = 1;"'
+    - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
     - '[ ! -d doc/devtools/dbdiff/cache ] && mkdir doc/devtools/dbdiff/cache'
     - '[ ! -f doc/devtools/dbdiff/cache/$DBFILE ] && curl -sS https://gitlab.com/tikiwiki/tikiwiki-ci-databases/raw/master/$DBFILE.gz -o doc/devtools/dbdiff/cache/$DBFILE.gz && gzip -d doc/devtools/dbdiff/cache/$DBFILE.gz'
     - export TIKI_CATCH_UPDATE_WARNINGS=1
-    - php -d display_errors=On doc/devtools/check_schema_upgrade.php -m $DBVER -e $ENGINE --db1=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikinew
-  after_script:
-    - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - mysqldump --column-statistics=0  --default-character-set=utf8mb4 -u root --password=$MYSQL_ROOT_PASSWORD -h mysql tikiold > tikiold.sql
-    - mysqldump --column-statistics=0  --default-character-set=utf8mb4 -u root --password=$MYSQL_ROOT_PASSWORD -h mysql tikinew > tikinew.sql
+    - php -d display_errors=On doc/devtools/check_schema_upgrade.php -m $DBVER -e $ENGINE --db1=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikinew
+    - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - mysqldump --column-statistics=0  --default-character-set=utf8mb4 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikiold > tikiold.sql
+    - mysqldump --column-statistics=0  --default-character-set=utf8mb4 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikinew > tikinew.sql
   artifacts:
     paths:
       - tikiold.sql
@@ -454,68 +469,43 @@ composer-could-update-lock:
     expire_in: 2 days
     when: always
 
-.template-tiki-schema-upgrade-mysql8: &template-tiki-schema-upgrade-mysql8
-  <<: *template-tiki-schema-upgrade
+.template-tiki-schema-upgrade-mysql8:
+  extends: .template-tiki-schema-upgrade
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
-      command: [ "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-      alias: mysql
+      alias: ${MYSQL_SERVICE_ALIAS}
+      command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
 
-db-upgrade-30-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_30.sql
-    DBVER: 30
+
+db-upgrade-recent:
+  extends: .template-tiki-schema-upgrade-mysql8
+  variables: 
     IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
     ENGINE: InnoDB
+  parallel:
+    matrix:
+      - DBFILE: ci_30.sql
+        DBVER: 30
+      - DBFILE: ci_29.sql
+        DBVER: 29
+      - DBFILE: ci_28.sql
+        DBVER: 28
+      - DBFILE: ci_27.sql
+        DBVER: 27
 
-db-upgrade-29-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_29.sql
-    DBVER: 29
-    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-28-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_28.sql
-    DBVER: 28
-    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-27-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_27.sql
-    DBVER: 27
-    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-26-mysql:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_26.sql
-    DBVER: 26
+db-upgrade-older:
+  extends: .template-tiki-schema-upgrade
+  variables: 
     IMAGE: ${MYSQL_5_IMAGE}
     ENGINE: InnoDB
-
-db-upgrade-25-mysql:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_25.sql
-    DBVER: 25
-    IMAGE: ${MYSQL_5_IMAGE}
-    ENGINE: InnoDB
-
-db-upgrade-24-mysql:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_24.sql
-    DBVER: 24
-    IMAGE: ${MYSQL_5_IMAGE}
-    ENGINE: InnoDB
+  parallel:
+    matrix:
+      - DBFILE: ci_26.sql
+        DBVER: 26
+      - DBFILE: ci_25.sql
+        DBVER: 25
+      - DBFILE: ci_24.sql
+        DBVER: 24
 
 sql-engine-conversion:
   stage: tiki-check
@@ -523,19 +513,20 @@ sql-engine-conversion:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  variables:
+    MYSQL_SERVICE_ALIAS: mysql-${CI_JOB_ID}
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_NEWEST_SUPPORTED}
-      alias: mysql
+      alias: ${MYSQL_SERVICE_ALIAS}
   script:
-    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode)"'
-    - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - php -d display_errors=On doc/devtools/check_sql_engine_conversion.php --db1=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikinew
-  after_script:
-    - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - mysqldump --column-statistics=0 -u root --password=$MYSQL_ROOT_PASSWORD -h mysql tikiold > tikiold.sql
-    - mysqldump --column-statistics=0 -u root --password=$MYSQL_ROOT_PASSWORD -h mysql tikinew > tikinew.sql
+    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode)"'
+    - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - php -d display_errors=On doc/devtools/check_sql_engine_conversion.php --db1=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikinew
+    - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - mysqldump --column-statistics=0 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikiold > tikiold.sql
+    - mysqldump --column-statistics=0 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikinew > tikinew.sql
   artifacts:
     paths:
       - tikiold.sql
@@ -573,39 +564,58 @@ console-php-works:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
-  services:
-    - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
-      alias: mysql
-      command: ["--explicit-defaults-for-timestamp=off"]
-    - name: ${DEPENDENCY_PROXY_PREFIX}elasticsearch:5
-      alias: elasticsearch
-    - name: ${DEPENDENCY_PROXY_PREFIX}manticoresearch/manticore:${MANTICORE_NEWEST_SUPPORTED}
-      alias: manticore
   variables:
     EXTRA: 1
     MCL: 1
+    # This allows concurrent jobs on the same runner not to interfere with one another.
+    # These aliases must remain within 15 characters and not start with a number (on docker linux). 
+    # So with the id being up to 7 characters, it means no more than 8 in the prefix.
+    # Rejected approach: Set FF_NETWORK_PER_BUILD globally.  WOuld be perfect, expcept I couldn't get dns resolution to work on the build host. - benoitg - 2026-07-27
+    MYSQL_SERVICE_ALIAS: mysql-${CI_JOB_ID}
+    ELASTICSEARCH_SERVICE_ALIAS: elastic-${CI_JOB_ID}
+    MANTICORE_SERVICE_ALIAS: manti-${CI_JOB_ID}
+  services:
+    - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
+      alias: ${MYSQL_SERVICE_ALIAS}
+      command: ["--explicit-defaults-for-timestamp=off"]
+    - name: ${DEPENDENCY_PROXY_PREFIX}${ELASTICSEARCH_IMAGE_NEWEST_SUPPORTED}
+      alias: ${ELASTICSEARCH_SERVICE_ALIAS}
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MANTICORE_IMAGE_NEWEST_SUPPORTED}
+      alias: ${MANTICORE_SERVICE_ALIAS}
   script:
     - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
-    - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
-    - 'echo -n "ElasticSearch Version: " && curl -sS -XGET ''http://elasticsearch:9200'' | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
-    - 'echo -n "Manticore Version: " && mysql -h manticore -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
-    - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
-    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --display-deprecations --display-notices --display-warnings
+    - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
+    - 'echo -n "ElasticSearch Version: " && curl -sS -XGET http://${ELASTICSEARCH_SERVICE_ALIAS}:9200 | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
+    - 'echo -n "Manticore Version: " && mysql -h ${MANTICORE_SERVICE_ALIAS} -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
+    - echo '<?php $host_tiki = "'${MYSQL_SERVICE_ALIAS}'"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
+    - php console.php smarty:generate-mapping
+    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit $PHPUNIT_EXTRA_PARAMS --log-junit temp/ci/phpunit-report.xml --display-deprecations --display-notices --display-warnings
+
+unit-tests-php-latest-with-coverage:
+  #We only generate one coverage report, for the lastest PHP.  Gitlab won't properly process if more than one parallel run has coverage artifacts.
+  extends: .template-unit-tests
+  allow_failure: false
+  variables:
+    XDEBUG_MODE: coverage
+    PHPUNIT_EXTRA_PARAMS: --coverage-cobertura temp/ci/phpunit-coverage.xml --coverage-text --colors=never
   artifacts:
     when: always
     paths:
-      - report.xml
+      # This is needed for php-gitlab-coverage to massage it for gitlab
+      - temp/ci/phpunit-coverage.xml
     reports:
-      junit: report.xml
-    expire_in: 2 days
-
-unit-tests:
-  extends: .template-unit-tests
-  allow_failure: false
+      junit: temp/ci/phpunit-report.xml
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   parallel:
     matrix:
       - PHP_VERSION: "8.5"
         DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+
+unit-tests-php-previousVersions:
+  extends: .template-unit-tests
+  allow_failure: false
+  parallel:
+    matrix:
       - PHP_VERSION: "8.4"
         DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
       - PHP_VERSION: "8.3"
@@ -614,6 +624,43 @@ unit-tests:
         DB_IMAGE: ${MYSQL_IMAGE_OLDEST_SUPPORTED}
       - PHP_VERSION: "8.1"
         DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
+
+# This job is needed beause of the 10MB gitlab limitation when processing cobertura xml files to 
+# show line by line coverage in diffs.
+# https://gitlab.com/gitlab-org/gitlab/-/work_items/328772
+# That limitation is silent, making it very hard to notice and debug..
+generate-gitlab-line-coverage-php:
+  stage: unit-tests
+  needs:
+    - unit-tests-php-latest-with-coverage
+  image: 
+    name: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    # Yes this is is a very bad idea for supply chain attacks.  But ironically because of:
+    # https://gitlab.com/gitlab-org/gitlab-runner/-/work_items/26501 and related bugs, we cannot use 
+    # the cobertura_split distroless docker image, despite wasting hours (gitlab keeps trying to inject the shell as an extra postional parameter.
+    # Since this is a gitlab-specific workaround and this step generates no executable artifacts, 
+    # and we are moving to forgejo, this is acceptable.
+    # Rejected (but attempted) alternative:
+    # Use gitlab native step runners to hack this.  Not supported by gitlab-ci-local so not workable.
+    # Use dind:  Requires privileged runners, and once we start dowan that path...
+    # Other rejecte approach:
+    # Build  cobertura_split each pipeline from source.  Slow and expensive in pipeline minutes.  And just as susceptible to supply chain attacks as this, and creates the same dependenci to github.
+    # So there we go.  - benoitg  2026-07-28
+    - curl -L -o cobertura_split https://github.com/mike-kfed/lcov2cobertura/releases/download/1.0.9/cobertura_split-x86_64-unknown-linux-musl
+    - chmod +x cobertura_split
+    - ./cobertura_split ${CI_PROJECT_DIR}/temp/ci/phpunit-coverage.xml
+    - echo "Generated files:"
+    - ls -lah ${CI_PROJECT_DIR}/temp/ci/phpunit-coverage-*.xml
+  artifacts:
+    #paths:
+      # This is only needed if you want to inspect the artifacts in gitlab's pipeline interface, the reports will compute without it.
+      #- temp/ci/phpunit-coverage-*.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        #cobertura_split will generate files appending numbers, such as phpunit-coverage-1.xml
+        path: temp/ci/phpunit-coverage-*.xml
 
 unit-tests-node:
   stage: unit-tests
@@ -624,6 +671,16 @@ unit-tests-node:
   script:
     - npm run testci
   coverage: '/All files(?:[^|]*\|){4}\s*(\S+)/'
+  artifacts:
+    when: always
+    #paths:
+      # This is only needed if you want to inspect the artifacts in gitlab's pipeline interface, the reports will compute without it.
+      #- temp/ci/js_coverage/cobertura-coverage.xml
+    reports:
+      junit: temp/ci/js-junit-report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: temp/ci/js_coverage/cobertura-coverage.xml
 
 # This test is only required because we don't have a combined node and php image currently. - benoitg - 2025-03-08
 unit-tests-icon-generator:
@@ -636,61 +693,128 @@ unit-tests-icon-generator:
   script:
     - php console.php build:generateiconlist
 
+# End-to-end browser tests (Playwright) — fully self-contained:
+# provisions a disposable Tiki (dedicated test database + schema install) and
+# serves it with PHP's built-in web server, so no pre-existing instance is
+# needed. See tests/e2e/README.md.
+# All jobs are manual + allow_failure while runtimes are validated on shared
+# runners; promote to automatic once stable. `e2e-all` runs every suite;
+# the `e2e-suite` matrix offers one play button per domain.
+.e2e-base:
+  stage: e2e-tests
+  needs:
+    - composer
+    - node_modules
+    # node_build artifacts provide public/generated/ (JS bundles + CSS) —
+    # without them Bootstrap JS 404s and every tab/modal interaction times out.
+    - node_build
+  when: manual
+  allow_failure: true
+  # Official Playwright image (Node + browsers); version must match the
+  # @playwright/test devDependency in the root package.json.
+  image: ${DEPENDENCY_PROXY_PREFIX}mcr.microsoft.com/playwright:v1.58.2-noble
+  services:
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MARIADB_IMAGE_COMMON_LTS}
+      alias: mysql
+      command: ["--explicit-defaults-for-timestamp=off"]
+  variables:
+    TIKI_E2E_WEBSERVER: "1"
+    TIKI_E2E_DB_HOST: mysql
+    TIKI_E2E_DB_NAME: ${MYSQL_DATABASE}
+    TIKI_E2E_DB_USER: ${MYSQL_USER}
+    TIKI_E2E_DB_PASS: ${MYSQL_PASSWORD}
+  script:
+    # php-bcmath is required by teqneers/shamir (Secret::share) — shared-secrets
+    # key creation fatals without it, silently skipping the fixture-based suites.
+    - apt-get update -qq && apt-get install -y -qq php-cli php-mysql php-xml php-mbstring php-zip php-gd php-intl php-curl php-bcmath > /dev/null
+    - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
+    - tests/e2e/bin/e2e-provision.sh
+    - npx playwright install chromium
+    # E2E_SUITE selects one domain (empty = all suites). Anchored to suites/<domain>/
+    # because the bare name is a regex over the full path and could over-match.
+    - npx playwright test --config=tests/e2e/playwright.config.ts ${E2E_SUITE:+suites/${E2E_SUITE}/}
+  after_script:
+    # PHP server output goes to a file (see playwright.config.ts) to keep the
+    # job log under GitLab's 4MB limit; surface fatals here for quick triage.
+    - grep -E 'PHP (Fatal|Parse) error' tests/e2e/php-server.log | tail -20 || true
+  artifacts:
+    when: always
+    paths:
+      - tests/e2e/playwright-report
+      - tests/e2e/php-server.log
+    expire_in: 2 days
+
+e2e-all:
+  extends: .e2e-base
+
+# One manual job per domain. Adding a new domain to the matrix list is the
+# only change needed here after `mkdir tests/e2e/suites/<domain>/`.
+e2e-suite:
+  extends: .e2e-base
+  parallel:
+    matrix:
+      - E2E_SUITE:
+          - smoke
+          - shared-secrets
+          - wiki-pages
+
 #
 # Package this Tiki build
 #
 
-tiki-package:
+.tiki-package-changelog-script: &tiki-package-changelog-script |
+  echo "=> Generate changelog ..."
+  TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"
+  git fetch origin "$TARGET_BRANCH" --tags --depth=1000
+  LAST_TAG=$(git tag --sort=-v:refname | head -n 1)
+  git merge-base --is-ancestor "$LAST_TAG" "origin/$TARGET_BRANCH" || git fetch --unshallow
+  php doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
+  mv generated_changelog.md CHANGELOG.generated.md
+
+.tiki-package-base: &tiki-package-base
   stage: package-tiki
-  variables:
-    GIT_DEPTH: "1000"
   needs:
     - composer
     - node_build
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  script:
-    # Remove dev dependencies in composer
-    - echo "=> Removing Composer dev dependencies ..."
-    - composer -V | grep "version 2" || composer self-update --2
-    - composer --ansi install -d vendor_bundled --no-dev --optimize-autoloader --no-progress --prefer-dist -n # remove dev packages
-    # TODO: Remove dev dependencies in npm - benoitg - 2023-11-17
-    - php console.php dev:buildwsconfs --generate
-    # Cleanup folders that may have data, and we do not want to be packed
-    - echo "=> Cleanup ..."
-    # Assure temp folder is empty
-    - rm -fr temp && git checkout temp
-    # remove bin directory
-    - rm -fr bin
-    # Log files that are not part of GIT in the folder (exclude the ones expected)
-    - echo "=> Files in the folder not tracked in git ..."
-    - git ls-files --others | grep -v vendor_bundled/vendor/ | grep -v .composercache/ || echo "Ignore Failure"
-    # remove comments from language files
-    - echo "=> Optimize language files ..."
-    - find lang/ -name language.php -exec php doc/devtools/stripcomments.php {} \;
-    # set Permissions
-    - echo "=> Fix permissions ..."
-    - find . -type f -exec chmod 0664 {} \;
-    - chmod 0775 setup.sh
-    - find . -type d -exec chmod 0755 {} \;
-    - echo "=> Generate changelog ..."
-    - 'TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"'
-    - git fetch origin "$TARGET_BRANCH" --tags --depth=1000
-    - 'LAST_TAG=$(git tag --sort=-v:refname | head -n 1)'
-    - 'echo "Latest tag: $LAST_TAG"'
-    - 'echo "Target branch: $TARGET_BRANCH"'
-    - git merge-base --is-ancestor "$LAST_TAG" "origin/$TARGET_BRANCH" || git fetch --unshallow
-    - php doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
-    - mv generated_changelog.md CHANGELOG.generated.md
-    # pack
-    - echo "=> Pack tiki ..."
-    - tar --exclude *.DS_Store --exclude tests --exclude doc/devtools --exclude .git --exclude .gitignore --exclude .composercache -pczf tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz *
   cache: [*cache-composercache]
+  allow_failure: true
+  artifacts:
+    paths:
+      - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
+    expire_in: 2 days
+
+# 1. SHALLOW PACKAGING: Fast because it uses a depth of 1 and doesn't need to fetch all tags.'
+tiki-package-shallow:
+  <<: *tiki-package-base
+  variables:
+    GIT_DEPTH: "1"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE != "merge_train"'
+      when: always
+    - when: never
+  script:
+    - PACKAGE_FILENAME="tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz" src/ci/build_package.sh
+
+# 2. DEEP PACKAGING: Slower because it needs to fetch all tags and apply only on merge requests to the master branch.
+tiki-package-deep:
+  <<: *tiki-package-base
+  variables:
+    GIT_DEPTH: "1000"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^\d+\.x$/)'
+      when: always
+    - if: '$CI_PROJECT_PATH == "tikiwiki/tiki" && $CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ /^\d+\.x$/)'
+      when: always
+    - when: never
+  script:
+    - *tiki-package-changelog-script
+    - PACKAGE_FILENAME="tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz" src/ci/build_package.sh
   artifacts:
     paths:
       - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
       - CHANGELOG.generated.md
     expire_in: 2 days
-  allow_failure: true
 
 check-directories:
   stage: package-tiki
@@ -810,15 +934,7 @@ composer-operator-check:
   needs:
     - composer
   script:
-  - apt-get update && apt-get install -y jq
-  - chmod +x doc/devtools/check_caret_operator.sh
-  - ./doc/devtools/check_caret_operator.sh
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
-  allow_failure: false
+    - php doc/devtools/check_caret_operator.php
 
 check-alphabetical-list:
   stage: unit-tests
@@ -826,11 +942,5 @@ check-alphabetical-list:
   needs:
     - composer
   script:
-    - chmod +x doc/devtools/check_alphabetical_list.php
     - php doc/devtools/check_alphabetical_list.php
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
   allow_failure: false

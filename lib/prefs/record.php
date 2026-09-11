@@ -12,6 +12,7 @@ function prefs_record_list()
             'description' => tra('Keep track of the unsuccessful attemps to translate strings.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'i18n',
         ],
     ];
 }

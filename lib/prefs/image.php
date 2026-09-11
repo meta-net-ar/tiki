@@ -12,6 +12,7 @@ function prefs_image_list()
             'description' => tra('Default option for whether an image produced with the IMG plugin has the img-fluid class - a plugin parameter allows this to be overridden'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => 'Miscellaneous',
         ],
     ];
 }

@@ -14,6 +14,7 @@ function prefs_username_list()
             'size' => 25,
             'perspective' => false,
             'default' => '/^[\'\-_a-zA-Z0-9@\.]*$/',
+            'help' => 'Login-General-Preferences',
         ],
     ];
 }

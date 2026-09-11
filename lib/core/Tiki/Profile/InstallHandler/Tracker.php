@@ -58,7 +58,6 @@ class Tiki_Profile_InstallHandler_Tracker extends Tiki_Profile_InstallHandler
             'show_comments' => 'showComments',
             'show_last_comment' => 'showLastComment',
             'save_and_comment' => 'saveAndComment',
-            'allow_attachments' => 'useAttachments',
             'restrict_start' => 'start',
             'restrict_end' => 'end',
             'hide_list_empty_fields' => 'doNotShowEmptyField',

@@ -28,8 +28,27 @@ class BigBlueButtonLib
     public function __construct()
     {
         global $prefs;
-        $this->bbb = new BigBlueButton($prefs['bigbluebutton_server_location'], $prefs['bigbluebutton_shared_secret']);
+        $this->bbb = new BigBlueButton($this->getServerBaseUrl(), $prefs['bigbluebutton_shared_secret']);
     }
+
+    /**
+     * Normalizes the configured server location so it always points at the
+     * '/bigbluebutton' path, regardless of whether the admin included it or not.
+     *
+     * @return string
+     */
+    private function getServerBaseUrl()
+    {
+        global $prefs;
+
+        $base = rtrim($prefs['bigbluebutton_server_location'], '/');
+        if (! str_contains($base, '/bigbluebutton')) {
+            $base .= '/bigbluebutton';
+        }
+
+        return $base;
+    }
+
     /**
      * @return bool|string
      */

@@ -93,8 +93,19 @@ class Feedback
 
             $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
 
-            $access->redirect($url, $message, msgtype: 'error');
+            // Append ?challenge=1 so the final login page can emit 401 (the 302 itself cannot carry it).
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $access->redirect($url . $separator . 'challenge=1', $message, msgtype: 'error');
             die;
+        }
+
+        if (
+            ($httpCode == 401 || $httpCode == 403)
+            && \Tiki\Sections::getCurrentSection() === \Tiki\Sections::SECTION_ADMIN_LAYOUT
+        ) {
+            // Don't leak admin UI (UAB layout, admin theme) to unauthorized visitors (WYSIWYCA).
+            // SECTION_ADMIN still counts as "admin" for theme purposes, so go further.
+            \Tiki\Sections::setCurrentSection(\Tiki\Sections::SECTION_GLOBAL);
         }
 
         $errorPage = $errorPage ?? "error.tpl";
@@ -305,8 +316,7 @@ class Feedback
     public static function sendHeaders(): void
     {
         if (PHP_SAPI !== 'cli') {
-            require_once 'lib/smarty_tiki/function.feedback.php';
-            $feedback = rawurlencode(str_replace(["\n", "\r", "\t"], '', smarty_function_feedback(
+            $feedback = rawurlencode(str_replace(["\n", "\r", "\t"], '', \SmartyTiki\FunctionHandler\Feedback::render(
                 [], // Encode since HTTP headers are ASCII-only. Other characters can go through, but header()'s documentation has no word on their treatment. Chealer 2017-06-20
                 TikiLib::lib('smarty')->getEmptyInternalTemplate()
             )));
@@ -466,7 +476,7 @@ class Feedback
      */
     public static function showWatchers(string $watch_event, $object, $extra_event = null)
     {
-        global $prefs;
+        global $prefs, $user;
         if ($prefs['feature_user_watches'] === 'y') {
             $watches = TikiLib::lib('tiki')->get_event_watches($watch_event, $object);
 
@@ -479,10 +489,19 @@ class Feedback
                 $watches = array_merge($watches, $extra_watches);
             }
 
+            // The editor is silently excluded from wiki_page_changed notifications unless they
+            // explicitly opted in (see sendWikiEmailNotification in notificationemaillib.php),
+            // so the displayed list must reflect the same exclusion.
+            if ($watch_event === 'wiki_page_changed' && ($prefs['wiki_watch_editor'] != 'y' || $prefs['user_wiki_watch_editor'] != 'y')) {
+                $watches = array_values(array_filter($watches, function ($watch) use ($user) {
+                    return $watch['user'] !== $user;
+                }));
+            }
+
             if (count($watches)) {
                 $usersList = [];
                 foreach ($watches as $watch) {
-                    $usersList[] = "<a href='tiki-user_information.php?user=" . $watch['user'] . "' class='fw-bold'>" . $watch['user'] . "</a>";
+                    $usersList[] = "<a href='tiki-user_information.php?view_user=" . urlencode($watch['user']) . "' class='fw-bold'>" . htmlspecialchars($watch['user']) . "</a>";
                 }
 
                 if (! empty($usersList)) {

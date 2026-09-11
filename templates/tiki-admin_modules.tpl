@@ -370,7 +370,7 @@
                 <label class="col-sm-2 col-form-label" for='um_data'>{tr}Contents{/tr}</label>
                 <div class="col-sm-10">
                     <a id="editcreate"></a>
-                    {textarea name='um_data' id='um_data' _class='form-control' _toolbars='y' _previewConfirmExit='n' _simple="y" syntax='smarty'}{$um_data}{/textarea}
+                    {textarea name='um_data' id='um_data' _class='form-control' _toolbars='y' _previewConfirmExit='n' _simple="y" _syntax='smarty'}{$um_data}{/textarea}
                 </div>
             </div>
             <div class="tiki-form-group row">
