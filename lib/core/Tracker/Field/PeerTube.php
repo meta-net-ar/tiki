@@ -2,10 +2,7 @@
 
 namespace Tracker\Field;
 
-use Tracker\Field\AbstractItemField;
-use Tracker\Field\SynchronizableInterface;
-
-class TrackerFieldPeerTube extends AbstractItemField implements SynchronizableInterface
+class PeerTube extends AbstractItemField implements SynchronizableInterface
 {
     public static function getManagedTypesInfo(): array
     {
@@ -160,4 +157,4 @@ class TrackerFieldPeerTube extends AbstractItemField implements SynchronizableIn
     }
 }
 
-class_alias(TrackerFieldPeerTube::class, 'Tracker_Field_PeerTube');
+class_alias(PeerTube::class, 'Tracker_Field_PeerTube');

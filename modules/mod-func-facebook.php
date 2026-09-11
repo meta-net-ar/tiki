@@ -55,7 +55,7 @@ function module_facebook($mod_reference, $module_params)
         $socnetsDataLib = new SocnetsDataLib();
         try {
             $timeline = $socnetsDataLib->getFacebookWall($user, 'Facebook', $page, $perPage, $pageId);
-        } catch (\TikiLib\Core\Services\Exception\SocnetsTokenNotFoundException $e) {
+        } catch (\Tiki\Lib\Socnets\Exception\SocnetsTokenNotFoundException $e) {
             $timeline = module_facebook_fetch_legacy_timeline($user);
 
             if (empty($timeline)) {
@@ -63,7 +63,7 @@ function module_facebook($mod_reference, $module_params)
                 $timeline[0]['created_time'] = '';
                 $timeline[0]['fromName'] = '';
             }
-        } catch (\TikiLib\Core\Services\Exception\SocnetsProviderNotConfiguredException | \TikiLib\Core\Services\Exception\SocnetsApiException $e) {
+        } catch (\Tiki\Lib\Socnets\Exception\SocnetsProviderNotConfiguredException | \Tiki\Lib\Socnets\Exception\SocnetsApiException $e) {
             $timeline = module_facebook_fetch_legacy_timeline($user);
 
             if (empty($timeline)) {

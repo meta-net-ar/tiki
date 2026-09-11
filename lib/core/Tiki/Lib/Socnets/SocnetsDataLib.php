@@ -7,18 +7,14 @@
 // author : aris002@yahoo.co.uk
 namespace Tiki\Lib\Socnets;
 
-require_once('lib/core/Services/Exception/SocnetsProviderNotConfigured.php');
-require_once('lib/core/Services/Exception/SocnetsTokenNotFound.php');
-require_once('lib/core/Services/Exception/SocnetsApi.php');
-
 use Tiki\Lib\Socnets\Util;
 use Tiki\Lib\Socnets\PrefsGen;
 use Hybridauth\HttpClient;
 use TikiLib;
 use Feedback;
-use TikiLib\Core\Services\Exception\SocnetsApiException;
-use TikiLib\Core\Services\Exception\SocnetsProviderNotConfiguredException;
-use TikiLib\Core\Services\Exception\SocnetsTokenNotFoundException;
+use Tiki\Lib\Socnets\Exception\SocnetsApiException;
+use Tiki\Lib\Socnets\Exception\SocnetsProviderNotConfiguredException;
+use Tiki\Lib\Socnets\Exception\SocnetsTokenNotFoundException;
 
 /**
  * Class to retrieve data from social networks using HybridAuth adapters

@@ -3,9 +3,9 @@
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE.
 
-namespace Services\Peertube;
+namespace Services\PeerTube;
 
-class ServicesPeerTubeController
+class Controller
 {
     public function setUp()
     {
@@ -186,4 +186,4 @@ class ServicesPeerTubeController
     }
 }
 
-class_alias(\Services\Peertube\ServicesPeerTubeController::class, 'Services_PeerTube_Controller');
+class_alias(Controller::class, 'Services_PeerTube_Controller');

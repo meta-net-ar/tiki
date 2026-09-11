@@ -39,7 +39,7 @@ parameters:
     #File specific globals
     - 
       message: '#Variable \$tikilib might not be defined.#'
-      path: 'lib/Auth/Tokens.php'
+      path: 'lib/core/Tiki/Lib/Auth/Tokens.php'
     
     #todo: https://github.com/phpstan/phpstan-deprecation-rules
     #TODO:  Add extensions for Symfony, etc.

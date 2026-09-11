@@ -20,7 +20,7 @@ if ($argc < 3) {
 
 set_include_path(get_include_path() . PATH_SEPARATOR . '../../');
 
-require_once('lib/language/LangStringEscaper.php');
+require_once('lib/core/Tiki/Lib/Language/LangStringEscaper.php');
 
 $oldString = LangStringEscaper::addPhpSlashes($argv[1]);
 $newString = LangStringEscaper::addPhpSlashes($argv[2]);

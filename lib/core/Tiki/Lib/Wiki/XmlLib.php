@@ -21,7 +21,7 @@ use ZipArchive;
 //
 // For the import, the import_pages() method opens the Zip file, parses the wiki.xml file and
 // creates the pages by calling create_page() for each page. The parser (PageParser) is defined
-// in lib/wiki/PageParser.php. create_page() either creates a new page or updates an old one. In the
+// in lib/core/Tiki/Lib/Wiki/PageParser.php. create_page() either creates a new page or updates an old one. In the
 // latter case, the page is extended by such things as the attachments or page history.
 
 

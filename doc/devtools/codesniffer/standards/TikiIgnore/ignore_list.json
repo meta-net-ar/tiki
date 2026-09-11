@@ -2985,7 +2985,7 @@
         "lib/core/Services/ResultLoader/WebService.php": {
             "class:Services_ResultLoader_WebService": true
         },
-        "lib/core/Services/Language/TranslationReader.php": {
+        "lib/language/TranslationReader.php": {
             "class:TranslationReader": true
         },
         "lib/core/Services/Language/TransifexController.php": {
@@ -3132,7 +3132,7 @@
         "lib/core/Services/Exception/Disabled.php": {
             "class:Services_Exception_Disabled": true
         },
-        "lib/core/Services/Exception/BadRequest.php": {
+        "lib/core/ServicesExceptionBadRequest.php": {
             "class:ServicesExceptionBadRequest": true
         },
         "lib/core/Services/Exception/FieldError.php": {
@@ -3893,7 +3893,7 @@
             "ContactLib::rename_ext": true,
             "ContactLib::modify_ext": true
         },
-        "lib/Sheet/DataFormat.php": {
+        "lib/core/Tiki/Lib/Sheet/DataFormat.php": {
             "DataFormat::currency_ca": true,
             "DataFormat::currency_us": true
         },
@@ -3940,7 +3940,7 @@
             "SheetLib::user_can_view": true,
             "SheetLib::user_can_edit": true
         },
-        "lib/Sheet/Sheet.php": {
+        "lib/core/Tiki/Lib/Sheet/Sheet.php": {
             "Sheet::error_handler": true
         },
         "lib/wiki-plugins/wikiplugin_backlinks.php": {
@@ -4010,7 +4010,7 @@
             "ParserLib::get_hotwords": true,
             "ParserLib::add_translationof_relation": true
         },
-        "lib/Theme/ThemeLib.php": {
+        "lib/core/Tiki/Lib/Theme/ThemeLib.php": {
             "ThemeLib::list_themes": true,
             "ThemeLib::get_options": true,
             "ThemeLib::list_theme_options": true,
@@ -4022,7 +4022,7 @@
             "ThemeLib::get_available_themes": true,
             "ThemeLib::get_available_options": true
         },
-        "lib/Theme/ThemeControlLib.php": {
+        "lib/core/Tiki/Lib/Theme/ThemeControlLib.php": {
             "ThemeControlLib::tc_assign_category": true,
             "ThemeControlLib::tc_assign_section": true,
             "ThemeControlLib::tc_assign_object": true,
@@ -4115,7 +4115,7 @@
         "lib/wiki/quantifylib.php": {
             "QuantifyLib::wiki_update": true
         },
-        "lib/wiki/XmlLib.php": {
+        "lib/core/Tiki/Lib/Wiki/XmlLib.php": {
             "XmlLib::get_error": true,
             "XmlLib::export_pages": true,
             "XmlLib::export_page": true,
@@ -4228,7 +4228,7 @@
             "UserMailinLib::update_user_mailin_struct": true,
             "UserMailinLib::delete_user_mailin_struct": true
         },
-        "lib/Logs/LogsLib.php": {
+        "lib/core/Tiki/Lib/Logs/LogsLib.php": {
             "LogsLib::add_log": true,
             "LogsLib::list_logs": true,
             "LogsLib::old_list_logs": true,
@@ -4380,11 +4380,11 @@
             "RankLib::wiki_ranking_top_authors": true,
             "RankLib::cms_ranking_top_authors": true
         },
-        "lib/Quizzes/Quiz.php": {
+        "lib/core/Tiki/Lib/Quizzes/Quiz.php": {
             "Quiz::show_html": true,
             "Quiz::data_load": true
         },
-        "lib/Quizzes/QuizLib.php": {
+        "lib/core/Tiki/Lib/Quizzes/QuizLib.php": {
             "QuizLib::get_quiz": true,
             "QuizLib::compute_quiz_stats": true,
             "QuizLib::list_quizzes": true,
@@ -4422,21 +4422,21 @@
             "QuizLib::quiz_store": true,
             "QuizLib::get_upload_dir": true
         },
-        "lib/Quizzes/Helper/QuizUtils.php": {
+        "lib/core/Tiki/Lib/Quizzes/Helper/QuizUtils.php": {
             "QuizUtils::NextText": true,
             "QuizUtils::NextBlank": true,
             "QuizUtils::quizlib_error_exit": true,
             "QuizUtils::TextToQuestions": true
         },
-        "lib/Quizzes/HWQuizQuestion.php": {
+        "lib/core/Tiki/Lib/Quizzes/HWQuizQuestion.php": {
             "HWQuizQuestion::from_text": true,
             "HWQuizQuestion::to_text": true
         },
-        "lib/Quizzes/HWQuizQuestionMultipleChoice.php": {
+        "lib/core/Tiki/Lib/Quizzes/HWQuizQuestionMultipleChoice.php": {
             "HWQuizQuestionMultipleChoice::from_text": true,
             "HWQuizQuestionMultipleChoice::to_text": true
         },
-        "lib/Quizzes/HWQuizQuestionYesNo.php": {
+        "lib/core/Tiki/Lib/Quizzes/HWQuizQuestionYesNo.php": {
             "HWQuizQuestionYesNo::from_text": true,
             "HWQuizQuestionYesNo::to_text": true
         },
@@ -4466,17 +4466,17 @@
             "TikiIntegrator::clear_cache": true,
             "TikiIntegrator::clear_cached_file": true
         },
-        "lib/Filegals/ScormLib.php": {
+        "lib/core/Tiki/Lib/Filegals/ScormLib.php": {
             "ScormLib::handle_file_creation": true,
             "ScormLib::handle_file_update": true
         },
-        "lib/Filegals/H5PLib.php": {
+        "lib/core/Tiki/Lib/Filegals/H5PLib.php": {
             "H5PLib::handle_fileCreation": true,
             "H5PLib::handle_fileUpdate": true,
             "H5PLib::handle_fileDelete": true,
             "H5PLib::alter_assets": true
         },
-        "lib/Filegals/FileGalLib.php": {
+        "lib/core/Tiki/Lib/Filegals/FileGalLib.php": {
             "FileGalLib::is_default_gallery_writable": true,
             "FileGalLib::get_attachment_gallery": true,
             "FileGalLib::get_wiki_attachment_gallery": true,
@@ -4647,7 +4647,7 @@
             "FaqLib::approve_suggested_question": true,
             "FaqLib::get_suggested_question": true
         },
-        "lib/Registration/RegistrationLib.php": {
+        "lib/core/Tiki/Lib/Registration/RegistrationLib.php": {
             "RegistrationLib::SnowCheckMail": true,
             "RegistrationLib::get_customfields": true,
             "RegistrationLib::local_check_registration": true,
@@ -4752,7 +4752,7 @@
             "ZoteroLib::get_entry": true,
             "ZoteroLib::get_formatted_references": true
         },
-        "lib/minical/minicallib.php": {
+        "lib/core/Tiki/Lib/MiniCal/MiniCalLib.php": {
             "MiniCalLib::minical_events_by_slot": true,
             "MiniCalLib::minical_upload_topic": true,
             "MiniCalLib::minical_list_topics": true,
@@ -5101,7 +5101,7 @@
             "XMPPLib::add_groups_to_room": true,
             "XMPPLib::get_groups": true
         },
-        "lib/Auth/LdapLib.php": {
+        "lib/core/Tiki/Lib/Auth/LdapLib.php": {
             "LdapLib::get_user_attributes": true,
             "LdapLib::get_all_users_attributes": true,
             "LdapLib::get_groups": true,
@@ -5110,7 +5110,7 @@
             "LdapLib::groupbase_dn": true,
             "LdapLib::add_log": true
         },
-        "lib/Auth/PasswordHash.php": {
+        "lib/core/Tiki/Lib/Auth/PasswordHash.php": {
             "PasswordHash::get_random_bytes": true,
             "PasswordHash::gensalt_private": true,
             "PasswordHash::crypt_private": true,
@@ -5213,7 +5213,7 @@
             "groupAlertLib::GetShowEachUser": true,
             "groupAlertLib::Notify": true
         },
-        "lib/Diff/Renderer/HtmlDiff.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/HtmlDiff.php": {
             "HtmlDiff::_insert_tag": true,
             "HtmlDiff::_count_tags": true,
             "HtmlDiff::_can_break": true
@@ -6427,7 +6427,7 @@
             "BanLib::export_rules": true,
             "BanLib::replace_rule": true
         },
-        "lib/TikiDate.php": {
+        "lib/core/Tiki/Lib/TikiDate.php": {
             "TikiDate::TimezoneIsValidId": true
         },
         "lib/bookmarks/bookmarklib.php": {
@@ -6992,7 +6992,7 @@
             "_convertTranslationsArray": true,
             "_getCacheLib": true
         },
-        "lib/GraphEngine/BarBasedGraphic.php": {
+        "lib/core/Tiki/Lib/GraphEngine/BarBasedGraphic.php": {
             "_getMinValue": true,
             "_getMaxValue": true,
             "_getLabels": true,
@@ -7003,27 +7003,27 @@
             "_drawLegendBox": true,
             "_default": true
         },
-        "lib/GraphEngine/GRenderer.php": {
+        "lib/core/Tiki/Lib/GraphEngine/GRenderer.php": {
             "_getRawColor": true
         },
-        "lib/GraphEngine/PDFLibGRenderer.php": {
+        "lib/core/Tiki/Lib/GraphEngine/PDFLibGRenderer.php": {
             "_convertLength": true,
             "_convertPosition": true,
             "_findStyle": true,
             "_getColor": true,
             "_getFormat": true
         },
-        "lib/GraphEngine/BarStackGraphic.php": {
+        "lib/core/Tiki/Lib/GraphEngine/BarStackGraphic.php": {
             "_getMinValue": true,
             "_getMaxValue": true,
             "_drawColumn": true,
             "_default": true
         },
-        "lib/GraphEngine/MultibarGraphic.php": {
+        "lib/core/Tiki/Lib/GraphEngine/MultibarGraphic.php": {
             "_drawColumn": true,
             "_default": true
         },
-        "lib/GraphEngine/LinearGridScale.php": {
+        "lib/core/Tiki/Lib/GraphEngine/LinearGridScale.php": {
             "_adjustScale": true,
             "_drawGridLine": true,
             "_drawGridTick": true,
@@ -7034,13 +7034,13 @@
             "_getZeroLocation": true,
             "_getValue": true
         },
-        "lib/GraphEngine/StaticGridScale.php": {
+        "lib/core/Tiki/Lib/GraphEngine/StaticGridScale.php": {
             "_calculateSkip": true,
             "_drawGridLine": true,
             "_drawGridTick": true,
             "_getValue": true
         },
-        "lib/GraphEngine/Graphic.php": {
+        "lib/core/Tiki/Lib/GraphEngine/Graphic.php": {
             "_getColor": true,
             "_drawLegend": true,
             "_drawContent": true,
@@ -7050,7 +7050,7 @@
             "_layout": true,
             "_notify": true
         },
-        "lib/GraphEngine/MultilineGraphic.php": {
+        "lib/core/Tiki/Lib/GraphEngine/MultilineGraphic.php": {
             "_getMinValue": true,
             "_getMaxValue": true,
             "_getLabels": true,
@@ -7059,7 +7059,7 @@
             "_drawLegendBox": true,
             "_default": true
         },
-        "lib/GraphEngine/GDGRenderer.php": {
+        "lib/core/Tiki/Lib/GraphEngine/GDGRenderer.php": {
             "_convertLength": true,
             "_convertPosition": true,
             "_findStyle": true,
@@ -7069,14 +7069,14 @@
             "_drawCenterText": true,
             "_drawRightText": true
         },
-        "lib/GraphEngine/PSGRenderer.php": {
+        "lib/core/Tiki/Lib/GraphEngine/PSGRenderer.php": {
             "_convertLength": true,
             "_convertPosition": true,
             "_findStyle": true,
             "_getColor": true,
             "_getFormat": true
         },
-        "lib/GraphEngine/GridBasedGraphic.php": {
+        "lib/core/Tiki/Lib/GraphEngine/GridBasedGraphic.php": {
             "_getMinValue": true,
             "_getMaxValue": true,
             "_getLabels": true,
@@ -7087,7 +7087,7 @@
             "_drawGridContent": true,
             "_default": true
         },
-        "lib/GraphEngine/PieChartGraphic.php": {
+        "lib/core/Tiki/Lib/GraphEngine/PieChartGraphic.php": {
             "_handleData": true,
             "_drawContent": true,
             "_drawLegendBox": true,
@@ -7100,10 +7100,10 @@
             "_ldap_sync_user_and_groups": true,
             "_ldap_sync_and_update_lastlogin": true
         },
-        "lib/Diff/Renderer/Inline.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/Inline.php": {
             "_block": true
         },
-        "lib/Diff/Renderer/HtmlDiff.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/HtmlDiff.php": {
             "_startDiff": true,
             "_endDiff": true,
             "_blockHeader": true,
@@ -7118,7 +7118,7 @@
             "_deleted": true,
             "_changed": true
         },
-        "lib/Diff/Renderer/Bytes.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/Bytes.php": {
             "_startDiff": true,
             "_endDiff": true,
             "_blockHeader": true,
@@ -7127,7 +7127,7 @@
             "_changed": true,
             "_count": true
         },
-        "lib/Diff/Renderer/CharacterInline.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/CharacterInline.php": {
             "_startDiff": true,
             "_endDiff": true,
             "_blockHeader": true,
@@ -7140,7 +7140,7 @@
             "_deleted": true,
             "_changed": true
         },
-        "lib/Diff/Renderer/Unified.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/Unified.php": {
             "_startDiff": true,
             "_endDiff": true,
             "_blockHeader": true,
@@ -7149,7 +7149,7 @@
             "_deleted": true,
             "_changed": true
         },
-        "lib/Diff/Renderer/Base.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/Base.php": {
             "_block": true,
             "_startDiff": true,
             "_endDiff": true,
@@ -7162,7 +7162,7 @@
             "_deleted": true,
             "_changed": true
         },
-        "lib/Diff/Renderer/SideBySide.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/SideBySide.php": {
             "_startDiff": true,
             "_endDiff": true,
             "_blockHeader": true,
@@ -7174,7 +7174,7 @@
             "_deleted": true,
             "_changed": true
         },
-        "lib/Diff/Renderer/Character.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/Character.php": {
             "_startDiff": true,
             "_endDiff": true,
             "_blockHeader": true,
@@ -7186,16 +7186,16 @@
             "_deleted": true,
             "_changed": true
         },
-        "lib/Diff/Renderer/TikiRenderer.php": {
+        "lib/core/Tiki/Lib/Diff/Renderer/TikiRenderer.php": {
             "_lines": true
         },
-        "lib/Diff/EngineNative.php": {
+        "lib/core/Tiki/Lib/Diff/EngineNative.php": {
             "_diag": true,
             "_lcsPos": true,
             "_compareseq": true,
             "_shiftBoundaries": true
         },
-        "lib/Diff/TextDiff.php": {
+        "lib/core/Tiki/Lib/Diff/TextDiff.php": {
             "_trimNewlines": true,
             "_check": true
         },

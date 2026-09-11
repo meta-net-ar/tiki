@@ -23,7 +23,8 @@ class Definition
     {
         $out = [];
         $definition = [];
-        $dirs = array_filter(glob(__DIR__ . '/*'), 'is_dir');
+        $ruleDirectory = dirname((new \ReflectionClass(Column::class))->getFileName());
+        $dirs = array_filter(glob($ruleDirectory . '/*'), 'is_dir');
 
         foreach ($dirs as $dir) {
             $group = basename($dir);

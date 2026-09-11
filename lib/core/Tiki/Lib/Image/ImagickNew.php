@@ -203,7 +203,7 @@ class ImagickNew extends ImageAbstract
             return false;
         }
 
-        $font = dirname(dirname(__DIR__)) . '/lib/captcha/DejaVuSansMono.ttf';
+        $font = TIKI_PATH . '/lib/captcha/DejaVuSansMono.ttf';
 
         $padLeft = 20;
         $padBottom = 20;
