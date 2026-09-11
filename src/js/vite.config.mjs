@@ -366,7 +366,7 @@ export default defineConfig(({ command, mode }) => {
                         rename: { stripBase: 3 },
                     },
                     {
-                        src: "node_modules/chart.js/dist/chart.js*",
+                        src: "node_modules/chart.js/dist/chart.{js,umd.js}*",
                         dest: "vendor_dist/chart.js/dist",
                         rename: { stripBase: 3 },
                     },
