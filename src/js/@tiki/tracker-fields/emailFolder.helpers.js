@@ -1,33 +1,67 @@
-export function updateEmailPreview(msgUid, listPath) {
-    $.get($.service("tracker", "previewItemEmail", { uid: msgUid, listPath: listPath }), function (email) {
-        $(".email-folder-preview").html(`
-            <div class="msg-headers">${email.headers}</div>
-            <div class="msg-body">${email.body}</div>
-            <div class="msg-parts">${email.msg_parts}</div>`);
-        // Remove .msg_actions and .long_header, if the user wants more interaction, they can expand the email in a new tab.
-        $(".email-folder-preview").find(".msg_actions, .long_header").remove();
+export async function updateEmailPreview(href) {
+    const urlParams = new URLSearchParams(href.split("?")[1]);
 
-        // Disable interactive elements in msg_haders and msg_parts. For interaction, the user can expand the email in a new tab.
-        $(".email-folder-preview")
-            .find(".msg-headers a, .msg-parts a, .msg-headers button, .msg-parts button")
-            .each(function () {
-                $(this).replaceWith(
-                    $(this)
-                        .clone()
-                        .removeAttr("onclick")
-                        .css("cursor", "not-allowed")
-                        .attr("data-bs-content", tr("Expand the email in a new tab to interact with this element."))
-                        .attr("data-bs-toggle", "tooltip")
-                        .attr("data-bs-trigger", "hover")
-                        .addClass("tips")
-                );
-            });
+    const requestKey = await getCyphtRequestKey();
+    if (!requestKey) return;
 
-        $(".email-folder-preview").tiki_popover();
-    }).fail(() => {
+    $.post(
+        $.service("cypht", "ajax", {
+            cypht_page: "message",
+            uid: urlParams.get("uid"),
+            list_path: urlParams.get("list_path"),
+        }),
+        {
+            imap_msg_uid: urlParams.get("uid"),
+            list_path: urlParams.get("list_path"),
+            hm_ajax_hook: "ajax_tiki_message_content",
+            hm_page_key: requestKey,
+        },
+        function (res) {
+            $(".email-folder-preview").html(`
+                <div class="msg-headers">${res.msg_headers}</div>
+                <div class="msg-body">${res.msg_text}</div>
+                <div class="msg-parts">${res.msg_parts}</div>`);
+            // Remove .msg_actions and .long_header, if the user wants more interaction, they can expand the email in a new tab.
+            $(".email-folder-preview").find(".msg_actions, .long_header").remove();
+
+            // Disable interactive elements in msg_haders and msg_parts. For interaction, the user can expand the email in a new tab.
+            $(".email-folder-preview")
+                .find(".msg-headers a, .msg-parts a, .msg-headers button, .msg-parts button")
+                .each(function () {
+                    $(this).replaceWith(
+                        $(this)
+                            .clone()
+                            .removeAttr("onclick")
+                            .css("cursor", "not-allowed")
+                            .attr("data-bs-content", tr("Expand the email in a new tab to interact with this element."))
+                            .attr("data-bs-toggle", "tooltip")
+                            .attr("data-bs-trigger", "hover")
+                            .addClass("tips")
+                    );
+                });
+
+            $(".email-folder-preview").tiki_popover();
+        }
+    ).fail(() => {
         showMessage(tr("An error occurred while fetching the email preview."), "error");
         $.closeModal();
     });
+}
+
+async function getCyphtRequestKey() {
+    if (sessionStorage.getItem("cypht_request_key")) {
+        return sessionStorage.getItem("cypht_request_key");
+    }
+
+    try {
+        const response = await fetch($.service("cypht", "getRequestKey"));
+        const requestKey = await response.json();
+        sessionStorage.setItem("cypht_request_key", requestKey);
+    } catch (error) {
+        showMessage(tr("Failed to launch the request"), "error");
+        $.closeModal();
+        return;
+    }
 }
 
 export function getPreviewNavLinks(currentItem) {

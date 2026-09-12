@@ -41,9 +41,7 @@ $(".tracker-email-view-path").on("click", function (e) {
         },
     });
 
-    const urlParams = new URLSearchParams($(this).attr("href").split("?")[1]);
-
-    updateEmailPreview(urlParams.get("uid"), urlParams.get("list_path"));
+    updateEmailPreview($(this).attr("href"));
 });
 
 $(document).on("click", ".nav-email-preview", function (e) {
@@ -52,8 +50,7 @@ $(document).on("click", ".nav-email-preview", function (e) {
     const modalContent = $(this).closest(".modal-content");
     modalContent.find(".email-folder-preview").html($.IMPORT_LOADER_MARKUP);
 
-    const urlParams = new URLSearchParams($(this).attr("href").split("?")[1]);
-    updateEmailPreview(urlParams.get("uid"), urlParams.get("list_path"));
+    updateEmailPreview($(this).attr("href"));
 
     const emailViewPath = $(".tracker-email-view-path[href='" + $(this).attr("href") + "']");
     const navigationLinks = getPreviewNavLinks(emailViewPath[0]);
