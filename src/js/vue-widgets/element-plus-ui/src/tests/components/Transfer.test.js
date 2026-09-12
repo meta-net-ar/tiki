@@ -34,6 +34,9 @@ vi.mock("../../components/ConfigWrapper.vue", () => {
     };
 });
 
+// Several tests below replace ElTransfer with their own stub, so keep a reference to the mock defined above to restore it when needed
+const elTransferMock = ElTransfer;
+
 describe("Transfer", () => {
     const consoleErrorSpy = vi.spyOn(console, "error");
     const consoleWarnSpy = vi.spyOn(console, "warn");
@@ -406,6 +409,26 @@ describe("Transfer", () => {
         expect(selectElement.options).toHaveLength(1);
         expect(selectElement.options[0].value).to.equal("c");
         expect(props.emitValueChange).toHaveBeenCalledWith(expect.objectContaining({ value: ["c"] }));
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
+    });
+
+    test("should update the lists and the hidden select when the data and defaultValue props change", async () => {
+        ElTransfer = elTransferMock;
+        const emitValueChange = vi.fn();
+        const { rerender } = render(Transfer, { props: { ...props, emitValueChange } });
+
+        const selectElement = screen.getByTestId(DATA_TEST_ID.HIDDEN_SELECT);
+        assertSelectElementToHaveOptions(selectElement, props.defaultValue);
+
+        const givenNewData = { b: "Item B", d: "Item D" };
+        await rerender({ data: givenNewData, defaultValue: ["b"] });
+
+        assertElTransferToBeCalledWith({ ...props, data: givenNewData });
+        assertSelectElementToHaveOptions(selectElement, ["b"]);
+        // The select that gets submitted is only fed by this event, so it has to be emitted
+        expect(emitValueChange).toHaveBeenCalledWith({ value: ["b"] });
 
         expect(consoleErrorSpy).not.toHaveBeenCalled();
         expect(consoleWarnSpy).not.toHaveBeenCalled();

@@ -58,7 +58,8 @@ class UserSelector extends Base
             'noneLabel' => 'None',
             'realnames' => $prefs['user_show_realnames'],
             'class' => 'form-control',
-            'lazyload' => 'false'
+            'lazyload' => 'false',
+            'noneSelectable' => 'y',
         ];
 
         $params = array_merge($defaults, $params);
@@ -194,9 +195,22 @@ class UserSelector extends Base
             ], $template);
         }
 
-        $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . ' style="' . $params['style'] . '" class="form-control">';
-        if ($params['allowNone'] === 'y') {
-            $ret .= '<option value=""' . (empty($params['user']) ? ' selected="selected"' : '') . ' >' . tra($params['noneLabel']) . '</option>';
+        $placeholder = '';
+        if ($params['allowNone'] === 'y' && $params['multiple'] === 'true' && $params['noneLabel'] !== '') {
+            // When selecting several users, "None" is not a value: the hidden input below already
+            // submits the empty value. Render it as a placeholder, which clears itself once a user
+            // is picked, instead of an option that can be selected alongside real users.
+            $placeholder = ' placeholder="' . htmlspecialchars(tra($params['noneLabel'])) . '"';
+        }
+
+        $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . $placeholder . ' style="' . $params['style'] . '" class="form-control">';
+        if ($params['allowNone'] === 'y' && $params['multiple'] !== 'true') {
+            $noneOptionAttributes = (empty($params['user']) ? ' selected="selected"' : '');
+            if ($params['noneSelectable'] !== 'y') {
+                $noneOptionAttributes .= ' disabled="disabled" hidden';
+            }
+
+            $ret .= '<option value=""' . $noneOptionAttributes . ' >' . tra($params['noneLabel']) . '</option>';
         }
         foreach ($users as $usr => $usersname) {
             $selected = isset($params['select']) && ($params['select'] === $usr || (is_array($params['select']) && in_array($usr, $params['select'])));
