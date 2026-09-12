@@ -400,9 +400,14 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                         }
                     }
                 }
+                $allowedUsers = [];
+                foreach ($users as $groupUsers) {
+                    $allowedUsers = array_merge($allowedUsers, array_keys($groupUsers));
+                }
                 $templateData = array_merge($templateData, [
                     'groups' => $groups,
                     'users' => $users,
+                    'allowed_users' => array_values(array_unique($allowedUsers)),
                     'selected_users' => $value,
                     'selected_groups' => $selected_groups,
                     'lazyload' => $this->trackerField->getOption('lazyload'),

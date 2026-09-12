@@ -15,7 +15,7 @@
     {else}
         <div class="col-sm-6">
             {tr}Select user(s):{/tr}
-            <select name="{$field.html_name}" id="user_selector_{$field.fieldId}" multiple="multiple" class="form-select" {if $field.options_map.lazyload}data-remote-source-url="{$data.remote_url}"{/if}>
+            <select name="{$field.html_name}" id="user_selector_{$field.fieldId}" multiple="multiple" class="form-select" {if $field.options_map.lazyload}data-remote-source-url="{$data.remote_url}"{else}{if $prefs.user_selector_drag_between_fields eq 'y'}data-drag-group="userselector" data-allowed-values="{$data.allowed_users|json_encode|escape}"{/if}{/if}>
                 {section name=ix loop=$data.selected_users}
                     <option value="{$data.selected_users[ix]}" selected>{if ($field.showRealname == 'y')}{$data.selected_users[ix]|username}{else}{$data.selected_users[ix]}{/if}</option>
                 {/section}
@@ -29,9 +29,13 @@
 </div>
 {jq}
     var users{{$field.fieldId}} = {{$data.users|json_encode}};
+    var labels{{$field.fieldId}} = {};
+    $.each(users{{$field.fieldId}}, function(group, users) {
+        $.extend(labels{{$field.fieldId}}, users);
+    });
     $("#user_group_selector_{{$field.fieldId}}").on("change", function() {
         var $selector = $('#user_selector_{{$field.fieldId}}'),
-            selected = $selector.val(),
+            selected = $selector.val() || [],
             group_users = {};
 
         if ($selector.data('remote-source-url')) {
@@ -50,6 +54,13 @@
             }
             var all_users = Object.keys(group_users);
 
+            $.each(selected, function(index, user) {
+                if ($.inArray(user, all_users) < 0) {
+                    group_users[user] = labels{{$field.fieldId}}[user] || user;
+                    all_users.push(user);
+                }
+            });
+
             var $group_selector = $("#user_group_selector_{{$field.fieldId}}"),
                 group_selected = $group_selector.val();
             if (all_users.length > 0) {
@@ -64,9 +75,6 @@
             }
 
 
-            var to_remove = $.map(selected, function(user) {
-                return $.inArray(user, all_users) < 0 ? user : null;
-            });
             $selector.empty();
             $.map(all_users, function(user){
                 return {value: user, label: group_users[user]};
@@ -94,4 +102,33 @@
             }
         }
     }).trigger('change');
+
+    $('#user_selector_{{$field.fieldId}}').on('change', function() {
+        var $group_selector = $('#user_group_selector_{{$field.fieldId}}'),
+            filter = $group_selector.val() || [],
+            missing = [];
+
+        if (! filter.length) {
+            return;
+        }
+        $.each($(this).val() || [], function(index, user) {
+            var shown = filter.some(function(group) {
+                return (users{{$field.fieldId}}[group] || {})[user] !== undefined;
+            });
+            if (shown) {
+                return;
+            }
+            var group = Object.keys(users{{$field.fieldId}}).filter(function(group) {
+                return users{{$field.fieldId}}[group][user] !== undefined;
+            }).sort(function(one, other) {
+                return Object.keys(users{{$field.fieldId}}[one]).length - Object.keys(users{{$field.fieldId}}[other]).length;
+            })[0];
+            if (group && $.inArray(group, missing) < 0) {
+                missing.push(group);
+            }
+        });
+        if (missing.length) {
+            $group_selector.val(filter.concat(missing)).trigger('change');
+        }
+    });
 {/jq}

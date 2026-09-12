@@ -198,6 +198,7 @@
                     {preference name=elementplus_select_filterable}
                     {preference name=elementplus_select_allow_create}
                     {preference name=elementplus_select_sortable}
+                    {preference name=user_selector_drag_between_fields}
                     {preference name=elementplus_upload}
                 </div>
             </fieldset>

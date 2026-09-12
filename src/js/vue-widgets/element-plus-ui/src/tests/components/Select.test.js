@@ -6,6 +6,7 @@ import { ElOption, ElSelect } from "element-plus";
 import * as SortableHelper from "../../helpers/select/sortable";
 import Sortable from "sortablejs";
 import ConfigWrapper from "../../components/ConfigWrapper.vue";
+import { startDrag, endDrag, setRefusal, refusalFor } from "../../helpers/select/dragBetweenFields";
 
 vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
@@ -400,6 +401,135 @@ describe("Select", () => {
                 // This is acceptable in a test environment with mocked components
                 expect(Sortable).not.toHaveBeenCalled();
             }
+        });
+    });
+
+    describe("Drag between fields", () => {
+        const dragProps = {
+            ...basicProps,
+            multiple: "true",
+            dragGroup: "userselector",
+            value: JSON.stringify(["foo"]),
+        };
+
+        const renderDraggableSelect = (props = dragProps) => {
+            vi.mocked(ElSelect).mockImplementationOnce(() => h("div", { class: "el-select__selection" }, "Selection"));
+            render(Select, { props });
+
+            return {
+                sortableOptions: Sortable.mock.calls[0][1],
+                field: Sortable.mock.instances[0],
+                otherField: {},
+            };
+        };
+
+        afterEach(() => {
+            endDrag();
+        });
+
+        test("gives the values a group to be exchanged in when the dragGroup prop is set", () => {
+            renderDraggableSelect();
+
+            expect(Sortable).toHaveBeenCalledWith(
+                screen.getByText("Selection"),
+                expect.objectContaining({
+                    group: expect.objectContaining({ name: "userselector", put: expect.any(Function) }),
+                })
+            );
+        });
+
+        test("keeps the values to their own field when no dragGroup prop is set", () => {
+            renderDraggableSelect({ ...dragProps, dragGroup: undefined, ordering: "true" });
+
+            expect(Sortable.mock.calls[0][1].group).toBeUndefined();
+        });
+
+        test("takes in a value the field does not hold yet", () => {
+            const { sortableOptions, field, otherField } = renderDraggableSelect();
+            startDrag({ value: "bar" });
+
+            expect(sortableOptions.group.put(field, otherField)).toBe(true);
+            expect(refusalFor(field)).toBe("");
+        });
+
+        test("turns down a value the field already holds, and says why", async () => {
+            const { sortableOptions, field, otherField } = renderDraggableSelect();
+            startDrag({ value: "foo" });
+
+            expect(sortableOptions.group.put(field, otherField)).toBe(false);
+            await waitFor(() => {
+                expect(screen.getByTestId(DATA_TEST_ID.DROP_REFUSAL).textContent).toContain("already selected");
+            });
+        });
+
+        test("turns down a user the allowedValues prop does not name, and says why", async () => {
+            const { sortableOptions, field, otherField } = renderDraggableSelect({
+                ...dragProps,
+                allowedValues: JSON.stringify(["foo", "bar"]),
+            });
+            startDrag({ value: "baz" });
+
+            expect(sortableOptions.group.put(field, otherField)).toBe(false);
+            await waitFor(() => {
+                expect(screen.getByTestId(DATA_TEST_ID.DROP_REFUSAL).textContent).toContain("does not belong to any group");
+            });
+        });
+
+        test("adds the value dropped by another field", () => {
+            const givenProps = { ...dragProps, emitValueChange: vi.fn() };
+            const { sortableOptions } = renderDraggableSelect(givenProps);
+            startDrag({ value: "bar" });
+
+            sortableOptions.onAdd();
+
+            expect(givenProps.emitValueChange).toHaveBeenCalledWith({ value: ["foo", "bar"] });
+        });
+
+        test("lets go of the value taken by another field", () => {
+            const givenProps = { ...dragProps, emitValueChange: vi.fn() };
+            const { sortableOptions } = renderDraggableSelect(givenProps);
+            startDrag({ value: "foo" });
+
+            sortableOptions.onRemove({ originalEvent: {} });
+
+            expect(givenProps.emitValueChange).toHaveBeenCalledWith({ value: [] });
+        });
+
+        test("keeps the value taken by another field when the copy modifier is held", () => {
+            const givenProps = { ...dragProps, emitValueChange: vi.fn() };
+            const { sortableOptions } = renderDraggableSelect(givenProps);
+            startDrag({ value: "foo" });
+
+            sortableOptions.onRemove({ originalEvent: { ctrlKey: true } });
+
+            expect(givenProps.emitValueChange).not.toHaveBeenCalled();
+        });
+
+        test("changes nothing while a field is turning the value down", () => {
+            const givenProps = { ...dragProps, emitValueChange: vi.fn() };
+            const { sortableOptions, otherField } = renderDraggableSelect(givenProps);
+            startDrag({ value: "bar" });
+            setRefusal(otherField, "duplicate");
+
+            sortableOptions.onAdd();
+            sortableOptions.onRemove({ originalEvent: {} });
+
+            expect(givenProps.emitValueChange).not.toHaveBeenCalled();
+        });
+
+        test("puts the tag back where it was taken from once it has been carried off", () => {
+            const { sortableOptions } = renderDraggableSelect();
+            const givenField = document.createElement("div");
+            const givenTag = document.createElement("div");
+            const givenNextTag = document.createElement("div");
+            givenField.append(givenTag, givenNextTag);
+            const givenOtherField = document.createElement("div");
+
+            sortableOptions.onStart({ item: givenTag, oldIndex: 0 });
+            givenOtherField.append(givenTag);
+            sortableOptions.onEnd({ item: givenTag, from: givenField, to: givenOtherField });
+
+            expect(Array.from(givenField.children)).toEqual([givenTag, givenNextTag]);
         });
     });
 });

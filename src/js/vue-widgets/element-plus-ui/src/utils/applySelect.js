@@ -50,6 +50,17 @@ function transformContainerSelects(containerElement) {
                 $(elementPlusUi).attr("remote-source-url", $(this).data("remote-source-url"));
             }
 
+            // Only selects sharing this marker exchange their values by drag and drop
+            const dragGroup = $(this).data("drag-group");
+            if (dragGroup) {
+                elementPlusUi.attr("drag-group", dragGroup);
+            }
+
+            const allowedValues = $(this).attr("data-allowed-values");
+            if (allowedValues) {
+                elementPlusUi.attr("allowed-values", allowedValues);
+            }
+
             syncSelectOptions(elementPlusUi.get(0), this);
 
             $(this).attr("element-plus-ref", elementUniqueId);

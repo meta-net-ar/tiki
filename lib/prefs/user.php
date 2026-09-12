@@ -337,6 +337,15 @@ function prefs_user_list($partial = false)
             'default' => 'n',
             'help' => $userPreferencesHelp,
         ],
+        'user_selector_drag_between_fields' => [
+            'name' => tra('Drag and drop users between fields'),
+            'description' => tra('Move a user from one User Selector to another by dragging it. Hold Ctrl (Option on macOS) while dragging to copy the user instead of moving it.'),
+            'type' => 'flag',
+            'hint' => tra('Only applies to selectors allowing multiple users, and a user can only be dropped on another User Selector.'),
+            'dependencies' => ['feature_elementplus', 'elementplus_select'],
+            'default' => 'n',
+            'help' => $userPreferencesHelp,
+        ],
         'user_favorites' => [
             'name' => tra('User favorites'),
             'description' => tra('Enable users to flag content as their favorite.'),
