@@ -12,6 +12,7 @@
 /.gitlab-ci-local/
 /phpunit
 /.phpunit.result.cache
+#Do NOT change the following to 'node_modules' or "/src/**/node_modules"!  See src/ci/noUnanticipatedNodeModules.sh - benoitg - 2026-09-11
 /node_modules
 /phpmyadmin
 /nbproject

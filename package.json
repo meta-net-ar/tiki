@@ -27,7 +27,8 @@
     "version" : "0.0.1",
     "type" : "module",
     "scriptsComments" : {
-        "checkEnvironment:validNodeModules" : "The idea is to stop everything if a dev updated from git and forgot to run npm install.  npm ls will do that (we check it's return code).  Unfortunately it is verbose (no easy cross platform way to suppress the output and keep the return code) and takes almost as long to run as a npm install...  Maybe just keep it until PHP developers get used to re-running composer and node - benoitg - 2023-11-24."
+        "checkEnvironment:validNodeModules" : "The idea is to stop everything if a dev updated from git and forgot to run npm install.  npm ls will do that (we check it's return code).  Unfortunately it is verbose (no easy cross platform way to suppress the output and keep the return code) and takes almost as long to run as a npm install...  Maybe just keep it until PHP developers get used to re-running composer and node - benoitg - 2023-11-24.",
+        "prepare":  "The complex node check is because it husky must not crash when run from a non-git repo (a tarball, a git workspace), and also needs to run on windows."
     },
     "scripts" : {
         "checkEnvironment:engine" : "node src/js/build_utils/engineCheck.js",
@@ -58,7 +59,7 @@
         "test:e2e:report" : "cd tests/e2e && npx playwright show-report",
         "postinstall" : "patch-package --patch-dir=src/js/patches --error-on-fail",
         "patch" : "patch-package --patch-dir=src/js/patches --error-on-fail",
-        "prepare" : "husky"
+        "prepare" : "node -e \"if (require('fs').statSync('.git').isDirectory()) process.exit(0);\" || husky"
     },
     "engines" : {
         "npm" : ">=9.0.0 <12",

@@ -90,7 +90,9 @@ node_modules:
   stage: build
   needs: []
   script:
-    - src/ci/build_frontend.sh install
+    #Note: If you are trying to run this from a git worktree, you'll need to mount your main git volume with something like: gitlab-ci-local --volume "/home/myusername/development/tiki:/home/myusername/development/tiki:ro" node_modules
+    - src/ci/build_frontend.sh install 
+    - src/ci/checks/noUnanticipatedNodeModules.sh
   extends: .node_dependencies_cache
   cache:
     policy: pull-push
