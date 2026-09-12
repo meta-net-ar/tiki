@@ -3491,28 +3491,4 @@ class Services_Tracker_Controller
             'useFolders' => $trackerField->getOption('useFolders')
         ];
     }
-
-    public function actionPreviewItemEmail($input)
-    {
-        global $tikipath;
-
-        require_once $tikipath . '/lib/cypht/integration/classes.php';
-
-        $config = new Tiki_Hm_Site_Config_File([]); // @phpstan-ignore class.notFound
-
-        $dispatch = new Hm_Dispatch($config, false); // @phpstan-ignore class.notFound
-
-        $dispatch->load_required_module_sets(['imap']);
-
-        $res = $dispatch->process_output_modules_with_handler(['filter_message_headers', 'filter_message_body', 'filter_message_struct'], 'tiki_message_content', request_post: [
-            'imap_msg_uid' => $input->uid->int(),
-            'list_path' => $input->listPath->text(),
-        ]);
-
-        return [
-            'headers' => $res['filter_message_headers']['msg_headers'],
-            'body' => $res['filter_message_body']['msg_text'],
-            'msg_parts' => $res['filter_message_struct']['msg_parts'],
-        ];
-    }
 }
