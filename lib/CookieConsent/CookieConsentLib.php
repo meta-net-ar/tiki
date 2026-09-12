@@ -110,17 +110,11 @@ class CookieConsentLib
 
             benoitg - 2026-03-24
         */
-
         // First, if the user is logged in, try to load their stored preference
-        if ($user) {
-            $userPreferences = $tikilib->get_user_preference($user, 'cookie_consent_user_pref', '');
-            if ($userPreferences) {
-                $consentPreferences = json_decode($userPreferences, true);
-                if (is_array($consentPreferences)) {
-                    // Sync the cookie with the user preference
-                    self::setConsentPreferences($consentPreferences);
-                }
-            }
+        $consentPreferences = self::getUserPreference();
+        if ($consentPreferences) {
+            // Sync the cookie with the user preference
+            self::setConsentPreferences($consentPreferences);
         }
 
         // Second, try to read the consent cookie from browser cookie
@@ -140,6 +134,23 @@ class CookieConsentLib
         }
 
         return $consentPreferences;
+    }
+
+    private static function getUserPreference(): ?array
+    {
+        global $tikilib, $user;
+
+        if ($user) {
+            $userPreferences = $tikilib->get_user_preference($user, 'cookie_consent_user_pref', '');
+            if ($userPreferences) {
+                $consentPreferences = json_decode($userPreferences, true);
+                if (is_array($consentPreferences)) {
+                    return $consentPreferences;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
