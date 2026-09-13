@@ -26,11 +26,6 @@ $map = [
 
 $s = new XML_RPC_Server($map);
 
-function xmlRpcCantLoginResponse($user)
-{
-    return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $user));
-}
-
 /**
  * @param $params
  * @return XML_RPC_Response
@@ -67,10 +62,6 @@ function sendStructurePage($params)
         $ok = $userlib->intervalidate($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $user, $pass, false);
     } else {
         list($ok, $user, $error) = $userlib->validate_user($user, $pass, '', '');
-
-        if ($ok && ! $userlib->canLogin($user)) {
-            return xmlRpcCantLoginResponse($user);
-        }
     }
     if (! $ok) {
         return new XML_RPC_Response(0, 101, "Invalid username or password");
@@ -118,10 +109,6 @@ function sendPage($params)
         $ok = $userlib->intervalidate($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $username, $password, false);
     } else {
         list($ok, $username, $error) = $userlib->validate_user($username, $password, '', '');
-
-        if ($ok && ! $userlib->canLogin($username)) {
-            return xmlRpcCantLoginResponse($username);
-        }
     }
     if (! $ok) {
         return new XML_RPC_Response(0, 101, "Invalid username or password");
@@ -196,10 +183,6 @@ function sendArticle($params)
         $ok = $userlib->intervalidate($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $username, $password, false);
     } else {
         [$ok, $username] = $userlib->validate_user($username, $password, '', '');
-
-        if ($ok && ! $userlib->canLogin($username)) {
-            return xmlRpcCantLoginResponse($username);
-        }
     }
     if (! $ok) {
         return new XML_RPC_Response(0, 101, "Invalid username or password");
