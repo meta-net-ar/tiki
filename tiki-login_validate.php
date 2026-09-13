@@ -66,9 +66,6 @@ if (isset($_REQUEST["user"]) && getenv('REQUEST_METHOD') != 'HEAD') {   // It se
                 list($isvalid, $_REQUEST["user"], $error) = $userlib->validate_user($_REQUEST["user"], $_REQUEST["pass"], true);
                 $_SESSION['last_validation'] = $isvalid ? ['user' => $_REQUEST["user"], 'actpass' => $_REQUEST["pass"]] : null;
             }
-            if ($isvalid && ! $userlib->canLogin($_REQUEST["user"])) {
-                Feedback::errorAndDie(tr('User "%0" is not allowed to log in.', $_REQUEST["user"]), \Laminas\Http\Response::STATUS_CODE_403);
-            }
         }
     } else {
         $error = PASSWORD_INCORRECT;

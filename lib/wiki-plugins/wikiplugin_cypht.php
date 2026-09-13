@@ -400,7 +400,7 @@ function wikiplugin_cypht($data, $params)
             'pass' => $params['smtp_password']
         ];
         if ($params['smtp_no_auth'] == 'y') {
-            $attributes['login_disabled'] = true;
+            $attributes['no_auth'] = true;
         }
         if (empty($_SESSION[$session_prefix]['user_data']['smtp_servers'])) {
             $_SESSION[$session_prefix]['user_data']['smtp_servers'] = [];

@@ -496,10 +496,6 @@ class Services_Group_Controller
                 if (! $ret[0]) {
                     Services_Utilities::modalException(tra('Invalid password'));
                 }
-
-                if (! $userlib->canLogin($user)) {
-                    Services_Utilities::modalException(tr('You are not allowed to login.'));
-                }
             }
 
             $util->setVars($input, $this->filters, 'items');
@@ -594,11 +590,6 @@ class Services_Group_Controller
                 $ret = $userlib->validate_user($user, $pass);
                 if (! $ret[0]) {
                     Feedback::error(tra('Invalid password.'));
-                    return Services_Utilities::closeModal();
-                }
-
-                if (! $userlib->canLogin($user)) {
-                    Feedback::error(tr('You are not allowed to login.'));
                     return Services_Utilities::closeModal();
                 }
             }
@@ -703,11 +694,6 @@ class Services_Group_Controller
                 $ret = $userlib->validate_user($user, $pass);
                 if (! $ret[0]) {
                     Feedback::error(tra('Invalid password.'));
-                    return Services_Utilities::closeModal();
-                }
-
-                if (! $userlib->canLogin($user)) {
-                    Feedback::error(tr('You are not allowed to login.'));
                     return Services_Utilities::closeModal();
                 }
             }
