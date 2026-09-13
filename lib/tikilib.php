@@ -2868,11 +2868,16 @@ class TikiLib extends TikiDb_Bridge
      * Convert internal links from absolute to relative
      *
      * @param string $data
+     * @param bool $isMarkdown
      * @return string
      */
-    public function convertAbsoluteLinksToRelative(string $data): string
+    public function convertAbsoluteLinksToRelative(string $data, bool $isMarkdown = false): string
     {
         global $prefs, $tikilib;
+
+        if ($isMarkdown || preg_match('~\{syntax\b(?=[^}]*\btype\s*=\s*(?:["\']?markdown["\']?)(?:\s|}|$))[^}]*\}~i', $data)) {
+             return $data;
+        }
 
         preg_match_all('/\[(([^|\]]+)(\|([^|\]]+))?)\]/', $data, $matches);
 
