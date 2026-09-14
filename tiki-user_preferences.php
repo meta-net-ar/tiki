@@ -185,7 +185,7 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_info"]) && $ac
     }
 
     if (isset($_POST["login"]) && $can_change_login) {
-        Tikilib::lib('user')->change_login($userinfo['login'], $_POST["login"]);
+        TikiLib::lib('user')->change_login($userinfo['login'], $_POST["login"]);
     }
 
     TikiLib::events()->trigger(
