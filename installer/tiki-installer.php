@@ -683,7 +683,7 @@ if ($install_step == '10') {
         $admin_username = $_SESSION[$ADMIN_CREDS_SESSION_KEY]['username'];
         $admin_password = $_SESSION[$ADMIN_CREDS_SESSION_KEY]['password'];
 
-        TikiLib::lib('user')->change_login('admin', $admin_username, true);
+        TikiLib::lib('user')->change_login('admin', $admin_username);
 
         $installer->query("UPDATE `users_users` SET `hash` = ?, `pass_confirm` = ?, `avatarName` = ? WHERE `users_users`.`userId`=1", [
             TikiLib::lib('user')->hashPassword($admin_password),

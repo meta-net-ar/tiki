@@ -28,7 +28,7 @@
                             {tr}User{/tr}
                         </label>
                         <div class="col-md-8">
-                            <input class="form-control" disabled value="{$userinfo.login|escape}">
+                            <input class="form-control" {if $change_login}name="login"{else}disabled{/if} value="{$userinfo.login|escape}">
                             <span class="form-text">
                                 {tr}Last login:{/tr} {$userinfo.lastLogin|tiki_long_datetime}
                             </span>

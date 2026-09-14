@@ -125,6 +125,9 @@ if ($userwatch != $user) {
     }
 }
 
+$userinfo = $userlib->get_user_info($userwatch);
+$can_change_login = $userwatch === $user && $userinfo['login'] === 'admin';
+
 // Custom fields
 $registrationlib = TikiLib::lib('registration');
 $customfields = $registrationlib->get_customfields();
@@ -180,6 +183,11 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_info"]) && $ac
     if (isset($_POST["homePage"])) {
         $tikilib->set_user_preference($userwatch, 'homePage', $_POST["homePage"]);
     }
+
+    if (isset($_POST["login"]) && $can_change_login) {
+        Tikilib::lib('user')->change_login($userinfo['login'], $_POST["login"]);
+    }
+
     TikiLib::events()->trigger(
         'tiki.user.update',
         [
@@ -565,7 +573,6 @@ $force2FA = $userlib->forceTwoFactorAuth($userwatch);
 $smarty->assign('force2FA', $force2FA);
 $smarty->assign('twoFactorSecret', $twoFactorSecret);
 
-$userinfo = $userlib->get_user_info($userwatch);
 $generate = isset($_REQUEST['tfagenerate']) || empty($tfaSecret);
 if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] == TwoFactorAuth::TOTP_2FA) {
     $google2fa = new Google2FA();
@@ -701,6 +708,7 @@ if (isset($user_preferences[$userwatch]['email is public'])) {
 $tikilib->get_user_preference($userwatch, 'mailCharset', $prefs['default_mail_charset']);
 $tikilib->get_user_preference($userwatch, 'display_12hr_clock', 'n');
 $smarty->assign_by_ref('userinfo', $userinfo);
+$smarty->assign('change_login', $can_change_login);
 //user theme
 $themelib = TikiLib::lib('theme');
 $available_themesandoptions = $themelib->get_available_themesandoptions();

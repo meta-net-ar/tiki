@@ -198,6 +198,12 @@
                 {/remarksbox}
             {/if}
 
+            {if $using_default_admin_username}
+                {remarksbox type="error" title="{tr}Admin username not properly configured{/tr}"}
+                    {tr}Using the "admin" username is not recommended for security reasons.{/tr} {tr}Please visit{/tr} <a href="tiki-user_preferences.php">{tr}the user preferences page{/tr}</a> {tr}to change it.{/tr}</a>
+                {/remarksbox}
+            {/if}
+
             {if ! empty($unusedIndices)}
                 {include file="search/search_unused_indices.tpl"}
             {/if}
