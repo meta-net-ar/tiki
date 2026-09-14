@@ -402,7 +402,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             }
 
             if (empty($calitem)) {
-                $title = tr('Calendar event : %0', tr('New'));
+                $title = tr('New event');
                 $calendar = $calendars[0];
                 $calendarId = $input->defaultCalendarId->int() > 0 ? $input->defaultCalendarId->int() : $calendar['calendarId'];
 
