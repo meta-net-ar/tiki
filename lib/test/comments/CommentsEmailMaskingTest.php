@@ -55,6 +55,7 @@ class CommentsEmailMaskingTest extends TikiTestCase
             'forum_notifications_use_new_threads' => 'n',
             // Used in Tikilib()->object_post_save() called during comment posting
             'feature_file_galleries' => 'n',
+            'markdown_enabled' => 'n',
         ];
 
         $this->forumId = $this->commentsLib->replace_forum([

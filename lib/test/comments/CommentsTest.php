@@ -46,9 +46,10 @@ class CommentsTest extends TikiTestCase
             'sender_email' => 'noreply@example.com',
             'feature_user_watches' => 'n',
             'feature_group_watches' => 'n',
-            'feature_comments_moderation' => 'n',  // Added missing preference
-            'feature_file_galleries' => 'n',  // Added missing preference
-            'forum_notifications_use_new_threads' => 'n', // Added missing preference
+            'feature_comments_moderation' => 'n',
+            'feature_file_galleries' => 'n',
+            'forum_notifications_use_new_threads' => 'n',
+            'markdown_enabled' => 'n',
         ];
         $this->forumId = $this->commentsLib->replace_forum(['forumId' => 0, 'name' => "forum 1", 'description' => "description"]);
         $_SERVER['SERVER_NAME'] = 'localhost';
