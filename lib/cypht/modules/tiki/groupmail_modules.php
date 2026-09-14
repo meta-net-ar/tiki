@@ -268,7 +268,7 @@ class Hm_Output_groupmail_page_link extends Hm_Output_Module
         if (! $this->get('groupmail_enabled')) {
             return '';
         }
-        $res = '<li class="menu_groupmail"><a class="unread_link" href="?page=groupmail">';
+        $res = '<li class="menu_groupmail"><a class="unread_link" href="' . $this->build_page_url('groupmail') . '">';
         if (! $this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-people account_icon"></i> ';
         }
@@ -414,8 +414,8 @@ class Hm_Output_filter_groupmail_data extends Hm_Output_Module
                 $row_class .= ' ' . str_replace(' ', '_', $source);
                 if ($msg['folder'] && hex2bin($msg['folder']) != 'INBOX') {
                     $source .= '-' . preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
-                }
-                $url = '?page=message&uid=' . $msg['uid'] . '&list_path=' . sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']) . '&list_parent=' . $parent_value;
+                };
+                $url = $this->build_page_url('message', ['uid' => $msg['uid'], 'list_path' => sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']), 'list_parent' => $parent_value]);
                 if ($list_page) {
                     $url .= '&list_page=' . $this->html_safe($list_page);
                 }
@@ -556,7 +556,7 @@ if (! hm_exists('sender_callback')) {
         global $smarty, $tikiroot;
         list($class, $from, $operator, $contactId, $wikiPage) = $vals;
         if ($contactId > 0) {
-            $output = smarty_block_self_link([
+            $output = \SmartyTiki\BlockHandler\SelfLink::render([
                 '_script' => $tikiroot . 'tiki-contacts.php',
                 'contactId' => $contactId,
                 '_icon_name' => 'user',
@@ -564,12 +564,12 @@ if (! hm_exists('sender_callback')) {
                 '_height' => 12
             ], tr('View contact'), $smarty->getEmptyInternalTemplate()) . ' ';
             if (! empty($wikiPage)) {
-                $output .= smarty_block_self_link([
-                    '_script' => $tikiroot . smarty_modifier_sefurl($wikiPage),
+                $output .= \SmartyTiki\BlockHandler\SelfLink::render([
+                    '_script' => $tikiroot . \SmartyTiki\Modifier\Sefurl::apply($wikiPage),
                     '_class' => "mod_webmail_from"
                 ], $from, $smarty->getEmptyInternalTemplate());
             } else {
-                $output .= smarty_block_self_link([
+                $output .= \SmartyTiki\BlockHandler\SelfLink::render([
                 '_script' => $tikiroot . 'tiki-contacts.php',
                 'contactId' => $contactId,
                 '_class' => "mod_webmail_from"

@@ -209,7 +209,7 @@ class Services_Tracker_CalendarController
                 'trackerId'        => $row['tracker_id'] ?? null,
                 'title'            => ($title && isset($row[$title])) ? $row[$title] : ($row['title'] ?? ''),
                 'extendedProps'      => ['description' => ($description && isset($row[$description])) ? $row[$description] : ($row['description'] ?? '')],
-                'url'              => smarty_modifier_sefurl($row['object_id'], $row['object_type']),
+                'url'              => \SmartyTiki\Modifier\Sefurl::apply($row['object_id'], $row['object_type']),
                 // For all-day events, return date-only strings so FullCalendar does not apply timezone conversions that can shift the visible day.
                 'allDay'           => $isDateOnlyEvent,
                 'start'            => $isDateOnlyEvent ? gmdate('Y-m-d', $dtStart) : ($useTimestamp ? $dtStart : TikiLib::date_format("c", $dtStart, $user, 5, false)),

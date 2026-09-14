@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class ForumName
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class ForumName implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'forumname';
+    }
+
     public function handle($commentid, $retrun_forumid = 'n')
     {
         global $tikilib;

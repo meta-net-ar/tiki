@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, esmExternalRequirePlugin } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -9,6 +9,7 @@ import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 import postcssRootToHost from "./postcssRootToHost.js";
+import diceBearStyles from "./avatar-generator/styles.constant.js";
 /*
 
 Overarching principles:
@@ -138,16 +139,26 @@ export default defineConfig(({ command, mode }) => {
         "tiki-offline": resolve(import.meta.dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),
         "toolbar-dialogs": resolve(import.meta.dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),
         "tracker-rules": resolve(import.meta.dirname, "vue-mf/tracker-rules/src/tracker-rules.js"),
+        "sss-admin": resolve(import.meta.dirname, "vue-mf/sss-admin/src/sss-admin.js"),
+        "element-plus-ui/encryptedField": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/encryptedField.js"),
+        "element-plus-ui/enterKeyModal": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/enterKeyModal.js"),
         "tiki-iot-dashboard": resolve(import.meta.dirname, "tiki-iot/dashboard.js"),
         "tiki-iot-dashboard-all": resolve(import.meta.dirname, "tiki-iot/dashboard-all.js"),
         "tiki-mermaid": resolve(import.meta.dirname, "tiki-mermaid/mermaid.js"),
         "tiki-lottie": resolve(import.meta.dirname, "tiki-lottie/lottie.js"),
         "tiki-vue-sfc-loader": resolve(import.meta.dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(import.meta.dirname, "tiki-toast-ui/toast-index.js"),
-        "@tiki/modules/search": resolve(__dirname, "@tiki/modules/search.js"),
+        "xmpp/conversejs-tiki": resolve(import.meta.dirname, "../../lib/xmpp/css/conversejs-tiki.scss"),
+        "@tiki/modules/search": resolve(import.meta.dirname, "@tiki/modules/search.js"),
         "@tiki/ui-utils": resolve(import.meta.dirname, "@tiki/ui-utils/index.js"),
         "wysiwyg/summernote": resolve(import.meta.dirname, "wysiwyg/summernote/index.js"),
         "wysiwyg/plugin": resolve(import.meta.dirname, "wysiwyg/plugin.js"),
+        "@dicebear/core": resolve(import.meta.dirname, "../../node_modules/@dicebear/core/lib/index.js"),
+        ...[...diceBearStyles].reduce((acc, style) => {
+            const packageName = style.name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+            acc[`@dicebear/${style.name}`] = resolve(import.meta.dirname, `../../node_modules/@dicebear/${packageName}/lib/index.js`);
+            return acc;
+        }, {}),
     });
     return {
         base: "/public/generated/js", //This must NOT have a trailing slash
@@ -217,7 +228,6 @@ export default defineConfig(({ command, mode }) => {
                     "jquery-ui",
                     "jquery-validation",
                     "mermaid",
-                    "moment",
                     /^moment\/.+/, //Moment submodules
                     "pivottablejs",
                     "plyr",
@@ -271,6 +281,11 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         plugins: [
+            // Own this external here to rewrite moment-timezone's require("moment") for browsers.
+            // https://rolldown.rs/builtin-plugins/esm-external-require
+            esmExternalRequirePlugin({
+                external: ["moment"],
+            }),
             vue({
                 template: {
                     transformAssetUrls: {
@@ -326,11 +341,6 @@ export default defineConfig(({ command, mode }) => {
 
                     /* BEGIN common_externals section
                     These should all ALSO be in rollupOptions / external */
-                    {
-                        src: "node_modules/@dicebear", //Both @@dicebear/core and @dicebear/collection.  They do not have a normal dist structure
-                        dest: "vendor_dist/@dicebear",
-                        rename: { stripBase: 2 },
-                    },
                     {
                         src: "node_modules/@lottiefiles/dotlottie-wc/dist/*.js",
                         dest: "vendor_dist/@lottiefiles/dotlottie-wc/dist",
@@ -393,22 +403,32 @@ export default defineConfig(({ command, mode }) => {
                         rename: { stripBase: 3 },
                     },
                     {
-                        src: "node_modules/converse.js/dist/webfonts",
+                        src: "node_modules/converse.js/dist/webfonts/*",
                         dest: "vendor_dist/converse.js/dist/webfonts",
                         rename: { stripBase: 4 },
                     },
                     {
-                        src: "node_modules/converse.js/dist/sounds",
+                        src: "node_modules/converse.js/dist/sounds/*",
                         dest: "vendor_dist/converse.js/dist/sounds",
                         rename: { stripBase: 4 },
                     },
                     {
-                        src: "node_modules/converse.js/dist/locales",
-                        dest: "vendor_dist/converse.js/dist/locales",
-                        rename: { stripBase: 4 },
+                        src: "node_modules/converse.js/dist/chunkjs/locales/*",
+                        dest: "vendor_dist/converse.js/dist/chunkjs/locales",
+                        rename: { stripBase: 5 },
+                    },
+                    {
+                        src: "node_modules/converse.js/dist/chunkjs/locales/dayjs/*",
+                        dest: "vendor_dist/converse.js/dist/chunkjs/locales/dayjs",
+                        rename: { stripBase: 6 },
                     },
                     {
                         src: "node_modules/converse.js/dist/emoji.json",
+                        dest: "vendor_dist/converse.js/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/converse.js/dist/curve25519_compiled.wasm",
                         dest: "vendor_dist/converse.js/dist",
                         rename: { stripBase: 3 },
                     },
@@ -588,6 +608,10 @@ export default defineConfig(({ command, mode }) => {
                         src: "node_modules/reveal.js/dist",
                         dest: "vendor_dist/reveal.js/dist",
                         rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/reveal.js/plugin/**/*",
+                        dest: "vendor_dist/reveal.js/plugin",
                     },
                     {
                         src: "node_modules/signature_pad/dist/signature_pad.umd.min.js",
@@ -825,8 +849,19 @@ export default defineConfig(({ command, mode }) => {
             },
             server: {
                 deps: {
-                    inline: [/element-plus/],
+                    inline: [/element-plus/, /@dicebear/],
                 },
+            },
+            alias: {
+                ...Object.fromEntries(
+                    diceBearStyles.map(({ name }) => [
+                        `@dicebear/${name}`,
+                        resolve(
+                            import.meta.dirname,
+                            `../../node_modules/@dicebear/${name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`
+                        ),
+                    ])
+                ),
             },
         },
     };

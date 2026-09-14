@@ -9,9 +9,18 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
-class TrackerItemStatusIcon extends Base
+class TrackerItemStatusIcon extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'tracker_item_status_icon';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;
@@ -33,7 +42,7 @@ class TrackerItemStatusIcon extends Base
         }
 
         if (($show_status == 'y') && $item && $status = $item->getDisplayedStatus()) {
-            return smarty_function_icon([
+            return \SmartyTiki\FunctionHandler\Icon::render([
                 'name' => 'status-' . $status,
                 'iclass' => 'tips',
                 'ititle' => ':' . tr($status),

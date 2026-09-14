@@ -147,7 +147,7 @@ $.fn.loadDraw = function (o) {
                 },
                 function (data) {
                     if (data.removeButtons) {
-                        if (!$.isArray(data.removeButtons)) data.removeButtons = data.removeButtons.split(",");
+                        if (!Array.isArray(data.removeButtons)) data.removeButtons = data.removeButtons.split(",");
                         for (let id in data.removeButtons) {
                             me.data("doc")
                                 .find("#" + data.removeButtons[id].trim())

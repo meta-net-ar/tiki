@@ -45,10 +45,14 @@
         {/if}
         {if $prefs.feature_community_mouseover_lastlogin eq 'y'}
             <div class="list-group-item flex-column align-items-start">
-                <h6 class="mb-1">{tr}Last login{/tr}</h6>
-                <p class="mb-1">{if !empty($lastSeen)}{$lastSeen|tiki_short_datetime}{else}{tr}Never logged in{/tr}{/if}</p>
+                <h6 class="mb-1">{tr}Current login{/tr}</h6>
+                <p class="mb-1">{if !empty($currentLogin)}{$currentLogin|tiki_short_datetime}{else}{tr}Never logged in{/tr}{/if}</p>
             </div>
         {/if}
+        <div class="list-group-item flex-column align-items-start">
+            <h6 class="mb-1">{tr}Last activity{/tr}</h6>
+            <p class="mb-1">{if !empty($lastActivity)}{$lastActivity|tiki_short_datetime}{else}{tr}No activity{/tr}{/if}</p>
+        </div>
         {if $shared_groups}
             <div class="list-group-item flex-column align-items-start">
                 <h6 class="mb-1">{tr}Shared groups{/tr}</h6>

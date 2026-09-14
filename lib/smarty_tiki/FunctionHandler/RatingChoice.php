@@ -10,9 +10,15 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class RatingChoice extends Base
+class RatingChoice extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'rating_choice';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;

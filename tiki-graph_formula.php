@@ -12,76 +12,30 @@
 use Tiki\Lib\GraphEngine\GDGRenderer;
 use Tiki\Lib\GraphEngine\MultilineGraphic;
 use Tiki\Lib\GraphEngine\PDFLibGRenderer;
+use Tiki\Math\Formula\GraphFormulaException;
+use Tiki\Math\Formula\GraphFormulaHelper;
 
+$inputConfiguration = [
+    [
+        'staticKeyFilters' => [
+            'w'     => 'int',
+            'h'     => 'int',
+            's'     => 'int',
+            'min'   => 'float',
+            'max'   => 'float',
+            't'     => 'word',
+            'title' => 'text',
+            'p'     => 'word',
+            'o'     => 'word',
+        ],
+        'staticKeyFiltersForArrays' => [
+            'f' => 'text',
+        ],
+    ],
+];
 require_once('tiki-setup.php');
 
-// List of valid functions
-$valid = [
-    'abs',
-    'acos',
-    'acosh',
-    'asin',
-    'asinh',
-    'atan2',
-    'atan',
-    'atanh',
-    'ceil',
-    'cos',
-    'cosh',
-    'deg2rad',
-    'exp',
-    'expm1',
-    'floor',
-    'fmod',
-    'hypot',
-    'log10',
-    'log1p',
-    'log',
-    'max',
-    'min',
-    'pi',
-    'pow',
-    'rad2deg',
-    'round',
-    'sin',
-    'sinh',
-    'sqrt',
-    'tan',
-    'tanh'
-];
-
-/**
- * @param $formula
- * @return string
- */
-function convert_formula($formula)
-{
-    global $valid;
-
-    // Stripping all quotes
-    $chars = [ '`', "'", '"', '&', '[', ']', '$', '{', '}' ];
-    $formula = str_replace($chars, array_fill(0, count($chars), ''), $formula);
-
-    // Make sure only valid functions are used
-    preg_match_all('/([a-z0-9_]+)/i', $formula, $out, PREG_PATTERN_ORDER);
-    foreach ($out[0] as $match) {
-        if (! is_numeric($match) && ! in_array(strtolower($match), $valid) && $match !== 'x') {
-            die("Invalid function call {$match}");
-        }
-    }
-
-    // Replace spaces for commas
-    $formula = preg_replace('/\s+/', ', ', $formula);
-
-    $formula = str_replace('x', '$x', $formula);
-
-    $function = function ($x) use ($formula) {
-        eval('$result = ' . $formula . ';');
-        return $result;
-    };
-    return $function;
-}
-
+$access->check_feature('feature_sheet');
 $access->check_permission('feature_sheet');
 
 if (
@@ -96,7 +50,7 @@ if (
     && $_GET['w'] >= 100
     && $_GET['h'] >= 100 )
 ) {
-    die;
+    Feedback::errorAndDie(tra('Invalid graph parameters.'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 switch ($_GET['t']) {
@@ -107,24 +61,32 @@ switch ($_GET['t']) {
         $renderer = new PDFLibGRenderer($_GET['p'], $_GET['o']);
         break;
     default:
-        die;
+        Feedback::errorAndDie(tra('Invalid graph output type.'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $graph = new MultilineGraphic();
-$graph->setTitle($_GET['title']);
+$graph->setTitle($_GET['title'] ?? '');
 
 $size = ($_GET['max'] - $_GET['min']) / $_GET['s'];
 
 $data = [];
 foreach (array_values($_GET['f']) as $key => $formula) {
-    $formula = convert_formula($formula);
+    try {
+        $evaluator = GraphFormulaHelper::compile($formula);
+    } catch (GraphFormulaException $e) {
+        Feedback::errorAndDie($e->getUserMessage(), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 
     $data['x'] = [];
     $data['y' . $key] = [];
 
     for ($x = $_GET['min']; $_GET['max'] > $x; $x += $size) {
         $data['x'][] = $x;
-        $data['y' . $key][] = $formula($x);
+        try {
+            $data['y' . $key][] = $evaluator($x);
+        } catch (GraphFormulaException $e) {
+            Feedback::errorAndDie($e->getUserMessage(), \Laminas\Http\Response::STATUS_CODE_400);
+        }
     }
 }
 

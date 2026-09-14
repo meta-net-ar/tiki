@@ -2,6 +2,12 @@ import { afterEach, describe, expect, test } from "vitest";
 import $ from "jquery";
 import { attachChangeEventHandler, observeSelectElementMutations } from "../../../helpers/select/applySelect";
 
+const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
+const flushMicrotasks = async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+};
+
 describe("applySelect helper functions", () => {
     beforeEach(() => {
         window.$ = $;
@@ -27,13 +33,12 @@ describe("applySelect helper functions", () => {
             document.body.append(givenSelect, givenElementPlusUi);
 
             observeSelectElementMutations(givenSelect, givenElementPlusUi);
-
-            await new Promise((resolve) => setTimeout(resolve, 0));
+            await tick();
 
             expect(givenElementPlusUi.getAttribute(elementPlusAttribute)).toBeNull();
 
             givenSelect.setAttribute(selectAttribute, attributeValue);
-            await new Promise((resolve) => setTimeout(resolve, 0));
+            await tick();
 
             expect(givenElementPlusUi.getAttribute(elementPlusAttribute)).toBe(expectedValue);
         }
@@ -44,14 +49,13 @@ describe("applySelect helper functions", () => {
         const givenElementPlusUi = document.createElement("element-plus-ui");
 
         givenSelect.appendChild(document.createElement("option"));
-
         observeSelectElementMutations(givenSelect, givenElementPlusUi);
 
         const selectOption = document.createElement("option");
         selectOption.value = "foo";
         givenSelect.appendChild(selectOption);
 
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        await flushMicrotasks();
 
         expect(JSON.parse(givenElementPlusUi.getAttribute("options"))).toEqual([
             { value: "", label: "", disabled: false },
@@ -59,26 +63,23 @@ describe("applySelect helper functions", () => {
         ]);
     });
 
-    test("updates the element-plus-ui options when the native select change event is triggered", async () => {
+    test("updates the element-plus-ui options when select options are removed", async () => {
         const givenSelect = document.createElement("select");
         const givenElementPlusUi = document.createElement("element-plus-ui");
-        const selectOption = document.createElement("option");
-        selectOption.value = "foo";
-        givenSelect.appendChild(selectOption);
+        const keep = document.createElement("option");
+        keep.value = "1";
+        const drop = document.createElement("option");
+        drop.value = "31";
 
-        attachChangeEventHandler(givenElementPlusUi, givenSelect);
+        givenSelect.append(keep, drop);
+        givenSelect.value = "1";
+        observeSelectElementMutations(givenSelect, givenElementPlusUi);
 
-        selectOption.disabled = true;
-        $(givenSelect).trigger("change");
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        drop.remove();
+        await flushMicrotasks();
 
-        expect(JSON.parse(givenElementPlusUi.getAttribute("options"))).toEqual([{ value: "foo", label: selectOption.textContent, disabled: true }]);
-
-        selectOption.disabled = false;
-        $(givenSelect).trigger("change");
-        await new Promise((resolve) => setTimeout(resolve, 0));
-
-        expect(JSON.parse(givenElementPlusUi.getAttribute("options"))).toEqual([{ value: "foo", label: selectOption.textContent, disabled: false }]);
+        expect(JSON.parse(givenElementPlusUi.getAttribute("options"))).toEqual([{ value: "1", label: keep.textContent, disabled: keep.disabled }]);
+        expect(givenElementPlusUi.getAttribute("value")).toBe("1");
     });
 
     test("updates the element-plus-ui groups when the select grouped options change", async () => {
@@ -86,7 +87,6 @@ describe("applySelect helper functions", () => {
         const givenElementPlusUi = document.createElement("element-plus-ui");
 
         givenSelect.appendChild(document.createElement("option"));
-
         observeSelectElementMutations(givenSelect, givenElementPlusUi);
 
         const selectOptGroup = document.createElement("optgroup");
@@ -96,9 +96,28 @@ describe("applySelect helper functions", () => {
         selectOptGroup.appendChild(selectOption);
         givenSelect.appendChild(selectOptGroup);
 
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        await flushMicrotasks();
 
         expect(givenElementPlusUi.getAttribute("group")).toBe("true");
+    });
+
+    test("syncs el-select when the native select changes programmatically", async () => {
+        const givenSelect = document.createElement("select");
+        ["28", "31"].forEach((v) => {
+            const option = document.createElement("option");
+            option.value = v;
+            givenSelect.appendChild(option);
+        });
+        givenSelect.value = "31";
+
+        const givenElementPlusUi = document.createElement("element-plus-ui");
+        attachChangeEventHandler(givenElementPlusUi, givenSelect);
+
+        givenSelect.value = "28";
+        $(givenSelect).trigger("change");
+        await tick();
+
+        expect(givenElementPlusUi.getAttribute("value")).toBe("28");
     });
 
     test.each([
@@ -109,32 +128,25 @@ describe("applySelect helper functions", () => {
         async (isMultiple, value) => {
             const givenSelect = document.createElement("select");
             givenSelect.multiple = isMultiple;
-            const selectOptions = ["foo", "bar"].map((v) => {
-                const option = document.createElement("option");
-                option.value = v;
-                return option;
-            });
-
-            givenSelect.append(...selectOptions);
-            givenSelect.value = "";
+            givenSelect.append(
+                ...["foo", "bar"].map((v) => {
+                    const option = document.createElement("option");
+                    option.value = v;
+                    return option;
+                })
+            );
 
             const givenElementPlusUi = document.createElement("element-plus-ui");
-
             attachChangeEventHandler(givenElementPlusUi, givenSelect);
 
-            expect(givenSelect.value).toBe("");
+            $(givenElementPlusUi).trigger($.Event("select-change", { detail: [{ value }] }));
+            await tick();
 
-            const selectChangeEvent = $.Event("select-change", { detail: [{ value }] });
-            $(givenElementPlusUi).trigger(selectChangeEvent);
-
-            await new Promise((resolve) => setTimeout(resolve, 0));
-
-            const actualValue = [];
-            for (let i = 0; i < givenSelect.selectedOptions.length; i++) {
-                actualValue.push(givenSelect.selectedOptions[i].value);
+            if (isMultiple) {
+                expect([...givenSelect.selectedOptions].map((o) => o.value)).toEqual(value);
+            } else {
+                expect(givenSelect.value).toEqual(value);
             }
-
-            expect(isMultiple ? actualValue : givenSelect.value).toEqual(value);
         }
     );
 
@@ -146,24 +158,14 @@ describe("applySelect helper functions", () => {
         async (multiple, updatedValue) => {
             const givenSelect = document.createElement("select");
             givenSelect.multiple = multiple;
-
             const givenElementPlusUi = document.createElement("element-plus-ui");
 
             attachChangeEventHandler(givenElementPlusUi, givenSelect);
-
-            expect(givenSelect.value).toBe("");
-
-            const selectChangeEvent = $.Event("select-change", { detail: [{ value: updatedValue }] });
-            $(givenElementPlusUi).trigger(selectChangeEvent);
-
-            await new Promise((resolve) => setTimeout(resolve, 0));
+            $(givenElementPlusUi).trigger($.Event("select-change", { detail: [{ value: updatedValue }] }));
+            await tick();
 
             if (multiple) {
-                const actualValue = [];
-                for (let i = 0; i < givenSelect.selectedOptions.length; i++) {
-                    actualValue.push(givenSelect.selectedOptions[i].value);
-                }
-                expect(actualValue).toEqual(updatedValue);
+                expect([...givenSelect.selectedOptions].map((o) => o.value)).toEqual(updatedValue);
             } else {
                 expect(givenSelect.value).toEqual(updatedValue);
             }

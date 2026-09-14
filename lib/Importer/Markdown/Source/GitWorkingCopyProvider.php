@@ -16,13 +16,20 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     private const CTX_TIMEOUT = 'timeout';
 
     private const DEF_BRANCH = 'main';
-    private const DEF_TIMEOUT = 45;
+    // Kept in sync with SourceConfig::DEF_TIMEOUT — SourceManager::createProvider()
+    // always supplies ctx['timeout'] explicitly, so this only matters for direct construction
+    private const DEF_TIMEOUT = 30;
+    // Short, independent timeout for informational-only git calls (metadata display).
+    // These must never be allowed to inflate the wall-clock cost of a fetch.
+    private const DEF_METADATA_TIMEOUT = 10;
+    // Grace period after SIGTERM before escalating to SIGKILL.
+    private const TERM_GRACE_SECONDS = 2;
 
     private array $fetchMeta = [];
 
     public function __construct(
         private array $cfg,   // ['repo_url'=>..., 'repo_branch'=>'main', 'repo_token'=>'', 'git_pull'=>true]
-        private array $ctx = [] // ex: ['timeout'=>45]
+        private array $ctx = [] // ex: ['timeout'=>30]
     ) {
     }
 
@@ -57,43 +64,44 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             'repo_reset' => false,
         ];
 
-        // The working copy is transient by design: always start from a fresh clone.
-        if (is_dir($wcPath)) {
-            $this->rrmdir($wcPath);
-            $this->fetchMeta['repo_reset'] = true;
-            $this->fetchMeta['sync_mode'] = 'fresh_clone';
-        }
+        // Prevent a manual "Import now" and the scheduled cron run from racing
+        // on the same working copy (both rrmdir/clone/scan the same directory).
+        $lock = $this->acquireLock($wcPath);
+        try {
+            $hasCheckout = is_dir($wcPath . '/.git');
+            $checkedOutBranch = $hasCheckout ? $this->getCheckedOutBranch($git, $wcPath, $token) : null;
+            $branchMatches = $hasCheckout && $checkedOutBranch === $branch;
 
-        // Clone initial (with retry) or pull
-        if (! is_dir($wcPath . '/.git')) {
-            try {
-                $this->gitClone($git, $repoUrl, $branch, $wcPath, $token, $timeout);
-                $this->waitForCloneReady($wcPath);
-                $this->markRepoSafe($git, $wcPath, $token);
-                $this->fetchMeta['sync_mode'] = 'fresh_clone';
-            } catch (\Throwable $e) {
-                if (is_dir($wcPath . '/.git')) {
-                    $this->markRepoSafe($git, $wcPath, $token);
-                } else {
-                    $this->rrmdir($wcPath);
-                    $this->ensureDir(\dirname($wcPath));
-                    $this->gitClone($git, $repoUrl, $branch, $wcPath, $token, $timeout);
-                    $this->waitForCloneReady($wcPath);
-                    $this->markRepoSafe($git, $wcPath, $token);
+            if ($hasCheckout && $branchMatches && $gitPull) {
+                // Real incremental update instead of a fresh clone every time.
+                try {
+                    $this->gitPull($git, $wcPath, $token, $timeout);
+                    $this->fetchMeta['sync_mode'] = 'pull';
+                } catch (\Throwable) {
+                    // Diverged history / corrupted checkout: fall back to a fresh clone.
+                    $this->freshClone($git, $repoUrl, $branch, $wcPath, $token, $timeout);
                     $this->fetchMeta['sync_mode'] = 'fresh_clone';
+                    $this->fetchMeta['repo_reset'] = true;
                 }
+            } elseif ($hasCheckout && $branchMatches) {
+                // git_pull is off: reuse the existing checkout, no network call at all.
+                $this->fetchMeta['sync_mode'] = 'reuse_no_pull';
+            } else {
+                // No usable checkout yet (missing, wrong branch, or corrupted).
+                $this->fetchMeta['repo_reset'] = $hasCheckout;
+                $this->freshClone($git, $repoUrl, $branch, $wcPath, $token, $timeout);
+                $this->fetchMeta['sync_mode'] = 'fresh_clone';
             }
-        } elseif ($gitPull) {
-            $this->gitPull($git, $wcPath, $token, $timeout);
-            $this->fetchMeta['sync_mode'] = 'pull';
-        } else {
-            $this->fetchMeta['sync_mode'] = 'reuse_no_pull';
+
+            $this->fetchMeta = array_merge(
+                $this->fetchMeta,
+                $this->collectRepoState($git, $wcPath, $token, $repoUrl, $branch, $checkedOutBranch)
+            );
+
+            return $wcPath;
+        } finally {
+            $this->releaseLock($lock);
         }
-
-        $this->fetchMeta = array_merge($this->fetchMeta, $this->collectRepoState($git, $wcPath, $token, $repoUrl, $branch, $timeout));
-
-        // Return working copy directory directly
-        return $wcPath;
     }
 
     public function getFetchMeta(): array
@@ -102,6 +110,72 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     }
 
     /* ---------- Git helpers ---------- */
+
+    /**
+     * Wipe (if present) and clone fresh, with one retry if the first attempt
+     * leaves a partial/corrupted checkout behind.
+     */
+    private function freshClone(string $git, string $repoUrl, string $branch, string $wcPath, string $token, int $timeout): void
+    {
+        if (is_dir($wcPath)) {
+            $this->rrmdir($wcPath);
+        }
+        $this->ensureDir(\dirname($wcPath));
+
+        try {
+            $this->gitClone($git, $repoUrl, $branch, $wcPath, $token, $timeout);
+            $this->waitForCloneReady($wcPath);
+            $this->markRepoSafe($git, $wcPath, $token);
+        } catch (\Throwable) {
+            if (is_dir($wcPath . '/.git')) {
+                $this->markRepoSafe($git, $wcPath, $token);
+                return;
+            }
+            $this->rrmdir($wcPath);
+            $this->ensureDir(\dirname($wcPath));
+            $this->gitClone($git, $repoUrl, $branch, $wcPath, $token, $timeout);
+            $this->waitForCloneReady($wcPath);
+            $this->markRepoSafe($git, $wcPath, $token);
+        }
+    }
+
+    private function getCheckedOutBranch(string $git, string $wcPath, string $token): ?string
+    {
+        $env = $this->gitEnv($token, null);
+        $res = $this->execGit($git, '-C ' . escapeshellarg($wcPath) . ' rev-parse --abbrev-ref HEAD', self::DEF_METADATA_TIMEOUT, $env, null);
+        return $res['code'] === 0 ? trim($res['output']) : null;
+    }
+
+    /**
+     * Acquire an exclusive, non-blocking lock for this working-copy path so a
+     * manual "Import now" and the scheduled cron run can never operate on the
+     * same directory at once. Fails fast rather than queueing, so a stuck run
+     * cannot cause a second one to hang waiting for the lock.
+     *
+     * @return resource
+     */
+    private function acquireLock(string $wcPath)
+    {
+        $lockPath = rtrim($wcPath, '/') . '.lock';
+        $this->ensureDir(\dirname($lockPath));
+        $handle = fopen($lockPath, 'c');
+        if ($handle === false) {
+            throw new \RuntimeException(tra('Cannot open lock file:') . ' ' . $lockPath);
+        }
+        if (! flock($handle, LOCK_EX | LOCK_NB)) {
+            fclose($handle);
+            throw new \RuntimeException(tra('Another import is already running for this source. Try again once it finishes.'));
+        }
+        return $handle;
+    }
+
+    private function releaseLock($handle): void
+    {
+        if (is_resource($handle)) {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
+    }
 
     private function waitForCloneReady(string $wcPath, int $ms = 1500): void
     {
@@ -118,6 +192,14 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     private function markRepoSafe(string $git, string $wcPath, string $token): void
     {
         $env = $this->gitEnv($token, null);
+
+        // Avoid growing .gitconfig with a duplicate entry on every single run.
+        $existing = $this->execGit($git, 'config --global --get-all safe.directory', self::DEF_METADATA_TIMEOUT, $env, null);
+        $already = $existing['code'] === 0 && in_array($wcPath, preg_split('/\R/', $existing['output']) ?: [], true);
+        if ($already) {
+            return;
+        }
+
         $this->runGit($git, '-C ' . escapeshellarg($wcPath) . ' config --global --add safe.directory ' . escapeshellarg($wcPath), 15, $env, null, 'Git safe.directory failed', false);
     }
 
@@ -171,56 +253,23 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         return $env;
     }
 
-    private function runGit(string $git, string $args, int $timeout, array $env, ?string $cwd, string $errLabel, bool $fatal = true): void
-    {
-        $cmd = escapeshellarg($git) . ' ' . $args . ' 2>&1';
-        $desc = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']];
-        $proc = proc_open($cmd, $desc, $pipes, $cwd, $env);
-        if (! \is_resource($proc)) {
-            if ($fatal) {
-                throw new \RuntimeException($errLabel . ' (spawn failed)');
-            }
-            return;
-        }
-        fclose($pipes[0]);
-        stream_set_blocking($pipes[1], false);
-        stream_set_blocking($pipes[2], false);
-
-        $start = time();
-        $out = '';
-        while (true) {
-            $status = proc_get_status($proc);
-            if (! $status['running']) {
-                break;
-            }
-            if (time() - $start > $timeout) {
-                proc_terminate($proc);
-                $out .= "\n[timeout]";
-                break;
-            }
-            $out .= (string)stream_get_contents($pipes[1]);
-            $out .= (string)stream_get_contents($pipes[2]);
-            usleep(100_000);
-        }
-        // Drain any remaining buffered output after process exit.
-        $out .= (string)stream_get_contents($pipes[1]);
-        $out .= (string)stream_get_contents($pipes[2]);
-        if (is_resource($pipes[1])) {
-            fclose($pipes[1]);
-        }
-        if (is_resource($pipes[2])) {
-            fclose($pipes[2]);
-        }
-        $code = proc_close($proc);
-
-        if ($fatal && $code !== 0) {
-            // Mask secrets in output
-            $outSafe = $this->maskSecrets($out);
-            throw new \RuntimeException($errLabel . ":\n$cmd\n-- output --\n" . trim($outSafe));
-        }
-    }
-
-    private function runGitCapture(string $git, string $args, int $timeout, array $env, ?string $cwd): array
+    /**
+     * Run a git subprocess, polling for completion with a hard timeout.
+     * Escalates to SIGKILL if the process is still alive shortly after SIGTERM,
+     * so a stuck git process can never outlive PHP's own timeout logic (and,
+     * critically, can never hold .git/index.lock into the next run).
+     *
+     * $maskSecrets must stay false for output that is parsed and compared
+     * programmatically (branch names, config listings, hashes) — the mask
+     * regex blanks out any run of 12+ alnum/dash/underscore characters, which
+     * matches ordinary branch names just as readily as a real secret, and
+     * comparing a masked value against an unmasked one silently breaks the
+     * comparison. Only pass true for output that is exclusively surfaced to a
+     * human (e.g. a thrown exception's message).
+     *
+     * @return array{code:int, output:string}
+     */
+    private function execGit(string $git, string $args, int $timeout, array $env, ?string $cwd, bool $maskSecrets = false): array
     {
         $cmd = escapeshellarg($git) . ' ' . $args . ' 2>&1';
         $desc = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']];
@@ -235,13 +284,33 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 
         $start = time();
         $out = '';
+        $timedOut = false;
+        // proc_close()'s return value is unreliable once proc_get_status() has
+        // already observed the process as exited (a well-known PHP quirk: the
+        // exit code is reaped on that first observation and proc_close() then
+        // reports -1). Capture it here, at the moment we see running:false.
+        $exitCode = null;
         while (true) {
             $status = proc_get_status($proc);
             if (! $status['running']) {
+                $exitCode = $status['exitcode'];
                 break;
             }
             if (time() - $start > $timeout) {
-                proc_terminate($proc);
+                $timedOut = true;
+                proc_terminate($proc); // SIGTERM
+                $graceUntil = microtime(true) + self::TERM_GRACE_SECONDS;
+                while (microtime(true) < $graceUntil) {
+                    $status = proc_get_status($proc);
+                    if (! $status['running']) {
+                        $exitCode = $status['exitcode'];
+                        break;
+                    }
+                    usleep(100_000);
+                }
+                if ($exitCode === null) {
+                    proc_terminate($proc, 9); // SIGKILL — still alive after the grace period
+                }
                 $out .= "\n[timeout]";
                 break;
             }
@@ -253,7 +322,6 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         // Drain any remaining buffered output after process exit.
         $out .= (string)stream_get_contents($pipes[1]);
         $out .= (string)stream_get_contents($pipes[2]);
-
         if (is_resource($pipes[1])) {
             fclose($pipes[1]);
         }
@@ -261,20 +329,33 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             fclose($pipes[2]);
         }
 
-        return ['code' => proc_close($proc), 'output' => trim($this->maskSecrets($out))];
+        proc_close($proc); // release the resource; exit code was already captured above
+
+        $code = $timedOut ? 124 : ($exitCode ?? 1);
+        $out = trim($out);
+
+        return ['code' => $code, 'output' => $maskSecrets ? $this->maskSecrets($out) : $out];
+    }
+
+    private function runGit(string $git, string $args, int $timeout, array $env, ?string $cwd, string $errLabel, bool $fatal = true): void
+    {
+        // Masked: this output only ever reaches a thrown exception message.
+        $result = $this->execGit($git, $args, $timeout, $env, $cwd, true);
+        if ($fatal && $result['code'] !== 0) {
+            throw new \RuntimeException($errLabel . ":\n" . escapeshellarg($git) . ' ' . $args . "\n-- output --\n" . $result['output']);
+        }
     }
 
     private function gitClone(string $git, string $url, string $branch, string $dst, string $token, int $timeout): void
     {
         $env = $this->gitEnv($token, $url);
 
-        // Check remote exists
-        $this->runGit($git, 'ls-remote ' . escapeshellarg($url) . ' ' . escapeshellarg($branch), 25, $env, null, 'Git ls-remote failed', false);
-
-        $args = 'clone --branch ' . escapeshellarg($branch) . ' --single-branch '
+        // Shallow clone: Tiki only reads working-tree file contents (DirectoryScanner),
+        // never git log/blame, so full history is pure network/disk cost with no benefit
+        // — significant for Logseq vaults that accumulate years of daily journal commits.
+        $args = 'clone --depth=1 --branch ' . escapeshellarg($branch) . ' --single-branch '
             . escapeshellarg($url) . ' ' . escapeshellarg($dst);
         $this->runGit($git, $args, $timeout, $env, null, 'Git clone failed', true);
-        $this->runGit($git, '-C ' . escapeshellarg($dst) . ' config --global --add safe.directory ' . escapeshellarg($dst), 15, $env, null, 'Git safe.directory failed', false);
     }
 
     private function gitPull(string $git, string $path, string $token, int $timeout): void
@@ -288,17 +369,36 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         }
 
         $env = $this->gitEnv($token, $origin);
-        $this->runGit($git, '-C ' . escapeshellarg($path) . ' pull --ff-only', $timeout, $env, null, 'Git pull failed', true);
+        $branch = $this->getCheckedOutBranch($git, $path, $token);
+        if ($branch === null) {
+            throw new \RuntimeException(tra('Git pull failed: could not determine the checked-out branch.'));
+        }
+
+        // The working copy is a shallow (--depth=1) clone: a plain `pull --ff-only`
+        // can spuriously report "diverging branches" whenever the remote's shallow
+        // history boundary shifts between fetches, even though there is no real
+        // conflict — Tiki only ever needs the latest file contents, never merge or
+        // fast-forward semantics. Fetch the new tip and hard-reset onto it instead.
+        $this->runGit($git, '-C ' . escapeshellarg($path) . ' fetch --depth=1 origin ' . escapeshellarg($branch), $timeout, $env, null, 'Git fetch failed', true);
+        $this->runGit($git, '-C ' . escapeshellarg($path) . ' reset --hard ' . escapeshellarg('origin/' . $branch), 15, $env, null, 'Git reset failed', true);
     }
 
-    private function collectRepoState(string $git, string $wcPath, string $token, string $repoUrl, string $branch, int $timeout): array
+    /**
+     * Collect informational-only metadata for display (CLI/UI). Best-effort:
+     * never allowed to fail the fetch, and bounded by its own short timeout so
+     * it can't inflate the wall-clock cost of an otherwise-successful fetch.
+     *
+     * @param ?string $knownCheckedOutBranch Reuse the branch already resolved by
+     *   fetchToTempDir() instead of paying for a second identical git call.
+     */
+    private function collectRepoState(string $git, string $wcPath, string $token, string $repoUrl, string $branch, ?string $knownCheckedOutBranch = null): array
     {
         $localEnv = $this->gitEnv($token, null);
         $remoteEnv = $this->gitEnv($token, $repoUrl);
 
-        $head = $this->runGitCapture($git, '-C ' . escapeshellarg($wcPath) . ' rev-parse --short HEAD', $timeout, $localEnv, null);
-        $headBranch = $this->runGitCapture($git, '-C ' . escapeshellarg($wcPath) . ' rev-parse --abbrev-ref HEAD', $timeout, $localEnv, null);
-        $remote = $this->runGitCapture($git, 'ls-remote --heads ' . escapeshellarg($repoUrl) . ' ' . escapeshellarg($branch), $timeout, $remoteEnv, null);
+        $head = $this->execGit($git, '-C ' . escapeshellarg($wcPath) . ' rev-parse --short HEAD', self::DEF_METADATA_TIMEOUT, $localEnv, null);
+        $headBranch = $knownCheckedOutBranch ?? $this->getCheckedOutBranch($git, $wcPath, $token);
+        $remote = $this->execGit($git, 'ls-remote --heads ' . escapeshellarg($repoUrl) . ' ' . escapeshellarg($branch), self::DEF_METADATA_TIMEOUT, $remoteEnv, null);
 
         $remoteHead = '';
         if ($remote['code'] === 0 && $remote['output'] !== '') {
@@ -308,7 +408,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 
         return [
             'head' => $head['code'] === 0 ? trim($head['output']) : null,
-            'checked_out_branch' => $headBranch['code'] === 0 ? trim($headBranch['output']) : null,
+            'checked_out_branch' => $headBranch,
             'remote_head' => $remoteHead !== '' ? substr($remoteHead, 0, 12) : null,
             'is_up_to_date' => ($remoteHead !== '' && $head['code'] === 0) ? str_starts_with($remoteHead, trim($head['output'])) : null,
         ];
@@ -449,7 +549,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 [http]
     sslVerify = true
 [core]
-    askPass = 
+    askPass =
 INI;
             if (file_put_contents($gitconfig, $cfg) === false) {
                 throw new \RuntimeException(tra('Failed to write git config:') . ' ' . $gitconfig);

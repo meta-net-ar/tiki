@@ -522,7 +522,7 @@ if (! function_exists('parse_object_link')) {
     {
         $smarty = TikiLib::lib('smarty');
         $parts = explode(':', $link);
-        $data = smarty_function_object_link(
+        $data = \SmartyTiki\FunctionHandler\ObjectLink::render(
             [
                 'type' => $parts[1],
                 'id' => $parts[2],

@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class GroupMemberCount
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class GroupMemberCount implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'groupmembercount';
+    }
+
     public function handle($group)
     {
         return \TikiLib::lib('user')->nb_users_in_group($group);

@@ -26,17 +26,17 @@ class DirectoryScanner implements ScannerInterface
     /**
      * Scan a directory and return normalized items.
      *
-      * @param string $path Absolute path to directory or ZIP file
+     * ZIP sources are extracted upstream before reaching this class — both
+     * FilesystemProvider (local upload) and GitWorkingCopyProvider (git clone)
+     * always resolve to a plain directory before calling scan() — so this only
+     * ever needs to handle a directory path.
+     *
+     * @param string $path Absolute path to a directory
      * @param array  $options Scan options
      * @return array {files: array, counts: array}
      */
     public function scan(string $path, array $options = []): array
     {
-        // Handle ZIP files (extract to temp dir first)
-        if (is_file($path) && strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'zip') {
-            return $this->scanZip($path, $options);
-        }
-
         if (! is_dir($path)) {
             return [self::SCAN_FILES => [], self::SCAN_COUNTS => [self::COUNT_PAGES => 0, self::COUNT_JOURNALS => 0, self::COUNT_TOTAL => 0]];
         }
@@ -136,103 +136,6 @@ class DirectoryScanner implements ScannerInterface
         }
 
         return $out;
-    }
-
-    /**
-     * Scan a ZIP file by extracting it to a temp directory, then scan the extracted directory.
-     */
-    private function scanZip(string $zipPath, array $options): array
-    {
-        if (! class_exists(\ZipArchive::class)) {
-            throw new \RuntimeException('ZipArchive extension required to scan ZIP files.');
-        }
-
-        $zip = new \ZipArchive();
-        if ($zip->open($zipPath) !== true) {
-            return [self::SCAN_FILES => [], self::SCAN_COUNTS => [self::COUNT_PAGES => 0, self::COUNT_JOURNALS => 0, self::COUNT_TOTAL => 0]];
-        }
-
-        // Extract to temp directory
-        $tempDir = sys_get_temp_dir() . '/mdimp_extract_' . uniqid();
-        if (! mkdir($tempDir, 0755, true) && ! is_dir($tempDir)) {
-            $zip->close();
-            return [self::SCAN_FILES => [], self::SCAN_COUNTS => [self::COUNT_PAGES => 0, self::COUNT_JOURNALS => 0, self::COUNT_TOTAL => 0]];
-        }
-
-        if (! $zip->extractTo($tempDir)) {
-            $zip->close();
-            return [self::SCAN_FILES => [], self::SCAN_COUNTS => [self::COUNT_PAGES => 0, self::COUNT_JOURNALS => 0, self::COUNT_TOTAL => 0]];
-        }
-        $zip->close();
-
-        try {
-            // Check if ZIP has a single top-level directory wrapping everything
-            $actualScanDir = $this->detectAndUnwrapTopFolder($tempDir);
-            $result = $this->scanDirectory($actualScanDir, $options);
-        } finally {
-            // Cleanup temp directory
-            $this->rrmdir($tempDir);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Detect if extracted ZIP has a single top-level folder and return its path.
-     * Many ZIP files wrap content in a folder named after the ZIP.
-     * E.g., Archive.zip contains Archive/file1.md instead of file1.md directly.
-     */
-    private function detectAndUnwrapTopFolder(string $dir): string
-    {
-        if (! is_dir($dir)) {
-            return $dir;
-        }
-
-        $items = scandir($dir);
-        if ($items === false) {
-            return $dir;
-        }
-
-        // Filter out . and ..
-        $realItems = array_filter($items, fn($i) => $i !== '.' && $i !== '..');
-
-        // If there's exactly one item and it's a directory, use it as the base
-        if (count($realItems) === 1) {
-            $single = reset($realItems);
-            $singlePath = $dir . '/' . $single;
-            if (is_dir($singlePath)) {
-                return $singlePath;
-            }
-        }
-
-        // Otherwise, use the original directory
-        return $dir;
-    }
-
-    /** Recursive directory removal. */
-    private function rrmdir(string $dir): void
-    {
-        if (! is_dir($dir)) {
-            return;
-        }
-        $it = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-        foreach ($it as $file) {
-            if ($file->isDir()) {
-                if (! rmdir($file->getPathname())) {
-                    trigger_error(tra('Failed to remove directory: %0', $file->getPathname()), E_USER_WARNING);
-                }
-            } else {
-                if (! unlink($file->getPathname())) {
-                    trigger_error(tra('Failed to remove file: %0', $file->getPathname()), E_USER_WARNING);
-                }
-            }
-        }
-        if (! rmdir($dir)) {
-            trigger_error(tra('Failed to remove directory: %0', $dir), E_USER_WARNING);
-        }
     }
 
     private function makeRelative(string $fullPath, string $basePath): string

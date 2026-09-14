@@ -7,6 +7,7 @@
 
 namespace I18n;
 
+use Language;
 use Tiki\Lib\Theme\ThemeLib;
 use TikiLib;
 
@@ -39,8 +40,8 @@ class LanguageTranslator
     {
         global $prefs;
 
-        $this->lang = $lang;
-        $this->initLanguageFromFiles($lang);
+        $this->lang = Language::isValidLocaleIdentifier($lang) ? $lang : 'en';
+        $this->initLanguageFromFiles($this->lang);
         $this->loadThemeOverrides();
         if (empty($options['skipDb']) && isset($prefs['lang_use_db']) && $prefs['lang_use_db'] == 'y') {
             $this->initLanguageFromDb();
@@ -83,7 +84,7 @@ class LanguageTranslator
     private function initLanguageFromFiles($lg)
     {
         global $tikidomain, $prefs;
-        if (is_file(LANG_SRC_PATH . "/$lg/language.php")) {//Base language must exist
+        if (Language::isValidLocaleIdentifier($lg) && is_file(LANG_SRC_PATH . "/$lg/language.php")) {//Base language must exist
             $lang = [];
             require_once(LANG_SRC_PATH . "/$lg/language.php");
 
@@ -145,6 +146,10 @@ class LanguageTranslator
      */
     private function loadThemeOverrides()
     {
+        if (! Language::isValidLocaleIdentifier($this->lang)) {
+            return;
+        }
+
         //This is just because the class isn't fully migrated, we need to load it as as side effect - benoitg - 2024-04-10
         \TikiLib::lib('theme');
         $themePath = ThemeLib::getThemePath(null, null, null, true);

@@ -9,9 +9,11 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
- * Tree Table Smarty func - smarty_function_treetable()
+ * Tree Table Smarty func - see \SmartyTiki\FunctionHandler\TreeTable
  * Renders a tree table (for use with https://github.com/ludo/jquery-treetable)
  *
  * Params
@@ -75,8 +77,15 @@ use Smarty\Template;
  * @param Smarty\Template $smarty
  * @return string html output
  */
-class TreeTable extends Base
+class TreeTable extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'treetable';
+    }
+
     public function handle($params, Template $template)
     {
         global $tree_table_id;
@@ -186,7 +195,7 @@ class TreeTable extends Base
         $class = empty($class) ? 'table table-striped' : $class;    // treetable
 
         if ($_listFilter == 'y' && count($_data) > $_filterMinRows) {
-            $html .= smarty_function_listfilter(
+            $html .= \SmartyTiki\FunctionHandler\ListFilter::render(
                 [
                     'id' => $id . '_filter',
                     'selectors' => "#$id tbody tr",
@@ -199,13 +208,13 @@ class TreeTable extends Base
 
         if ($_openall == 'y') {
             $html .= '&nbsp;<label id="' . $id . '_openall" style="cursor:pointer">'
-                . smarty_function_icon(
+                . \SmartyTiki\FunctionHandler\Icon::render(
                     [
                         'name' => 'file-archive',
                     ],
                     $template
                 )
-                . smarty_function_icon(
+                . \SmartyTiki\FunctionHandler\Icon::render(
                     [
                         'name' => 'file-archive-open',
                         'istyle' => 'display:none'
@@ -277,7 +286,7 @@ $("#' . $id . '_showSelected").on("click", function () {
         if (! empty($_checkbox)) {
             for ($i = 0, $icount_checkbox = count($_checkbox); $i < $icount_checkbox; $i++) {
                 $html .= '<th class="checkBoxHeader">';
-                $html .= smarty_function_select_all(
+                $html .= \SmartyTiki\FunctionHandler\SelectAll::render(
                     [
                         'checkbox_names' => [$_checkbox[$i] . '[]'],
                         'label' => empty($_checkboxTitles) ? '' : htmlspecialchars(tra($_checkboxTitles[$i])),

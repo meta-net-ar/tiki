@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class ForumTopicCount
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class ForumTopicCount implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'forumtopiccount';
+    }
+
     public function handle($forumId)
     {
         return \TikiLib::lib('comments')->count_forum_topics($forumId);

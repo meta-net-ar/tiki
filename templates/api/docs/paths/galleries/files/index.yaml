@@ -1,6 +1,11 @@
 ---
 get:
-  description: Retrieve all files of a gallery
+  description: |
+    Retrieve all files of a gallery.
+
+    Pass `omit_metadata=1` to leave out the extracted-content fields
+    (`metadata`, `search_data`, `ocr_data`). They have no size limit and typically
+    dominate the response. Every other field is returned either way.
   parameters:
     - name: galleryId
       in: path
@@ -35,6 +40,13 @@ get:
       description: The search string to find files.
       schema:
         type: string
+    - name: omit_metadata
+      in: query
+      description: Set to 1 to omit the extracted-content fields from each file entry.
+      schema:
+        type: integer
+        enum: [0, 1]
+        default: 0
   responses:
     '200':
       description: files response

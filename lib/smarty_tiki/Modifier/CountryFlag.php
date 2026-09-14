@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * \brief Smarty modifier plugin to add user's country flag
  *
@@ -21,8 +23,13 @@ namespace SmartyTiki\Modifier;
  *
  * Example: {$userinfo.login|countryflag}
  */
-class CountryFlag
+class CountryFlag implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'countryflag';
+    }
+
     public function handle($user)
     {
         global $tikilib;

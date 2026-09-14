@@ -44,6 +44,11 @@ if ($action == 'delete' && $tokenId > 0) {
     $tokenlib->deleteToken($_REQUEST['tokenId']);
 }
 
+if (isset($_POST['rotate_secret']) && $access->checkCsrf(true)) {
+    $revokedCount = $tokenlib->rotateSigningSecret();
+    Feedback::success(tr('Token signing secret rotated. %0 existing token(s) were revoked and must be recreated.', $revokedCount));
+}
+
 if ($action == 'add') {
     $url = filter_input(INPUT_POST, 'entry', FILTER_SANITIZE_URL);
     $entry = parse_url($url, PHP_URL_PATH);

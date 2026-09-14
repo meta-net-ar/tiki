@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /*
     * Smarty plugin
     * -------------------------------------------------------------
@@ -15,8 +17,13 @@ namespace SmartyTiki\Modifier;
     * Purpose:  map true and false to first and second parameter respectively
     * -------------------------------------------------------------
     */
-class Ternary
+class Ternary implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'ternary';
+    }
+
     public function handle($input, $true = '', $false = '')
     {
         return $input ? $true : $false;

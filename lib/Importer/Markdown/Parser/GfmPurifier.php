@@ -57,8 +57,11 @@ class GfmPurifier implements MarkdownPurifierInterface
             'NOW'  => '[ ]',
             'DONE' => '[x]',
         ];
+        // Case-sensitive: Logseq/GFM task markers are always upper-case. Matching
+        // case-insensitively swallows ordinary words that start a bullet, e.g.
+        // "- Doing the dishes" or "- Now what?", silently eating real content.
         $out = preg_replace_callback(
-            '/^(\s*[-*+]\s+)(TODO|DOING|DONE|LATER|NOW)\b[: ]?/mi',
+            '/^(\s*[-*+]\s+)(TODO|DOING|DONE|LATER|NOW)\b[: ]?/m',
             function ($m) use ($map, &$did) {
                 $did = true;
                 return $m[1] . $map[$m[2]] . ' ';

@@ -474,6 +474,7 @@ CREATE TABLE `tiki_calendar_items` (
   `hideParticipants` tinyint(1) default '0',
   PRIMARY KEY (`calitemId`),
   KEY `calendarId` (`calendarId`),
+  KEY `idx_calendarid_start_end` (`calendarId`, `start`, `end`),
   KEY `idx_lastmodif` (`lastmodif`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
@@ -1756,6 +1757,7 @@ INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `s
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Tiki Logs','tiki-syslog.php',1245,'','tiki_p_admin','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Tiki Manager','tiki-ajax_services.php?controller=manager&action=index',1247,'feature_tiki_manager','tiki_p_admin','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Security Admin','tiki-admin_security.php',1250,'','tiki_p_admin','',0);
+INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Encryption Keys','tiki-admin.php?page=security&cookietab=6',1251,'feature_user_encryption','tiki_p_admin','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Action Log','tiki-admin_actionlog.php',1255,'feature_actionlog','tiki_p_admin','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Action Log','tiki-admin_actionlog.php',1255,'feature_actionlog','tiki_p_view_actionlog','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Action Log','tiki-admin_actionlog.php',1255,'feature_actionlog','tiki_p_view_actionlog_owngroups','',0);
@@ -2004,6 +2006,9 @@ CREATE TABLE `tiki_preferences` (
   `value` mediumtext,
   PRIMARY KEY (`name`(191))
 ) ENGINE=MyISAM;
+
+INSERT INTO `tiki_preferences` (`name`, `value`)
+SELECT 'auth_token_secret', SHA2(CONCAT(UUID(), RAND()), 256);
 
 DROP TABLE IF EXISTS `tiki_private_messages`;
 CREATE TABLE `tiki_private_messages` (
@@ -2977,6 +2982,7 @@ CREATE TABLE `users_users` (
   `default_group` varchar(255),
   `lastLogin` int(14) default NULL,
   `currentLogin` int(14) default NULL,
+  `lastActivity` int default NULL,
   `registrationDate` int(14) default NULL,
   `pass_confirm` int(14) default NULL,
   `email_confirm` int(14) default NULL,
@@ -3127,7 +3133,11 @@ CREATE TABLE `tiki_object_scores` (
   `pointsAssigned` INT NOT NULL,
   `pointsBalance` INT NOT NULL,
   `date` INT NOT NULL,
-  `reversalOf` INT UNSIGNED
+  `reversalOf` INT UNSIGNED,
+  KEY `recipient_latest` (`recipientObjectType`(32), `recipientObjectId`(191), `id`),
+  KEY `recipient_rule` (`recipientObjectType`(32), `recipientObjectId`(128), `ruleId`(80)),
+  KEY `trigger_event` (`triggerObjectType`(32), `triggerObjectId`(64), `triggerUser`(64), `triggerEvent`(64), `id`),
+  KEY `trigger_rule` (`triggerObjectType`(24), `triggerObjectId`(64), `ruleId`(48), `recipientObjectType`(24), `recipientObjectId`(64), `reversalOf`, `id`)
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `tiki_file_handlers`;
@@ -3482,6 +3492,7 @@ INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-view_forum_thread.php\\?comments_parentId=(\\d+)', 'forumthread$1', 'forumthread', 'feature_forums', 0);
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-admin_tracker_fields.php\\?trackerId=(\\d+)','trackerfields$1', 'trackerfields', 'feature_trackers', 200);
 
+UPDATE tiki_menu_options SET icon = 'key' WHERE menuId = 42 AND name = 'Encryption Keys';
 UPDATE tiki_menu_options SET icon = 'settings' WHERE name = 'Settings';
 UPDATE tiki_menu_options SET icon = 'admin_search' WHERE name = 'Search';
 UPDATE tiki_menu_options SET icon = 'admin_wiki' WHERE name = 'Wiki';
@@ -3706,7 +3717,7 @@ CREATE TABLE `tiki_auth_tokens` (
     `timeout` INT NOT NULL DEFAULT 0,
     `hits` INT NOT NULL DEFAULT 1,
     `maxhits` INT NOT NULL DEFAULT 1,
-    `token` CHAR(32),
+    `token` VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin,
     `entry` MEDIUMTEXT,
     `user` VARCHAR(200) default NULL,
     `email` varchar(255) NOT NULL,
@@ -4308,6 +4319,16 @@ CREATE TABLE `tiki_password_reset_tokens` (
   KEY `expires` (`expires`)
 ) ENGINE=MyISAM;
 
+DROP TABLE IF EXISTS `tiki_xmpp_guest_credentials`;
+CREATE TABLE `tiki_xmpp_guest_credentials` (
+  `username` varchar(64) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `created` int NOT NULL,
+  `last_seen` int NOT NULL,
+  PRIMARY KEY (`username`),
+  KEY `last_seen` (`last_seen`)
+) ENGINE=MyISAM;
+
 DROP TABLE IF EXISTS `tiki_markdown_imports`;
 CREATE TABLE `tiki_markdown_imports` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -4323,8 +4344,8 @@ CREATE TABLE `tiki_markdown_imports` (
   `error_note` TEXT NULL,
   `is_journal` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_source_relpath` (`source_key`(120), `relpath`(120)),
+  UNIQUE KEY `uq_source_relpath` (`source_key`(75), `relpath`(165)),
   KEY `idx_page` (`page_name`(190)),
-  KEY `idx_status` (`last_status`),
-  KEY `idx_orphaned` (`orphaned_at`)
+  KEY `idx_orphaned` (`orphaned_at`),
+  KEY `idx_source_status` (`source_key`, `last_status`)
 ) ENGINE=MyISAM;

@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class PackageItemId
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class PackageItemId implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'packageitemid';
+    }
+
     public function handle($token)
     {
         $api = new \Tiki\Package\Extension\Api();

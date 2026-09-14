@@ -603,8 +603,7 @@ if (isset($_REQUEST["removeImage"])) {
 }
 // ************* return to list ***************************
 if (isset($_REQUEST["returntracker"]) || isset($_REQUEST["save_return"])) {
-    require_once('lib/smarty_tiki/block.self_link.php');
-    $returnUrl = smarty_block_self_link(
+    $returnUrl = \SmartyTiki\BlockHandler\SelfLink::render(
         [
             '_script' => 'tiki-view_tracker.php',
             '_tag' => 'n',
@@ -803,7 +802,7 @@ if ($itemObject->canModify() && $prefs['tracker_legacy_insert'] == 'y' && $prefs
         ]
     );
     if ($otherUser && $otherUser !== $user) {
-        $msg = tr("This tracker item is being edited by user %0. Please check with the user before editing, otherwise conflicts will occur and data might be lost.", smarty_modifier_username($otherUser));
+        $msg = tr("This tracker item is being edited by user %0. Please check with the user before editing, otherwise conflicts will occur and data might be lost.", \SmartyTiki\Modifier\Username::apply($otherUser));
         $msg .= '<br /><br /><a href="' . filter_out_sefurl('tiki-view_tracker_item.php?itemId=' . $itemId . '&conflictoverride=y') . '">' . tra('Override lock and carry on with edit') . '</a>';
         $smarty->assign('msg', $msg);
         $smarty->assign('errortitle', tra('Item is currently being edited'));
@@ -916,5 +915,5 @@ try {
 } catch (\Smarty\Exception $e) {
     $message = tr('The requested element cannot be displayed. One of the view/edit templates is missing or has errors: %0', $e->getMessage());
     trigger_error($e->getMessage(), E_USER_WARNING);
-    $access->redirect(smarty_modifier_sefurl($info['trackerId'], 'tracker'), $message, 302, 'error');
+    $access->redirect(\SmartyTiki\Modifier\Sefurl::apply($info['trackerId'], 'tracker'), $message, 302, 'error');
 }

@@ -467,9 +467,43 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         $builder = new OrderBuilder($this);
         $order = $builder->build($query->getSortOrder());
 
-        $builder = new FacetBuilder($this);
-        $builder->setPossibleFields($this->pdo_client->possibleFacetFields($table));
-        $facets = $builder->build($query->getFacets());
+        $streaming = method_exists($query, 'isStreamingMode') && $query->isStreamingMode();
+
+        if ($streaming) {
+            $facets = '';
+            $aggregationSpecs = [];
+            $groupByAggregations = [];
+        } else {
+            $builder = new FacetBuilder($this);
+            $builder->setPossibleFields($this->pdo_client->possibleFacetFields($table));
+            $facets = $builder->build($query->getFacets());
+
+            // Split aggregations: those without explicit metrics use the
+            // cheap FACET path; those with metrics (SUM, AVG, …) need a
+            // separate SELECT … GROUP BY query because SphinxQL FACET
+            // syntax cannot express aggregate functions.
+            $aggregationSpecs = [];
+            $groupByAggregations = [];
+            if (method_exists($query, 'hasAggregations') && $query->hasAggregations()) {
+                $facetAggs = [];
+                foreach ($query->getAggregations() as $name => $agg) {
+                    if (AggregationBuilder::aggregationHasMetrics($agg)) {
+                        $groupByAggregations[$name] = $agg;
+                    } else {
+                        $facetAggs[$name] = $agg;
+                    }
+                }
+
+                if (! empty($facetAggs)) {
+                    $aggBuilder = new AggregationBuilder($this);
+                    $built = $aggBuilder->build($facetAggs);
+                    if (! empty($built['clauses'])) {
+                        $facets = trim(((string) $facets) . ' ' . $built['clauses']);
+                        $aggregationSpecs = $built['specs'];
+                    }
+                }
+            }
+        }
 
         if ($selectFields = $query->getSelectionFields()) {
             $selectFields = array_map(function ($field) {
@@ -578,6 +612,36 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
                 $resultSet->addFacetFilter($filter);
             }
         }
+
+        if (! empty($aggregationSpecs)) {
+            $aggReader = new AggregationReader();
+            foreach ($aggReader->read($facets, $aggregationSpecs) as $aggResult) {
+                $resultSet->setAggregationResult($aggResult);
+            }
+        }
+
+        // Execute SELECT … GROUP BY queries for metric-bearing aggregations
+        // that cannot be expressed as FACET clauses.
+        if (! empty($groupByAggregations)) {
+            $aggBuilder = new AggregationBuilder($this);
+            $built = $aggBuilder->buildGroupByQueries($groupByAggregations, $table, $condition, $selectExpressions);
+            if (! empty($built['queries'])) {
+                $rowsets = [];
+                foreach ($built['queries'] as $q) {
+                    try {
+                        $rowsets[] = $this->pdo_client->fetchAll($q['sql']);
+                    } catch (\PDOException $e) {
+                        \Feedback::error(tr('Malformed search query: %0', $e->getMessage()));
+                        $rowsets[] = [];
+                    }
+                }
+                $aggReader = new AggregationReader();
+                foreach ($aggReader->read($rowsets, $built['specs']) as $aggResult) {
+                    $resultSet->setAggregationResult($aggResult);
+                }
+            }
+        }
+
         return $resultSet;
     }
 
@@ -631,7 +695,9 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 
     public function scroll(\Search_Query_Interface $query)
     {
-        $perPage = 100;
+        $perPage = method_exists($query, 'getScrollBatchSize')
+            ? ($query->getScrollBatchSize() ?? 1000)
+            : 1000;
         $hasMore = true;
 
         for ($from = 0; $hasMore; $from += $perPage) {

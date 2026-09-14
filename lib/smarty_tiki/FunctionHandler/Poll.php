@@ -10,9 +10,15 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Poll extends Base
+class Poll extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'poll';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;

@@ -16,9 +16,15 @@ use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use Tiki\Sections;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class HtmlBodyAttributes extends Base
+class HtmlBodyAttributes extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'html_body_attributes';
+    }
+
     // Used in the template to create the html_body_attributes tag which can take a class as parameter and returns the attributes for a standard tiki page body tag
     public function handle($params, Template $template)
     {

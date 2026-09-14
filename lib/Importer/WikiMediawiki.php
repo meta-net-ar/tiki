@@ -295,6 +295,60 @@ class WikiMediawiki extends Wiki
     }
 
     /**
+     * Validate and normalize an attachment filename from a MediaWiki dump.
+     *
+     * Filenames are attacker-controlled via the uploaded XML. Reject any value
+     * that contains a directory component or resolves to something other than a
+     * plain basename, so path traversal cannot escape $attachmentsDestDir.
+     *
+     * @param string $fileName Raw <filename> value from the dump
+     * @return string|null Safe basename, or null if unsafe / empty
+     */
+    public function sanitizeAttachmentFileName($fileName)
+    {
+        $fileName = trim((string) $fileName);
+
+        if ($fileName === '' || str_contains($fileName, "\0")) {
+            return null;
+        }
+
+        // Reject absolute paths and any directory separator (Unix or Windows).
+        if (preg_match('#[/\\\\]#', $fileName)) {
+            return null;
+        }
+
+        $baseName = basename($fileName);
+        if ($baseName === '' || $baseName === '.' || $baseName === '..' || $baseName !== $fileName) {
+            return null;
+        }
+
+        return $baseName;
+    }
+
+    /**
+     * Build the absolute destination path for an attachment and ensure it stays
+     * inside $attachmentsDestDir (defense in depth after filename sanitization).
+     *
+     * @param string $safeFileName Already-sanitized basename
+     * @return string|null Absolute path under the destination directory, or null
+     */
+    public function resolveAttachmentDestPath($safeFileName)
+    {
+        $destDir = realpath($this->attachmentsDestDir);
+        if ($destDir === false || ! is_dir($destDir)) {
+            return null;
+        }
+
+        $destPath = $destDir . DIRECTORY_SEPARATOR . $safeFileName;
+        $parent = realpath(dirname($destPath));
+        if ($parent === false || $parent !== $destDir) {
+            return null;
+        }
+
+        return $destPath;
+    }
+
+    /**
      * Searches for the last version of each attachments in the XML file
      * and try to download it to the img/wiki_up/ directory
      *
@@ -329,10 +383,28 @@ class WikiMediawiki extends Wiki
                 $i = $attachments->length - 1;
                 $lastVersion = $attachments->item($i);
 
-                $fileName = $lastVersion->getElementsByTagName('filename')->item(0)->nodeValue;
+                $rawFileName = $lastVersion->getElementsByTagName('filename')->item(0)->nodeValue;
                 $fileUrl = $lastVersion->getElementsByTagName('src')->item(0)->nodeValue;
 
-                if (file_exists($this->attachmentsDestDir . $fileName)) {
+                $fileName = $this->sanitizeAttachmentFileName($rawFileName);
+                if ($fileName === null) {
+                    $this->saveAndDisplayLog(
+                        tr('File %0 is not being imported because the filename must not contain directory separators or `..`.', $rawFileName) . "\n",
+                        true
+                    );
+                    continue;
+                }
+
+                $destPath = $this->resolveAttachmentDestPath($fileName);
+                if ($destPath === null) {
+                    $this->saveAndDisplayLog(
+                        tr('File %0 is not being imported because the destination path is invalid.', $fileName) . "\n",
+                        true
+                    );
+                    continue;
+                }
+
+                if (file_exists($destPath)) {
                     $this->saveAndDisplayLog(
                         tr(
                             'File %0 is not being imported because there is already a file with the same name in the destination directory (%1)',
@@ -344,28 +416,46 @@ class WikiMediawiki extends Wiki
                     continue;
                 }
 
-                // Prevent SSRF: attachment URLs come from the imported XML dump
-                // which may be untrusted. Block private/reserved IP targets.
-                // Only check URLs with a scheme (http/https); relative file paths
-                // are local references and not a network SSRF vector.
-                if (preg_match('#^https?://#i', $fileUrl)) {
-                    $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
-                    if (! $ssrf->isUrlAllowed($fileUrl)) {
-                        $this->saveAndDisplayLog(tr('File %0 not imported: URL targets a private or reserved address.', $fileName) . "\n", true);
-                        continue;
-                    }
+                // Prevent SSRF / local-file disclosure: attachment <src> values come
+                // from the imported XML dump and may be untrusted. Always validate
+                // with SsrfLib (http/https allowlist + reject private/reserved hosts)
+                // so file://, php://, and other stream wrappers cannot bypass the gate.
+                $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+                if (! $ssrf->isUrlAllowed($fileUrl)) {
+                    $this->saveAndDisplayLog(
+                        tr('File %0 not imported: attachment URL must be a public http(s) address.', $fileName) . "\n",
+                        true
+                    );
+                    continue;
                 }
 
-                if (@fopen($fileUrl, 'r')) {
-                    $attachmentContent = @file_get_contents($fileUrl);
-                    $newFile = fopen($this->attachmentsDestDir . $fileName, 'w');
+                $attachmentContent = $this->fetchAttachmentContents($fileUrl);
+                if ($attachmentContent !== false) {
+                    $newFile = fopen($destPath, 'w');
+                    if ($newFile === false) {
+                        $this->saveAndDisplayLog(tr('Unable to write file %0.', $fileName) . "\n", true);
+                        continue;
+                    }
                     fwrite($newFile, $attachmentContent);
+                    fclose($newFile);
                     $this->saveAndDisplayLog(tr('File %0 successfully imported!', $fileName) . "\n");
                 } else {
                     $this->saveAndDisplayLog(tr('Unable to download file %0. File not found.', $fileName) . "\n", true);
                 }
             }
         }
+    }
+
+    /**
+     * Fetch attachment bytes from a validated URL.
+     * Isolated for unit tests so downloads can be mocked without network I/O.
+     *
+     * @param string $fileUrl
+     * @return string|false
+     */
+    protected function fetchAttachmentContents($fileUrl)
+    {
+        return @file_get_contents($fileUrl);
     }
 
     /**

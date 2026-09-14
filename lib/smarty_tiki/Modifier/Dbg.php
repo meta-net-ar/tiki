@@ -7,12 +7,19 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * \brief Smarty modifier plugin to add string to debug console log w/o modify output
  * Usage format {$smarty_var|dbg}
  */
-class Dbg
+class Dbg implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'dbg';
+    }
+
     public function handle($string, $label = '')
     {
         global $debugger;

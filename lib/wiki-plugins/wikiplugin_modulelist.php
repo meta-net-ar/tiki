@@ -45,7 +45,7 @@ function wikiplugin_modulelist($data, $params)
 
     $smarty = TikiLib::lib('smarty');
 
-    return smarty_function_modulelist(
+    return \SmartyTiki\FunctionHandler\ModuleList::render(
         [
             'zone' => $params['zone'],
             'id' => $params['zone'] . '_plugin_modules',

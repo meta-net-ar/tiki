@@ -224,7 +224,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         if (! empty($parsed_fields['source_id'])) {
             $page_info = TikiLib::lib('tiki')->get_page_info_from_id($parsed_fields['source_id']);
             if ($page_info && stristr($page_info['data'], "cypht")) {
-                $view_path = smarty_modifier_sefurl($page_info['pageName']);
+                $view_path = \SmartyTiki\Modifier\Sefurl::apply($page_info['pageName']);
                 if (preg_match("/tiki-index\.php\?page=.*/", $view_path)) {
                     $view_path = "tiki-index.php?page_id=" . $parsed_fields['source_id'];
                 }
@@ -238,9 +238,9 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
 
 
         if (in_array('Draft', $parsed_fields['flags'])) {
-            $view_path .= "page=compose&draft_id=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+            $view_path .= "cypht_page=compose&draft_id=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
         } else {
-            $view_path .= "page=message&uid=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+            $view_path .= "cypht_page=message&uid=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
         }
         $parsed_fields['view_path'] = $view_path;
 
@@ -296,7 +296,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         }
 
         if ($compose_page = $this->getOption('composePage')) {
-            $base_webmail_path = smarty_modifier_sefurl($compose_page);
+            $base_webmail_path = \SmartyTiki\Modifier\Sefurl::apply($compose_page);
             if (preg_match("/tiki-index\.php\?page=.*/", $base_webmail_path)) {
                 $base_webmail_path = "tiki-index.php?page_id=" . TikiLib::lib('tiki')->get_page_id_from_name($compose_page);
             }

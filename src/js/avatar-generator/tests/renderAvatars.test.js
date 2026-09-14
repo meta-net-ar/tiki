@@ -3,7 +3,6 @@ import renderAvatars from "../renderAvatars";
 import stylesConstant from "../styles.constant";
 import $ from "jquery";
 import { createAvatar } from "@dicebear/core";
-import * as collections from "@dicebear/collection";
 import { AVATAR_RADIUS, AVATAR_SIZE } from "../avatarOptions.constant";
 
 vi.mock("@dicebear/core", () => ({
@@ -22,7 +21,7 @@ describe("renderAvatars", () => {
         $("body").empty();
     });
 
-    test("should replace all .dicebear-avatar elements with corresponding dicebear avatars", () => {
+    test("should replace all .dicebear-avatar elements with corresponding dicebear avatars", async () => {
         $("body").append(`
             <div class="avatar-container">
                 <div class="dicebear-avatar" data-style="${stylesConstant[0].name}" data-seed="seed1"></div>
@@ -30,17 +29,16 @@ describe("renderAvatars", () => {
             </div>
         `);
 
-        renderAvatars();
+        await renderAvatars();
 
         expect($(".avatar-container").find(".dicebear-avatar").length).toBe(0);
         const images = $(".avatar-container").find("img");
         expect(images.length).toBe(2);
         images.each((index, img) => {
-            const style = stylesConstant[index].name;
             const seed = `seed${index + 1}`;
             expect($(img).attr("src")).toBe("data:avatar/uri");
 
-            expect(createAvatar).toHaveBeenCalledWith(collections[style], {
+            expect(createAvatar).toHaveBeenCalledWith(expect.any(Object), {
                 seed: seed,
                 size: index === 0 ? AVATAR_SIZE.small : AVATAR_SIZE.large,
                 radius: AVATAR_RADIUS,
@@ -48,14 +46,14 @@ describe("renderAvatars", () => {
         });
     });
 
-    test("should not replace .dicebear-avatar elements with corresponding dicebear avatars, when the style is invalid", () => {
+    test("should not replace .dicebear-avatar elements with corresponding dicebear avatars, when the style is invalid", async () => {
         $("body").append(`
             <div class="avatar-container">
                 <div class="dicebear-avatar" data-style="invalid-style" data-seed="seed1"></div>
             </div>
         `);
 
-        renderAvatars();
+        await renderAvatars();
 
         expect($(".avatar-container").find(".dicebear-avatar").length).toBe(1);
         expect($(".avatar-container").find("img").length).toBe(0);

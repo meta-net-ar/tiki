@@ -41,6 +41,17 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                         'parentkey' => 'tracker_id',
                         'sort_order' => 'position_nasc',
                     ],
+                    'subdirectoryBehavior' => [
+                        'name' => tr('Dropped folder behavior'),
+                        'description' => tr('How to handle files inside folders dropped onto the upload area.'),
+                        'filter' => 'word',
+                        'default' => 'subgalleries',
+                        'options' => [
+                            'subgalleries' => tr('Attach files from subfolders in matching sub-galleries'),
+                            'flat' => tr('Attach all files from all subfolders as a flat list in the field gallery'),
+                            'skip' => tr('Do not traverse nested subfolders; attach only the dropped files'),
+                        ],
+                    ],
                     'filter' => [
                         'name' => tr('MIME Type Filter'),
                         'description' => tr('Mask for accepted MIME types in the field'),
@@ -390,6 +401,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             'gallerySearch' => $gallery_list,
             'requireTitle' => $this->getOption('requireTitle'),
             'directoryPattern' => $directoryPattern,
+            'subdirectoryBehavior' => $this->getOption('subdirectoryBehavior') ?: 'subgalleries',
             'fileGalleryPerTrackerItem' => $this->trackerField->getOption('fileGalleryPerTrackerItem'),
 
         ];
@@ -428,7 +440,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
     defaultGalleryId:' . $defaultGalleryId . ',
     deepGallerySearch: ' . $deepGallerySearch . ',
     defaultVolumeId:' . $defaultVolumeId . ',
-    ticket: \'' . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '\',
+    ticket: \'' . \SmartyTiki\FunctionHandler\Ticket::render(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '\',
     getFileCallback: function(file,elfinder){ window.handleFinderFile(file,elfinder); },
     eventOrigin:this
 });';
@@ -579,7 +591,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                 } elseif ($this->getOption('displayMode') == 'barelink') {
                         $smarty = TikiLib::lib('smarty');
                     foreach ($this->getConfiguration('files') as $fileId => $file) {
-                        $ret .= smarty_modifier_sefurl($file['fileId'], 'file');
+                        $ret .= \SmartyTiki\Modifier\Sefurl::apply($file['fileId'], 'file');
                     }
                 } elseif ($this->getOption('displayMode') == 'table') {
                     $ret = $this->renderTemplate('trackeroutput/files_table.tpl', $context, [
@@ -598,21 +610,21 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                     $ret .= '<li>';
                     $skipName = false;
                     if ($prefs['vimeo_upload'] == 'y' && $this->getOption('displayMode') == 'vimeo') {
-                        $ret .= smarty_function_icon(['name' => 'vimeo'], $smarty->getEmptyInternalTemplate());
+                        $ret .= \SmartyTiki\FunctionHandler\Icon::render(['name' => 'vimeo'], $smarty->getEmptyInternalTemplate());
                     } elseif (str_starts_with($file['filetype'], 'audio/')) {
-                        $ret .= smarty_function_inline_audio_player(['fileId' => $fileId, 'type' => $file['filetype']], $smarty->getEmptyInternalTemplate());
+                        $ret .= \SmartyTiki\FunctionHandler\InlineAudioPlayer::render(['fileId' => $fileId, 'type' => $file['filetype']], $smarty->getEmptyInternalTemplate());
                         $skipName = true;
                     } else {
-                        $ret .= smarty_modifier_iconify('tiki-download_file.php?fileId=' . $fileId, $file['filetype'], $fileId, 2);
+                        $ret .= \SmartyTiki\Modifier\Iconify::apply('tiki-download_file.php?fileId=' . $fileId, $file['filetype'], $fileId, 2);
                     }
 
                     if (! $skipName) {
-                        $ret .= smarty_function_object_link(['type' => 'file', 'id' => $fileId, 'title' => $file['name'], 'class' => 'label'], $smarty->getEmptyInternalTemplate());
+                        $ret .= \SmartyTiki\FunctionHandler\ObjectLink::render(['type' => 'file', 'id' => $fileId, 'title' => $file['name'], 'class' => 'label'], $smarty->getEmptyInternalTemplate());
                     }
 
                     $globalperms = Perms::get([ 'type' => 'file gallery', 'object' => $galleryId ]);
 
-                    $viewicon = smarty_function_icon(['name' => 'view'], $smarty->getEmptyInternalTemplate());
+                    $viewicon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'view'], $smarty->getEmptyInternalTemplate());
 
                     if ($file['filetype'] == $mimetypes["pdf"] || (PDFHelper::canConvertToPDF($file['filetype']) && $prefs['fgal_convert_documents_pdf'] == 'y')) {
                         if ($pdfjsIsInstalled && $prefs['fgal_pdfjs_feature'] == 'y') {
@@ -623,7 +635,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                         }
                     } elseif ($this->isMimeType($mimetypes, $file['filetype'], ['mp3', 'oga', 'webm', 'mp4', 'wmv', 'ogv'])) {
                         global $base_url;
-                        $src = smarty_modifier_sefurl($file['fileId'], 'display');
+                        $src = \SmartyTiki\Modifier\Sefurl::apply($file['fileId'], 'display');
                         $fileurl = $base_url . $src;
 
                         $ret .= "<div style='display:none'>
@@ -650,12 +662,12 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                         $perms = Perms::get('file', $fileId);
                         $smarty->assign('canAssignPerms', $perms->assign_perm_file_gallery);
                         $text = $smarty->fetch('tracker/fileTrackerContextMenu.tpl');
-                        $popup = smarty_function_popup([
+                        $popup = \SmartyTiki\FunctionHandler\Popup::render([
                             'fullhtml' => '1',
                             'text' => $text,
                             'trigger' => 'click'
                         ], $smarty->getEmptyInternalTemplate());
-                        $icon = smarty_function_icon(['name' => 'wrench'], $smarty->getEmptyInternalTemplate());
+                        $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'wrench'], $smarty->getEmptyInternalTemplate());
                         $ret .= " <a class='fgalname tips label' title='" . tr('Actions') . "'href='#' $popup>$icon</a>";
                     }
 
@@ -932,18 +944,18 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
         $result = '<table class="table"><tr><td class="diffdeleted diffprefix">-</td><td class="diffdeleted diffcontent"><del class="diffchar deleted">';
 
         foreach ($removedFileInfos as $file) {
-            $url = smarty_modifier_sefurl($file['fileId'], 'file');
-            $result .= smarty_modifier_iconify($url, $file['filetype'], $file['fileId'], 1);
-            $result .= ' <a href="' . $url . '">' . smarty_modifier_escape($file['name']) . '</a><br>';
+            $url = \SmartyTiki\Modifier\Sefurl::apply($file['fileId'], 'file');
+            $result .= \SmartyTiki\Modifier\Iconify::apply($url, $file['filetype'], $file['fileId'], 1);
+            $result .= ' <a href="' . $url . '">' . \SmartyTiki\Modifier\Escape::apply($file['name']) . '</a><br>';
         }
 
         $result .= '</del></td><td class="diffadded diffprefix">+</td><td class="diffadded diffcontent"><ins class="diffchar inserted">';
 
         foreach ($addedFileInfos as $file) {
-            $url = smarty_modifier_sefurl($file['fileId'], 'file');
-            $result .= smarty_modifier_iconify($url, $file['filetype'], $file['fileId'], 1);
-            $result .= ' <a href="' . $url . '">' . smarty_modifier_escape($file['name']) . '</a>';
-            $result .= ' <a href="' . $url . '&amp;display" target="_blank" class="tips cboxElement" title="Preview" data-bs-content="' . smarty_modifier_escape($file['name']) . '" data-box="box-3" data-bs-original-title="Preview">';
+            $url = \SmartyTiki\Modifier\Sefurl::apply($file['fileId'], 'file');
+            $result .= \SmartyTiki\Modifier\Iconify::apply($url, $file['filetype'], $file['fileId'], 1);
+            $result .= ' <a href="' . $url . '">' . \SmartyTiki\Modifier\Escape::apply($file['name']) . '</a>';
+            $result .= ' <a href="' . $url . '&amp;display" target="_blank" class="tips cboxElement" title="Preview" data-bs-content="' . \SmartyTiki\Modifier\Escape::apply($file['name']) . '" data-box="box-3" data-bs-original-title="Preview">';
             $result .= '<span class="icon icon-view fas fa-search-plus"></span></a><br/>';
         }
 
@@ -1014,7 +1026,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                                 'File #%0 missing (was attached to trackerfield "%1" on item %2)',
                                 $id,
                                 $this->getConfiguration('permName'),
-                                smarty_function_object_link(
+                                \SmartyTiki\FunctionHandler\ObjectLink::render(
                                     [
                                         'id'   => $itemId,
                                         'type' => 'trackeritem',
@@ -1092,13 +1104,13 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             $urls = [];
 
             foreach (explode(',', $this->getValue()) as $value) {
-                $urls[] = smarty_modifier_sefurl($value, 'file');
+                $urls[] = \SmartyTiki\Modifier\Sefurl::apply($value, 'file');
             }
             return [
                 'geo_located' => $typeFactory->identifier('y'),
                 'geo_file' => $typeFactory->identifier(implode(',', $urls)),
                 'geo_file_format' => $typeFactory->identifier($this->getOption('indexGeometry')),
-                $baseKey => $typeFactory->identifier($value),
+                $baseKey => $typeFactory->sortable($value),
             ];
         } else {
             $fileIds = array_filter(explode(',', $value));
@@ -1191,7 +1203,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                 $fileIds = explode(',', $value);
                 foreach ($fileIds as $fileId) {
                     if (is_numeric($fileId)) {
-                        $urls[] = $base_url . smarty_modifier_sefurl($fileId, 'display');
+                        $urls[] = $base_url . \SmartyTiki\Modifier\Sefurl::apply($fileId, 'display');
                     }
                 }
 

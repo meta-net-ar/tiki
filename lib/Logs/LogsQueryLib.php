@@ -287,12 +287,9 @@ class LogsQueryLib
             " . ($this->groupType == "countByDate" ? " GROUP BY DATE_FORMAT(FROM_UNIXTIME(lastModif), '%Y%m%d') " : "") . "
 
             ORDER BY lastModif " . ($this->desc == true ? "DESC" : "ASC") . "
-
-            " . (! empty($this->limit) ?
-                " LIMIT " . $this->limit
-                : ""
-            ) . "
         ";
+
+        $numrows = ! empty($this->limit) ? (int)$this->limit : -1;
 
         $params = [$this->type];
 
@@ -315,7 +312,7 @@ class LogsQueryLib
         if ($this->groupType == "count") {
             return $tikilib->getOne($query, $params);
         } else {
-            return $tikilib->fetchAll($query, $params);
+            return $tikilib->fetchAll($query, $params, $numrows);
         }
     }
 }

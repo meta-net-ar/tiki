@@ -15,3 +15,65 @@
 converse-chat-message[message_type=info] {
     display: none;
 }
+
+.brand-heading {
+    display: inline-flex !important;
+    align-items: center;
+}
+
+.brand-heading .converse-svg-logo,
+.brand-heading .brand-name__text,
+.brand-heading .byline {
+    display: none !important;
+}
+
+.brand-heading::before {
+    content: "";
+    display: inline-block;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-image: var(--tiki-chat-logo-image, none);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.tiki-xmpp-identity-switcher {
+    border-color: color-mix(in srgb, var(--bs-primary) 25%, var(--bs-border-color)) !important;
+    background: color-mix(in srgb, var(--bs-primary) 5%, var(--bs-body-bg)) !important;
+}
+
+#conversejs.converse-overlayed .toggle-controlbox,
+#conversejs .toggle-controlbox {
+    position: fixed !important;
+    right: 1rem !important;
+    bottom: 1rem !important;
+    left: auto !important;
+    margin: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    border: 0;
+    border-radius: 999px;
+    padding: .65rem 1.15rem;
+    box-shadow: 0 .5rem 1.25rem rgba(13, 110, 253, .35);
+    z-index: 1060;
+}
+
+#conversejs.converse-embedded .toggle-controlbox,
+#conversejs.converse-fullscreen .toggle-controlbox {
+    display: none !important;
+}
+
+#conversejs .toggle-controlbox::before {
+    content: "\f086";
+    font-family: "Font Awesome 6 Free", "FontAwesome";
+    font-weight: 900;
+    color: #fff;
+}
+
+#conversejs .toggle-controlbox span,
+#conversejs .toggle-controlbox .toggle-feedback {
+    color: #fff !important;
+    font-weight: 600;
+}

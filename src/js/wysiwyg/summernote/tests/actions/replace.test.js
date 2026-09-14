@@ -56,7 +56,7 @@ describe("replace action", () => {
         expect(formGroups.length).toBe(3);
         const findInput = formGroups.eq(0).find("input");
         expect(findInput.attr("id")).toBe("find");
-        expect(findInput.attr("autofocus")).toBe("autofocus");
+        expect(findInput.is("[autofocus]")).toBe(true);
         expect(formGroups.eq(0).find("label").text()).toBe(expectedTranslatedText);
         expect(window.tr).toHaveBeenCalledWith("Find");
 

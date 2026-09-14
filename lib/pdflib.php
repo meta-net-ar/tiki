@@ -355,8 +355,10 @@ HTML;
         $this->_getImages($html, $tempImgArr);
         $defaults = new \Mpdf\Config\ConfigVariables(); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
         $defaultVariables = $defaults->getDefaults();
+        $customFontsDir = TIKI_PATH . '/' . TIKI_CUSTOMIZATIONS_SHARED_FONTS_PATH;
+        $customFontDirs = is_dir($customFontsDir) ? [$customFontsDir . '/'] : [];
         $mpdfConfig = [
-            'fontDir' => array_merge([TIKI_PATH . '/' . FONTAWESOME_WEBFONTS_PATH . '/'], $defaultVariables['fontDir']),
+            'fontDir' => array_merge($customFontDirs, [TIKI_PATH . '/' . FONTAWESOME_WEBFONTS_PATH . '/'], $defaultVariables['fontDir']),
             'mode' => 'utf8',
             'format' => $pdfSettings['pagesize'],
             'margin_left' => $pdfSettings['margin_left'],
@@ -392,6 +394,7 @@ HTML;
          'fontawesome-brands' => [
             'R' => "fa-brands-400.ttf"
          ]];
+        $custom_fontdata = array_merge($custom_fontdata, get_custom_font_data($customFontsDir));
 
         //calling function to add custom fonts
         add_custom_font_to_mpdf($mpdf, $custom_fontdata);
@@ -2038,6 +2041,41 @@ function cleanContent($content, $tagArr)
         }
     }
     return $doc->saveHTML();
+}
+
+/**
+ * @return array in the same shape add_custom_font_to_mpdf() / $custom_fontdata expect
+ */
+function get_custom_font_data($dir)
+{
+    if (! is_dir($dir)) {
+        return [];
+    }
+
+    $variantSuffixes = [
+        'BI' => '-bolditalic',
+        'B' => '-bold',
+        'I' => '-italic',
+    ];
+
+    $fontdata = [];
+    foreach (array_merge(glob($dir . '/*.ttf'), glob($dir . '/*.otf')) as $file) {
+        $filename = basename($file);
+        $family = pathinfo($filename, PATHINFO_FILENAME);
+        $style = 'R';
+
+        foreach ($variantSuffixes as $key => $suffix) {
+            if (strlen($family) > strlen($suffix) && stripos($family, $suffix, -strlen($suffix)) !== false) {
+                $family = substr($family, 0, -strlen($suffix));
+                $style = $key;
+                break;
+            }
+        }
+
+        $fontdata[strtolower($family)][$style] = $filename;
+    }
+
+    return $fontdata;
 }
 
 function add_custom_font_to_mpdf(&$mpdf, $fonts_list)

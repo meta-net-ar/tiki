@@ -121,6 +121,9 @@ class HeaderLib
      */
     public $js_modules = [];
 
+    /** @var array External JS files to load as <script type="module" src="...">. */
+    public $js_module_files = [];
+
     /**
      * Do NOT manipulate this directly.  The only reason this is public is so PageCache.php has access to it.
      *
@@ -147,9 +150,9 @@ class HeaderLib
     public $forceJsRankLate = false;
 
 
-    public $jquery_version = '3.7.1';
-    public $jqueryui_version = '1.13.2';
-    public $jquerymigrate_version = '3.4.1';
+    public $jquery_version = '4.0.0';
+    public $jqueryui_version = '1.14.2';
+    public $jquerymigrate_version = '4.0.2';
 
     private ?string $outputHeadersWasStartedBy = null;
     private ?string $outputStaticJSFooterWasStartedBy = null;
@@ -630,6 +633,16 @@ class HeaderLib
         return $this;
     }
 
+    /** Adds an external javascript file to load as a module. */
+    public function addJsfileModule($file, $rank = 0)
+    {
+        $this->throwIfJSFooterAlreadyOutput();
+        if (empty($this->js_module_files[$rank]) or ! in_array($file, $this->js_module_files[$rank])) {
+            $this->js_module_files[$rank][] = $file;
+        }
+        return $this;
+    }
+
     public function add_cssfile($file, $rank = 0)
     {
         $this->throwIfHeadersAlreadyOutput();
@@ -744,7 +757,7 @@ class HeaderLib
         $back = generateJsImportmapScripts();
         $back .= "\n";
         if ($this->title) {
-            $back = '<title>' . smarty_modifier_escape($this->title) . "</title>\n\n";
+            $back = '<title>' . \SmartyTiki\Modifier\Escape::apply($this->title) . "</title>\n\n";
         }
 
         if ($this->rawhtml) {
@@ -755,7 +768,7 @@ class HeaderLib
             foreach ($this->metatags as $n => $m) {
                 // check if the meta name starts with OpenGraph protocol prefix and use property instead of name if true
                 $nameattrib = preg_match('/^og\:/', $n) ? 'property' : 'name';
-                $back .= '<meta ' . $nameattrib . '="' . smarty_modifier_escape($n) . '" content="' . smarty_modifier_escape($m) . "\">\n";
+                $back .= '<meta ' . $nameattrib . '="' . \SmartyTiki\Modifier\Escape::apply($n) . '" content="' . \SmartyTiki\Modifier\Escape::apply($m) . "\">\n";
             }
             $back .= "\n";
         }
@@ -794,7 +807,7 @@ class HeaderLib
             foreach ($this->rssfeeds as $x => $rssf) {
                 $back .= "<!-- rss $x -->\n";
                 foreach ($rssf as $rsstitle => $rssurl) {
-                    $back .= "<link rel=\"alternate\" type=\"application/rss+xml\" title=\"" . smarty_modifier_escape($this->convert_cdn($rsstitle)) . "\" href=\"" . smarty_modifier_escape($rssurl) . "\">\n";
+                    $back .= "<link rel=\"alternate\" type=\"application/rss+xml\" title=\"" . \SmartyTiki\Modifier\Escape::apply($this->convert_cdn($rsstitle)) . "\" href=\"" . \SmartyTiki\Modifier\Escape::apply($rssurl) . "\">\n";
                 }
             }
             $back .= "\n";
@@ -837,7 +850,7 @@ class HeaderLib
          foreach ($customCdns as $entry) {
          trim($entry);
          if (!empty($entry)) {
-         $output[$rank] .= "<script type=\"text/javascript\" src=\"".smarty_modifier_escape($entry)."\"></script>\n";
+         $output[$rank] .= "<script type=\"text/javascript\" src=\"".\SmartyTiki\Modifier\Escape::apply($entry)."\"></script>\n";
          }
          }
          }
@@ -863,7 +876,7 @@ class HeaderLib
         foreach ($ranks as $rank) {
             if (isset($jsfiles[$rank])) {
                 foreach ($jsfiles[$rank] as $entry) {
-                    $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                    $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
                 }
             }
         }
@@ -879,7 +892,7 @@ class HeaderLib
                 if (isset($jsfiles[$rank])) {
                     foreach ($jsfiles[$rank] as $entry) {
                         $entry = $this->convert_cdn($entry, $rank);
-                        $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                        $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
                     }
                 }
             }
@@ -892,23 +905,23 @@ class HeaderLib
 
             $ranks = ['30dependency', '40external', '50standard'];
             $entry = $this->minifyJSFiles($jsfiles, $ranks);
-            $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+            $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
 
             $minifyLateActive = isset($prefs['tiki_minify_late_js_files']) && $prefs['tiki_minify_late_js_files'] == 'y';
             $rank = '60late';
             if ($minifyLateActive) {
                 foreach ($jsfiles[$rank] as $index => $file) {
                     if (isset($this->skip_minify[$file]) && $this->skip_minify[$file] === true) {
-                        $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($file) . '"></script>';
+                        $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($file) . '"></script>';
                         unset($jsfiles[$rank][$index]);
                     }
                 }
                 // handling of user defined cdn servers is done inside minifyJSFiles()
                 $entry = $this->minifyJSFiles($jsfiles, [$rank]);
-                $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
             } else {
                 foreach ($jsfiles[$rank] as $entry) {
-                    $output[] = '<script type="text/javascript" src="' . smarty_modifier_escape($entry) . '"></script>';
+                    $output[] = '<script type="text/javascript" src="' . \SmartyTiki\Modifier\Escape::apply($entry) . '"></script>';
                 }
             }
         }
@@ -1059,6 +1072,11 @@ class HeaderLib
         return md5($hash);
     }
 
+    private function stripCacheBuster(string $file): string
+    {
+        return strtok($file, '?') ?: $file;
+    }
+
 
     /**
      * Output script tags for all javascript files being used.
@@ -1110,6 +1128,15 @@ class HeaderLib
             $output .= $b;
         }
 
+        if (count($this->js_module_files)) {
+            ksort($this->js_module_files);
+            foreach ($this->js_module_files as $rank => $files) {
+                foreach ($files as $file) {
+                    $output .= "\n" . '<script type="module" src="' . \SmartyTiki\Modifier\Escape::apply($file) . '"></script>';
+                }
+            }
+        }
+
         // we get one sorted array with script tags
         $js_files = $this->getJsFilesWithScriptTags();
 
@@ -1155,6 +1182,7 @@ class HeaderLib
         $this->js_modules = [];
         if ($clear_js_files) {
             $this->jsfiles = [];
+            $this->js_module_files = [];
         }
         return $this;
     }
@@ -1308,6 +1336,17 @@ class HeaderLib
         return $html;
     }
 
+    public function getJsModulesFromHTML($html)
+    {
+        preg_match_all('/<script[^>]*type=[\'"]?module[\'"]?[^>]*>\s*?(.*)(?:\s*<\/script>)/Umis', $html, $jsarr);
+        return array_filter($jsarr[1] ?? []);
+    }
+
+    public function removeJsModulesFromHTML($html)
+    {
+        return preg_replace('/<script[^>]*type=[\'"]?module[\'"]?[^>]*>\s*?(.*)(?:\s*<\/script>)/Umis', '', $html);
+    }
+
     public function get_all_css_content()
     {
         $files = $this->collect_css_files();
@@ -1360,9 +1399,9 @@ class HeaderLib
 
         foreach ($files as $file) {
             $file = $this->convert_cdn($file);
-            $back .= "<link rel=\"stylesheet\" href=\"" . smarty_modifier_escape($file) . "\" type=\"text/css\"";
+            $back .= "<link rel=\"stylesheet\" href=\"" . \SmartyTiki\Modifier\Escape::apply($file) . "\" type=\"text/css\"";
             if (! empty($media)) {
-                $back .= " media=\"" . smarty_modifier_escape($media) . "\"";
+                $back .= " media=\"" . \SmartyTiki\Modifier\Escape::apply($media) . "\"";
             }
             $back .= ">\n";
         }
@@ -1378,6 +1417,7 @@ class HeaderLib
         foreach ($files as $originalFile) {
             /* This does not use the same cachelib-based caching strategy as get_minified_css_single() since I could not see any improvement.
             I tested on Windows 8 with an HDD and a filesystem-based Tiki\Lib\Cache\Lib\Base. Tiki\Cache\FileSystem::getCached() may be inefficient. The strategy may still improve performance for other setups, such as those using Tiki\Lib\Cache\Lib\Memcache. Chealer 2018-08-31 */
+            $originalFile = $this->stripCacheBuster($originalFile);
             $fileContentsHash = md5_file($originalFile);
             $minimalFilePath = $publicDirectory . "minified_$fileContentsHash.css";
             if (! file_exists($minimalFilePath)) {
@@ -1412,11 +1452,7 @@ class HeaderLib
 
             foreach ($files as $originalFile) {
                 // remove cache-buster parameters from the end of the filename
-                $pos = strpos($originalFile, '?');
-                if ($pos !== false) {
-                    $originalFile = substr($originalFile, 0, $pos);
-                }
-                $minifier->add($originalFile);
+                $minifier->add($this->stripCacheBuster($originalFile));
             }
 
             $minifier->minify($minimalFilePath);

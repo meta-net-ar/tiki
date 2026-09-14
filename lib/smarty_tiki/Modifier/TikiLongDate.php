@@ -7,12 +7,19 @@
 
 namespace SmartyTiki\Modifier;
 
-class TikiLongDate
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class TikiLongDate implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tiki_long_date';
+    }
+
     public function handle($string)
     {
         global $prefs;
         \TikiLib::lib('smarty'); //Load SmartyLib for side effects
-        return smarty_modifier_tiki_date_format($string, $prefs['long_date_format']);
+        return \SmartyTiki\Modifier\TikiDateFormat::apply($string, $prefs['long_date_format']);
     }
 }

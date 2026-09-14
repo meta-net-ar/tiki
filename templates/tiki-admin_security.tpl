@@ -17,7 +17,7 @@
 {assign var=htStatus value=$htaccessCheck.status}
 
 {if $htStatus == 'mismatch'}
-    {remarksbox type="warning"}
+    {remarksbox type="info"}
     {tr}.htaccess differs from the bundled _htaccess.{/tr}
     <div class="mt-2 d-flex flex-wrap gap-2">
         <a class="btn btn-outline-secondary btn-sm" href="{$htaccessDocsUrl|escape}" target="_blank" rel="noopener">

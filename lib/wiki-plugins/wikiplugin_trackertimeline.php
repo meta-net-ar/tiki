@@ -374,7 +374,7 @@ function wikiplugin_trackertimeline($data, $params)
                 }
                 if (is_numeric($image)) {
                     // a fileId
-                    $image = smarty_modifier_sefurl($image, 'thumbnail');
+                    $image = \SmartyTiki\Modifier\Sefurl::apply($image, 'thumbnail');
                 }
                 $js .= "console.log('" . $image . "');";
                 $event['content'] .= "<br><img src='./" . $image . "'>";

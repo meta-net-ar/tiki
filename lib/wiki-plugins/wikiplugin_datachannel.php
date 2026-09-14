@@ -328,9 +328,8 @@ function wikiplugin_datachannel($data, $params)
                 }
                 $id = $paymentlib->request_payment($desc, $params['price'], $prefs['payment_default_delay']);
                 $paymentlib->register_behavior($id, 'complete', 'execute_datachannel', [ $data, $params, $posts, $executionId ]);
-                require_once 'lib/smarty_tiki/function.payment.php';
 
-                return '^~np~' . smarty_function_payment([ 'id' => $id ], $smarty->getEmptyInternalTemplate()) . '~/np~^';
+                return '^~np~' . \SmartyTiki\FunctionHandler\Payment::render([ 'id' => $id ], $smarty->getEmptyInternalTemplate()) . '~/np~^';
             }
 
             $success = true;

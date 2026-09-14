@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty plugin Accordion
@@ -26,8 +27,13 @@ use Smarty\Template;
  *  {/accordion}
  * \endcode
  */
-class AccordionGroup extends Base
+class AccordionGroup extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'accordion_group';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {
@@ -41,7 +47,7 @@ class AccordionGroup extends Base
             $accordion_position = 0;
         }
 
-        $title = smarty_modifier_escape($params['title']);
+        $title = \SmartyTiki\Modifier\Escape::apply($params['title']);
         $id = $accordion_current_group . '-' . ++$accordion_position;
 
         if (! empty($params['accordion_pos'])) {

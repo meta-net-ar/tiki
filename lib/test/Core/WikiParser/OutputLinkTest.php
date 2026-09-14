@@ -77,7 +77,7 @@ class WikiParser_OutputLinkTest extends TikiTestCase
         $link->setWikiLookup([$this, 'getPageInfo']);
         $link->setWikiLinkBuilder([$this, 'getWikiLink']);
 
-        $this->assertLinkIs('<a href="TestWithAVeryBigNameThatExceedsTheColumnSizeOfTheDatabaseTestWithAVeryBigNameThatExceedsTheColumnSizeOfTheDatabaseTestWithAVeryBigNameThatExceedsTheColumnSize" data-bs-content="Testing" class="wiki wiki_page tips">TestWithAVeryBigNameThatExceedsTheColumnSizeOfTheDatabaseTestWithAVeryBigNameThatExceedsTheColumnSizeOfTheDatabaseTestWithAVeryBigNameThatExceedsTheColumnSizeTHISMUSTBETRIMMED</a>', $link->getHtml());
+        $this->assertLinkIs('<a href="TestWithAVeryBigNameThatExceedsTheColumnSizeOfTheDatabaseTestWithAVeryBigNameThatExceedsTheColumnSizeOfTheDatabaseTestWithAVeryBigNameThatExceedsTheColumnSize" data-bs-content="Testing" data-bs-custom-class="pe-none" class="wiki wiki_page tips">TestWithAVeryBigNameThatExceedsTheColumnSizeOfTheDatabaseTestWithAVeryBigNameThatExceedsTheColumnSizeOfTheDatabaseTestWithAVeryBigNameThatExceedsTheColumnSizeTHISMUSTBETRIMMED</a>', $link->getHtml());
     }
 
     public function testPageDoesExist()
@@ -93,7 +93,7 @@ class WikiParser_OutputLinkTest extends TikiTestCase
         $link->setWikiLookup([$this, 'getPageInfo']);
         $link->setWikiLinkBuilder([$this, 'getWikiLink']);
 
-        $this->assertLinkIs('<a href="Test" data-bs-content="Testing" class="wiki wiki_page tips">Test</a>', $link->getHtml());
+        $this->assertLinkIs('<a href="Test" data-bs-content="Testing" data-bs-custom-class="pe-none" class="wiki wiki_page tips">Test</a>', $link->getHtml());
     }
 
     public function testInfoFunctionProvidesAlias()
@@ -109,7 +109,7 @@ class WikiParser_OutputLinkTest extends TikiTestCase
         $link->setWikiLookup([$this, 'getPageInfo']);
         $link->setWikiLinkBuilder([$this, 'getWikiLink']);
 
-        $this->assertLinkIs('<a href="Test1.2" data-bs-content="Testing" class="wiki wiki_page tips">Test</a>', $link->getHtml());
+        $this->assertLinkIs('<a href="Test1.2" data-bs-content="Testing" data-bs-custom-class="pe-none" class="wiki wiki_page tips">Test</a>', $link->getHtml());
     }
 
     public function testExistsWithRelType()
@@ -126,7 +126,7 @@ class WikiParser_OutputLinkTest extends TikiTestCase
         $link->setWikiLookup([$this, 'getPageInfo']);
         $link->setWikiLinkBuilder([$this, 'getWikiLink']);
 
-        $this->assertLinkIs('<a href="Test" data-bs-content="Testing" class="wiki wiki_page tips abc">Test</a>', $link->getHtml());
+        $this->assertLinkIs('<a href="Test" data-bs-content="Testing" data-bs-custom-class="pe-none" class="wiki wiki_page tips abc">Test</a>', $link->getHtml());
     }
 
     public function testUndefinedExternalLink()
@@ -183,7 +183,7 @@ class WikiParser_OutputLinkTest extends TikiTestCase
         $link->setWikiLinkBuilder([$this, 'getWikiLink']);
         $link->setHandlePlurals(true);
 
-        $this->assertLinkIs('<a href="Policy" data-bs-content="Some Page" class="wiki wiki_page tips">Policies</a>', $link->getHtml());
+        $this->assertLinkIs('<a href="Policy" data-bs-content="Some Page" data-bs-custom-class="pe-none" class="wiki wiki_page tips">Policies</a>', $link->getHtml());
     }
 
     public function testRenderCreateLinkWithNamespace()
@@ -214,7 +214,7 @@ class WikiParser_OutputLinkTest extends TikiTestCase
         $link->setNamespace('HelloWorld', '_');
         $link->setIdentifier('Test');
 
-        $this->assertLinkIs('<a href="HelloWorld_Test" data-bs-content="HelloWorld / Test" class="wiki wiki_page tips">Test</a>', $link->getHtml());
+        $this->assertLinkIs('<a href="HelloWorld_Test" data-bs-content="HelloWorld / Test" data-bs-custom-class="pe-none" class="wiki wiki_page tips">Test</a>', $link->getHtml());
     }
 
     public function testRenderFromDifferentNamespace()
@@ -235,7 +235,7 @@ class WikiParser_OutputLinkTest extends TikiTestCase
         $link->setNamespace('Foobar', '_');
         $link->setIdentifier('HelloWorld_Test');
 
-        $this->assertLinkIs('<a href="HelloWorld_Test" data-bs-content="HelloWorld / Test" class="wiki wiki_page tips"><span class="namespace first last">HelloWorld</span>Test</a>', $link->getHtml());
+        $this->assertLinkIs('<a href="HelloWorld_Test" data-bs-content="HelloWorld / Test" data-bs-custom-class="pe-none" class="wiki wiki_page tips"><span class="namespace first last">HelloWorld</span>Test</a>', $link->getHtml());
     }
 
     public function testRenderFromDifferentNamespaceWithMultipleParts()
@@ -256,7 +256,7 @@ class WikiParser_OutputLinkTest extends TikiTestCase
         $link->setNamespace('Foobar', '_');
         $link->setIdentifier('Abc_Def_HelloWorld_Test');
 
-        $this->assertLinkIs('<a href="Abc_Def_HelloWorld_Test" data-bs-content="Abc / Def / HelloWorld / Test" class="wiki wiki_page tips"><span class="namespace first">Abc</span><span class="namespace">Def</span><span class="namespace last">HelloWorld</span>Test</a>', $link->getHtml());
+        $this->assertLinkIs('<a href="Abc_Def_HelloWorld_Test" data-bs-content="Abc / Def / HelloWorld / Test" data-bs-custom-class="pe-none" class="wiki wiki_page tips"><span class="namespace first">Abc</span><span class="namespace">Def</span><span class="namespace last">HelloWorld</span>Test</a>', $link->getHtml());
     }
 
     public function getPageInfo($page)

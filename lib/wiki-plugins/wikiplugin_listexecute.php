@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Search\Query\Aggregation\QueryFacade as AggregationFacade;
 use Tiki\Command\ListExecuteCommand;
 use Tiki\Lib\Wiki\PluginsLibUtil;
 
@@ -142,7 +143,8 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
 
     PluginsLibUtil::handleDownload($query, $index, $matches);
 
-    $result = $query->search($index);
+    $aggFacade = (new AggregationFacade())->applyWikiMarkup($matches);
+    $result = $aggFacade->searchWithAggregations($query, $index);
     $result->setId('wplistexecute-' . $iListExecute);
 
     $resultBuilder = new Search_ResultSet_WikiBuilder($result);
@@ -289,7 +291,7 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
 
             // need to reload search results in case action has modified the original contents
             // or queried only specific objects
-            $result = $searchQuery->search($index);
+            $result = $aggFacade->searchWithAggregations($searchQuery, $index);
             $result->setId('wplistexecute-' . $iListExecute);
             $resultBuilder = new Search_ResultSet_WikiBuilder($result);
             $resultBuilder->apply($matches, $params);

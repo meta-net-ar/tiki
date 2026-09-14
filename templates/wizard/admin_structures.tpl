@@ -13,6 +13,7 @@
         <fieldset>
             <legend>{tr}Structures options{/tr}</legend>
             <div class="admin clearfix featurelist">
+                {preference name=wiki_structure_add_to_structure_bar}
                 {preference name=feature_wiki_open_as_structure}
                 {preference name=feature_wiki_make_structure}
                 {if $isCategories eq true}

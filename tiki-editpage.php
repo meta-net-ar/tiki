@@ -268,7 +268,7 @@ if (
             Feedback::warning(tr('Page %0 is already part of this structure.', $page));
         }
 
-        $url = smarty_function_sefurl([
+        $url = \SmartyTiki\FunctionHandler\Sefurl::render([
             'page' => $currentNodeInfo['pageName'],
             'structure' => $currentStructureInfo['pageName'],
             'page_ref_id' => $currentRefId,
@@ -437,9 +437,7 @@ if ($prefs['feature_warn_on_edit'] === 'y') {
         }
     }
     if ($editpageconflict === 'y' && ! isset($_REQUEST["conflictoverride"])) {
-        include_once('lib/smarty_tiki/modifier.userlink.php');
-        include_once('lib/smarty_tiki/modifier.username.php');
-        $msg = tr("This page is being edited by %0. Please check with the user before editing the page,    otherwise the changes will be stored as two separate versions in the history and you will have to manually merge them later.", smarty_modifier_username($semUser));
+        $msg = tr("This page is being edited by %0. Please check with the user before editing the page,    otherwise the changes will be stored as two separate versions in the history and you will have to manually merge them later.", \SmartyTiki\Modifier\Username::apply($semUser));
         $msg .= '<br /><br /><a href="tiki-editpage.php?page=';
         $msg .= urlencode($page);
         $msg .= '&conflictoverride=y">' . tra('Override lock and carry on with edit') . '</a>';
@@ -672,7 +670,7 @@ if ($prefs['feature_wiki_attachments'] === 'y' && isset($_REQUEST["attach"]) && 
             if ($uploads) {
                 if (isset($_REQUEST['edit'])) {
                     foreach ($uploads as $upload) {
-                        $_REQUEST['edit'] .= '[' . smarty_modifier_sefurl($upload['fileId'], 'file') . '|' . $upload['name'] . ']';
+                        $_REQUEST['edit'] .= '[' . \SmartyTiki\Modifier\Sefurl::apply($upload['fileId'], 'file') . '|' . $upload['name'] . ']';
                     }
                 }
                 Feedback::success(tr('File uploaded'));
@@ -1493,7 +1491,7 @@ if (
                 $structure_info = $structlib->s_get_page_info($structure_info['parent_id']);
             }
             if ($structure_info) {
-                $url = smarty_function_sefurl([
+                $url = \SmartyTiki\FunctionHandler\Sefurl::render([
                     'page' => $page,
                     'structure' => $structure_info['pageName'],
                     'page_ref_id' => $page_ref_id,
@@ -1803,15 +1801,15 @@ if ($need_lang) {
             $smarty = TikiLib::lib('smarty');
 
             $content .= "<form method='post' action='tiki-admin.php'>";
-            $content .= str_replace('"', "&quot;", smarty_function_preference(['name' => 'ajax_autosave'], $smarty->getEmptyInternalTemplate()));
-            $content .= str_replace('"', "&quot;", smarty_function_ticket([], $smarty->getEmptyInternalTemplate()));
+            $content .= str_replace('"', "&quot;", \SmartyTiki\FunctionHandler\Preference::render(['name' => 'ajax_autosave'], $smarty->getEmptyInternalTemplate()));
+            $content .= str_replace('"', "&quot;", \SmartyTiki\FunctionHandler\Ticket::render([], $smarty->getEmptyInternalTemplate()));
             $content .= "<input type='submit' class='btn btn-primary btn-sm' value='";
-            $content .= smarty_modifier_escape(tra('Apply')) . "'>";
+            $content .= \SmartyTiki\Modifier\Escape::apply(tra('Apply')) . "'>";
             $content .= '</form>';
         }
         $remrepeat = false;
         $smartyTemplate = $smarty->getEmptyInternalTemplate();
-        $remarksbox = str_replace('"', "'", smarty_block_remarksbox(['type' => 'warning', 'title' => 'Autosave', 'close' => 'y'], $content, $smartyTemplate, $remrepeat));
+        $remarksbox = str_replace('"', "'", \SmartyTiki\BlockHandler\Remarksbox::render(['type' => 'warning', 'title' => 'Autosave', 'close' => 'y'], $content, $smartyTemplate, $remrepeat));
 
         $smarty->assign('alert_content', $remarksbox);
     }

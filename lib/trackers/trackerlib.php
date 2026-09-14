@@ -30,6 +30,8 @@
  */
 define('HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE', -1);
 
+require_once(__DIR__ . '/../init/tra.php');  //This is required when running phpunit under recent php versions.
+
 use Tiki\Tracker\TrackerConfigHistory;
 
 /**
@@ -2231,6 +2233,29 @@ class TrackerLib extends TikiLib
         $this->itemFields()->insertOrUpdate(['value' => $value], $conditions);
     }
 
+    /**
+     * Copy the raw stored value of one field from a source item to a target item,
+     * bypassing any per-field transformation (notably the encryption-on-save in
+     * modify_field). Used to duplicate Secret (SEC) field values: the raw blob —
+     * plaintext, or ciphertext bound to the field's encryption key — is valid
+     * verbatim on another item of the same tracker, so duplication needs neither
+     * the encryption key in session nor re-encryption.
+     */
+    public function copyItemFieldValueRaw($sourceItemId, $targetItemId, $fieldId)
+    {
+        $value = $this->itemFields()->fetchOne('value', [
+            'itemId' => (int) $sourceItemId,
+            'fieldId' => (int) $fieldId,
+        ]);
+        if ($value === false || $value === null) {
+            return;
+        }
+        $this->itemFields()->insertOrUpdate(
+            ['value' => $value],
+            ['itemId' => (int) $targetItemId, 'fieldId' => (int) $fieldId]
+        );
+    }
+
     public function groupName($tracker_info, $itemId)
     {
         if (empty($tracker_info['autoCreateGroupInc'])) {
@@ -2841,6 +2866,25 @@ class TrackerLib extends TikiLib
                         $mandatory_fields[] = $f;
                     } elseif ($f['type'] == 'r' && empty(array_filter((array) $f['value']))) {  // ItemLink - '0' counts as empty
                         $mandatory_fields[] = $f;
+                    } elseif ($f['type'] == 'SEC') {
+                        // Secret: an empty submission may be backed by the source item's value
+                        // (duplication copies it at database level after insert) or by this item's
+                        // own stored value (keep-on-blank). View permissions are re-checked because
+                        // the cloneSource marker arrives from the POST body.
+                        $secretIsMissing = Tracker_Field_Secret::isMandatorySubmissionEmpty($f, (int) $itemId, function ($backingItemId) use ($trackerId, $f) {
+                            try {
+                                $backingItem = Tracker_Item::fromId($backingItemId);
+                            } catch (Exception $e) {
+                                return '';
+                            }
+                            if (! $backingItem || ! $backingItem->canView() || ! $backingItem->canViewField($f['fieldId'])) {
+                                return '';
+                            }
+                            return $this->get_item_value($trackerId, $backingItemId, $f['fieldId']);
+                        });
+                        if ($secretIsMissing) {
+                            $mandatory_fields[] = $f;
+                        }
                     } elseif (! isset($f['value']) || ! is_array($f['value']) && strlen($f['value']) == 0 || is_array($f['value']) && empty($f['value'])) {
                         $mandatory_fields[] = $f;
                     }
@@ -6333,19 +6377,38 @@ class TrackerLib extends TikiLib
             }
 
             $r = null;
+            $encryptionBadge = '';
 
             if (! empty($field['encryptionKeyId'])) {
+                $encryptionKeyId = (int)$field['encryptionKeyId'];
+                $fieldId = (int)$field['fieldId'];
+                $itemId = (int)($item['itemId'] ?? 0);
+                $keyName = '';
+
                 try {
                     $key = new Tiki\Encryption\Key($field['encryptionKeyId']);
-                    $field['value'] = $item[$field['fieldId']] = $key->decryptData($field['value']);
+                    $keyName = htmlspecialchars((string)($key->get('name') ?? ''), ENT_QUOTES);
+                    $fieldAttrs = ' data-field-id="' . $fieldId . '" data-item-id="' . $itemId . '"';
+
+                    if ($key->isKeyAccessible()) {
+                        $field['value'] = $item[$field['fieldId']] = $key->decryptData($field['value']);
+                        $header = \TikiLib::lib('header');
+                        $header->add_js_module("import '@vue-widgets/encrypted-field'");
+                        $encryptionBadge = '<tiki-encrypted-field key-name="' . $keyName . '"' . $fieldAttrs . '></tiki-encrypted-field>';
+                    } else {
+                        $field['value'] = $item[$field['fieldId']] = '';
+                        $r = $this->buildLockedEncryptedFieldHtml($fieldId, $encryptionKeyId, $keyName, $itemId);
+                    }
                 } catch (Tiki\Encryption\NotFoundException) {
-                    $r = tr('Field is encrypted with a key that no longer exists!');
+                    $header = \TikiLib::lib('header');
+                    $header->add_js_module("import '@vue-widgets/encrypted-field'");
+                    $fieldAttrs = ' data-field-id="' . $fieldId . '" data-item-id="' . $itemId . '"';
+                    $r = '<tiki-encrypted-field forbidden key-name=""' . $fieldAttrs . '></tiki-encrypted-field>';
                 } catch (Tiki\Encryption\Exception $e) {
                     $field['value'] = $item[$field['fieldId']] = '';
-                    $r = tr('Field data is encrypted using key "%0" but there was an error decrypting the data: %1', $key->get('name'), $e->getMessage());
-                    $r .= ' ' . $key->manualEntry();
-                    \TikiLib::lib('header')->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tracker-field-view-reload.js');
+                    $r = $this->buildLockedEncryptedFieldHtml($fieldId, $encryptionKeyId, $keyName, $itemId);
                 }
+
                 $handler = $this->get_field_handler($field, $item);
                 $field = array_merge($field, $handler->getFieldData());
                 $handler = $this->get_field_handler($field, $item);
@@ -6384,7 +6447,7 @@ class TrackerLib extends TikiLib
             }
 
             if (! is_null($r)) {
-                // already rendered (decryption error)
+                // already rendered (locked, forbidden, or error state — skip renderOutput)
             } elseif (! empty($params['editable']) && $params['field']['type'] !== 'STARS') {
                 if ($params['editable'] === true) {
                     // Some callers pass true/false instead of an actual mode, default to block
@@ -6447,15 +6510,35 @@ class TrackerLib extends TikiLib
                 $r = $handler->renderOutput($context);
             }
 
+            $output = is_null($r) ? '' : ($encryptionBadge . $r);
             if (empty($params['smarty_assign']) || $params['smarty_assign'] !== 'n') {
-                TikiLib::lib('smarty')->assign("f_$fieldId", $r);
+                TikiLib::lib('smarty')->assign("f_$fieldId", $output);
                 $fieldPermName = $field['permName'];
-                TikiLib::lib('smarty')->assign("f_$fieldPermName", $r);
+                TikiLib::lib('smarty')->assign("f_$fieldPermName", $output);
             }
-            return is_null($r) ? '' : $r;
+            return $output;
         }
 
         return '';
+    }
+
+    private function buildLockedEncryptedFieldHtml(int $fieldId, int $encryptionKeyId, string $keyName, int $itemId): string
+    {
+        $header = \TikiLib::lib('header');
+        $header->add_js_module("import '@vue-widgets/encrypted-field'");
+        $header->add_js_module("import '@vue-widgets/enter-key-modal'");
+        $header->add_js_module("import { handleEncryptedField } from '@tiki/ui-utils'; handleEncryptedField();");
+        $fieldAttrs = ' data-field-id="' . $fieldId . '" data-item-id="' . $itemId . '"';
+        return '<tiki-encrypted-field locked key-name="' . $keyName . '"' . $fieldAttrs . '></tiki-encrypted-field>'
+            . '<span id="encrypted-view-' . $fieldId . '-' . $itemId . '" class="encrypted-view-value" style="display:none;"></span>'
+            . '<tiki-enter-key-modal'
+            . ' data-field-id="' . $fieldId . '"'
+            . ' data-item-id="' . $itemId . '"'
+            . ' field-id="' . $fieldId . '"'
+            . ' key-name="' . $keyName . '"'
+            . ' encryption-key-id="' . $encryptionKeyId . '"'
+            . ' item-id="' . $itemId . '"'
+            . ' hidden></tiki-enter-key-modal>';
     }
 
     public function get_child_items($itemId)

@@ -15,8 +15,6 @@ if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     exit;
 }
 
-include_once('lib/smarty_tiki/block.self_link.php');
-
 $toolbarPickerIndex = -1;
 
 

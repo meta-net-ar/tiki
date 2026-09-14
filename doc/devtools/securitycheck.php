@@ -64,7 +64,7 @@ $skipDirs = [
     './' . TIKI_CUSTOMIZATIONS_SRC_DIST_PATH,
     './' . BIN_PATH,
     './' . PUBLIC_GENERATED_PATH, // generated files
-    './src/php/external_lib_sources' // External php codebases whose source code have been included in tiki.
+    './src/php/external_lib_sources', // External php codebases whose source code have been included in tiki.
 ];
 
 $safePaths = [

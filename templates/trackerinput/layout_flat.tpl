@@ -60,7 +60,7 @@ if (selectAllBox.length > 0) {
 }
 
 if ($('.multi-toggle-selection').length > 0) {
-    $('.multi-toggle-selection').click(function() {
+    $('.multi-toggle-selection').on('click', function() {
         const btn = $(this);
         const fieldId = btn.data('field-id');
         const fieldType = btn.data('field-type');

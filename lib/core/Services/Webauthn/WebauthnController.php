@@ -183,29 +183,30 @@ class WebauthnController
 
             $deviceName = $input->device_name->text();
             $aaguid = (string) $attestationObject->authData->attestedCredentialData->aaguid;
+            $credentialId = base64_encode($publicKeyCredentialSource->publicKeyCredentialId);
 
-            $existingAuthenticator = $this->webAuthnTable->fetchRow(['authenticator_id'], [
-                'authenticator_id' => $aaguid,
+            $existingCredential = $this->webAuthnTable->fetchRow(['credential_id'], [
+                'credential_id' => $credentialId,
                 'user' => $publicKeyCredentialCreationOptions->user->name
             ]);
 
-            if ($existingAuthenticator) {
+            if ($existingCredential) {
                 return [
                     'status' => 'success',
                     'code' => 'AUTHENTICATOR_EXIST',
-                    'message' => tr('This authenticator has already been registered.')
+                    'message' => tr('This passkey has already been registered.')
                 ];
             }
 
             $this->webAuthnTable->insert([
-                'credential_id' => base64_encode($publicKeyCredentialSource->publicKeyCredentialId),
+                'credential_id' => $credentialId,
                 'public_key' => base64_encode($publicKeyCredentialSource->credentialPublicKey),
                 'sign_count' => $publicKeyCredentialSource->counter,
                 'user' => $publicKeyCredentialCreationOptions->user->name,
                 'user_handle' => $publicKeyCredentialSource->userHandle,
                 'device_name' => $deviceName,
                 'authenticator_id' => $aaguid,
-                'created_at' => date('Y-m-d H:i:s')
+                'created_at' => gmdate('Y-m-d H:i:s')
             ]);
 
             return [
@@ -312,7 +313,7 @@ class WebauthnController
                 $_SESSION['webauthn_user'] = $userName;
                 $this->webAuthnTable->update([
                     'sign_count' => $signCount,
-                    'last_signin' => date('Y-m-d H:i:s')
+                    'last_signin' => gmdate('Y-m-d H:i:s')
                 ], [
                     'credential_id' => $credential_id,
                 ]);

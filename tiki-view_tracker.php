@@ -377,7 +377,7 @@ if (! empty($_REQUEST['remove'])) {
     // redirect to the tracker item list of the last item deleted
     if (isset($item_info) && ! empty($item_info['trackerId'])) {
         if (! isset($_REQUEST['sort_mode']) && ! isset($_REQUEST['offset'])) {
-            $access->redirect(smarty_modifier_sefurl($item_info['trackerId'], 'tracker'));
+            $access->redirect(\SmartyTiki\Modifier\Sefurl::apply($item_info['trackerId'], 'tracker'));
         }
     }
 } elseif (isset($_REQUEST['batchaction']) and ($_REQUEST['batchaction'] == 'o' || $_REQUEST['batchaction'] == 'p' || $_REQUEST['batchaction'] == 'c')) {

@@ -10,9 +10,15 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class RatingResult extends Base
+class RatingResult extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'rating_result';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;
@@ -37,9 +43,8 @@ class RatingResult extends Base
             </td>';
             }
         } elseif ($votings) {
-            include_once('lib/smarty_tiki/function.rating_result_avg.php');
             $smarty = TikiLib::lib('smarty');
-            return smarty_function_rating_result_avg($params, $smarty->getEmptyInternalTemplate());
+            return \SmartyTiki\FunctionHandler\RatingResultAvg::render($params, $smarty->getEmptyInternalTemplate());
         }
 
         return "<table class='ratingDeliberationResultTable w-100 mt-2'><tr>" . $tableBody . "</tr></table>";

@@ -71,7 +71,7 @@
                 </select>
                 <input type="hidden" name="trackerId" value="{$trackerId|escape}">
                 <input type="hidden" name="confirm" value="0">
-                <button type="submit" class="btn btn-primary" name="submit">{tr}Search{/tr}</button>
+                <button type="submit" class="btn btn-primary" name="submit">{tr}Go{/tr}</button>
             </div>
         </div>
     </form>

@@ -81,7 +81,8 @@ class FacetBuilder
             } else {
                 $out .= ' ORDER BY COUNT(*) DESC';
             }
-            $out .= ' LIMIT ' . $count;
+            // Cast to int to prevent SQL injection. SphinxQL FACET syntax does not support bound parameters
+            $out .= ' LIMIT ' . (int)$count;
         }
 
         return $out;

@@ -157,7 +157,7 @@ class Tracker_Field_Checkbox extends \Tracker\Field\AbstractItemField implements
             ->setLabel($name)
             ->setPlainReplacement('X')
             ->setRenderTransform(function ($value) use ($smarty) {
-                return ('y' === $value) ? smarty_function_icon(['name' => 'success'], $smarty->getEmptyInternalTemplate()) : '';
+                return ('y' === $value) ? \SmartyTiki\FunctionHandler\Icon::render(['name' => 'success'], $smarty->getEmptyInternalTemplate()) : '';
             })
             ;
 

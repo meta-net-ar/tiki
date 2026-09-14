@@ -16,7 +16,7 @@ if (isset($_SESSION['tiki_cookie_jar'])) {
 
     if (is_array($_SESSION['tiki_cookie_jar'])) {
         foreach ($_SESSION['tiki_cookie_jar'] as $nn => $vv) {
-            $cookielist[] = "'" . smarty_modifier_escape($nn, 'javascript') . "': '" . smarty_modifier_escape($vv, 'javascript') . "'";
+            $cookielist[] = "'" . \SmartyTiki\Modifier\Escape::apply($nn, 'javascript') . "': '" . \SmartyTiki\Modifier\Escape::apply($vv, 'javascript') . "'";
         }
     }
 

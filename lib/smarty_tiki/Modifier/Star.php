@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class Star
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class Star implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'star';
+    }
+
     public function handle($score)
     {
         global $prefs, $tikilib;

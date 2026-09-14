@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Filter\Pre;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty prefilter jq
  * -------------------------------------------------------------
@@ -14,8 +16,13 @@ namespace SmartyTiki\Filter\Pre;
  *
  * -------------------------------------------------------------
  */
-class Jq implements \Smarty\Filter\FilterInterface
+class Jq implements \Smarty\Filter\FilterInterface, TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'jq';
+    }
+
     public function filter($source, \Smarty\Template $template)
     {
         if (! str_contains($source, '{jq')) {

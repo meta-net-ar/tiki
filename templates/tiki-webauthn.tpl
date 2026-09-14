@@ -24,8 +24,8 @@
                         <td> {$devices[device].authenticator_name} </td>
                         <td> {$devices[device].device_name} </td>
                         <td> {$devices[device].sign_count} </td>
-                        <td> {$devices[device].created_at} </td>
-                        <td> {$devices[device].last_signin} </td>
+                        <td> {$devices[device].created_at|tiki_short_datetime} </td>
+                        <td> {$devices[device].last_signin|tiki_short_datetime} </td>
                         <td class="action">
                             {actions}
                                 <action>

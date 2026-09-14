@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Search\Query\Aggregation\QueryFacade as AggregationFacade;
 use Tiki\Lib\Wiki\PluginsLibUtil;
 
 function wikiplugin_list_info()
@@ -72,6 +73,19 @@ function wikiplugin_list_info()
                 'separator' => ',',
                 'filter' => 'text',
                 'since' => '20.0',
+            ],
+            'tier' => [
+                'required' => false,
+                'name' => tra('Aggregation Execution Tier'),
+                'description' => tra('Override the automatic routing of {group}/{metric}/{having} aggregations. "engine" forces them to the search backend (cheapest, but no Others/Total/derived/formula/having support). "temp_table" forces a per-request MySQL table fed by scrolled hits (handles every feature, slower for huge result sets). "auto" (default) picks the right tier from the requested features.'),
+                'filter' => 'word',
+                'default' => 'auto',
+                'options' => [
+                    ['text' => tra('Auto (recommended)'), 'value' => 'auto'],
+                    ['text' => tra('Engine pushdown'), 'value' => 'engine'],
+                    ['text' => tra('MySQL temp table'), 'value' => 'temp_table'],
+                ],
+                'advanced' => true,
             ],
             'multisearchid' => [
                 'required' => false,
@@ -314,6 +328,12 @@ function wikiplugin_list($data, $params)
                 $facetsBuilder->build($query, $unifiedsearchlib->getFacetProvider());
             }
 
+            /* set up server-side aggregations ({group}, {metric}, {join}) */
+            $aggFacade = (new AggregationFacade())
+                ->applyWikiMarkup($matches)
+                ->setTierOverride(isset($params['tier']) ? (string) $params['tier'] : null);
+            $aggFacade->prepareQuery($query, $index);
+
             if ($multisearch) {
                 $originalQueries[$id] = $query;
                 $query->search($index, (string)$id);
@@ -321,6 +341,10 @@ function wikiplugin_list($data, $params)
                 $result = $query->search($index, '', $multisearchResults[$params['multisearchid']]);
             } else {
                 $result = $query->search($index);
+            }
+
+            if (! $multisearch && isset($result)) {
+                $aggFacade->enrichResult($result, $query, $index);
             }
         } // END: Foreach loop of queries
         if ($multisearch) {

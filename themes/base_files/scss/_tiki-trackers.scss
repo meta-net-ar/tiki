@@ -221,6 +221,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 300px;
@@ -312,6 +313,51 @@
 @media (prefers-color-scheme: dark) {
   .bbb-recording-display-item h6 {
     color: #e2e8f0;
+  }
+}
+
+/* Relation field list styling (MR !8915) */
+.relation-list {
+  padding-left: 1.25rem;
+  list-style-type: disc;
+  list-style-position: outside;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+
+  li {
+    /* Larger inter-item spacing vs. line-height — makes each item visually distinct */
+    margin-bottom: 0.65rem;
+    line-height: 1.45;
+    color: var(--bs-body-color);
+    padding-left: 0.1rem;
+
+    &::marker {
+      /* Faded bullet using opacity so themes can override via color variable */
+      color: var(--bs-secondary-color, #6c757d);
+      font-size: 0.7em;
+      opacity: 0.6;
+    }
+
+    a {
+      font-weight: 400;
+      color: var(--bs-link-color, var(--bs-primary));
+      text-decoration: none;
+
+      strong {
+        font-weight: 600;
+      }
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    /* Pure CSS: suppress bullet when a status icon already acts as a visual marker */
+    &:has(.tiki-status-icon, .icon, i[class*="status"]) {
+      list-style-type: none;
+      padding-left: 0;
+      margin-left: -1.15rem; /* Keep text aligned with items that have bullets */
+    }
   }
 }
 

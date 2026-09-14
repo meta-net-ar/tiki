@@ -224,6 +224,18 @@ class TikiVersionTest extends PHPUnit\Framework\TestCase
         $this->assertEquals($expectedMessage, $upgrade->getMessage());
     }
 
+    /**
+     * Casting to string must match getMessage(), so objects reaching a template still render.
+     *
+     * @dataProvider upgradeMessages
+     */
+    public function testUpgradeCastsToItsMessage(string $expectedMessage, Tiki_Version_Upgrade $upgrade, array $ltsMockData = []): void
+    {
+        $this->setupMockTWV($ltsMockData);
+
+        $this->assertEquals($expectedMessage, (string) $upgrade);
+    }
+
     public static function upgradeMessages()
     {
         $providerLink = '<a href="https://tiki.org/Extended-Security-Maintenance" target="_blank" class="alert-link">' . tra("Official Service Providers") . '</a>';

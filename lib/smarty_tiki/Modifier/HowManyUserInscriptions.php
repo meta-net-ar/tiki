@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -17,8 +19,13 @@ namespace SmartyTiki\Modifier;
  *           then return 48 (=13+1+15+1+17+1)
  * -------------------------------------------------------------
  */
-class HowManyUserInscriptions
+class HowManyUserInscriptions implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'how_many_user_inscriptions';
+    }
+
     public function handle($text)
     {
 

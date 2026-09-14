@@ -354,11 +354,10 @@ class Utilities
         if (isset($component->{'X-Tiki-Allday'})) {
             $isAllDay = ! empty($convertToString($component->{'X-Tiki-Allday'}));
         }
-        if ($isAllDay) {
-            $result['allday'] = 1;
-            if ($rec) {
-                $rec->setAllday(1);
-            }
+
+        $result['allday'] = $isAllDay ? 1 : 0;
+        if ($rec) {
+            $rec->setAllday($result['allday']);
         }
         if (isset($component->{'X-Tiki-sendReminder'})) {
             $result['sendReminder'] = empty($convertToString($component->{'X-Tiki-sendReminder'})) ? 0 : 1;
@@ -632,6 +631,7 @@ class Utilities
         } elseif (! empty($row['uid'])) {
             $data['UID'] = $row['uid'];
         }
+
         if (! empty($row['allday'])) {
             $data['X-Tiki-Allday'] = $row['allday'];
         } else {

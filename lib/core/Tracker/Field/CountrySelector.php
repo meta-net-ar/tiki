@@ -234,7 +234,8 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
 
     private function renderImage($code, $label)
     {
-        return \Tiki\CountryFlagHelper::toHtml($code, $label);
+        $smarty = TikiLib::lib('smarty');
+        return '<img src="img/flags/' . \SmartyTiki\Modifier\Escape::apply($code) . '.png" title="' . \SmartyTiki\Modifier\Escape::apply($label) . '" alt="' . \SmartyTiki\Modifier\Escape::apply($label) . '" />';
     }
 
     public function renderInput($context = [])
@@ -379,7 +380,7 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
                 if (count($value)) {
                     return implode(',', array_map(function ($v) use ($possibilities) {
                         $label = $possibilities[$v];
-                        return $this->renderImage($v, $possibilities[$v]) . ' ' . smarty_modifier_escape($label);
+                        return $this->renderImage($v, $possibilities[$v]) . ' ' . \SmartyTiki\Modifier\Escape::apply($label);
                     }, $value));
                 }
             })

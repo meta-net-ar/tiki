@@ -112,12 +112,13 @@ export function getAutocompleteResources(type, options = {}) {
             });
             transformResultCb = (res) => {
                 return res.resultset.result.map((item) => ({
-                    value: item.title,
+                    value: $("<div/>").append(item.title).text(), // strip HTML tags from value
+                    html: item.title,
                     object_id: item.title,
                     url: $("<div/>").append(item.link).find("a").attr("href"),
                 }));
             };
-            customRemoteQueryKey = "filter~content";
+            customRemoteQueryKey = "filter~title";
             break;
         default:
             remoteSourceUrl = null;

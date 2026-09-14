@@ -271,6 +271,18 @@ class Language_GetStringsTest extends TikiTestCase
         $obj->setLanguages();
     }
 
+    public function testMissingLanguageDirectoryReturnsNoLanguages(): void
+    {
+        vfsStream::setup('root', null, ['src' => []]);
+
+        $obj = new Language_GetStrings($this->collectFiles, $this->writeFileFactory, [
+            'scanDir' => vfsStream::url('root/src'),
+            'langDir' => vfsStream::url('root/missing-lang'),
+        ]);
+
+        $this->assertSame([], $obj->getLanguages());
+    }
+
     /**
      * @throws Language_Exception
      */

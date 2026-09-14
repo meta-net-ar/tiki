@@ -71,6 +71,7 @@
                 <fieldset>
                     <legend class="h3">{tr}ConverseJS options (common){/tr}</legend>
                     {preference name=xmpp_conversejs_always_load}
+                    {preference name=xmpp_chat_button}
                     {preference name=xmpp_conversejs_debug}
                     {preference name=xmpp_conversejs_init_json}
                 </fieldset>

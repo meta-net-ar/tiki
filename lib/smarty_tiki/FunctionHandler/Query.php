@@ -9,9 +9,18 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
-class Query extends Base
+class Query extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'query';
+    }
+
     public function handle($params, Template $template)
     {
         global $auto_query_args, $prefs;
@@ -204,7 +213,7 @@ class Query extends Base
                 // This also implies that if no anchor, every current URL params will be loosed
 
                 if (isset($params['controller'], $params['action'])) {
-                    $php_self = smarty_function_service(
+                    $php_self = \SmartyTiki\FunctionHandler\Service::render(
                         [
                             'controller' => $params['controller'],
                             'action' => $params['action'],
@@ -213,7 +222,7 @@ class Query extends Base
                     );
                 } else {
                     if ($_SERVER['PHP_SELF'] == 'tiki-ajax_services.php' && isset($_GET['controller'], $_GET['action'])) {
-                        $php_self = smarty_function_service(
+                        $php_self = \SmartyTiki\FunctionHandler\Service::render(
                             [
                                 'controller' => $_GET['controller'],
                                 'action' => $_GET['action'],

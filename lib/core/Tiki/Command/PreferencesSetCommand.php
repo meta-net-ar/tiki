@@ -52,13 +52,11 @@ class PreferencesSetCommand extends Command
             return Command::FAILURE;
         }
 
-        if (count($preferenceInfo['conflicts'])) {
-            if ($value == 'y') {
-                foreach ($preferenceInfo['conflicts']['active'] as $conflict) {
-                    $output->write(sprintf("<error>[CONFLICT]: the preference %s must be disabled first.</error>", $conflict['name']));
-                }
-                return Command::FAILURE;
+        if ($value == 'y' && ! empty($preferenceInfo['conflicts']['active'])) {
+            foreach ($preferenceInfo['conflicts']['active'] as $conflict) {
+                $output->write(sprintf("<error>[CONFLICT]: the preference %s must be disabled first.</error>", $conflict['name']));
             }
+            return Command::FAILURE;
         }
 
         if ($preferenceInfo['type'] == 'flag' && ! in_array($value, ['y', 'n'])) {

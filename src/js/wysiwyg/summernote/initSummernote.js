@@ -26,13 +26,6 @@ export default function (areaId, toolbar, options) {
             }
         },
 
-        onKeydown: function (event) {
-            if (event.key === "@") {
-                event.preventDefault();
-                renderUserMentionModal(areaId);
-            }
-        },
-
         onCodeviewToggled: function () {
             Handlers.customCodeview(target);
         },
@@ -78,12 +71,7 @@ export default function (areaId, toolbar, options) {
                 // Initialize language checker if enabled via options
                 initializeLanguageCheck(target, options);
             },
-            onKeydown: function (event) {
-                if (event.key === "@") {
-                    event.preventDefault();
-                    renderUserMentionModal(areaId);
-                }
-            },
+            onKeydown: Handlers.userMention(target),
             onCodeviewToggled: function () {
                 Handlers.customCodeview(target);
             },

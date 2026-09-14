@@ -63,5 +63,5 @@ function wikiplugin_icon($data, $params)
 {
     $smarty = TikiLib::lib('smarty');
 
-    return smarty_function_icon($params, $smarty->getEmptyInternalTemplate());
+    return \SmartyTiki\FunctionHandler\Icon::render($params, $smarty->getEmptyInternalTemplate());
 }

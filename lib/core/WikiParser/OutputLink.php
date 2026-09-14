@@ -100,6 +100,7 @@ class WikiParser_OutputLink
                 [
                         'href' => call_user_func($this->wikiBuilder, $pageId) . $this->anchor,
                         'data-bs-content' => $this->getTitle($info),
+                        'data-bs-custom-class' => 'pe-none',
                         'class' => 'wiki wiki_page tips',
                 ]
             );
@@ -129,6 +130,7 @@ class WikiParser_OutputLink
                 [
                     'href' => call_user_func($this->wikiBuilder, $pageId) . $this->anchor,
                     'data-bs-content' => $this->getTitle($info),
+                    'data-bs-custom-class' => 'pe-none',
                     'class' => 'wiki wiki_page tips',
                 ]
             );

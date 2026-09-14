@@ -40,4 +40,24 @@ class Tiki_Version_Utils
 
         return $upgrades;
     }
+
+    /**
+     * Same check as checkUpdatesForVersion(), but returns the messages as text.
+     *
+     * For callers handing the result straight to a template, which cannot do
+     * anything with the Tiki_Version_Upgrade objects.
+     *
+     * @param string|Tiki_Version_Version $version
+     * @return string[]
+     * @throws Exception
+     */
+    public static function getUpgradeMessages(string|Tiki_Version_Version $version): array
+    {
+        return array_map(
+            function (Tiki_Version_Upgrade $upgrade): string {
+                return $upgrade->getMessage();
+            },
+            self::checkUpdatesForVersion($version)
+        );
+    }
 }

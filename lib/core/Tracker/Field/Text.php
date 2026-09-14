@@ -153,7 +153,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
         }
         $value = parent::renderInnerOutput($context);
         if ($this->getConfiguration('type') === 't' && $context['list_mode'] !== 'csv') {   // not TextAreas or csv output
-            $value = smarty_modifier_escape($value);
+            $value = \SmartyTiki\Modifier\Escape::apply($value);
         }
         if (
             $this->getConfiguration('isMultilingual') == 'y' &&
@@ -452,7 +452,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                 }
 
                 if ($value) {
-                    return smarty_function_object_link([
+                    return \SmartyTiki\FunctionHandler\ObjectLink::render([
                         'type' => 'trackeritem',
                         'id' => $extra['itemId'],
                         'title' => $value,

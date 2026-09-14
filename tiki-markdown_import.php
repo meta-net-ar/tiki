@@ -66,6 +66,7 @@ $inputConfiguration = [[
         'repo_branch'  => 'word',
         'git_pull'      => 'bool',
         'repo_token'  => 'string',
+        'clear_repo_token' => 'bool',
         'git_timeout'  => 'digits',
 
         // Options Wiki / mapping
@@ -152,7 +153,7 @@ if ($action === ACTION_SAVE && $access->checkCsrf()) {
         $src[CFG_REPO_URL] = trim($_POST['repo_url'] ?? '');
         $src[CFG_REPO_BRANCH] = trim($_POST['repo_branch'] ?? '');
         $src[CFG_GIT_PULL] = isset($_POST['git_pull']);
-        $src[CFG_REPO_TOKEN] = trim($_POST['repo_token'] ?? '');
+        $src[CFG_REPO_TOKEN] = mdimp_merge_repo_token($src[CFG_REPO_TOKEN] ?? '', $_POST);
         $src[CFG_GIT_TIMEOUT] = max(5, (int)($_POST['git_timeout'] ?? 30));
     }
     $_SESSION[SESS_MD_IMPORT][SESS_SOURCE] = $src;
@@ -294,6 +295,26 @@ if ($action === ACTION_IMPORT && $access->checkCsrf()) {
     }
 }
 
+/**
+ * The repo_token field is a password input that is never pre-filled with its
+ * stored value (a secret must never be echoed back into HTML). Re-submitting
+ * the form without retyping it therefore always posts an empty repo_token —
+ * this must be treated as "leave unchanged", not "clear the token", or every
+ * save/preview/import submission silently wipes a previously configured token.
+ * Only an explicit "clear_repo_token" checkbox actually clears it.
+ */
+function mdimp_merge_repo_token(string $existingToken, array $post): string
+{
+    $posted = trim((string)($post['repo_token'] ?? ''));
+    if ($posted !== '') {
+        return $posted;
+    }
+    if (! empty($post['clear_repo_token'])) {
+        return '';
+    }
+    return $existingToken;
+}
+
 function mdimp_val_plain($v): ?string
 {
     if ($v === null) {
@@ -340,7 +361,7 @@ function mdimp_build_runtime_cfg(array $sessionCfg): array
         $source[CFG_GIT_PULL] = false;
     }
     if (array_key_exists('repo_token', $_POST)) {
-        $source[CFG_REPO_TOKEN] = trim((string)$_POST['repo_token']);
+        $source[CFG_REPO_TOKEN] = mdimp_merge_repo_token($source[CFG_REPO_TOKEN] ?? '', $_POST);
     }
     if (array_key_exists('git_timeout', $_POST)) {
         $source[CFG_GIT_TIMEOUT] = max(5, (int)$_POST['git_timeout']);

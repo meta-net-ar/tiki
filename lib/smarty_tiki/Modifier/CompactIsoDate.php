@@ -7,8 +7,18 @@
 
 namespace SmartyTiki\Modifier;
 
-class CompactIsoDate
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
+class CompactIsoDate implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'compactisodate';
+    }
+
     public function handle($string)
     {
         global $tikilib;

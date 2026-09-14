@@ -286,12 +286,12 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                     ],
                     'forceObjectSelector' => [
                         'name' => tr('Force object selector'),
-                        'description' => tr('Override the automatic widget selection. 1 forces the object selector (search panel with checkboxes for multi-select). 2 forces the dropdown. 0 lets the system decide (default behavior).'),
+                        'description' => tr('Override the automatic widget selection. 0 lets the system decide (default behavior). 1 forces the object selector (search panel with checkboxes for multi-select). 2 forces the dropdown.'),
                         'filter' => 'int',
                         'options' => [
                             0 => tr('System default'),
-                            1 => tr('Yes'),
-                            2 => tr('No'),
+                            1 => tr('Object selector'),
+                            2 => tr('Dropdown'),
                         ],
                     ],
                     'indexRemote' => [
@@ -608,7 +608,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
             $smarty = TikiLib::lib('smarty');
 
-            return smarty_function_jstransfer_list([
+            return \SmartyTiki\FunctionHandler\JsTransferList::render([
                 'fieldName' => $this->getHTMLFieldName(),
                 'data' => $data['list'],
                 'defaultSelected' => $this->getValue(),
@@ -698,7 +698,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
         if ($item && ! is_array($item) && (! isset($context['list_mode']) || $context['list_mode'] !== 'csv') && $this->trackerField->getOption('fieldId')) {
             if ($this->trackerField->getOption('linkPage')) {
-                $link = smarty_function_object_link(
+                $link = \SmartyTiki\FunctionHandler\ObjectLink::render(
                     [
                         'type' => 'wiki page',
                         'id' => $this->trackerField->getOption('linkPage') . '&itemId=' . $item,  // add itemId param TODO properly
