@@ -214,11 +214,14 @@
                 <div class="mb-3 row">
                     <label for="groups_group" class="col-form-label col-md-3">{tr}Group{/tr}</label>
                     <div class="col-md-9">
-                        {if $groupname neq 'Anonymous' and $groupname neq 'Registered' and $groupname neq 'Admins'}
+                        {if $groupname neq 'Anonymous' and $groupname neq 'Registered' and $groupname neq 'Admins' and $isEponymousGroup neq 'y'}
                             <input type="text" name="name" id="groups_group" value="{$groupname|escape}" class="form-control">
                         {else}
                             <input type="hidden" name="name" id="groups_group" value="{$groupname|escape}">
                             {$groupname|escape}
+                            {if $isEponymousGroup eq 'y'}
+                                <div class="form-text">{tr}This group name matches the username and cannot be changed.{/tr}</div>
+                            {/if}
                         {/if}
                     </div>
                 </div>

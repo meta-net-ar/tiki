@@ -198,8 +198,8 @@ if ($ts['enabled'] && ! $ts['ajax']) {
 $inc = [];
 list(   $groupname, $groupdesc, $grouphome, $userstrackerid, $usersfieldid, $grouptrackerid,
         $groupfieldid, $defcatfieldid, $themefieldid, $groupperms, $trackerinfo, $memberslist,
-        $userChoice, $groupdefcat, $grouptheme, $expireAfter, $emailPattern, $anniversary, $prorateInterval, $isRole, $isTplGroup) =
-        ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+        $userChoice, $groupdefcat, $grouptheme, $expireAfter, $emailPattern, $anniversary, $prorateInterval, $isRole, $isTplGroup, $isEponymousGroup) =
+        ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
 
 if (! empty($_REQUEST["group"])) {
     $re = $userlib->get_group_info($_REQUEST["group"]);
@@ -238,6 +238,9 @@ if (! empty($_REQUEST["group"])) {
     }
     if (isset($re['isTplGroup'])) {
         $isTplGroup = $re['isTplGroup'];
+    }
+    if (isset($re['isEponymousGroup'])) {
+        $isEponymousGroup = $re['isEponymousGroup'];
     }
     if ($prefs['userTracker'] == 'y') {
         if (isset($re["usersTrackerId"]) and $re["usersTrackerId"]) {
@@ -496,6 +499,7 @@ $smarty->assign_by_ref('pages_count', $users["count"]);
 $smarty->assign('group_info', $re);
 $smarty->assign('isRole', $isRole);
 $smarty->assign('isTplGroup', $isTplGroup);
+$smarty->assign('isEponymousGroup', $isEponymousGroup);
 
 // Assign the list of groups
 $smarty->assign_by_ref('users', $users["data"]);

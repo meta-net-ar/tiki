@@ -312,6 +312,10 @@ if (isset($_REQUEST['batch']) && is_uploaded_file($_FILES['csvlist']['tmp_name']
         $errors[] = sprintf(tra('User %s already exists'), $_REQUEST['login']);
         $AddUser = false;
     }
+    if ($prefs['eponymousGroups'] == 'y' && $userlib->group_exists($_REQUEST['login'])) {
+        $errors[] = tr('Cannot create user %0 because a group with that name already exists.', $_REQUEST['login']);
+        $AddUser = false;
+    }
     if (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $_REQUEST['login'])) {
         $errors[] = tra('Username cannot contain any spaces');
         $AddUser = false;
@@ -354,17 +358,17 @@ if (isset($_REQUEST['batch']) && is_uploaded_file($_FILES['csvlist']['tmp_name']
                 $apass = '';
             }
 
-            if (
-                $_REQUEST['login'] = $userlib->add_user(
-                    $_REQUEST['login'],
-                    $newPass,
-                    $_REQUEST['email'],
-                    $pass_first_login ? $newPass : '',
-                    $pass_first_login,
-                    $apass,
-                    ($send_validation_email ? 'u' : null)
-                )
-            ) {
+            $createdLogin = $userlib->add_user(
+                $_REQUEST['login'],
+                $newPass,
+                $_REQUEST['email'],
+                $pass_first_login ? $newPass : '',
+                $pass_first_login,
+                $apass,
+                ($send_validation_email ? 'u' : null)
+            );
+            if ($createdLogin) {
+                $_REQUEST['login'] = $createdLogin;
                 $feedback = sprintf(tra('New user created with username %s.'), $_REQUEST['login']);
                 Feedback::success($feedback);
                 $logslib->add_log('adminusers', $feedback, $user);

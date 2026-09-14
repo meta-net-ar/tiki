@@ -29,7 +29,7 @@
                         <action>
 
                             {if $groups[group].groupName neq 'Anonymous' and $groups[group].groupName neq 'Registered' and $groups[group].groupName neq 'Admins'}
-                                <a href="#" class="edit_group_a" data-id="{$groups[group].id}" data-name="{$groups[group].groupName}" data-description="{$groups[group].groupDesc}" role="button">
+                                <a href="#" class="edit_group_a" data-id="{$groups[group].id}" data-name="{$groups[group].groupName}" data-description="{$groups[group].groupDesc}" data-eponymous="{$groups[group].isEponymousGroup|escape}" role="button">
                                     {icon name="edit" _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
                                 </a>
                             {/if}
@@ -51,8 +51,9 @@
     var id = $(this).data('id');
     var name = $(this).data('name');
     var desc = $(this).data('description');
+    var isEponymous = $(this).data('eponymous') === 'y';
 
-    $("#modal_edit_group input[name=name]").val(name);
+    $("#modal_edit_group input[name=name]").val(name).prop('readonly', isEponymous);
     $("#modal_edit_group textarea[name=desc]").val(desc);
     $("#modal_edit_group input[name=id]").val(id);
     $("#modal_edit_group .modal-title").html('{tr}Edit{/tr} '+name);

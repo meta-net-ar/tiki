@@ -2989,6 +2989,8 @@ class UsersLib extends TikiLib
         $this->query('delete from `tiki_user_reports_cache` where `user` = ?', [$user]);
         $this->query('delete from `tiki_user_mailin_struct` where `username` = ?', [$user]);
 
+        $this->removeEponymousGroup($user);
+
         $cachelib->invalidate('userslist');
 
         TikiLib::events()->trigger('tiki.user.delete', ['type' => 'user', 'object' => $user]);
@@ -3124,6 +3126,8 @@ class UsersLib extends TikiLib
                     );
                 }
             }
+
+            $this->renameEponymousGroup($from, $to);
 
             $cachelib->invalidate('userslist');
             TikiLib::events()->trigger('tiki.user.update', ['type' => 'user', 'object' => $from]);
@@ -7108,6 +7112,7 @@ class UsersLib extends TikiLib
         }
 
         if ($prefs['eponymousGroups'] == 'y' && $this->group_exists($user)) {
+            Feedback::error(tr('Cannot create user %0 because a group with that name already exists.', $user));
             return false;
         }
 
@@ -7213,6 +7218,78 @@ class UsersLib extends TikiLib
     {
         $this->add_group($user, "Personal group for $user.", '', 0, 0, 0, '', isEponymousGroup: 'y');
         $this->assign_user_to_group($user, $user);
+    }
+
+    /**
+     * Rename a user's eponymous group when their login changes.
+     *
+     * @param string $from Old username / group name
+     * @param string $to   New username / group name
+     * @return bool
+     */
+    public function renameEponymousGroup($from, $to)
+    {
+        if ($from === $to || $from === '' || $to === '') {
+            return false;
+        }
+
+        $info = $this->table('users_groups')->fetchFullRow(['groupName' => $from]);
+        if (! $info || ($info['isEponymousGroup'] ?? 'n') !== 'y') {
+            return false;
+        }
+        if ($this->group_exists($to)) {
+            return false;
+        }
+
+        $desc = $info['groupDesc'] ?? '';
+        if ($desc === "Personal group for $from.") {
+            $desc = "Personal group for $to.";
+        }
+
+        return $this->change_group(
+            $from,
+            $to,
+            $desc,
+            $info['groupHome'] ?? '',
+            $info['usersTrackerId'] ?? 0,
+            $info['groupTrackerId'] ?? 0,
+            $info['usersFieldId'] ?? 0,
+            $info['groupFieldId'] ?? 0,
+            $info['registrationUsersFieldIds'] ?? '',
+            $info['userChoice'] ?? '',
+            $info['groupDefCat'] ?? 0,
+            $info['groupTheme'] ?? '',
+            $info['isExternal'] ?? 'n',
+            $info['expireAfter'] ?? 0,
+            $info['emailPattern'] ?? '',
+            $info['anniversary'] ?? '',
+            $info['prorateInterval'] ?? '',
+            $info['groupColor'] ?? '',
+            $info['isRole'] ?? '',
+            $info['isTplGroup'] ?? '',
+            $this->get_included_groups($from, false),
+            $info['twoFactorAuthGracePeriod'] ?? null
+        );
+    }
+
+    /**
+     * Remove a user's eponymous group. Does not remove a regular group that happens to share the username.
+     *
+     * @param string $user Username / group name
+     * @return bool
+     */
+    public function removeEponymousGroup($user)
+    {
+        if ($user === '') {
+            return false;
+        }
+
+        $info = $this->table('users_groups')->fetchFullRow(['groupName' => $user]);
+        if (! $info || ($info['isEponymousGroup'] ?? 'n') !== 'y') {
+            return false;
+        }
+
+        return (bool) $this->remove_group($user);
     }
 
     public function autogenerate_login($userId, $digits = 6)
@@ -7911,6 +7988,7 @@ class UsersLib extends TikiLib
             $query[] = 'update `tiki_group_inclusion` set `includeGroup`=? where `includeGroup`=?';
             $query[] = 'update `tiki_newsletter_groups` set `groupName`=? where `groupName`=?';
             $query[] = 'update `tiki_group_watches` set `group`=? where `group`=?';
+            $query[] = 'update `users_users` set `default_group`=? where `default_group`=?';
 
             foreach ($query as $q) {
                 $this->query($q, [$group, $olgroup]);
@@ -7989,6 +8067,9 @@ class UsersLib extends TikiLib
             return false;
         }
         $includeGroups = $this->get_included_groups($groupInfo["groupName"]);
+        if (($groupInfo['isEponymousGroup'] ?? 'n') === 'y') {
+            $name = $groupInfo['groupName'];
+        }
 
         $this->change_group(
             $groupInfo["groupName"],

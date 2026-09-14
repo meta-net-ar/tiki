@@ -1772,10 +1772,6 @@ function wikiplugin_tracker($data, $params)
                 // if in registration and creating a user tracker item for the new user
                 // remove the user if they did not complete the tracker correctly
                 $userlib->remove_user($userField['value']);
-                if ($prefs['eponymousGroups'] == 'y') {
-                    // eponymous group will contain only this (former) user so remove that too
-                    $userlib->remove_group($userField['value']);
-                }
 
                 $user = '';                             // needed to re-include the captcha inputs
                 $hidden_fieldId = [];               // remove hidden user fields which are otherwise required
