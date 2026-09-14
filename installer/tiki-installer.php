@@ -923,13 +923,7 @@ if (isset($_POST['fix_double_encoding']) && ! empty($_POST['previous_encoding'])
     $smarty->assign('double_encode_fix_attempted', 'y');
 }
 
-// Do not ask for admin credentials if we are upgrading
-if ($install_step == '6' && $install_type == 'update') {
-    $install_step = '7';
-    $smarty->assign('install_step', $install_step);
-}
-
-if ($install_step == '6') {
+if ($install_step == '6' && $install_type == 'scratch') {
     $errored = false;
 
     if (empty($_POST['admin_user'])) {
@@ -981,6 +975,12 @@ if ($install_step == '5') {
         $value = array_shift($res);
     }
     $smarty->assign('database_charset', $value);
+
+    // Skip the admin credentials step for upgrades
+    if ($install_type === 'update') {
+        $install_step = '6';
+        $smarty->assign('install_step', $install_step);
+    }
 }
 
 if (((isset($value) && $value == 'utf8mb4') || $install_step == '8') && ($db = TikiDb::get()) && ! empty($dbs_tiki)) {
