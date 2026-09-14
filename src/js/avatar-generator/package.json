@@ -1,6 +1,7 @@
 {
   "name": "avatar-generator",
   "version": "0.0.1",
+  "type": "module",
   "main": "index.js",
   "author": "Tiki Wiki CMS",
   "license": "LGPL-2.0-only",

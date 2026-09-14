@@ -279,6 +279,14 @@ export default defineConfig(({ command, mode }) => {
             postcss: {
                 plugins: [postcssRootToHost()],
             },
+            // The standalone Converse entry uses a caller-configured partial shared with
+            // the legacy theme build, which already suppresses this deprecation. Remove
+            // this suppression when the shared theme pipeline migrates to Sass modules.
+            preprocessorOptions: {
+                scss: {
+                    silenceDeprecations: ["import"],
+                },
+            },
         },
         plugins: [
             // Own this external here to rewrite moment-timezone's require("moment") for browsers.
