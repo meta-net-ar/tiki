@@ -3001,13 +3001,15 @@ CREATE TABLE `users_users` (
   `twoFactorGracePeriodStart` int(14) DEFAULT NULL,
   `last_mfa_date` bigint DEFAULT NULL,
   `login_disabled` char(1) default 'n',
+  `default_admin` bool DEFAULT NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `login` (login (191)),
+  UNIQUE KEY `uniq_default_admin` (`default_admin`),
   KEY `registrationDate` (`registrationDate`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 -- Administrator account
-INSERT INTO users_users(email,login,created,registrationDate,avatarName,avatarType,avatarLibName) VALUES ('','admin',UNIX_TIMESTAMP(),UNIX_TIMESTAMP(),'admin','l','dicebear/initials');
+INSERT INTO users_users(email,login,created,registrationDate,avatarName,avatarType,avatarLibName,default_admin) VALUES ('','admin',UNIX_TIMESTAMP(),UNIX_TIMESTAMP(),'admin','l','dicebear/initials',true);
 INSERT INTO tiki_user_preferences (user,`prefName`,value) VALUES ('admin','realName','System Administrator');
 INSERT INTO users_usergroups (`userId`, `groupName`) VALUES(1,'Admins');
 INSERT INTO users_grouppermissions (`groupName`, `permName`) VALUES ('Admins','tiki_p_admin');

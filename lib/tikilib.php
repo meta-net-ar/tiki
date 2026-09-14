@@ -2024,7 +2024,7 @@ class TikiLib extends TikiDb_Bridge
 
     public function getDefaultAdminLogin()
     {
-        return $this->get_user_login(1);
+        return $this->table('users_users')->fetchOne('login', ['default_admin' => true]);
     }
 
     // User assigned modules ////
