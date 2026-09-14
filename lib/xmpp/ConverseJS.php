@@ -339,7 +339,7 @@ class ConverseJS
         $deps = [
             CONVERSEJS_DIST_PATH . '/converse.min.css',
             'lib/xmpp/css/conversejs.css',
-            JS_ASSETS_PATH . '/xmpp/conversejs-tiki.css',
+            'themes/base_files/css/conversejs-tiki.css',
         ];
         return array_map([$this, 'append_mtime'], $deps);
     }

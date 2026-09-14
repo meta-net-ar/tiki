@@ -1,3 +1,8 @@
+$font-family-base: var(--bs-body-font-family, system-ui, sans-serif) !default;
+$input-bg: var(--bs-body-bg, #fff) !default;
+$input-color: var(--bs-body-color, #212529) !default;
+$input-border-color: var(--bs-border-color, #dee2e6) !default;
+
 .tiki #conversejs, .tiki #conversejs.converse-embedded {
 
     --foreground-color: var(--bs-body-color);

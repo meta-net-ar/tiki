@@ -148,7 +148,6 @@ export default defineConfig(({ command, mode }) => {
         "tiki-lottie": resolve(import.meta.dirname, "tiki-lottie/lottie.js"),
         "tiki-vue-sfc-loader": resolve(import.meta.dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(import.meta.dirname, "tiki-toast-ui/toast-index.js"),
-        "xmpp/conversejs-tiki": resolve(import.meta.dirname, "../../lib/xmpp/css/conversejs-tiki.scss"),
         "@tiki/modules/search": resolve(import.meta.dirname, "@tiki/modules/search.js"),
         "@tiki/ui-utils": resolve(import.meta.dirname, "@tiki/ui-utils/index.js"),
         "wysiwyg/summernote": resolve(import.meta.dirname, "wysiwyg/summernote/index.js"),
