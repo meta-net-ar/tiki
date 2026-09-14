@@ -54,9 +54,6 @@ class UpdateCommand extends Command
         $installer->autoRegister = $autoRegister;
         $installed = $installer->tableExists('users_users');
 
-        $installer->commandLineInput = $input;
-        $installer->commandLineOutput = $output;
-
         if ($installed) {
             // tiki-setup.php may not have been run yet, so load the minimum required libs to be able process the schema updates
             require_once('lib/tikilib.php');
