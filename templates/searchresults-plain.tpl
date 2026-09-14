@@ -15,6 +15,7 @@
             <button type="button" class="btn btn-primary">{tr}Filter{/tr}</button>
         </div>
     </aside>
+    <script type="module">import "@jquery-tiki/tiki-searchresults";</script>
     {jq}
         $('.facets select').registerFacet();
         $('.facets button').on("click", function () {

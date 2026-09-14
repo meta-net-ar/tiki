@@ -29,6 +29,9 @@
     max-width: 100%;
     position: sticky;
     top: 6rem;
+    /* content taller than this is revealed via JS-driven scrollTop as the page scrolls, not a visible scrollbar */
+    max-height: calc(100vh - 7rem);
+    overflow: hidden;
 }
 
 .search-with-facets .search-facets-sidebar .form-select[multiple] {
@@ -52,6 +55,8 @@
         margin-bottom: 1.25rem;
         position: static;
         top: auto;
+        max-height: none;
+        overflow: visible;
     }
 
     .search-with-facets .search-results-main {
