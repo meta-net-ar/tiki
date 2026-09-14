@@ -22,6 +22,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                 'prefs' => ['trackerfield_wiki'],
                 'tags' => ['basic'],
                 'default' => 'y',
+                'supported_changes' => ['a'],
                 'params' => [
                     'samerow' => [
                         'name' => tr('Same Row'),
@@ -528,6 +529,230 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
             });
 
         return $schema;
+    }
+
+    /**
+     * Convert all items data to the only supported field type: TextArea
+     * This needs to be quick as it can run on potentially huge dataset, thus the raw db layer.
+     *
+     * @param string $type - the field type to convert to
+     * @return array - converted field options
+     * @throws Exception
+     */
+    public function convertFieldTo(string $type): array
+    {
+        if ($type !== 'a') {
+            throw new Exception(
+                tr(
+                    'Unsupported field conversion type: from %0 to %1',
+                    $this->getConfiguration('type'),
+                    $type
+                )
+            );
+        }
+
+        $trklib = TikiLib::lib('trk');
+        $relationlib = TikiLib::lib('relation');
+        $logslib = TikiLib::lib('logs');
+        // $unifiedsearchlib = TikiLib::lib('unifiedsearch');
+        $tikilib = TikiLib::lib('tiki');
+
+        $fieldId = $this->getConfiguration('fieldId');
+        $pagenameField = $this->getOption('fieldIdForPagename');
+        $options = $this->getConfiguration('options_map');
+        $pageTable = $trklib->table('tiki_pages');
+        $trackerItemFieldsTable = $trklib->table('tiki_tracker_item_fields');
+
+        $pageNamePrefix = $this->getOption('customnamespace', '');
+
+        $tx = $trklib->begin();
+
+        $result = $trackerItemFieldsTable->fetchAll(
+            ['itemId', 'value'],
+            ['fieldId' => $fieldId],
+            -1,
+            -1,
+            ['itemId' => 'ASC']
+        );
+
+        foreach ($result as $row) {
+            $itemId = $row['itemId'];
+            $pageData = [];
+            $finalValue = '';
+            $oldValue = (string)($row['value'] ?? '');
+
+            $pageName = trim($row['value']);
+
+            if (! $pageName) {
+                // tracker field value missing so try the pagename field (usually the title)
+                $pageName = $trackerItemFieldsTable->fetchOne(
+                    'value',
+                    [
+                        'fieldId' => $pagenameField,
+                        'itemId' => $itemId,
+                    ]
+                );
+            }
+
+            if ($pageName) {
+                $pageData = $pageTable->fetchColumn('data', [
+                    'pageName' => $pageName,
+                ]);
+                if (count($pageData) !== 1) {
+                    // try again with the cleaned version of the page
+                    $originalPageName = $pageName;
+                    $pageName = $this->cleanPageName($pageName);
+
+                    $pageData = $pageTable->fetchColumn('data', [
+                        'pageName' => $pageName,
+                    ]);
+
+                    if (
+                        count($pageData) !== 1 &&
+                        (! $pageNamePrefix || strpos($pageName, $pageNamePrefix) !== 0)
+                    ) {
+                        // try again with the prefix as old bugs created bad data
+                        $pageName = $this->getFullPageName($originalPageName);
+
+                        $pageData = $pageTable->fetchColumn('data', [
+                            'pageName' => $pageName,
+                        ]);
+                    }
+                }
+            }
+
+            if (count($pageData) !== 1) {
+                // page might have been renamed? Check if there's a relation to an existing page
+                $related = $relationlib->get_relations_to('trackeritem', $itemId, 'tiki.wiki.linkeditem');
+                $legacyCandidateCount = 0;
+                $legacyCandidatePageName = '';
+                $legacyCandidatePageData = [];
+                foreach ($related as $rel) {
+                    $candidatePageName = (string)($rel['itemId'] ?? '');
+                    if (! $candidatePageName) {
+                        continue;
+                    }
+                    if (strlen($candidatePageName) > 160) {
+                        $candidatePageName = substr($candidatePageName, 0, 160);
+                    }
+
+                    $relatedFields = $relationlib->get_relations_from('wiki page', $candidatePageName, 'tiki.wiki.linkedfield');
+                    $linkedFieldIds = [];
+                    foreach ($relatedFields as $relation) {
+                        $linkedFieldId = (int)($relation['itemId'] ?? 0);
+                        if ($linkedFieldId > 0) {
+                            $linkedFieldIds[] = $linkedFieldId;
+                        }
+                    }
+                    $linkedFieldIds = array_values(array_unique($linkedFieldIds));
+                    if (in_array($fieldId, $linkedFieldIds, true)) {
+                        $candidatePageData = $pageTable->fetchColumn('data', [
+                            'pageName' => $candidatePageName,
+                        ]);
+                        if (count($candidatePageData) === 1) {
+                            $pageName = $candidatePageName;
+                            $pageData = $candidatePageData;
+                            break;
+                        }
+                        continue;
+                    }
+
+                    // Don't consume pages that are explicitly linked to a different Wiki field.
+                    if (! empty($linkedFieldIds)) {
+                        continue;
+                    }
+
+                    // Legacy data may have linkeditem relation without linkedfield relation.
+                    $candidatePageData = $pageTable->fetchColumn('data', [
+                        'pageName' => $candidatePageName,
+                    ]);
+                    if (count($candidatePageData) === 1) {
+                        $legacyCandidateCount++;
+                        if ($legacyCandidateCount === 1) {
+                            $legacyCandidatePageName = $candidatePageName;
+                            $legacyCandidatePageData = $candidatePageData;
+                        }
+                    }
+                }
+
+                if (count($pageData) !== 1 && $legacyCandidateCount === 1) {
+                    $pageName = $legacyCandidatePageName;
+                    $pageData = $legacyCandidatePageData;
+                }
+            }
+
+            if (count($pageData) === 1) {
+                // remove the relations first
+                $relations = $relationlib->get_relations_from('wiki page', $pageName);
+                foreach ($relations as $relation) {
+                    foreach (['tiki.wiki.linkeditem', 'tiki.wiki.linkedfield'] as $relationType) {
+                        if ($relation['relation'] === $relationType) {
+                            $relationlib->remove_relations_from('wiki page', $pageName, $relationType);
+                        }
+                    }
+                }
+                if (strlen($pageData[0]) < 65535) {
+                    $finalValue = $pageData[0];
+                    $trklib->table('tiki_tracker_item_fields')->update(
+                        ['value' => $finalValue],
+                        ['itemId' => $itemId, 'fieldId' => $fieldId]
+                    );
+                    // delete the page
+                    $tikilib->remove_all_versions($pageName);
+                } else {
+                    $finalValue = "Converting Wiki Page field to TextArea
+Page too big, so included below:
+
+{include page=\"{$pageName}\"}";
+
+                    $trklib->table('tiki_tracker_item_fields')->update(
+                        ['value' => $finalValue],
+                        ['itemId' => $itemId, 'fieldId' => $fieldId]
+                    );
+                    Feedback::warning(
+                        tr(
+                            'Converting Wiki Page field to TextArea: ((%0)) page content too big on itemId %1 (so added an include plugin)',
+                            $pageName,
+                            $itemId
+                        )
+                    );
+                }
+            } else {
+                $finalValue = "Converting Wiki Page field to TextArea, page not found: \"{$pageName}\"";
+                $trklib->table('tiki_tracker_item_fields')->update(
+                    ['value' => $finalValue],
+                    ['itemId' => $itemId, 'fieldId' => $fieldId]
+                );
+                Feedback::error(
+                    tr(
+                        'Converting Wiki Page field to TextArea: "%0" page not found for itemId %1',
+                        $pageName,
+                        $itemId
+                    )
+                );
+            }
+            if ($oldValue !== $finalValue) {
+                // record the previous value so conversion appears correctly in field history
+                $version = $trklib->last_log_version($itemId) + 1;
+                if (($logslib->add_action('Updated', $itemId, 'trackeritem', $version)) == 0) {
+                    $version = 0;
+                }
+                $trklib->log($version, $itemId, $fieldId, $oldValue);
+            }
+
+            // don't mark item as needing reindexing - a full index rebuild will usually be quicker
+            //$unifiedsearchlib->invalidateObject('trackeritem', $itemId);
+        }
+        $tx->commit();
+        return [
+            'samerow' => $this->getOption('samerow'),
+            'toolbars' => $this->getOption('toolbars'),
+            'width' => $this->getOption('width'),
+            'height' => $this->getOption('height'),
+            'max' => $this->getOption('max'),
+            'wordmax' => $this->getOption('wordmax'),
+            'wysiwyg' => $this->getOption('wysiwyg'),
+        ];
     }
 
     protected function attemptParse($text)
