@@ -721,7 +721,7 @@ for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
             const link = e.target.closest("a.sm-sub-toggler");
             if (link && nav[indexCurrentNav].contains(link)) {
                 const href = link.getAttribute("href");
-                if (0 && href && href !== "#" && href !== "") {
+                if (noMouseoverBehavior !== "click" && href && href !== "#" && href !== "") {
                     e.preventDefault();
                     e.stopPropagation();
                     window.location.href = href;
