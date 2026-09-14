@@ -2006,7 +2006,7 @@ import { defaults as defaultControls } from "ol/control";
                             });
                         },
                         "json"
-                    ).complete(function () {
+                    ).always(function () {
                         $(container).trigger("complete.map.search");
                     });
                     return false;
