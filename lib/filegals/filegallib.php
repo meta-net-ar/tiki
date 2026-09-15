@@ -3815,7 +3815,7 @@ class FileGalLib extends TikiLib
         return $title;
     }
 
-    public function fileContentIsSVG(&$data)
+    public function fileContentIsSVG($data)
     {
         $finfo = new finfo(FILEINFO_MIME);
 
@@ -3825,9 +3825,11 @@ class FileGalLib extends TikiLib
             substr($type, 0, 18) == 'application/x-gzip' ||
             substr($type, 0, 16) == 'application/gzip'
         ) {
-            $data = gzdecode($data);
-            $finfo = new finfo(FILEINFO_MIME);
-            $type = $finfo->buffer($data);
+            $decoded = gzdecode($data);
+            if ($decoded !== false) {
+                $finfo = new finfo(FILEINFO_MIME);
+                $type = $finfo->buffer($decoded);
+            }
         }
         return substr($type, 0, 9) == 'image/svg';
     }
