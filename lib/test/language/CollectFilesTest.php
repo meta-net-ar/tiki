@@ -83,6 +83,17 @@ class Language_CollectFilesTest extends TikiTestCase
         $this->assertEquals($expectedResult, $this->obj->scanDir(vfsStream::url('root')));
     }
 
+    public function testScanDirShouldTraverseDirectoryNamedLikeAFile(): void
+    {
+        vfsStream::setup('root', null, [
+            'package.js' => ['translations.php' => ''],
+        ]);
+
+        $files = $this->obj->scanDir(vfsStream::url('root'));
+
+        $this->assertSame(['vfs://root/package.js/translations.php'], $files);
+    }
+
     public function testScanDirShouldIgnoreExcludedDirs(): void
     {
         $obj = $this->getMockBuilder('Language_CollectFiles')

@@ -157,10 +157,10 @@ class Tracker_Field_Currency extends \Tracker\Field\AbstractItemField implements
         $smarty = TikiLib::lib('smarty');
         if (! empty($context['reloff']) && $this->getOption('all_symbol') != 1) {
             $format = $part1a . $symbol;
-            return smarty_modifier_money_format($data['amount'], $locale, $currency, $format, 0);
+            return \SmartyTiki\Modifier\MoneyFormat::apply($data['amount'], $locale, $currency, $format, 0);
         } else {
             $format = $part1b . $symbol;
-            return smarty_modifier_money_format($data['amount'], $locale, $currency, $format, 1);
+            return \SmartyTiki\Modifier\MoneyFormat::apply($data['amount'], $locale, $currency, $format, 1);
         }
     }
 
@@ -170,7 +170,7 @@ class Tracker_Field_Currency extends \Tracker\Field\AbstractItemField implements
 
         $data = $this->getFieldData();
 
-        return smarty_function_currency(
+        return \SmartyTiki\FunctionHandler\Currency::render(
             [
                 'amount' => $data['amount'],
                 'sourceCurrency' => $data['currency'],

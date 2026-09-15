@@ -339,10 +339,15 @@ import { defaults as defaultControls } from "ol/control";
 
             const getFeatureColor = (feature) => {
                 // Try feature property first
-                const color = feature.get("color");
+                let color = feature.get("stroke-color");
                 if (color) {
                     return color;
                 }
+                color = feature.get("color");
+                if (color) {
+                    return color;
+                }
+
                 // Try coords lookup from container-level storage (set by colorpicker)
                 const key = getFeatureColorKey(feature);
                 if (key && container.featureColors && container.featureColors[key]) {
@@ -363,7 +368,12 @@ import { defaults as defaultControls } from "ol/control";
                 }
 
                 if (!fillColor) {
-                    fillColor = feature.get("fillColor");
+                    if (feature.get("stroke-color")) {
+                        // if stroke-color is supplied then `color` is for the fill
+                        fillColor = feature.get("color");
+                    } else {
+                        fillColor = feature.get("fillColor") ?? feature.get("fill-color");
+                    }
                 }
 
                 if (!fillColor) {
@@ -374,10 +384,54 @@ import { defaults as defaultControls } from "ol/control";
 
                 const intent = feature.get("intent");
 
+                const fill = {
+                    color: fillColor,
+                };
+
+                function getLineDash(lineDash, width) {
+                    if (typeof lineDash !== "string") {
+                        return lineDash;
+                    }
+                    // map ol2 values to ol3+
+                    width = width || 1;
+
+                    switch (lineDash) {
+                        case "dot":
+                            return [1, 2 * width];
+                        case "dash":
+                            return [width, 2 * width];
+                        case "dashdot":
+                            return [width, 2 * width, 1, 2 * width];
+                        case "longdash":
+                            return [2 * width, 2 * width];
+                        case "longdashdot":
+                            return [2 * width, 2 * width, 1, 2 * width];
+                        default:
+                            if (lineDash.length) {
+                                // array of up to 4 integers
+                                return JSON.parse(lineDash);
+                            } else {
+                                return null;
+                            }
+                    }
+                }
+
+                const width = parseInt(feature.get("stroke-width") || feature.get("width")) ?? 2;
+                const stroke = {
+                    color: color,
+                    width: width,
+                    lineDash: getLineDash(feature.get("stroke-line-dash") ?? feature.get("stroke-dashstyle"), width),
+                    lineCap: feature.get("stroke-line-cap") ?? "round",
+                    lineJoin: feature.get("stroke-line-join") ?? "round",
+                    lineDashOffset: feature.get("stroke-line-dash-offset") ?? 0,
+                    miterLimit: feature.get("stroke-miter-limit") ?? 10,
+                    offset: feature.get("stroke-offset") ?? 0,
+                };
+
                 if (intent === "vectors") {
                     coloredStyle = new ol.style.Style({
-                        fill: new ol.style.Fill({ color: fillColor }),
-                        stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                        fill: new ol.style.Fill(fill),
+                        stroke: new ol.style.Stroke(stroke),
                     });
                 } else if (intent === "marker") {
                     coloredStyle = new ol.style.Style({
@@ -391,8 +445,8 @@ import { defaults as defaultControls } from "ol/control";
                     coloredStyle = new ol.style.Style({
                         image: new ol.style.Circle({
                             radius: 12,
-                            fill: new ol.style.Fill({ color: fillColor }),
-                            stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                            fill: new ol.style.Fill(fill),
+                            stroke: new ol.style.Stroke(stroke),
                         }),
                     });
                 }
@@ -1094,7 +1148,9 @@ import { defaults as defaultControls } from "ol/control";
                     .appendTo($(".ol-viewport", container));
 
                 container.displayFeatureInfo = function (pixel, evt) {
-                    $mapBootstrapTooltipDummy.tooltip("hide");
+                    if ($mapBootstrapTooltipDummy.data("init")) {
+                        $mapBootstrapTooltipDummy.tooltip("hide");
+                    }
                     let feature, layer;
                     const both = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
                         return [feature, layer];
@@ -1142,7 +1198,8 @@ import { defaults as defaultControls } from "ol/control";
                                 title: feature.get("content"),
                                 container: "body",
                             })
-                            .tooltip("show");
+                            .tooltip("show")
+                            .data("init", true);
                     }
                 };
 
@@ -1267,7 +1324,7 @@ import { defaults as defaultControls } from "ol/control";
                                     placement: "auto",
                                 })
                                 .popover("show")
-                                .on("shown.bs.popover", function (event) {
+                                .one("shown.bs.popover", function (event) {
                                     const $popover = $(".popover.show").first();
                                     let $h3 = $popover.find("h3").text("");
                                     if ($h3.length === 0) {
@@ -1284,16 +1341,9 @@ import { defaults as defaultControls } from "ol/control";
                                             event: event,
                                             element: this,
                                             callback: function (event, $html) {
-                                                $html.find("a.service-dialog").remove();
                                                 const title = $html.find("h1").remove().text() || feature.get("content");
                                                 $("h3", $popover).text(title);
                                                 $(".popover-body", $popover).empty().html($html.html());
-                                                $popover.on("mouseleave", function () {
-                                                    $popover.find("h3").text("");
-                                                    $popover.find(".popover-body").empty();
-                                                    $mapBootstrapPopoverDummy.popover("dispose");
-                                                    selectionInteraction.getFeatures().clear();
-                                                });
                                             },
                                         });
                                     } else {
@@ -1301,13 +1351,22 @@ import { defaults as defaultControls } from "ol/control";
                                         // just a marker, info it in the link
                                         $popover.find("h3").text($el.text());
                                         $popover.find(".popover-body").empty().text($el.attr("title"));
-                                        $popover.on("mouseleave", function () {
+                                    }
+                                    let timeout = 0;
+                                    $popover.on("mouseleave", function () {
+                                        timeout = setTimeout(function () {
                                             $popover.find("h3").text("");
                                             $popover.find(".popover-body").empty();
-                                            $mapBootstrapPopoverDummy.popover("hide");
+                                            $mapBootstrapPopoverDummy.popover("dispose");
                                             selectionInteraction.getFeatures().clear();
-                                        });
-                                    }
+                                        }, 1000);
+                                    });
+                                    $popover.on("mouseenter", function () {
+                                        if (timeout) {
+                                            clearTimeout(timeout);
+                                            timeout = 0;
+                                        }
+                                    });
                                 });
                             break;
                     }
@@ -1947,7 +2006,7 @@ import { defaults as defaultControls } from "ol/control";
                             });
                         },
                         "json"
-                    ).complete(function () {
+                    ).always(function () {
                         $(container).trigger("complete.map.search");
                     });
                     return false;

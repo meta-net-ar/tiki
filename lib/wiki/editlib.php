@@ -1512,7 +1512,7 @@ class EditLib
                 $tikiLibUser = TikiLib::lib('user');
                 $smarty = TikiLib::lib('smarty');
 
-                $objectUrl = smarty_function_object_link(
+                $objectUrl = \SmartyTiki\FunctionHandler\ObjectLink::render(
                     ['type' => $arguments['type'],  'id' => $arguments['object']],
                     $smarty->getEmptyInternalTemplate()
                 );

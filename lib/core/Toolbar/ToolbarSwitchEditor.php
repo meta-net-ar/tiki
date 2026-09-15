@@ -52,7 +52,7 @@ class ToolbarSwitchEditor extends ToolbarUtilityItem
 
         $params = ['controller' => 'edit', 'action' => 'editor_settings', 'modal' => 1, 'domId' => $this->domElementId, 'syntax' => $this->getEditorSyntaxType()];
 
-        $icon = smarty_function_icon(['name' => $this->iconname], $smarty->getEmptyInternalTemplate());
+        $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => $this->iconname], $smarty->getEmptyInternalTemplate());
         $url = $servicelib->getUrl($params);
         $title = tra($this->label);
 

@@ -768,10 +768,11 @@ class Language extends TikiDb_Bridge
         if (
             ! empty($section)
             && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))
-            && ! empty($prefs['language_admin'])
-            && self::isValidLocale($prefs['language_admin'])
         ) {
-            return $prefs['language_admin'];
+            $adminLanguage = ! empty($prefs['language_admin']) ? $prefs['language_admin'] : $prefs['site_language'];
+            if (self::isValidLocale($adminLanguage)) {
+                return $adminLanguage;
+            }
         }
 
         return null;
@@ -802,12 +803,26 @@ class Language extends TikiDb_Bridge
         }
 
         // Step 4: apply language
-        self::setCurrentLanguage($lang);
+        if ($adminLang !== null && empty($prefs['language_admin'])) {
+            $prefs['language'] = $lang;
+            TikiLib::lib('smarty')->refreshLanguage();
+        } else {
+            self::setCurrentLanguage($lang);
+        }
     }
 
     public static function getCurrentLanguage(): string
     {
         global $user, $user_preferences, $prefs;
+
+        if (
+            (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))
+            && empty($prefs['language_admin'])
+            && ! empty($prefs['language'])
+        ) {
+            return $prefs['language'];
+        }
+
         $language = 'en';
         if (isset($user) && ! empty($user_preferences[$user]['language'])) {
             $language = $user_preferences[$user]['language'];

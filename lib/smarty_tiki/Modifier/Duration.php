@@ -7,6 +7,9 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\ModifierStaticFacadeTrait;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -15,8 +18,15 @@ namespace SmartyTiki\Modifier;
  * Purpose:  formats a duration from seconds
  * -------------------------------------------------------------
  */
-class Duration
+class Duration implements TikiSmartyExtensionInterface
 {
+    use ModifierStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'duration';
+    }
+
     public function handle($string, $long = true, $maxLevel = false)
     {
         if (! is_numeric($string)) {

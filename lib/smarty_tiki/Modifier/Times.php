@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class Times
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class Times implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'times';
+    }
+
     public function handle($n1, $n2)
     {
         return $n1 * $n2;

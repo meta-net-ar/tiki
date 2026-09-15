@@ -9,9 +9,15 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Permission extends Base
+class Permission extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'permission';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {

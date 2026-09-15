@@ -26,7 +26,7 @@ class ToolbarFileGallery extends ToolbarUtilityItem
         $smarty = TikiLib::lib('smarty');
         if ($prefs['fgal_elfinder_feature'] !== 'y' || $prefs['fgal_elfinder_on_toolbar'] !== 'y') {
             return 'openFgalsWindow(\''
-                . smarty_function_filegal_manager_url(['area_id' => $this->domElementId, 'allowedMimeTypes' => ['image/*']], $smarty->getEmptyInternalTemplate())
+                . \SmartyTiki\FunctionHandler\FileGalManagerUrl::render(['area_id' => $this->domElementId, 'allowedMimeTypes' => ['image/*']], $smarty->getEmptyInternalTemplate())
                 . '\', true);';
         } else {
             include_once 'lib/jquery_tiki/elfinder/tikiElFinder.php';
@@ -60,7 +60,7 @@ class ToolbarFileGallery extends ToolbarUtilityItem
                 {
                     defaultGalleryId: ' . (empty($prefs['home_file_gallery']) ? $prefs['fgal_root_id'] : $prefs['home_file_gallery']) . ',
                     deepGallerySearch: true,
-                    ticket: \'' . smarty_function_ticket(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '\',
+                    ticket: \'' . \SmartyTiki\FunctionHandler\Ticket::render(['mode' => 'get'], $smarty->getEmptyInternalTemplate()) . '\',
                     getFileCallback: function(file,elfinder) {
                             window.handleFinderInsertAt(file,elfinder,area_id);
                         },

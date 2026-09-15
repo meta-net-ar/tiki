@@ -9,9 +9,18 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
-class ServiceInline extends Base
+class ServiceInline extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'service_inline';
+    }
+
     public function handle($params, Template $template)
     {
         $servicelib = \TikiLib::lib('service');
@@ -40,7 +49,7 @@ class ServiceInline extends Base
         } catch (\Services_Exception $e) {
             if (empty($params['_silent'])) {
                 $repeat = false;
-                return smarty_block_remarksbox(['type' => 'warning', 'title' => tr('Unavailable')], $e->getMessage(), $template, $repeat);
+                return \SmartyTiki\BlockHandler\Remarksbox::render(['type' => 'warning', 'title' => tr('Unavailable')], $e->getMessage(), $template, $repeat);
             }
         }
     }

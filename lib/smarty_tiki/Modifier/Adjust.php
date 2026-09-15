@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty modifier adjust
  * -------------------------------------------------------------
@@ -18,8 +20,13 @@ namespace SmartyTiki\Modifier;
  *             using $pad as filler.
  * -------------------------------------------------------------
  */
-class Adjust
+class Adjust implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'adjust';
+    }
+
     public function handle($string, $length = 80, $pad = '&nbsp;', $etc = '...', $break_words = false)
     {
         if ($length == 0) {

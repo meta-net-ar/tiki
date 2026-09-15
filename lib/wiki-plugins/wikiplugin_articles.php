@@ -357,7 +357,7 @@ function wikiplugin_articles($data, $params)
             }
         }
         $paramsnext['_type'] = 'absolute_path';
-        $urlnext = smarty_function_query($paramsnext, $smarty->getEmptyInternalTemplate());
+        $urlnext = \SmartyTiki\FunctionHandler\Query::render($paramsnext, $smarty->getEmptyInternalTemplate());
     }
 
     $smarty->assign_by_ref('quiet', $quiet);

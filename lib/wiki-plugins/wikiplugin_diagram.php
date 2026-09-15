@@ -396,7 +396,7 @@ function loadImageAnnotate($annotate)
     $userLib = TikiLib::lib('user');
     $file = \Tiki\FileGallery\File::id($annotate);
 
-    $url = smarty_modifier_sefurl($annotate, 'display');
+    $url = \SmartyTiki\Modifier\Sefurl::apply($annotate, 'display');
 
     if (! $file->exists() || ! $userLib->user_has_perm_on_object($user, $file->fileId, 'file', 'tiki_p_download_files')) {
         Feedback::error(tr("Tiki wasn't able to find the file with id %0.", $annotate));

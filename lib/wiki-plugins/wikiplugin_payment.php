@@ -32,6 +32,5 @@ function wikiplugin_payment($data, $params)
     if (empty($params['id'])) {
         return WikiParser_PluginOutput::error(tr('Plugin Payment error'), tr('Param id is required'));
     }
-    require_once 'lib/smarty_tiki/function.payment.php';
-    return '^~np~' . smarty_function_payment($params, $smarty->getEmptyInternalTemplate()) . '~/np~^';
+    return '^~np~' . \SmartyTiki\FunctionHandler\Payment::render($params, $smarty->getEmptyInternalTemplate()) . '~/np~^';
 }

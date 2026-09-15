@@ -21,7 +21,7 @@ function createButton(label, classNames, action) {
         const buttonWrapper = $("<div></div>").addClass("flex-shrink-0 flex-grow-0 d-flex gap-2 p-2 border rounded shadow-sm btn-wrapper");
         buttonWrapper.append(button);
         buttonWrapper.append($(".delete-icon").first().clone().removeClass("d-none"));
-        $(".delete-icon", buttonWrapper).click(function () {
+        $(".delete-icon", buttonWrapper).on("click", function () {
             deleteButton($(this));
         });
         container.append(buttonWrapper);

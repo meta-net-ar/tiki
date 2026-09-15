@@ -272,7 +272,7 @@ function wikiplugin_attach($data, $params)
                 $link .= '<a href="tiki-download_wiki_attachment.php?attId=' . $attachment['attId'] . $url . '&amp;download=y" class="wiki"';
                 $link .= ' title="' . $description . '">';
                 if (! empty($icon)) {
-                    $iconhtml = smarty_modifier_iconify($attachment['filename']);
+                    $iconhtml = \SmartyTiki\Modifier\Iconify::apply($attachment['filename']);
                     $link .= $iconhtml . '&nbsp';
                 }
 

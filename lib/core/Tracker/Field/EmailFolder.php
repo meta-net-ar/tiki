@@ -1,5 +1,7 @@
 <?php
 
+use Search\IntegrityException;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -161,6 +163,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         $autoMoveReplies = [];
         foreach ($fileIds as $folder => $files) {
             $emails[$folder] = [];
+            $isSentFolder = $folder === 'sent';
             foreach ($files as $fileId) {
                 if (empty($fileId)) {
                     continue;
@@ -169,6 +172,11 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                 if (! $email) {
                     continue;
                 }
+
+                // In sent/draft folders the useful "other party" is the recipient; everywhere else it's the sender.
+                $other = $isSentFolder ? ($email['recipient'] ?? '') : ($email['sender'] ?: $email['from']);
+                [$email['contact_name'], $email['contact_email']] = self::parseAddress($other);
+
                 $emails[$folder][] = $email;
 
                 if ($email['auto_move_reply']) {
@@ -209,6 +217,20 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         }
     }
 
+    /**
+     * Splits a raw "Name <email@example.com>" header value into its display name and address.
+     * @return array{0: string, 1: string} [$name, $email]
+     */
+    private static function parseAddress(string $raw): array
+    {
+        $raw = trim($raw);
+        if ($raw !== '' && preg_match('/^"?([^"<>]*?)"?\s*<([^<>]+)>$/', $raw, $m)) {
+            return [trim($m[1]), trim($m[2])];
+        }
+
+        return ['', $raw];
+    }
+
     public function getEmailFromFile($fileId)
     {
         $file_object = Tiki\FileGallery\File::id($fileId);
@@ -224,7 +246,10 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         if (! empty($parsed_fields['source_id'])) {
             $page_info = TikiLib::lib('tiki')->get_page_info_from_id($parsed_fields['source_id']);
             if ($page_info && stristr($page_info['data'], "cypht")) {
-                $view_path = smarty_modifier_sefurl($page_info['pageName']);
+                $view_path = \SmartyTiki\Modifier\Sefurl::apply($page_info['pageName']);
+                if (preg_match("/tiki-index\.php\?page=.*/", $view_path)) {
+                    $view_path = "tiki-index.php?page_id=" . $parsed_fields['source_id'];
+                }
             }
         }
         if (str_contains($view_path, '?')) {
@@ -293,7 +318,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         }
 
         if ($compose_page = $this->getOption('composePage')) {
-            $base_webmail_path = smarty_modifier_sefurl($compose_page);
+            $base_webmail_path = \SmartyTiki\Modifier\Sefurl::apply($compose_page);
             if (preg_match("/tiki-index\.php\?page=.*/", $base_webmail_path)) {
                 $base_webmail_path = "tiki-index.php?page_id=" . TikiLib::lib('tiki')->get_page_id_from_name($compose_page);
             }
@@ -395,6 +420,12 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
     {
+        $galleryId = (int) $this->getOption('galleryId');
+        $gallery = TikiLib::lib('filegal')->get_file_gallery($galleryId, false);
+        if (! $gallery || empty($gallery['galleryId'])) {
+            throw new IntegrityException(tr('%0 field: Gallery #%1 not found', $this->getConfiguration('name'), $galleryId));
+        }
+
         $value = $this->getValue();
         $baseKey = $this->getBaseKey();
         $emails = $this->getConfiguration('emails');

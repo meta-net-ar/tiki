@@ -111,7 +111,7 @@ Note: The show content block must be defined at root level to use the include. A
             {if $structure eq 'y' and (($prefs.wiki_structure_bar_position ne 'bottom') && ($prefs.wiki_structure_bar_position ne 'none'))}
                 {include file='tiki-wiki_structure_bar.tpl'}
             {/if}
-            {if $prefs.feature_wiki_structure eq 'y' and $structure eq 'n' and !empty($showAddToStructureBar) and (($prefs.wiki_structure_bar_position ne 'bottom' and $prefs.wiki_structure_bar_position ne 'none') or $prefs.wiki_structure_bar_position eq 'none')}
+            {if $structure eq 'n' and !empty($showAddToStructureBar) and (($prefs.wiki_structure_bar_position ne 'bottom' and $prefs.wiki_structure_bar_position ne 'none') or $prefs.wiki_structure_bar_position eq 'none')}
                 {include file='tiki-wiki_add_to_structure.tpl'}
             {/if}
 
@@ -170,7 +170,7 @@ Note: The show content block must be defined at root level to use the include. A
         {if $structure eq 'y' and (($prefs.wiki_structure_bar_position eq 'bottom') or ($prefs.wiki_structure_bar_position eq 'both'))}
             {include file='tiki-wiki_structure_bar.tpl'}
         {/if}
-        {if $prefs.feature_wiki_structure eq 'y' and $structure eq 'n' and !empty($showAddToStructureBar) and ($prefs.wiki_structure_bar_position eq 'bottom' or $prefs.wiki_structure_bar_position eq 'both')}
+        {if $structure eq 'n' and !empty($showAddToStructureBar) and ($prefs.wiki_structure_bar_position eq 'bottom' or $prefs.wiki_structure_bar_position eq 'both')}
             {include file='tiki-wiki_add_to_structure.tpl'}
         {/if}
 

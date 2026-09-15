@@ -29,6 +29,9 @@ class Executor
 
     private $formatterPlugins = [];
     private $reverseMapping = [];
+    private $paginationRequested = false;
+    private $paginationOffset = 0;
+    private $paginationMax = 0;
 
     public function __construct(Record $record, Search_Formatter $sf)
     {
@@ -44,6 +47,7 @@ class Executor
         $body = $this->replacePlaceholders();
         $result = $this->performSearch($body);
         $this->formatResult($result);
+        $this->applySublistPagination();
         $this->processSublists();
     }
 
@@ -192,6 +196,13 @@ class Executor
     {
         $matches = (new Parser())->getMatches($body);
 
+        foreach ($matches as $match) {
+            if ($match->getName() == 'pagination') {
+                $this->paginationRequested = true;
+                break;
+            }
+        }
+
         $query = new Search_Query();
         TikiLib::lib('unifiedsearch')->initQuery($query);
 
@@ -200,11 +211,60 @@ class Executor
         $builder->skipPagination();
         $builder->apply($matches);
 
+        if ($this->paginationRequested) {
+            // This search is shared (OR'd) across every matched parent row, so limiting it
+            // here would paginate that shared pool, not one parent's own children. Record the
+            // requested offset/max and apply them per parent row in applySublistPagination().
+            $paginationArguments = $builder->getPaginationArguments();
+            $offsetArg = $paginationArguments['offset_arg'];
+            $this->paginationMax = max(1, (int) $paginationArguments['max']);
+            $this->paginationOffset = max(0, (int) ($_REQUEST[$offsetArg] ?? 0));
+        }
+
         // try to retrieve as many as possible from the sublist subqueries
         $query->setRange(0, 9999);
 
         $index = TikiLib::lib('unifiedsearch')->getIndex();
         return $query->search($index);
+    }
+
+    /**
+     * Slices each parent row's already-joined children down to the requested page, once
+     * formatResult() has resolved who belongs to whom, so it pages correctly regardless of how
+     * many parent rows are in play. Exposes `<key>_count`/`_offset`/`_max` for
+     * {pagination_links}. No-op (same data, same shape) when no {pagination} block is present.
+     */
+    protected function applySublistPagination(): void
+    {
+        if (! $this->paginationRequested || ! $this->record->isMultiple()) {
+            // A non-multiple sublist holds one entry, not a list - nothing to paginate.
+            return;
+        }
+
+        $key = $this->record->getKey();
+        $offset = $this->paginationOffset;
+        $max = $this->paginationMax;
+
+        foreach ($this->data as $i => $row) {
+            if (empty($row)) {
+                continue;
+            }
+            if ($this->record->getParent() && $this->record->getParent()->isMultiple()) {
+                foreach ($row as $j => $_) {
+                    $fullList = $this->data[$i][$j][$key] ?? [];
+                    $this->data[$i][$j][$key] = array_slice($fullList, $offset, $max);
+                    $this->data[$i][$j][$key . '_count'] = count($fullList);
+                    $this->data[$i][$j][$key . '_offset'] = $offset;
+                    $this->data[$i][$j][$key . '_max'] = $max;
+                }
+            } else {
+                $fullList = $this->data[$i][$key] ?? [];
+                $this->data[$i][$key] = array_slice($fullList, $offset, $max);
+                $this->data[$i][$key . '_count'] = count($fullList);
+                $this->data[$i][$key . '_offset'] = $offset;
+                $this->data[$i][$key . '_max'] = $max;
+            }
+        }
     }
 
     /** This applies formatters, which will rewrite $this->data */

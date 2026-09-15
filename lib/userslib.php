@@ -2264,6 +2264,23 @@ class UsersLib extends TikiLib
 
         return true;
     }
+    /**
+     * Updates date and time of user's lastActivity.
+     *
+     * @param user: Username
+     */
+    public function updateLastActivity($user)
+    {
+        $query = 'update `users_users` set `lastActivity`=? where `login`=? and (`waiting` <> \'a\' OR `waiting` IS NULL)';
+        $this->query(
+            $query,
+            [
+                (int)$this->now,
+                $user
+            ]
+        );
+        return true;
+    }
 
     /**
      * Creates a new user in the LDAP directory
@@ -2586,7 +2603,7 @@ class UsersLib extends TikiLib
             // indicate whether the user's email is from a disposable mail server
             $res['disposable_email'] = false;
 
-            if ($prefs['email_detect_disposable'] === 'y' && isset($res['email'])) {
+            if ($prefs['email_detect_disposable'] === 'y' && ! empty($res['email'])) {
                 try {
                     if (DisposableEmail::isDisposable($res['email'])) {
                         $res['disposable_email'] = true;
@@ -2596,7 +2613,7 @@ class UsersLib extends TikiLib
                 }
             }
 
-            if (TIKI_API) {
+            if (defined('TIKI_API') && TIKI_API) {
                 // TODO: handle this as part of the API output serialization module
                 $res['avatar'] = $this->get_user_avatar_inline($res);
                 unset($res['avatarName']);
@@ -3610,7 +3627,7 @@ class UsersLib extends TikiLib
         if (! $useCache || ! $user_details = $cachelib->getSerialized($cacheKey)) {
             $user_details = [];
 
-            $query = 'SELECT `userId`, `login`, `email`, `lastLogin`, `currentLogin`,' .
+            $query = 'SELECT `userId`, `login`, `email`, `lastLogin`, `lastActivity`, `currentLogin`,' .
                             ' `registrationDate`, `created`, `avatarName`, `avatarSize`,' .
                             ' `avatarFileType`, `avatarLibName`, `avatarType`' .
                             ' FROM `users_users` WHERE `login` = ?';
@@ -7202,7 +7219,9 @@ class UsersLib extends TikiLib
             );
         }
 
-        TikiLib::lib('userprefs')->set_user_avatar($user, 'l', 'dicebear/' . $prefs['user_default_avatar_style'], $user, null, null, null, false);
+        if ($prefs['user_dicebear_avatar'] == 'y') {
+            TikiLib::lib('userprefs')->set_user_avatar($user, 'l', 'dicebear/' . $prefs['user_default_avatar_style'], $user, null, null, null, false);
+        }
 
         if (empty($groups)) {
             $this->assign_user_to_group($user, 'Registered');
@@ -7524,6 +7543,14 @@ class UsersLib extends TikiLib
             return $pass;
         }
         return false;
+    }
+
+    public function isValidActivationCode(string $user, string $actpass): bool
+    {
+        $query = 'select `provpass` from `users_users` where `login`=?';
+        $pass = $this->getOne($query, [$user]);
+
+        return ! empty($pass) && hash_equals(md5($pass), $actpass);
     }
 
    /**
@@ -8237,6 +8264,9 @@ class UsersLib extends TikiLib
                 ['view_user' => $name]
             )
         );
+
+        // falls back to login if not enabled
+        $smarty->assign('mail_realname', $this->clean_user($name));
 
         include_once('lib/webmail/tikimaillib.php');
 

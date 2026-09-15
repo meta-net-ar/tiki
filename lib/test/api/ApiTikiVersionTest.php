@@ -59,4 +59,30 @@ class ApiTikiVersionTest extends ApiTestCase
             $this->assertStringContainsString('application/json', $response['headers']['Content-Type']);
         }
     }
+
+    public function testApiGetTikiVersionCanBeDisabledByPreference()
+    {
+        static::setTestPreferences(['auth_api_tiki_version' => 'n']);
+
+        try {
+            $response = $this->makeApiRequest('GET', '/version');
+            $responseData = $this->getResponseBody($response);
+
+            $this->assertArrayNotHasKey('version', $responseData, 'The version must not be disclosed when disabled');
+            $this->assertValidErrorResponse($responseData, 403, 'version endpoint is disabled');
+        } finally {
+            static::deleteTestPreferences(['auth_api_tiki_version' => 'n']);
+        }
+    }
+
+    public function testApiGetTikiVersionEnabledByDefault()
+    {
+        static::deleteTestPreferences(['auth_api_tiki_version' => 'y']);
+
+        $response = $this->makeApiRequest('GET', '/version');
+        $responseData = $this->getResponseBody($response);
+
+        $this->assertResponseStatus(200, $response);
+        $this->assertArrayHasKey('version', $responseData);
+    }
 }

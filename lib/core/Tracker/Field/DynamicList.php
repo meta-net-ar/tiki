@@ -329,9 +329,7 @@ $("body").on("change", "input[name=\'' . $filterFieldHereName . '\'], select[nam
 
                 const elementPlusTransfer = document.querySelector("el-transfer[field-name=\'" + data.request.insertId + "\']");
                 if (elementPlusTransfer) {
-                    const elementPlusTransferCopy = elementPlusTransfer.cloneNode(true);
-                    elementPlusTransferCopy.setAttribute("data", JSON.stringify(transferData));
-                    elementPlusTransfer.replaceWith(elementPlusTransferCopy);
+                    elementPlusTransfer.setAttribute("data", JSON.stringify(transferData));
                 }
                     
                 if (data.request.originalValue) {
@@ -367,7 +365,7 @@ $("input[name=\'' . $filterFieldHereName . '\'], select[name=\'' . $filterFieldH
         if ($this->trackerField->getOption('inputtype') === 't') {
             $smarty = TikiLib::lib('smarty');
 
-            return $oldMarker . smarty_function_jstransfer_list([
+            return $oldMarker . \SmartyTiki\FunctionHandler\JsTransferList::render([
                 'fieldName' => $insertId,
                 'data' => [],
                 'defaultSelected' => $this->getValue(),
@@ -442,6 +440,7 @@ $("input[name=\'' . $filterFieldHereName . '\'], select[name=\'' . $filterFieldH
                 case 'e':
                 case 'd':
                 case 'D':
+                case 'M': // multi-select dropdown
                     //$listFieldThere = array_merge($listFieldThere, array('value' => $remoteItemId));
                     $handler = $trklib->get_field_handler($listFieldThere, $itemInfo);
                     // array selected_categories etc.

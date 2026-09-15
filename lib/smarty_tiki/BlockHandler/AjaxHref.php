@@ -9,6 +9,8 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\BlockHandlerStaticFacadeTrait;
 
 /**
  * smarty block ajax_href creates the href for a link in Smarty according to AJAX prefs
@@ -18,8 +20,15 @@ use Smarty\Template;
  *  _onclick    -   extra JS to run first onclick
  *
  */
-class AjaxHref extends Base
+class AjaxHref extends Base implements TikiSmartyExtensionInterface
 {
+    use BlockHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'ajax_href';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {

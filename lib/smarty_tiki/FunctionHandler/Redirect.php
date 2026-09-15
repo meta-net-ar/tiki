@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Redirect extends Base
+class Redirect extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'redirect';
+    }
+
     public function handle($params, Template $template)
     {
         global $user;

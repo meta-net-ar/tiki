@@ -10,6 +10,7 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use Tiki\Lib\TikiDate;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty {html_select_date} plugin
@@ -44,8 +45,13 @@ use Tiki\Lib\TikiDate;
  * @param Smarty
  * @return string
  */
-class HtmlSelectDate extends Base
+class HtmlSelectDate extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'html_select_date';
+    }
+
     public function handle($params, Template $template)
     {
         global $tikilib, $prefs; // TIKI
@@ -252,7 +258,7 @@ class HtmlSelectDate extends Base
             $month_result .= $extra_attrs . ' data-date-part="month">' . "\n";
 
             $tikidate->setLocalTime(1, (int) $time[1], 2000, 0, 0, 0, 0);
-            $month_result .= smarty_function_html_options(
+            $month_result .= (new \Smarty\FunctionHandler\HtmlOptions())->handle(
                 [
                     'output'     => $month_names,
                     'values'     => $month_values,
@@ -302,7 +308,7 @@ class HtmlSelectDate extends Base
                 $day_result .= ' ' . $day_extra;
             }
             $day_result .= $extra_attrs . ' data-date-part="day">' . "\n";
-            $day_result .= smarty_function_html_options(
+            $day_result .= (new \Smarty\FunctionHandler\HtmlOptions())->handle(
                 [
                     'output'       => $day_values,
                     'values'       => $days,
@@ -353,7 +359,7 @@ class HtmlSelectDate extends Base
                     $year_result .= ' ' . $year_extra;
                 }
                 $year_result .= $extra_attrs . ' data-date-part="year">' . "\n";
-                $year_result .= smarty_function_html_options(
+                $year_result .= (new \Smarty\FunctionHandler\HtmlOptions())->handle(
                     [
                         'output' => $years,
                         'values' => $yearvals,

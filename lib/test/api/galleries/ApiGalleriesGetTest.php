@@ -43,6 +43,10 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
 
     public function testApiGetGalleriesWithPagination()
     {
+        $uid = uniqid();
+        foreach (['A', 'B', 'C'] as $suffix) {
+            static::createGallery('API_Test_Pagination_' . $suffix . '_' . $uid, 'Pagination test gallery');
+        }
         $data = [
             'offset' => 0,
             'maxRecords' => 2,
@@ -95,12 +99,11 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
     public function testApiGetGalleriesWithSearch()
     {
         // create a gallery to search for
-        static::createGallery(
-            'API_Test_Gallery_Search',
-            'Gallery created for API search testing',
-            1
-        );
-        $data = ['find' => 'API_Test_Gallery_Search'];
+        $name = 'API_Test_Gallery_Search_' . uniqid();
+        $galleryId = static::createGallery($name, 'Gallery created for API search testing');
+        $this->assertNotEmpty($galleryId, 'The gallery to search for should have been created');
+
+        $data = ['find' => $name];
         $response = $this->makeApiRequest(
             'GET',
             '/galleries',
@@ -114,8 +117,8 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         $body = $this->getResponseBody($response);
         $this->assertValidGalleryListResponse($body);
         // Should return only galleries matching the search term (API_Test_Gallery_Search)
-        $this->assertEquals(1, count($body['result']), 'Should return 1 matching gallery');
-        $this->assertStringContainsString('API_Test_Gallery_Search', $body['result'][0]['name'], 'Gallery name should contain search term');
+        $this->assertCount(1, $body['result'], 'Should return 1 matching gallery');
+        $this->assertEquals($name, $body['result'][0]['name'], 'Gallery name should match the search term');
     }
 
     public function testApiGetGalleryInfoWithoutPermission()
@@ -197,6 +200,50 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
             }
         }
         $this->assertTrue($foundDefault, 'Default test file should be in the list');
+    }
+
+    public function testApiGetGalleryFilesKeepsExtractedContentByDefault()
+    {
+        $galleryId = static::$defaultGalleries['default']['galleryId'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/{$galleryId}/list_files",
+            'Admins'
+        );
+
+        $this->assertResponseStatus(200, $response);
+        $body = $this->getResponseBody($response);
+        $this->assertValidFileListResponse($body);
+        $this->assertNotEmpty($body['result'], 'The gallery should list at least one file');
+
+        foreach ($body['result'] as $file) {
+            $this->assertArrayHasKey('metadata', $file);
+            $this->assertArrayHasKey('search_data', $file);
+        }
+    }
+
+    public function testApiGetGalleryFilesOmitsExtractedContentWhenRequested()
+    {
+        $galleryId = static::$defaultGalleries['default']['galleryId'];
+        $response = $this->makeApiRequest(
+            'GET',
+            "/galleries/{$galleryId}/list_files",
+            'Admins',
+            ['omit_metadata' => 1]
+        );
+
+        $this->assertResponseStatus(200, $response);
+        $body = $this->getResponseBody($response);
+        $this->assertValidFileListResponse($body);
+        $this->assertNotEmpty($body['result'], 'The gallery should list at least one file');
+
+        foreach ($body['result'] as $file) {
+            $this->assertArrayNotHasKey('metadata', $file);
+            $this->assertArrayNotHasKey('search_data', $file);
+            $this->assertArrayNotHasKey('ocr_data', $file);
+            $this->assertArrayHasKey('fileId', $file, 'The regular fields should still be present');
+            $this->assertArrayHasKey('filename', $file, 'The regular fields should still be present');
+        }
     }
 
     public function testApiGetNonExistentGalleryFiles()

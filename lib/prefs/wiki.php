@@ -728,6 +728,13 @@ function prefs_wiki_list($partial = false)
             'default' => 'top',
             'help' => $wikiFeaturesHelp,
         ],
+        'wiki_structure_add_to_structure_bar' => [
+            'name' => tra('Add to structure bar'),
+            'description' => tra('Show a bar on wiki pages that are not in a structure, offering quick links to add the page to an existing structure.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'help' => $wikiFeaturesHelp,
+        ],
         'wiki_backlinks_name_len' => [
             'name' => tra('Backlink page names maximum displayed length'),
             'hint' => tra($truncationHint),

@@ -33,6 +33,11 @@ include_once('lib/wiki-plugins/wikiplugin_slideshow.php');
 $access->check_feature('feature_wiki');
 $access->check_feature('feature_slideshow');
 
+// Allow slideshow in iframes from the same origin (needed for speaker's notes view)
+// SAMEORIGIN allows same-domain iframes while protecting against external embedding
+$prefs['http_header_frame_options'] = 'y';
+$prefs['http_header_frame_options_value'] = 'SAMEORIGIN';
+
 //make the other things know we are loading a slideshow
 $tikilib->is_slideshow = true;
 $smarty->assign('is_slideshow', 'y');
@@ -100,7 +105,40 @@ $tikilib->add_hit($page);
 // Get page data
 $parserlib = TikiLib::lib('parser');
 $info = $tikilib->get_page_info($page);
-$pdata = $parserlib->parse_data_raw($info["data"]);
+
+// Extract slideshow plugin parameters from raw data (before wiki parsing)
+$slidePluginData = $parserlib->getPlugins($info["data"], ['slideshow']);
+
+$speakerNotesEnabled = false;
+if (! empty($slidePluginData)) {
+    if (array_key_exists('speakerNotes', $slidePluginData[0]['arguments'])) {
+        $speakerNotesEnabled = $slidePluginData[0]['arguments']['speakerNotes'] === 'y';
+    }
+}
+
+// Process speaker's notes BEFORE wiki parsing to prevent wiki parser from removing {NOTES} tags
+// Convert {NOTES()}...{NOTES} blocks to ~np~<aside class="notes">...</aside>~/np~
+// The ~np~ tags prevent wiki parser from processing the HTML
+if ($speakerNotesEnabled) {
+    $rawData = preg_replace_callback(
+        '/\{NOTES\(\)\}(.*?)\{NOTES\}/is',
+        function ($matches) {
+            $noteContent = trim($matches[1]);
+            // Wrap in ~np~ to preserve HTML through wiki parsing
+            return '~np~<aside class="notes" data-label="'
+                . htmlspecialchars(tra("Speaker's Notes:"), ENT_QUOTES)
+                . '">'
+                . htmlspecialchars($noteContent, ENT_NOQUOTES)
+                . '</aside>~/np~';
+        },
+        $info["data"]
+    );
+} else {
+    $rawData = $info["data"];
+}
+
+// Now parse the modified data
+$pdata = $parserlib->parse_data_raw($rawData);
 
 if (! isset($_REQUEST['pagenum'])) {
     $_REQUEST['pagenum'] = 1;
@@ -116,8 +154,6 @@ $pdata = WikiPaginationUtils::getPage($pdata, $_REQUEST['pagenum']);
 // Put ~pp~, ~np~ and <pre> back. --rlpowell, 24 May 2004
 $parserlib->replace_preparse($info["data"], $preparsed, $noparsed);
 $parserlib->replace_preparse($pdata, $preparsed, $noparsed);
-
-$slidePluginData = $parserlib->getPlugins($info["data"], ['slideshow']);
 
 $slidePluginHeadingLevelSlideSeparator = 3;
 if (! empty($slidePluginData)) {
@@ -257,6 +293,9 @@ $smarty->assign_by_ref('lastUser', $info["user"]);
 include_once('tiki-section_options.php');
 
 $headerlib->add_jsfile($revealJsJsFile);
+if ($speakerNotesEnabled) {
+    $headerlib->add_jsfile(REVEALJS_DIST_PATH . '/../plugin/notes/notes.js');
+}
 $headerlib->add_cssfile($revealJsCssFile);
 $headerlib->add_cssfile($revealThemeFile);
 
@@ -439,8 +478,54 @@ $headerlib->add_jq_onready(<<<JS
     `);
 JS);
 
+if ($speakerNotesEnabled) {
+    $headerlib->add_jq_onready(<<<JS
+    document.querySelector('head').insertAdjacentHTML('beforeend', `
+        <style>
+            /* Speaker's Notes Styling */
+            .reveal .notes {
+                display: none;
+            }
+            
+            /* Show notes when printing */
+            @media print {
+                .reveal .notes {
+                    display: block !important;
+                    page-break-before: always;
+                    page-break-inside: avoid;
+                    border: 2px solid #2c3e50;
+                    border-radius: 5px;
+                    padding: 1.5em;
+                    margin: 1.5em 0;
+                    background: #f8f9fa;
+                    font-size: 0.9em;
+                    line-height: 1.6;
+                }
+                
+                .reveal .notes::before {
+                    content: attr(data-label);
+                    display: block;
+                    font-weight: bold;
+                    font-size: 1.1em;
+                    color: #2c3e50;
+                    margin-bottom: 0.8em;
+                    padding-bottom: 0.5em;
+                    border-bottom: 1px solid #ccc;
+                }
+                
+                /* Better slide numbering in print */
+                .reveal .slides section {
+                    page-break-after: avoid;
+                }
+            }
+        </style>
+    `);
+JS);
+}
+
 if (isset($_REQUEST['print-pdf']) && $_REQUEST['print-pdf'] == 1) {
     $smarty->assign('printpdf', 'y');
+    $showNotesConfig = $speakerNotesEnabled ? 'showNotes: "separate-page",' : '';
     $headerlib->add_jq_onready(<<<JS
     Reveal.initialize({ 
         width: 960,
@@ -452,7 +537,7 @@ if (isset($_REQUEST['print-pdf']) && $_REQUEST['print-pdf'] == 1) {
         embedded: true,
         pdfSeparateFragments: false,
         // disableLayout: true,
-        showNotes: "separate-page", 
+        $showNotesConfig
     });
     Reveal.addEventListener('ready', () => {
         setTimeout(() => {
@@ -556,7 +641,11 @@ JS);
         });
         //Append slide title with URL on slide change
         Reveal.addEventListener( "slidechanged", function( event ) { location.hash = "!_"+$(".present table tr td").children("h1").attr("id");});
-        Reveal.initialize({ width: "98%",height: "100%",center: false});
+        Reveal.initialize({ 
+            width: "98%",
+            height: "100%",
+            center: false
+        });
         $(window).on("load", function() {
             //loop to scale contents
             $( "section" ).each(function( index ) {
@@ -594,6 +683,13 @@ JS);
 JS
     );
 }
+
+if ($speakerNotesEnabled) {
+    $headerlib->add_jq_onready(<<<JS
+        Reveal.registerPlugin(RevealNotes);
+JS);
+}
+
 $params = [];
 
 foreach ($_GET as $key => $value) {

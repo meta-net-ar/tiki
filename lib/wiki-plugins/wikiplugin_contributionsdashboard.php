@@ -226,7 +226,7 @@ function wikiplugin_contributionsdashboard($data, $params)
                     " . tr("Contributions Dashboard") . "
                     <form class='headerHelper'>
                         <span>" . tr("Date Range") . "</span>
-                        <span>" . smarty_function_jscalendar($fields, $smarty->getEmptyInternalTemplate()) . "</span>
+                        <span>" . \SmartyTiki\FunctionHandler\JsCalendar::render($fields, $smarty->getEmptyInternalTemplate()) . "</span>
                         <input type='hidden' name='refresh' value='1' />
                         <input type='submit' id='updateData$i' class='headerAction' value='" . tr("Update") . "' />
                     </form>

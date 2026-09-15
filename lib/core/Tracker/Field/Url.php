@@ -92,7 +92,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
         if ($url === '' || ($context['list_mode'] ?? '') === 'csv' || $this->getOption('linkToURL') == 1) {
             return $url;
         } elseif ($this->getOption('linkToURL') == 2) { // Site title as link
-            return smarty_function_object_link(
+            return \SmartyTiki\FunctionHandler\ObjectLink::render(
                 [
                     'type' => 'external',
                     'id' => $url,
@@ -100,7 +100,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
                 $smarty->getEmptyInternalTemplate()
             );
         } elseif ($this->getOption('linkToURL') == 0) { // URL as link
-            return smarty_function_object_link(
+            return \SmartyTiki\FunctionHandler\ObjectLink::render(
                 [
                     'type' => 'external',
                     'id' => $url,
@@ -109,7 +109,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
                 $smarty->getEmptyInternalTemplate()
             );
         } elseif ($this->getOption('linkToURL') == 3) { // URL + site title
-            return smarty_function_object_link(
+            return \SmartyTiki\FunctionHandler\ObjectLink::render(
                 [
                     'type' => 'external_extended',
                     'id' => $url,
@@ -117,7 +117,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
                 $smarty->getEmptyInternalTemplate()
             );
         } elseif ($this->getOption('linkToURL') == 4) { // URL as link
-            return smarty_function_object_link(
+            return \SmartyTiki\FunctionHandler\ObjectLink::render(
                 [
                     'type' => 'external',
                     'id' => $url,

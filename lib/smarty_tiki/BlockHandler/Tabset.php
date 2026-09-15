@@ -10,6 +10,7 @@ namespace SmartyTiki\BlockHandler;
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  *
@@ -28,8 +29,13 @@ use Tiki\Lib\CookieConsent\CookieConsentLib;
  * \endcode
  */
 
-class Tabset extends Base
+class Tabset extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'tabset';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs, $smarty_tabset_name, $smarty_tabset, $smarty_tabset_i_tab, $cookietab, $cookietabTabset;
@@ -91,7 +97,7 @@ class Tabset extends Base
                     $button_params['_auto_args'] = '*';
                     $button_params['_onclick'] = "setCookie('$smarty_tabset_name','" . ($tabsetCookietab == 'n' ? 1 : 'n') . "', 'tabs', 'session', " . "window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);";
                     $button_params['_class'] = 'btn-sm'; // btn-secondary removed because btn-primary is also being applied somehow.
-                    $notabs = smarty_function_button($button_params, $smarty->getEmptyInternalTemplate());
+                    $notabs = \SmartyTiki\FunctionHandler\Button::render($button_params, $smarty->getEmptyInternalTemplate());
                     $notabs = "<div class='float-end'>$notabs</div>";
                     $content_class = '';
                 } else {

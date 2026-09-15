@@ -292,9 +292,9 @@
         "overtrue/phplint": "~9.6",
         "php-webdriver/webdriver": "~1.15",
         "phpcompatibility/php-compatibility": "~10.x-dev",
-        "phpcompatibility/phpcompatibility-paragonie": "~2.0@dev",
-        "phpcompatibility/phpcompatibility-passwordcompat": "~2.0@dev",
-        "phpcompatibility/phpcompatibility-symfony": "~2.0@dev",
+        "phpcompatibility/phpcompatibility-paragonie": "~2.0@alpha",
+        "phpcompatibility/phpcompatibility-passwordcompat": "~2.0@alpha",
+        "phpcompatibility/phpcompatibility-symfony": "~2.0@alpha",
         "phpcsstandards/phpcsutils": "~1.0",
         "phpstan/phpstan": "~2.1",
         "phpstan/phpstan-deprecation-rules": "~2.0",
@@ -524,6 +524,7 @@
             "Tiki\\Composer\\CleanVendors::clean",
             "Tiki\\Composer\\CleanVendorAfterVendorBundledMigration::clean",
             "Tiki\\Composer\\GenerateIndexFiles::generate",
+            "Tiki\\Composer\\SmartyExtensionMapper::generate",
             "Tiki\\Composer\\PatchCypht::setup"
         ],
         "pre-update-cmd": [
@@ -536,6 +537,7 @@
             "Tiki\\Composer\\BootstrapCompiler::build",
             "Tiki\\Composer\\CleanVendors::clean",
             "Tiki\\Composer\\CleanVendorAfterVendorBundledMigration::clean",
+            "Tiki\\Composer\\SmartyExtensionMapper::generate",
             "Tiki\\Composer\\PatchCypht::setup"
         ],
         "test": "php ../lib/test/phpunit.php -c phpunit.xml.dist --colors=always"
@@ -577,10 +579,17 @@
             "type": "composer",
             "url": "https://composer.tiki.org",
             "canonical": false,
+            "_comment": [
+            "-------------------------------------------------------------",
+            "IMPORTANT: php-sieve-manager is tempotarily preferred from composer.tiki.org",
+            "until the github repo issue is resolved.",
+            "-------------------------------------------------------------"
+            ],
             "only": [
                 "openannotation/annotator",
                 "jquery/jquery-sheet",
-                "bower-asset/wodo.texteditor"
+                "bower-asset/wodo.texteditor",
+                "henrique-borba/php-sieve-manager"
             ]
         }
     }

@@ -1666,7 +1666,7 @@ function wikiplugin_tracker($data, $params)
                 } else {
                     // setting default value prevent dropdown default value working
                     $options = $flds['data'][$i]['options_array'];
-                    if (! in_array($flds['data'][$i]['type'], ['d', 'D', 'R', 'M']) || count($options) === count(array_unique($options))) {
+                    if ($flds['data'][$i]['type'] != 'f' && (! in_array($flds['data'][$i]['type'], ['d', 'D', 'R', 'M']) || count($options) === count(array_unique($options)))) {
                         $flds['data'][$i]['value'] = ''; // initialize fields with blank values
                     }
                 }
@@ -1789,7 +1789,7 @@ function wikiplugin_tracker($data, $params)
                 $_REQUEST['error'] = 'y';
             }
             if (isset($field_errors['err_outputwiki'])) {
-                $icon = smarty_function_icon(['name' => 'warning'], $smarty->getEmptyInternalTemplate());
+                $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'warning'], $smarty->getEmptyInternalTemplate());
                 $back .= '<div class="alert alert-warning">' . $icon . ' ';
                 $back .= $field_errors['err_outputwiki'];
                 $back .= '</div><br />';
@@ -1929,7 +1929,7 @@ function wikiplugin_tracker($data, $params)
             $back .= '<form class="' . $formClasses . '" name="editItemForm' . $iTRACKER . '" id="editItemForm' . $iTRACKER . '" enctype="multipart/form-data" method="post"' . (! is_null($target) ? ' target="' . $target . '"' : '') . ' action="' . $_SERVER['REQUEST_URI'] . '" ' . $ajax_datas . '><input type="hidden" name="trackit" value="' . $trackerId . '" />';
             $back .= '<input type="hidden" name="refresh" value="1" />';
         }
-        $back .= smarty_function_ticket([], $smarty->getEmptyInternalTemplate());
+        $back .= \SmartyTiki\FunctionHandler\Ticket::render([], $smarty->getEmptyInternalTemplate());
         $back .= '<input type="hidden" name="iTRACKER" value="' . $iTRACKER . '" />';
         if (isset($_REQUEST['page'])) {
             $back .= '<input type="hidden" name="page" value="' . $_REQUEST["page"] . '" />';
@@ -2222,7 +2222,7 @@ function wikiplugin_tracker($data, $params)
         }
 
         if ($datepicker) {
-            $back .= smarty_function_js_insert_icon(['type' => "jscalendar"], $smarty->getEmptyInternalTemplate());
+            $back .= \SmartyTiki\FunctionHandler\JsInsertIcon::render(['type' => "jscalendar"], $smarty->getEmptyInternalTemplate());
         }
 
         if (! empty($tpl)) {

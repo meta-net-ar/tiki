@@ -103,4 +103,70 @@ Some more text
         $tags = $headerlib->output_js_files();
         $this->assertStringContainsString($expected, $tags, 'Autotoc off, page set to on');
     }
+
+    public function testGetParseSkipCacheDoesNotReadOrUpdatePageCache(): void
+    {
+        global $prefs, $testhelpers, $user;
+
+        $wikilib = TikiLib::lib('wiki');
+        $originalPrefs = $this->capturePrefs(['wiki_cache', 'feature_wiki_icache']);
+        $originalRequest = $_REQUEST;
+        $originalMethod = $_SERVER['REQUEST_METHOD'] ?? null;
+        $originalUser = $user;
+
+        try {
+            $prefs['wiki_cache'] = 3600;
+            $prefs['feature_wiki_icache'] = 'n';
+            $user = '';
+
+            $testhelpers->createPage($this->pageName, 0, 'Fresh wiki render body');
+            $wikilib->update_cache($this->pageName, 'Stale cached render body');
+
+            $_SERVER['REQUEST_METHOD'] = 'GET';
+            $_REQUEST = [];
+
+            $canBeRefreshed = false;
+            $parsed = $wikilib->get_parse($this->pageName, $canBeRefreshed, false, true);
+
+            $this->assertStringContainsString('Fresh wiki render body', $parsed);
+            $this->assertStringNotContainsString('Stale cached render body', $parsed);
+            $this->assertSame('Stale cached render body', $wikilib->get_cache_info($this->pageName)['cache']);
+        } finally {
+            $this->restorePrefs($originalPrefs, ['wiki_cache', 'feature_wiki_icache']);
+            $_REQUEST = $originalRequest;
+            $user = $originalUser;
+            if ($originalMethod === null) {
+                unset($_SERVER['REQUEST_METHOD']);
+            } else {
+                $_SERVER['REQUEST_METHOD'] = $originalMethod;
+            }
+        }
+    }
+
+    private function capturePrefs(array $names): array
+    {
+        global $prefs;
+
+        $captured = [];
+        foreach ($names as $name) {
+            if (array_key_exists($name, $prefs)) {
+                $captured[$name] = $prefs[$name];
+            }
+        }
+
+        return $captured;
+    }
+
+    private function restorePrefs(array $captured, array $names): void
+    {
+        global $prefs;
+
+        foreach ($names as $name) {
+            if (array_key_exists($name, $captured)) {
+                $prefs[$name] = $captured[$name];
+            } else {
+                unset($prefs[$name]);
+            }
+        }
+    }
 }

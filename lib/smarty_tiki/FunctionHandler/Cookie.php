@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Cookie extends Base
+class Cookie extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'cookie';
+    }
+
     public function handle($params, Template $template)
     {
         global $tikilib;

@@ -210,6 +210,18 @@ class Search_Elastic_Connection
         }
     }
 
+    public function clearScroll($scrollId): void
+    {
+        if (empty($scrollId)) {
+            return;
+        }
+        try {
+            $this->delete('/_search/scroll/' . rawurlencode((string) $scrollId));
+        } catch (\Throwable $e) {
+            // intentionally swallowed - might not be there already
+        }
+    }
+
     public function storeQuery($index, $name, $query)
     {
         if ($this->getVersion() >= 5) {

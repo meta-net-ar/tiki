@@ -224,6 +224,12 @@ class Services_File_FinderController
                     }
                 }
 
+                $cpath = $input->cpath->text();
+                $reqid = $input->reqid->text();
+                if ($cpath && $reqid) {
+                    setcookie('elfdl' . $reqid, '1', 0, urlencode($cpath));
+                }
+
                 TikiLib::lib('access')->redirect($url);
                 return [];
             }

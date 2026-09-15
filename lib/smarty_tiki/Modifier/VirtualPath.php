@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class VirtualPath
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class VirtualPath implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'virtual_path';
+    }
+
     public function handle($fileOrPageId, $type = 'file')
     {
         global $base_url;

@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * \brief Smarty {js_maxlength} function handler
@@ -20,8 +21,13 @@ use Smarty\Template;
  * TODO would be great if it worked with array arguments
  *
  */
-class JsMaxLength extends Base
+class JsMaxLength extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'js_maxlength';
+    }
+
     public function handle($params, Template $template)
     {
         extract($params); // textarea=string maxlength=num

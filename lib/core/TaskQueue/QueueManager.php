@@ -248,9 +248,9 @@ class QueueManager implements QueuedInterface
             $taskRows = $this->fetchAllQueuedTasks($cols, $where, $order, $limit, $offset);
             if (! empty($taskRows)) {
                 foreach ($taskRows as $taskRow) {
-                    $taskRow['created_at'] = smarty_modifier_tiki_short_datetime($taskRow['created_at'], '', 'n');
-                    $taskRow['started_at'] = ! empty($taskRow['started_at']) ? smarty_modifier_tiki_short_datetime($taskRow['started_at'], '', 'n') : null;
-                    $taskRow['ended_at'] = ! empty($taskRow['ended_at']) ? smarty_modifier_tiki_short_datetime($taskRow['ended_at'], '', 'n') : null;
+                    $taskRow['created_at'] = \SmartyTiki\Modifier\TikiShortDateTime::apply($taskRow['created_at'], '', 'n');
+                    $taskRow['started_at'] = ! empty($taskRow['started_at']) ? \SmartyTiki\Modifier\TikiShortDateTime::apply($taskRow['started_at'], '', 'n') : null;
+                    $taskRow['ended_at'] = ! empty($taskRow['ended_at']) ? \SmartyTiki\Modifier\TikiShortDateTime::apply($taskRow['ended_at'], '', 'n') : null;
                     $tasks[] = $this->createTaskFromRow($taskRow);
                 }
             }

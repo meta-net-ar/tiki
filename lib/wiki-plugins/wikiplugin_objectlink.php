@@ -49,7 +49,7 @@ function wikiplugin_objectlink($data, $params)
 {
     $smarty = TikiLib::lib('smarty');
 
-    return smarty_function_object_link(
+    return \SmartyTiki\FunctionHandler\ObjectLink::render(
         [
             'type' => $params['type'],
             'id' => $params['id'],

@@ -559,11 +559,18 @@ if ($prefs['rating_advanced'] == 'y' && $prefs['rating_recalculation'] == 'rando
 
 // using jquery-migrate-1.3.0.js plugin for tiki 11, still required in tiki 12 LTS to support some 3rd party plugins
 
-if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'google') {
-    $headerlib->add_jsfile_cdn("$url_scheme://ajax.googleapis.com/ajax/libs/jquery/$headerlib->jquery_version/jquery.min.js");
-    // goggle is not hosting migrate so load from local
-    $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-migrate/dist/jquery-migrate.min.js", true);
-} elseif (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
+// jQuery 4 also ships an ES module build (dist-module/jquery.module.js), but Tiki still
+// loads the classic one here: module scripts are deferred, so every classic script runs
+// first, and anything classic using $ at load time would break if jQuery were only
+// reachable as a module. jQuery also stays on the global window object for the many
+// plugins that expect it there. The headerlib refactor lifts that ordering constraint,
+// and jQuery 4's own exports map is meant to give import and require the same copy, so
+// the switch should not need a shim on our side.
+// See https://github.com/jquery/jquery/wiki/jQuery-4-exports-explainer
+
+// Google's CDN has no jQuery 4.x (its newest is 3.7.1), so 'google' falls through to
+// the local copies below instead of 404ing, as jquery-migrate already had to.
+if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
     $headerlib->add_jsfile_cdn("$url_scheme://code.jquery.com/jquery-$headerlib->jquery_version.min.js");
     $headerlib->add_jsfile_cdn("$url_scheme://code.jquery.com/jquery-migrate-$headerlib->jquerymigrate_version.min.js");
 } else {
@@ -652,9 +659,11 @@ if ($prefs['cookie_consent_feature'] == 'y') {
 // $url_scheme is 'http' or 'https' depending on request type condsidering already a reverse proxy
 // $https_mode is true / false depending on request type condsidering already a reverse proxy
 if ($prefs['feature_jquery_ui'] == 'y') {
-    if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'google') {
-        $headerlib->add_jsfile_cdn("$url_scheme://ajax.googleapis.com/ajax/libs/jqueryui/$headerlib->jqueryui_version/jquery-ui.min.js");
-    } elseif (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
+    // Google's CDN does not carry the jQuery UI version Tiki pins (its newest is
+    // 1.14.1), so 'google' falls through to the local copy below rather than 404ing.
+    // Same approach already used for jquery-migrate, which Google has never hosted,
+    // and for the jQuery UI theme CSS further down.
+    if (isset($prefs['javascript_cdn']) && $prefs['javascript_cdn'] == 'jquery') {
         $headerlib->add_jsfile_cdn("$url_scheme://code.jquery.com/ui/$headerlib->jqueryui_version/jquery-ui.min.js");
     } else {
         if ($prefs['tiki_minify_javascript'] === 'y') {
@@ -703,7 +712,7 @@ for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
         nav[indexCurrentNav].classList.add("sm-navbar");
         nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
         const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
-        
+
         // Enable navigation on parent menu items with children
         // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
         // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
@@ -712,7 +721,7 @@ for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
             const link = e.target.closest("a.sm-sub-toggler");
             if (link && nav[indexCurrentNav].contains(link)) {
                 const href = link.getAttribute("href");
-                if (0 && href && href !== "#" && href !== "") {
+                if (noMouseoverBehavior !== "click" && href && href !== "#" && href !== "") {
                     e.preventDefault();
                     e.stopPropagation();
                     window.location.href = href;
@@ -759,7 +768,7 @@ if ($prefs['feature_shadowbox'] == 'y') {
     max-width: 90vw;
     max-height: 90vh;
 }
-.gnext.disabled, 
+.gnext.disabled,
 .gprev.disabled{
     display: none !important;
 }
@@ -826,13 +835,11 @@ if (empty($user) && $prefs['feature_antibot'] == 'y') {
 }
 
 if (! empty($prefs['header_custom_css'])) {
-    // Hopsfully temporary clean-up of inline syntax tags for Tiki 30.0
-    $headerlib->add_css($tikilib->removeInlineSyntaxTags($prefs['header_custom_css']));
+    $headerlib->add_css($prefs['header_custom_css']);
 }
 
 if (! empty($prefs['header_custom_js'])) {
-    // Hopefully temporary clean-up of inline syntax tags for Tiki 30.0
-    $headerlib->add_js($tikilib->removeInlineSyntaxTags($prefs['header_custom_js']));
+    $headerlib->add_js($prefs['header_custom_js']);
 }
 
 if ($prefs['feature_file_galleries'] == 'y') {
@@ -991,6 +998,7 @@ $("#top").on("annotationCreated", function (e, annotation) {
 });
 
 $headerlib->add_jsfile('lib/jquery_tiki/pluginedit.js');
+$headerlib->add_js_module('import "@jquery-tiki/coverpage-form";');
 
 if ($prefs['feature_machine_learning'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-machine_learning.js');

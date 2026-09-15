@@ -9,9 +9,15 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Filter extends Base
+class Filter extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'filter';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs;

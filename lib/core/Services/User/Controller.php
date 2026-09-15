@@ -281,9 +281,9 @@ class Services_User_Controller
                 }
 
                 if ($prefs['feature_community_mouseover_lastlogin'] == 'y') {
-                    $result['lastSeen'] = $info['currentLogin'] ? $info['currentLogin'] : null;
+                    $result['currentLogin'] = $info['currentLogin'] ? $info['currentLogin'] : null;
                 }
-
+                $result['lastActivity'] = $info['lastActivity'] ? $info['lastActivity'] : null;
 
                 if ($prefs['feature_community_mouseover_picture'] == 'y') {
                     $result['avatarHtml'] = $tikilib->get_user_avatar($other_user);
@@ -1117,6 +1117,7 @@ class Services_User_Controller
                 $avatarName = $input->avatarName->text();
                 $avatarType = $input->avatarType->text();
                 TikiLib::lib('userprefs')->set_user_avatar($userwatch, $avatarType, $avatarLibName, $avatarName, null, null, null, false);
+                TikiLib::lib('userprefs')->remove_file_gallery_image($userwatch);
                 return true;
             }
             if (empty($_FILES['userfile']['name'])) {
@@ -1158,9 +1159,7 @@ class Services_User_Controller
         $action = $input->timezone_action->text();
 
         if ($action === 'never') {
-            if ($tikilib->set_preference('user_localtimezonesync', 'n')) {
-                $tikilib->set_user_preference($user, 'localtimezonesync', 'n');
-            }
+            $tikilib->set_user_preference($user, 'user_localtimezonesync', 'n');
             $access->redirect($_SERVER['HTTP_REFERER']);
             return [];
         }

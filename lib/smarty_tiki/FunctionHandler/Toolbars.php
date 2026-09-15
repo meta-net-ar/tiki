@@ -10,12 +10,21 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use Tiki\Lib\core\Toolbar\ToolbarsList;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * Smarty plugin to display content only to some groups
  */
-class Toolbars extends Base
+class Toolbars extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'toolbars';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs, $is_html, $tiki_p_admin, $tiki_p_admin_toolbars, $section;

@@ -13,9 +13,18 @@ use TikiLib;
 use Feedback;
 use Tiki\BruteForce\BruteForce;
 use Tiki\Lib\Registration\Error as RegistrationError;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
-class UserRegistration extends Base
+class UserRegistration extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'user_registration';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs, $https_mode, $base_url_https, $user;

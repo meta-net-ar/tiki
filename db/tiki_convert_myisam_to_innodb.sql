@@ -279,4 +279,5 @@ ALTER TABLE `tiki_iot_apps` ENGINE = InnoDB;
 ALTER TABLE `tiki_iot_apps_actions_logs` ENGINE=InnoDB;
 ALTER TABLE `tiki_user_passwords_history` ENGINE = InnoDB;
 ALTER TABLE `tiki_password_reset_tokens` ENGINE = InnoDB;
+ALTER TABLE `tiki_xmpp_guest_credentials` ENGINE = InnoDB;
 ALTER TABLE `tiki_markdown_imports` ENGINE = InnoDB;

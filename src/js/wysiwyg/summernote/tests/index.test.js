@@ -16,6 +16,7 @@ vi.mock("../handlers/index", () => ({
     pluginEdit: vi.fn(),
     customCodeview: vi.fn(),
     dirtyCheck: vi.fn(),
+    userMention: vi.fn(() => vi.fn()),
 }));
 
 vi.mock("../handlers/formSubmission.helpers", () => ({
@@ -157,34 +158,6 @@ describe("initSummernote", () => {
         }
     });
 
-    test("should render the user mention modal when the @ key is pressed", () => {
-        const id = "foo";
-        const givenTextarea = $(`<textarea id="${id}"></textarea>`);
-        $("body").append(givenTextarea);
-
-        initSummernote(id, [], "en-US");
-
-        const givenEvent = { key: "@", preventDefault: vi.fn() };
-        givenTextarea.summernote.mock.calls[0][0].callbacks.onKeydown(givenEvent);
-
-        expect(window.renderUserMentionModal).toHaveBeenCalledWith(id);
-        expect(givenEvent.preventDefault).toHaveBeenCalled();
-    });
-
-    test("should not render the user mention modal when a key other than @ is pressed", () => {
-        const id = "foo";
-        const givenTextarea = $(`<textarea id="${id}"></textarea>`);
-        $("body").append(givenTextarea);
-
-        initSummernote(id, [], "en-US");
-
-        const givenEvent = { key: "a", preventDefault: vi.fn() };
-        givenTextarea.summernote.mock.calls[0][0].callbacks.onKeydown(givenEvent);
-
-        expect(window.renderUserMentionModal).not.toHaveBeenCalled();
-        expect(givenEvent.preventDefault).not.toHaveBeenCalled();
-    });
-
     test("should call the customCodeview handler when the codeview is toggled", () => {
         const id = "foo";
         const givenTextarea = $(`<textarea id="${id}"></textarea>`);
@@ -195,6 +168,23 @@ describe("initSummernote", () => {
         givenTextarea.summernote.mock.calls[0][0].callbacks.onCodeviewToggled();
 
         expect(Handlers.customCodeview).toHaveBeenCalledWith(givenTextarea);
+    });
+
+    test("should call the userMention handler on keydown", () => {
+        const id = "foo";
+        const givenTextarea = $(`<textarea id="${id}"></textarea>`);
+        $("body").append(givenTextarea);
+
+        const userMentionHandler = vi.fn();
+        Handlers.userMention.mockReturnValue(userMentionHandler);
+
+        initSummernote(id, [], "en-US");
+
+        expect(Handlers.userMention).toHaveBeenCalledWith(givenTextarea);
+
+        givenTextarea.summernote.mock.calls[0][0].callbacks.onKeydown();
+
+        expect(userMentionHandler).toHaveBeenCalled();
     });
 });
 

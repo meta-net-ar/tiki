@@ -152,6 +152,14 @@ function prefs_xmpp_list()
             'dependencies' => ['xmpp_feature'],
             'help' => $xmppHelp,
         ],
+        'xmpp_chat_button' => [
+            'name' => tra('Floating chat button'),
+            'default' => 'y',
+            'description' => tra('Show a floating "Chat" button site-wide. Turn this off to keep XMPP chat available only through PluginXMPP on specific pages.'),
+            'keywords' => 'xmpp jabber chat button floating bubble',
+            'type' => 'flag',
+            'dependencies' => ['xmpp_feature'],
+        ],
         'xmpp_domain_users' => [
             'name' => tra('XMPP domain for registered users'),
             'description' => tra('Domain used by XMPP server for authenticated members'),

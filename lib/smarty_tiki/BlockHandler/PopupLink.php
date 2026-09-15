@@ -9,9 +9,15 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class PopupLink extends Base
+class PopupLink extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'popup_link';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         global $prefs;

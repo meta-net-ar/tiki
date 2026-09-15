@@ -1320,6 +1320,7 @@ if (isset($_GET['slideshow'])) {
                         }
                     }
                 }
+                unset($file);
             }
 
             $smarty->assign_by_ref('files', $files['data']);

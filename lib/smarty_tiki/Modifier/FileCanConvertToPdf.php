@@ -7,6 +7,8 @@
 
 namespace SmartyTiki\Modifier;
 
+use SmartyTiki\TikiSmartyExtensionInterface;
+
 /**
  * Smarty plugin
  * -------------------------------------------------------------
@@ -15,8 +17,13 @@ namespace SmartyTiki\Modifier;
  * Purpose:  Checks if mimetype is supported to convert to PDF
  * -------------------------------------------------------------
  */
-class FileCanConvertToPdf
+class FileCanConvertToPdf implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'file_can_convert_to_pdf';
+    }
+
     public function handle($string)
     {
         return \Tiki\File\PDFHelper::canConvertToPDF($string);

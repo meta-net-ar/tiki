@@ -199,7 +199,7 @@ $.fn.setupEventCalendar = function (
             true
         );
 
-        const openNewEventModal = (startValue, endValue = null) => {
+        const openNewEventModal = (startValue, endValue = null, allDay = null) => {
             if (isOpeningModal) return;
             const countCals = $(".filtercal .calcheckbox").length;
             if (countCals >= 1 || targetId != "calendar") {
@@ -222,6 +222,10 @@ $.fn.setupEventCalendar = function (
                     params.prefill_tz = browserTimezone;
                 }
 
+                if (typeof allDay === "boolean") {
+                    params.prefill_allday = allDay ? 1 : 0;
+                }
+
                 if (endValue !== null && typeof endValue !== "undefined") {
                     const prefillEnd = toPrefillParamValue(endValue);
                     if (prefillEnd) {
@@ -230,19 +234,10 @@ $.fn.setupEventCalendar = function (
                 }
 
                 $.openModal({
-                    title: tr("New event"),
                     size: "modal-lg",
                     remote: $.service("calendar", "edit_item", params),
                     open: function () {
                         $(calendarEl).tikiModal();
-                        $("form:not(.no-ajax)", this)
-                            .addClass("no-ajax") // Remove default ajax handling, we replace it
-                            .on(
-                                "submit",
-                                ajaxSubmitEventHandler(function (data) {
-                                    calendarEditSubmit(data, this);
-                                })
-                            );
                         isOpeningModal = false;
                     },
                     error: function () {
@@ -443,7 +438,7 @@ $.fn.setupEventCalendar = function (
             eventSources: [{ url: urlEventSource }],
             select: function (info) {
                 // Handle Drag Selection
-                openNewEventModal(info.startStr ?? info.start, info.endStr ?? info.end);
+                openNewEventModal(info.startStr ?? info.start, info.endStr ?? info.end, info.allDay);
             },
             slotMinTime: eventCalendarParams.minHourOfDay,
             slotMaxTime: eventCalendarParams.maxHourOfDay,
@@ -673,19 +668,11 @@ $.fn.setupEventCalendar = function (
                 if (event.id && event.extendedProps.viewable) {
                     let $this = $(info.el).tikiModal(" ");
                     $.openModal({
-                        title: tr("New event"),
+                        title: tr("Event details"),
                         size: "modal-lg",
                         remote: "tiki-ajax_services.php?controller=calendar&action=view_item&calitemId=" + event.id + "&modal=1",
                         open: function () {
                             $this.tikiModal();
-                            $("form:not(.no-ajax)", this)
-                                .addClass("no-ajax") // Remove default ajax handling, we replace it
-                                .on(
-                                    "submit",
-                                    ajaxSubmitEventHandler(function (data) {
-                                        calendarEditSubmit(data, this);
-                                    })
-                                );
                         },
                     });
                 }
@@ -701,7 +688,10 @@ $.fn.setupEventCalendar = function (
             eventResize: function (info) {
                 $.post($.service("calendar", "resize"), {
                     calitemId: info.event.id,
-                    delta: info.endDelta,
+                    delta: info.endDelta.seconds,
+                }).fail(function () {
+                    info.revert();
+                    showMessage(tr("The event could not be resized."), "error");
                 });
             },
             eventDrop: function (info) {
@@ -715,6 +705,14 @@ $.fn.setupEventCalendar = function (
         });
     });
 };
+
+$(document).on("click", ".add-calendar-event", function (event) {
+    event.preventDefault();
+    $.openModal({
+        size: "modal-lg",
+        remote: $(this).attr("href"),
+    });
+});
 
 // open modal for edit form
 $(document).on("click", ".edit-calendar-item-btn", function (e) {
@@ -730,15 +728,6 @@ $(document).on("click", ".edit-calendar-item-btn", function (e) {
                     remote: $this.attr("href"),
                     open: function () {
                         $this.tikiModal();
-
-                        $("form:not(.no-ajax)", this)
-                            .addClass("no-ajax") // Remove default ajax handling, we replace it
-                            .on(
-                                "submit",
-                                ajaxSubmitEventHandler(function (data) {
-                                    calendarEditSubmit(data, this);
-                                })
-                            );
                     },
                 });
             },

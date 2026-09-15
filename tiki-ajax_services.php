@@ -157,6 +157,27 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         }
 
         $access->output_serialized($finalusers);
+    } elseif ($listonly == 'usersautocomplete') {
+        $names_array = explode(',', str_replace(';', ',', $query));
+        $last_name = trim(end($names_array));
+        $groups = $jitRequest->groups->text();
+        $groups = $groups ? explode(',', $groups) : [];
+        $listusers = $userlib->get_users_light(0, -1, 'login_asc', $last_name, $groups);
+
+        $finalusers = [];
+        foreach ($listusers as $usrId => $usr) {
+            if (isset($last_name)) {
+                $longusr = $usr . ' (' . $usrId . ')';
+                if (stripos($longusr, $last_name) !== false) {
+                    $finalusers[] = [
+                        'username' => $usrId,
+                        'realname' => $usr != $usrId ? $usr : '',
+                        'avatar' => $userlib->get_user_avatar($usrId, '', 'xSmall'),
+                    ];
+                }
+            }
+        }
+        $access->output_serialized($finalusers);
     } elseif ($listonly == 'tags') {
         $freetaglib = TikiLib::lib('freetag');
 

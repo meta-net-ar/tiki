@@ -106,7 +106,7 @@ function wikiplugin_localfiles($data, $params)
             // thanks http://www.php.net/manual/en/function.pathinfo.php#107461
         }
         if ($params['icons'] === 'y') {
-            $iconhtml = smarty_modifier_iconify($info['basename']);
+            $iconhtml = \SmartyTiki\Modifier\Iconify::apply($info['basename']);
         }
 
         $files[] = [

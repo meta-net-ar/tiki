@@ -9,6 +9,7 @@ namespace SmartyTiki\Modifier;
 
 use Kint\Kint;
 use SmartyTiki\Utils\SmartyKint;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * If installed, this modifier will use Kint (from https://github.com/kint-php/kint/)
@@ -20,8 +21,13 @@ use SmartyTiki\Utils\SmartyKint;
  *
  *     {$smarty.request|d}
  */
-class D
+class D implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'd';
+    }
+
     public function handle($var, $modifier = '')
     {
         if (is_callable('Kint::dump')) {

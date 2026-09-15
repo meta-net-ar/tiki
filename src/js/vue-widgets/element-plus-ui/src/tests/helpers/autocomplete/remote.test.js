@@ -1,8 +1,12 @@
-import { describe, test, vi, expect, afterEach } from "vitest";
+import { describe, test, vi, expect, afterEach, beforeEach } from "vitest";
 import { fetchSuggestions } from "../../../helpers/autocomplete/remote";
 
 describe("Autocomplete remote helper functions", () => {
     describe("fetchSuggestions", () => {
+        beforeEach(() => {
+            window.jqueryTiki = {};
+        });
+
         afterEach(() => {
             vi.clearAllMocks();
         });

@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty plugin
@@ -29,8 +30,13 @@ use Smarty\Template;
  *
  * @return string           Content to display if allowed
  */
-class TrackerItemCheck extends Base
+class TrackerItemCheck extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'trackeritemcheck';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {

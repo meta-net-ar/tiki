@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class SchedulerParams extends Base
+class SchedulerParams extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'scheduler_params';
+    }
+
     public function handle($params, Template $template)
     {
         if (empty($params['name'])) {
@@ -34,7 +40,7 @@ class SchedulerParams extends Base
 
         if (is_array($inputParams)) {
             foreach ($inputParams as $key => $param) {
-                $escapedParam = (isset($schedulerParams[$key])) ? smarty_modifier_escape($schedulerParams[$key]) : '';
+                $escapedParam = (isset($schedulerParams[$key])) ? \SmartyTiki\Modifier\Escape::apply($schedulerParams[$key]) : '';
                 $inputKey = $taskName . '_' . $key;
 
                 switch ($param['type']) {
@@ -56,8 +62,8 @@ class SchedulerParams extends Base
 
                 $infoHtml = '';
                 if (! empty($param['description'])) {
-                    $description = smarty_modifier_escape($param['description']);
-                    $icon = smarty_function_icon(['name' => 'information'], $template);
+                    $description = \SmartyTiki\Modifier\Escape::apply($param['description']);
+                    $icon = \SmartyTiki\FunctionHandler\Icon::render(['name' => 'information'], $template);
 
                     $infoHtml = <<<HTML
     <a class="tikihelp text-info" title="{$param['name']}: {$description}">

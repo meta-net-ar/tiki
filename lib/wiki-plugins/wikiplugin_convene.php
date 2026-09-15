@@ -356,9 +356,9 @@ function wikiplugin_convene($data, $params): string
 
         if ($lockDate < $tikiDate) {
             $params['locked'] = 'y';
-            $autolockMessage = tr('Voting ended: %0', smarty_modifier_tiki_short_datetime($params['autolock']));
+            $autolockMessage = tr('Voting ended: %0', \SmartyTiki\Modifier\TikiShortDateTime::apply($params['autolock']));
         } else {
-            $autolockMessage = tr('Voting ends: %0', smarty_modifier_tiki_short_datetime($params['autolock']));
+            $autolockMessage = tr('Voting ends: %0', \SmartyTiki\Modifier\TikiShortDateTime::apply($params['autolock']));
         }
     }
 

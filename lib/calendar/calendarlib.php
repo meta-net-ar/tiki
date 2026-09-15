@@ -441,40 +441,7 @@ class CalendarLib extends TikiLib
             return [];
         }
 
-        $calIdsCanAdmin = Perms::filter(
-            ['type' => 'calendar'],
-            'object',
-            array_map(function ($calId) {
-                return ['calendarId' => $calId];
-            }, $calIds),
-            [ 'object' => 'calendarId' ],
-            'admin_calendar'
-        );
-        $calIdsCanAdmin = array_map(function ($object) {
-            return intval($object['calendarId']);
-        }, $calIdsCanAdmin);
-        if (empty($calIdsCanAdmin)) {
-            $calIdsCanAdmin[] = 0;
-        }
-
-        $where = [];
-        $bindvars = [];
-        foreach ($calIds as $calendarId) {
-            $where[] = "i.`calendarId`=?";
-            $bindvars[] = (int)$calendarId;
-        }
-
-        $cond = "(" . implode(" or ", $where) . ") and ";
-        $cond .= " ((i.`start` > ? and i.`end` < ?) or (i.`start` < ? and i.`end` > ?))";
-
-        $bindvars[] = (int)$tstart;
-        $bindvars[] = (int)$tstop;
-        $bindvars[] = (int)$tstop;
-        $bindvars[] = (int)$tstart;
-
-        $cond .= " and (c.`personal` != 'y' or (c.`personal`='y' and c.`private` = 'n' and i.`user`=?) or (c.`personal` = 'y' and c.`private` = 'y' and (i.`user` = ? or c.calendarId in (" . implode(', ', $calIdsCanAdmin) . "))))";
-        $bindvars[] = $user;
-        $bindvars[] = $user;
+        [$cond, $bindvars] = $this->buildCalendarItemRangeCondition($calIds, $user, $tstart, $tstop);
 
         $query = "select i.`calitemId` as `calitemId` ";
         $queryCompl = '';
@@ -565,6 +532,89 @@ class CalendarLib extends TikiLib
         }
 
         return $ret;
+    }
+
+    /**
+     * Return the fields used to draw the interactive calendar.
+     *
+     * The grid does not need participants, attachments or other data loaded by get_item().
+     *
+     * @param int[] $calIds
+     * @return array<int, array<string, mixed>>
+     */
+    public function listEventFeedItems(array $calIds, $user, int $tstart, int $tstop): array
+    {
+        if (empty($calIds)) {
+            return [];
+        }
+
+        $calIds = array_values(array_unique(array_map('intval', $calIds)));
+        [$cond, $bindvars] = $this->buildCalendarItemRangeCondition($calIds, $user, $tstart, $tstop);
+
+        $query = "SELECT i.`calitemId`, i.`calendarId`, i.`start`, i.`end`, i.`name`, "
+            . "i.`description`, i.`allday`, cc.`backgroundColor` AS `categoryBackgroundColor` "
+            . "FROM `tiki_calendar_items` i "
+            . "INNER JOIN `tiki_calendars` c ON c.`calendarId` = i.`calendarId` "
+            . "LEFT JOIN `tiki_calendar_categories` cc ON cc.`calcatId` = i.`categoryId` "
+            . "WHERE ($cond) "
+            . "ORDER BY i.`start` ASC, i.`calendarId` ASC";
+
+        return $this->fetchAll($query, $bindvars);
+    }
+
+    /**
+     * Build the calendar, date and privacy conditions shared by both item queries.
+     *
+     * @param array<int|string> $calIds
+     * @return array{0:string,1:array<int, mixed>}
+     */
+    private function buildCalendarItemRangeCondition(array $calIds, $user, int $tstart, int $tstop): array
+    {
+        $calIdsCanAdmin = Perms::filter(
+            ['type' => 'calendar'],
+            'object',
+            array_map(
+                static function ($calendarId): array {
+                    return ['calendarId' => $calendarId];
+                },
+                $calIds
+            ),
+            ['object' => 'calendarId'],
+            'admin_calendar'
+        );
+        $calIdsCanAdmin = array_map(
+            static function (array $object): int {
+                return (int) $object['calendarId'];
+            },
+            $calIdsCanAdmin
+        );
+        if (empty($calIdsCanAdmin)) {
+            $calIdsCanAdmin[] = 0;
+        }
+
+        $where = [];
+        $bindvars = [];
+        foreach ($calIds as $calendarId) {
+            $where[] = "i.`calendarId` = ?";
+            $bindvars[] = (int) $calendarId;
+        }
+
+        $adminCalendarIds = implode(', ', $calIdsCanAdmin);
+        $condition = '(' . implode(' OR ', $where) . ') '
+            . "AND ((i.`start` > ? AND i.`end` < ?) OR (i.`start` < ? AND i.`end` > ?)) "
+            . "AND (c.`personal` != 'y' "
+            . "OR (c.`personal` = 'y' AND c.`private` = 'n' AND i.`user` = ?) "
+            . "OR (c.`personal` = 'y' AND c.`private` = 'y' "
+            . "AND (i.`user` = ? OR c.`calendarId` IN ($adminCalendarIds))))";
+
+        $bindvars[] = $tstart;
+        $bindvars[] = $tstop;
+        $bindvars[] = $tstop;
+        $bindvars[] = $tstart;
+        $bindvars[] = $user;
+        $bindvars[] = $user;
+
+        return [$condition, $bindvars];
     }
 
     /**

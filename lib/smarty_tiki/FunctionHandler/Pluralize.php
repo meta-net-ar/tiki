@@ -9,14 +9,20 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * \brief Smarty plugin to return plural or singular form of given word based on count
  * Usage format {pluralize word_count=2 singular_form="mouse" plural_form="mice"}
  *
  */
-class Pluralize extends Base
+class Pluralize extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'pluralize';
+    }
+
     public function handle($params, Template $template)
     {
         if (empty($params['singular_form']) || ! isset($params['word_count'])) {

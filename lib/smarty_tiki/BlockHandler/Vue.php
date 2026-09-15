@@ -9,6 +9,8 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\BlockHandlerStaticFacadeTrait;
 
 /**
  * \brief Smarty {vue} block handler to contain a vue.js component
@@ -49,8 +51,15 @@ use Smarty\Template;
  * @return string
  * @throws Exception
  */
-class Vue extends Base
+class Vue extends Base implements TikiSmartyExtensionInterface
 {
+    use BlockHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'vue';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat || empty($content)) {

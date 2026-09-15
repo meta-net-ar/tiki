@@ -9,9 +9,15 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class IfSearchNotExists extends Base
+class IfSearchNotExists extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'ifsearchnotexists';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if (empty($params['type']) || empty($params['id'])) {

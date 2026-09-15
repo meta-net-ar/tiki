@@ -9,12 +9,18 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /** {set var=$name value=$value}
  * do the same than assign but accept a varaible as var name
  */
-class Set extends Base
+class Set extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'set';
+    }
+
     public function handle($params, Template $template)
     {
         $smarty = \TikiLib::lib('smarty');

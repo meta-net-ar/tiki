@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Importer\Markdown\Scanner;
 
+use Tiki\Lib\Importer\Markdown\Parser\CommonMarkPurifier;
+
 /**
  * MarkdownFileAnalyzer
  * Pure business logic for analyzing markdown files.
@@ -97,20 +99,15 @@ class MarkdownFileAnalyzer
         ];
     }
 
-    /** Remove YAML front-matter if present. */
+    /** Remove YAML front-matter if present, delegating to the shared implementation. */
     private function removeFrontMatter(string $raw, bool &$hadFM = false, ?string &$fmTitle = null): string
     {
-        $hadFM = false;
+        [$body, $hadFM, $fmBlock] = CommonMarkPurifier::removeFrontMatter($raw);
         $fmTitle = null;
-        if (preg_match('/^---\s*\r?\n(.*?)\r?\n---\s*\r?\n/s', $raw, $m)) {
-            $hadFM = true;
-            $fm    = $m[1];
-            if (preg_match('/^\s*title\s*:\s*(.+)$/mi', $fm, $tm)) {
-                $fmTitle = trim($this->trimQuotes($tm[1]));
-            }
-            return (string)substr($raw, strlen($m[0]));
+        if ($hadFM && preg_match('/^\s*title\s*:\s*(.+)$/mi', (string)$fmBlock, $tm)) {
+            $fmTitle = trim($this->trimQuotes($tm[1]));
         }
-        return $raw;
+        return $body;
     }
 
     private function trimQuotes(string $s): string

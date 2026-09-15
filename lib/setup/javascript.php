@@ -260,6 +260,8 @@ if (! timezone) {
     $jqueryTiki['queued_tasks_js_processing_disabled'] = ($prefs['queued_tasks_js_processing_disabled'] ?? 'n') === 'y';
     $jqueryTiki['calendar_pdf_export_layout'] = $prefs['calendar_pdf_export_layout'];
     $jqueryTiki['feature_search_show_object_type'] = $prefs['feature_search_show_object_type'] === 'y';
+    $jqueryTiki['user_mention_enabled'] = $prefs['feature_tag_users'] === 'y';
+    $jqueryTiki['tiki_object_selector_wildcardsearch'] = $prefs['tiki_object_selector_wildcardsearch'] === 'y';
 // Check if user has active tasks (Pending or InProgress) to enable smart polling
     $hasActiveJobs = false;
     if (($prefs['feature_queued_tasks'] ?? 'n') === 'y') {

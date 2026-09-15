@@ -19,6 +19,7 @@ function wikiplugin_xmpp_info()
                 'name' => tra('Room Name'),
                 'description' => tr('Room to auto-join'),
                 'since' => 19,
+                'default' => '',
                 'filter' => 'text',
             ],
             'view_mode' => [
@@ -48,7 +49,7 @@ function wikiplugin_xmpp_info()
                 'name' => tra('Height'),
                 'description' => tra('Chat room height in CSS units'),
                 'since' => 19,
-                'default' => '400px',
+                'default' => '600px',
                 'filter' => 'imgsize',
             ],
             'visibility' => [
@@ -107,6 +108,7 @@ function wikiplugin_xmpp_info()
             'groups' => [
                 'name' => tra('Groups (comma-separated)'),
                 'description' => tra('Allowed groups to use this resource'),
+                'default' => '',
                 'filter' => 'alpha',
                 'required' => false,
                 'separator' => ',',
@@ -159,6 +161,18 @@ function wikiplugin_xmpp_info()
                     ['text' => tra('No'), 'value' => 'n'],
                 ],
             ],
+            'auto_open' => [
+                'name' => tra('Auto-open'),
+                'description' => tra('If this room should open automatically instead of staying minimized/hidden until the visitor clicks the chat button. Always shown when view_mode is embedded or fullscreen, regardless of this setting.'),
+                'default' => 'n',
+                'filter' => 'alpha',
+                'required' => false,
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
+                ],
+            ],
         ],
     ];
 }
@@ -171,17 +185,22 @@ function wikiplugin_xmpp($data, $params)
     $servicelib = TikiLib::lib('service');
     $smarty = TikiLib::lib('smarty');
 
-    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_xmpp_info());
-
-    $anonMode = trim($prefs['xmpp_anonymous_mode'] ?? '');
-    $isAnonymous = ($params['visibility'] ?? '') === 'anonymous';
-    $dmMode = $isAnonymous && $anonMode === 'support';
     $params['view_mode'] = $params['view_mode'] ?? 'overlayed';
+    $pluginDefaultViewMode = $params['view_mode'];
+    $viewModeCookie = $_COOKIE['tiki_xmpp_view_mode'] ?? '';
+    [$cookieDefault, $cookieChoice] = array_pad(explode(':', $viewModeCookie, 2), 2, '');
+    if ($cookieDefault === $pluginDefaultViewMode && in_array($cookieChoice, ['overlayed', 'embedded', 'fullscreen'], true)) {
+        $params['view_mode'] = $cookieChoice;
+    }
     $params['width'] = $params['width'] ?? '100%';
-    $params['height'] = $params['height'] ?? '400px';
+    $params['height'] = $params['height'] ?? '600px';
+    if (! isset($params['auto_open'])) {
+        $params['auto_open'] = 'n';
+    }
 
-    // Require room only when not in anonymous support (DM) mode
-    if (! $dmMode && empty($params['room'])) {
+    $params['anonymous_auto_open'] = $params['auto_open'];
+
+    if (empty($params['room'])) {
         Feedback::error(tr('PluginXMPP Error: No room specified'));
         return '';
     }
@@ -189,30 +208,10 @@ function wikiplugin_xmpp($data, $params)
     $visibility = $params['visibility'] ?? 'anonymous';
     $params['anonymous'] = $visibility === 'anonymous' ? 'y' : 'n';
 
-    // If anonymous → force the room defined in prefs
-    if (empty($user) && isset($params['anonymous']) && $params['anonymous'] === 'y') {
-        $anonMode      = $prefs['xmpp_anonymous_mode'] ?? 'community';
-        $communityRoom = trim($prefs['xmpp_anonymous_room'] ?? '');
-        $supportRoom   = trim($prefs['xmpp_anonymous_support_room'] ?? '');
-        $targetRoom    = '';
-        $xmpplib = TikiLib::lib('xmpp');
-
-        if ($dmMode) {
-            // Personalized support: direct message target, no MUC
-            $params['dm_target'] = trim($prefs['xmpp_admin_jid'] ?? '');
-            unset($params['room']);
-        } elseif ($anonMode === 'community' && $communityRoom !== '') {
-            $targetRoom = $communityRoom;
-        }
-
-        // Never override anonymous room with plugin value
-        if (! empty($user) && $targetRoom === '' && ! empty($params['room'])) {
-            $targetRoom = $params['room'];
-        }
-
-        if ($targetRoom !== '') {
-            $params['room'] = $targetRoom;
-        }
+    if (empty($user) && $params['anonymous'] !== 'y') {
+        return '<div class="alert alert-warning">'
+            . tra('This chat room is restricted.')
+            . '</div>';
     }
 
     if (! empty($user) && ($params['anonymous'] ?? 'n') !== 'y') {
@@ -230,11 +229,51 @@ function wikiplugin_xmpp($data, $params)
         }
     }
 
-    $result = '<style type="text/css">#page-bar .dropdown-menu { z-index: 1031; }</style>'
-        . '<div id="conversejs"'
+    $xmpplib = $xmpplib ?? TikiLib::lib('xmpp');
+    $roomJid = $xmpplib->buildRoomJid($params['room']);
+    $roomConfig = [
+        'muc#roomconfig_persistentroom' => ($params['persistent'] ?? 'y') === 'y' ? '1' : '0',
+        'muc#roomconfig_enablelogging' => ($params['archiving'] ?? 'y') === 'y' ? '1' : '0',
+        'muc#roomconfig_moderatedroom' => ($params['moderated'] ?? 'y') === 'y' ? '1' : '0',
+        'muc#roomconfig_publicroom' => ($params['secret'] ?? 'n') === 'y' ? '0' : '1',
+    ];
+    $configCacheKey = md5(serialize($roomConfig));
+    if (($_SESSION['xmpp_room_configured'][$roomJid] ?? '') !== $configCacheKey) {
+        $xmpplib->ensureRoomExists($roomJid, $roomConfig);
+        $_SESSION['xmpp_room_configured'][$roomJid] = $configCacheKey;
+    }
+
+    $identitySwitcher = '';
+    if (! empty($user)) {
+        $jidInfo = $xmpplib->getJidInfoForUser($user);
+        if ($jidInfo['isExternal']) {
+            $usingExternal = ($_COOKIE['tiki_xmpp_external'] ?? '') === '1';
+            $localJid = htmlspecialchars((string) ($jidInfo['localJid'] ?? ''), ENT_QUOTES, 'UTF-8');
+            $externalJid = htmlspecialchars((string) ($jidInfo['externalJid'] ?? ''), ENT_QUOTES, 'UTF-8');
+
+            $identityButton = function (string $identity, string $jidLabel, bool $active) {
+                $class = $active ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary';
+                $check = $active ? '<i class="fa fa-check-circle me-1" aria-hidden="true"></i>' : '';
+                return '<button type="button" class="' . $class . '" data-tiki-xmpp-identity="' . $identity . '"'
+                    . ' aria-pressed="' . ($active ? 'true' : 'false') . '">' . $check . $jidLabel . '</button>';
+            };
+
+            $identitySwitcher = '<div class="tiki-xmpp-identity-switcher mb-3 d-flex flex-wrap align-items-center gap-2" role="group" aria-label="' . tra('Chat identity') . '">'
+                . '<strong>' . tra('Chat as:') . '</strong> '
+                . $identityButton('local', $localJid, ! $usingExternal)
+                . $identityButton('external', $externalJid, $usingExternal)
+                . '</div>';
+        }
+    }
+
+    $conversejsTag = $params['view_mode'] === 'embedded' ? 'converse-root' : 'div';
+    $result = $identitySwitcher
+        . '<style type="text/css">#page-bar .dropdown-menu { z-index: 1031; }</style>'
+        . '<' . $conversejsTag . ' id="conversejs"'
         . ' data-view-mode="' . $params['view_mode'] . '"'
+        . ' data-plugin-default-view-mode="' . htmlspecialchars($pluginDefaultViewMode, ENT_QUOTES, 'UTF-8') . '"'
         . ' style="' . "width:{$params['width']}; height:{$params['height']}" . '"'
-        . '></div>';
+        . '></' . $conversejsTag . '>';
 
     unset($params['width'], $params['height']);
 
@@ -262,14 +301,11 @@ function wikiplugin_xmpp($data, $params)
         unset($url, $item);
     }
 
-    if ($params['view_mode'] === 'fullscreen') {
-        // supress to avoid conflict
-        $headerlib->unsafeClearAllCss();
-    }
-
     $javascript = 'lib/jquery_tiki/wikiplugin-xmpp.js';
     $headerlib->add_jsfile_late($javascript . '?_=' . filemtime(TIKI_PATH . "/$javascript"), false);
 
+    $params['on_xmpp_page'] = 'y';
+    $params['auto_open'] = $params['auto_open'] ?? 'n';
     TikiLib::lib('xmpp')->render_xmpp_client($params);
 
     $result .= $smarty->fetch('wiki-plugins/wikiplugin_xmpp.tpl');

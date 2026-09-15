@@ -47,8 +47,8 @@ function wikiplugin_exercise($data, $params)
     }
 
     if ($answer) {
-        $escapedAnswer = smarty_modifier_escape($answer);
-        $escapedId = smarty_modifier_escape('exercise-' . $nextId++);
+        $escapedAnswer = \SmartyTiki\Modifier\Escape::apply($answer);
+        $escapedId = \SmartyTiki\Modifier\Escape::apply('exercise-' . $nextId++);
 
         if ($incorrect = $params->incorrect->text()) {
             $exercises = wikiplugin_exercise_parse_argument($incorrect);
@@ -148,10 +148,10 @@ function wikiplugin_exercise_finalize()
 {
     $smarty = TikiLib::lib('smarty');
 
-    $checkYourScore = smarty_modifier_escape(tr('Check your score'));
+    $checkYourScore = \SmartyTiki\Modifier\Escape::apply(tr('Check your score'));
     $yourScoreIs = tr('You scored %0 out of %1', '~SCORE~', '~TOTAL~');
-    $checkIcon = smarty_function_icon(['_id' => 'tick', 'title' => tr('Good!')], $smarty->getEmptyInternalTemplate());
-    $crossIcon = smarty_function_icon(['_id' => 'cross', 'title' => tr('Oops!')], $smarty->getEmptyInternalTemplate());
+    $checkIcon = \SmartyTiki\FunctionHandler\Icon::render(['_id' => 'tick', 'title' => tr('Good!')], $smarty->getEmptyInternalTemplate());
+    $crossIcon = \SmartyTiki\FunctionHandler\Icon::render(['_id' => 'cross', 'title' => tr('Oops!')], $smarty->getEmptyInternalTemplate());
 
     $js = <<<JS
 $.exerciseFinalize = function (random) {

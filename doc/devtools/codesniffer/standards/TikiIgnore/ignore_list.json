@@ -399,12 +399,6 @@
         "lib/captcha/Captcha_ReCaptcha20.php": {
             "class:Captcha_ReCaptcha20": true
         },
-        "lib/smarty_tiki/resource.tplwiki.php": {
-            "class:Smarty_Resource_Tplwiki": true
-        },
-        "lib/smarty_tiki/resource.wiki.php": {
-            "class:Smarty_Resource_Wiki": true
-        },
         "lib/userslib.php": {
             "class:UsersLib": true
         },
@@ -7280,12 +7274,6 @@
         },
         "lib/captcha/Captcha_ReCaptcha20.php": {
             "Captcha_ReCaptcha20": true
-        },
-        "lib/smarty_tiki/resource.tplwiki.php": {
-            "Smarty_Resource_Tplwiki": true
-        },
-        "lib/smarty_tiki/resource.wiki.php": {
-            "Smarty_Resource_Wiki": true
         },
         "lib/test/Calendar/DateTest.php": {
             "Calendar_DateTest": true

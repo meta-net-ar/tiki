@@ -1,5 +1,22 @@
 {title help="Token Access"}{tr}Admin Tokens{/tr}{/title}
 
+{remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
+    {tr}Rotating the token signing secret immediately revokes all existing token access links. They will stop working and new tokens will need to be created.{/tr}
+{/remarksbox}
+
+<form action="tiki-admin_tokens.php" method="post" class="mb-4">
+    {ticket}
+    <button
+        type="submit"
+        name="rotate_secret"
+        value="1"
+        class="btn btn-danger"
+        onclick="return confirm('{tr}Rotate the token signing secret and revoke all existing tokens?{/tr}');"
+    >
+        {tr}Rotate token signing secret{/tr}
+    </button>
+</form>
+
 {tabset name="tabs_admtokens"}
     {tab name="{tr}List tokens{/tr}"}
         <h2>{tr}List tokens{/tr}</h2>

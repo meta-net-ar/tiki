@@ -54,7 +54,7 @@ function wikiplugin_h5p($data, $params)
         $params['index'] = $instance;
     }
 
-    return smarty_function_service_inline($params, $smarty->getEmptyInternalTemplate());
+    return \SmartyTiki\FunctionHandler\ServiceInline::render($params, $smarty->getEmptyInternalTemplate());
 }
 
 function wikiplugin_h5p_rewrite($data, $params, $context)

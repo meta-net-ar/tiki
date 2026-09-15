@@ -9,6 +9,8 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\BlockHandlerStaticFacadeTrait;
 
 /**
  * smarty_block_pagination_links: Generate pagination links
@@ -45,8 +47,15 @@ use Smarty\Template;
  *  - _onclick : to allow for custom onclick for link
  *  - offset_jsvar : the variable name of the javascript variable to store the requested offset when pagination link is clicked (does not work with reloff).
  */
-class PaginationLinks extends Base
+class PaginationLinks extends Base implements TikiSmartyExtensionInterface
 {
+    use BlockHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'pagination_links';
+    }
+
     public function handle($params, $url, Template $template, &$repeat)
     {
         global $prefs;
@@ -158,7 +167,7 @@ class PaginationLinks extends Base
             if (isset($params['_keepall'])) {
                 $query_params['_keepall'] = $params['_keepall'];
             }
-            $url = smarty_function_query($query_params, $template);
+            $url = \SmartyTiki\FunctionHandler\Query::render($query_params, $template);
         }
 
         // remove empty url arguments (done by default)
@@ -232,7 +241,8 @@ class PaginationLinks extends Base
                         $params['_onclick'] = $params['offset_jsvar'] . "=$linkoffset;" . $params['_onclick'];
                     }
 
-                    $link .= smarty_block_ajax_href(
+                    $repeat = false;
+                    $link .= \SmartyTiki\BlockHandler\AjaxHref::render(
                         [
                             'template' => $params['template'],
                             'htmlelement' => $params['htmlelement'],
@@ -241,7 +251,7 @@ class PaginationLinks extends Base
                         ],
                         $url,
                         $smarty->getEmptyInternalTemplate(),
-                        false
+                        $repeat
                     );
                 } else {
                     $link .= " href=\"$url\" ";

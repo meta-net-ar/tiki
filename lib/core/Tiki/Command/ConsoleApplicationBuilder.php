@@ -85,6 +85,7 @@ class ConsoleApplicationBuilder
                 new FixBOMandUnixCommand(),
                 new GetStringsCommand(),
                 new BuildIconsListCommand(),
+                new SmartyGenerateMappingCommand(),
                 ],
             ],[
             'condition' => 'checkIsDevMode',
@@ -204,6 +205,7 @@ class ConsoleApplicationBuilder
                 new UsersTemporaryCommand(),
                 new TokensClearCommand(),
                 new ApiTokensRevokeAllCommand(),
+                new TokensRotateSecretCommand(),
                 new McpTokenCreateCommand(),
                 new CookiesClearCommand(),
                 new StatsCommand(),

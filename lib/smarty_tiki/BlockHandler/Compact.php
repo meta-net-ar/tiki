@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty block Compact
@@ -18,8 +19,13 @@ use Smarty\Template;
  * to strip all HTML at once... And it have no nasty BUG which is incorrectly
  * join some words together...
  */
-class Compact extends Base
+class Compact extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'compact';
+    }
+
     public function handle($params, $content, Template $template, &$repeat)
     {
         if ($repeat) {

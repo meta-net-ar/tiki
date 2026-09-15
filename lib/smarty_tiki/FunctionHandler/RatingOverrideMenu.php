@@ -10,9 +10,15 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class RatingOverrideMenu extends Base
+class RatingOverrideMenu extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'rating_override_menu';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;

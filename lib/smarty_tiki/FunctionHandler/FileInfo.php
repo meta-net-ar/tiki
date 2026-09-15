@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /*
  * smarty_function_fileinfo: Display one info/property of a file (from a file gallery)
@@ -18,8 +19,13 @@ use Smarty\Template;
  *  - _field: Return the value of the specified field/property
  *  - _link: Return the result inside an A tag that links to the image. The value of _link will be used to match the 'name' attribute of images to use for shadowbox (if feature shadowbox is enabled)
  */
-class FileInfo extends Base
+class FileInfo extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'fileinfo';
+    }
+
     public function handle($params, Template $template)
     {
         if (! is_array($params) || ! isset($params['_id']) || ! isset($params['_field'])) {

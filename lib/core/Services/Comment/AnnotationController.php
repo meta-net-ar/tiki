@@ -253,7 +253,7 @@ class Services_Comment_AnnotationController
     private function createTitle($text)
     {
         $smarty = TikiLib::lib('smarty');
-        return smarty_modifier_truncate($text, 50);
+        return \SmartyTiki\Modifier\Truncate::apply($text, 50);
     }
 
     /**

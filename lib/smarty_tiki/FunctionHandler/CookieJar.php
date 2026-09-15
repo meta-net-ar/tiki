@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * smarty_function_cookie_jar handler: Get a cookie value from the Tiki Cookie Jar
@@ -16,8 +17,13 @@ use Smarty\Template;
  * params:
  *    - name: Name of the cookie
  */
-class CookieJar extends Base
+class CookieJar extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'cookie_jar';
+    }
+
     public function handle($params, Template $template)
     {
         if (empty($params['name'])) {

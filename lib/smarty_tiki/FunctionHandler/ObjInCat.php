@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Smarty function obj_in_cat handler
@@ -22,8 +23,13 @@ use Smarty\Template;
  *               catnumber is the category Id# eg catnumber=3
  * -------------------------------------------------------------
  */
-class ObjInCat extends Base
+class ObjInCat extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'obj_in_cat';
+    }
+
     public function handle($params, Template $template)
     {
         $categlib = \TikiLib::lib('categ');

@@ -8,6 +8,7 @@
 namespace SmartyTiki\Modifier;
 
 use SmartyTiki\Utils\StyleType;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
 /**
  * Converts a positive integer into a selected format.
@@ -25,8 +26,13 @@ use SmartyTiki\Utils\StyleType;
  *
  * eg. {14|numStyle:'upper-roman'}
  */
-class NumStyle
+class NumStyle implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'numStyle';
+    }
+
     public function handle($num, $type)
     {
         $style = new StyleType();

@@ -116,6 +116,7 @@ function prefs_wikiplugin_list($partial = false)
         $out['wikiplugin_list_gui'] = ['default' => 'y'];
         $out['wikiplugin_list_convert_trackerlist'] = ['default' => 'n'];
         $out['wikiplugin_maximum_passes'] = ['default' => 500];
+        $out['wikiplugin_fade_default_expanded'] = ['default' => 'n'];
 
         return $out;
     }
@@ -209,6 +210,14 @@ function prefs_wikiplugin_list($partial = false)
         'tags' => ['advanced'],
         'warning' => tr('Security-sensitive setting. Keep this list minimal and avoid allowing the Tiki installation directory.'),
         'hint' => tr('Set this using system configuration (tiki.ini/local.ini) so it can be forced by host policy.'),
+    ];
+
+    $prefs['wikiplugin_fade_default_expanded'] = [
+        'name' => tra('Fade plugin default expanded'),
+        'description' => tra('When wiki authors omit the expanded parameter, start Fade plugin sections open (expanded) or closed (collapsed).'),
+        'type' => 'flag',
+        'default' => 'n',
+        'dependencies' => ['wikiplugin_fade'],
     ];
 
     return $prefs;

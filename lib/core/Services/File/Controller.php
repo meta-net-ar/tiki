@@ -86,6 +86,7 @@ class Services_File_Controller
             'requireTitle'          => $input->requireTitle->text(),
             'changeFileNameOnUpload' => $input->changeFileNameOnUpload->int(),
             'directoryPattern'      => $input->directoryPattern->text(),
+            'subdirectoryBehavior'  => $this->normalizeSubdirectoryBehavior($input->subdirectoryBehavior->word()),
         ];
 
         if ($input->uploadInModal->int()) {
@@ -170,7 +171,8 @@ class Services_File_Controller
             $title = $name;
         }
 
-        if ($directory = $input->directory->text()) {
+        $subdirectoryBehavior = $this->normalizeSubdirectoryBehavior($input->subdirectoryBehavior->word());
+        if ($subdirectoryBehavior === 'subgalleries' && ($directory = $input->directory->text())) {
             $gal_info = $this->utilities->findOrCreateDirectoryHierarchy($gal_info['galleryId'], $directory);
         }
 
@@ -216,11 +218,22 @@ class Services_File_Controller
         $cat_name = $name;
         $cat_href = "tiki-download_file.php?fileId=$fileId";
 
-        if ($categories) {
-            $_REQUEST['cat_categories'] = $categories;
-            $_REQUEST["cat_categorize"] = 'on';
+        // Categories are either posted by the form or, on a replace, already on the file.
+        $postedCategories = [];
+        if (isset($_REQUEST['cat_categorize']) && $_REQUEST['cat_categorize'] === 'on' && ! empty($_REQUEST['cat_categories'])) {
+            $postedCategories = array_filter(array_map('intval', (array) $_REQUEST['cat_categories']));
         }
-        include('categorize.php');
+
+        if ($postedCategories) {
+            $_REQUEST['cat_categories'] = $postedCategories;
+            include('categorize.php');
+        } elseif ($categories) {
+            // Replacing a file with nothing posted: keep what it already had.
+            $_REQUEST['cat_categories'] = $categories;
+            $_REQUEST['cat_categorize'] = 'on';
+            include('categorize.php');
+        }
+        // Otherwise skip: categorize.php has no no-op path and would clear the file's categories.
 
         $filegallib = TikiLib::lib('filegal');
         $info = $filegallib->get_file_info($fileId);
@@ -681,13 +694,22 @@ class Services_File_Controller
             throw new Services_Exception_NotFound();
         }
 
+        $files = $result['data'];
+        if ($input->omit_metadata->int()) {
+            // slimmer result: these fields can be huge
+            $files = array_map(function ($file) {
+                unset($file['metadata'], $file['search_data'], $file['ocr_data']);
+                return $file;
+            }, $files);
+        }
+
         return [
             'title' => tr('List files'),
             'galleryId' => $galleryId,
             'offset' => $offset,
             'maxRecords' => $maxRecords,
             'count' => $result['count'],
-            'result' => $result['data'],
+            'result' => $files,
         ];
     }
 
@@ -1019,15 +1041,22 @@ class Services_File_Controller
         return $message;
     }
 
+    private function normalizeSubdirectoryBehavior(?string $behavior): string
+    {
+        if (in_array($behavior, ['subgalleries', 'flat', 'skip'], true)) {
+            return $behavior;
+        }
+
+        return 'subgalleries';
+    }
+
     private function buildFailedUploadErrorMessage()
     {
-        require_once __DIR__ . '/../../../smarty_tiki/modifier.kbsize.php';
-
         $tikilib = TikiLib::lib('tiki');
         $maxPostSize = $tikilib->return_bytes(ini_get('post_max_size'));
 
         if (isset($_SERVER['CONTENT_LENGTH']) && (int) $_SERVER['CONTENT_LENGTH'] > $maxPostSize) {
-            $message = tr('Uploaded data is larger than the max post size, uploaded data should not exceed %0', smarty_modifier_kbsize($maxPostSize, true, 0));
+            $message = tr('Uploaded data is larger than the max post size, uploaded data should not exceed %0', \SmartyTiki\Modifier\KbSize::apply($maxPostSize, true, 0));
         } else {
             $message = tr('File could not be uploaded.');
         }

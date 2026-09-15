@@ -9,9 +9,15 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class Banner extends Base
+class Banner extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'banner';
+    }
+
     public function handle($params, Template $template)
     {
         $bannerlib = \TikiLib::lib('banner');

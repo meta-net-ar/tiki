@@ -50,6 +50,7 @@ class TikiMarkdownImporter
     private const PIPE_OPT_RUNTIME_LOGSEQ = 'runtime_logseq';
     private const PIPE_OPT_BLOCKREF = 'blockref_mode';
     private const PIPE_OPT_JOURNAL_NS = 'journal_ns';
+    private const PIPE_OPT_JOURNAL_LANG = 'journal_lang';
 
     private const SCAN_RELPATH = 'relpath';
     private const SCAN_RELATIVE = 'relative';
@@ -174,6 +175,7 @@ class TikiMarkdownImporter
 
         $ctx = [
             self::PIPE_OPT_JOURNAL_NS => $wikiOpts[self::PIPE_OPT_JOURNAL_NS] ?? self::DEFAULT_JOURNAL_NS,
+            self::PIPE_OPT_JOURNAL_LANG => $wikiOpts[self::WIKI_OPT_JOURNAL_LANG] ?? 'en',
             self::PIPE_OPT_STRIP_FM => $pipelineCfg[self::PIPE_OPT_STRIP_FM] ?? true,
             self::PIPE_OPT_RUNTIME_LOGSEQ => $pipelineCfg[self::PIPE_OPT_RUNTIME_LOGSEQ] ?? false,
             self::PIPE_OPT_BLOCKREF => $pipelineCfg[self::PIPE_OPT_BLOCKREF] ?? 'inline',
@@ -242,6 +244,7 @@ class TikiMarkdownImporter
         $gcReport = $this->runGarbageCollect(
             $registry,
             $sourceKey,
+            $existingMap,
             array_keys($seenRelpaths),
             [
                 self::GC_OPT_MODE => $gcMode, // off|mark|delete
@@ -338,6 +341,7 @@ class TikiMarkdownImporter
         $dialect = $wikiOpts[self::WIKI_OPT_MARKDOWN_SOURCE] ?? 'commonmark';
         $ctx = array_merge([
             self::PIPE_OPT_JOURNAL_NS => $wikiOpts[self::PIPE_OPT_JOURNAL_NS] ?? self::DEFAULT_JOURNAL_NS,
+            self::PIPE_OPT_JOURNAL_LANG => $wikiOpts[self::WIKI_OPT_JOURNAL_LANG] ?? 'en',
             self::PIPE_OPT_STRIP_FM => true,
             self::PIPE_OPT_RUNTIME_LOGSEQ => false,
             self::PIPE_OPT_BLOCKREF => 'inline',
@@ -502,8 +506,9 @@ class TikiMarkdownImporter
      * present in previous imports but are missing from the current import.
      *
      * Detection:
-     * - Compares files seen in current import ($seenRelpaths) against all registry
-     *   entries for this source ($registry->getAllBySourceKey($sourceKey))
+     * - Compares files seen in current import ($seenRelpaths) against the registry
+     *   entries for this source fetched by the caller before the import loop ran
+     *   ($existingMap, relpath => row)
      * - Files in registry but not in current import = orphans
      *
      * Handling Modes:
@@ -525,11 +530,16 @@ class TikiMarkdownImporter
      *
      * @param ImportRegistry $registry
      * @param string         $sourceKey
+     * @param array          $existingMap   Registry rows for this source (relpath => row), fetched
+     *                                      once by the caller before the import loop. Orphan rows are
+     *                                      by definition untouched by that loop's upserts (which only
+     *                                      ever touch $seenRelpaths), so this stays accurate — no need
+     *                                      to re-query the same rows a second time.
      * @param array          $seenRelpaths  Relpaths of files found in current import
      * @param array          $opts          ['mode'=>'off|mark|delete', 'safe_namespace'=>'Journal']
      * @return array ['orphans'=>int, 'deleted'=>int, 'marked'=>int, 'errors'=>[]]
      */
-    private function runGarbageCollect(ImportRegistry $registry, string $sourceKey, array $seenRelpaths, array $opts): array
+    private function runGarbageCollect(ImportRegistry $registry, string $sourceKey, array $existingMap, array $seenRelpaths, array $opts): array
     {
         $tikilib = TikiLib::lib('tiki');
 
@@ -545,7 +555,7 @@ class TikiMarkdownImporter
 
         $now      = $tikilib->now;
         $seenMap  = array_flip($seenRelpaths);
-        $existing = $registry->getAllBySourceKey($sourceKey); // relpath => row
+        $existing = $existingMap; // relpath => row
 
         $orphans = [];
         foreach ($existing as $rel => $row) {

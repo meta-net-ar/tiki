@@ -9,17 +9,28 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * Smarty {preference} special parameters
  *
- * @param string $syntax      Sets the language/mode for syntax highlighting.
+ * @param string $syntax      Sets the language/mode for syntax highlighting (for textarea prefs).
  *                            Supported modes include: "php", "javascript", "css", "html", etc.
  *                            If $syntax is set and the feature_syntax_highlighter preference is enabled, then,
  *                            codemirror is enabled automatically.
+ *                            As of Tiki 31+ by default the syntax passed to `\SmartyTiki\BlockHandler\TextArea` is `none`, i.e. plain text.
+ *                            To get the textarea to use a markup language (tiki or markdown) pass an empty string, e.g. `syntax=''`
  */
-class Preference extends Base
+class Preference extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'preference';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs, $user_overrider_prefs;
@@ -108,6 +119,10 @@ class Preference extends Base
                         break;
                     }
                 }
+            }
+
+            if ($info['type'] === 'textarea' && $params['syntax'] !== 'tiki' && $params['syntax'] !== 'markdown') {
+                $info['value'] = \TikiLib::lib('tiki')->removeInlineSyntaxTags($info['value']);
             }
 
             $smarty->assign('p', $info);

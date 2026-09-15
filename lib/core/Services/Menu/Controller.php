@@ -110,7 +110,7 @@ class Services_Menu_Controller
             $optionInfo['class']
         );
 
-        $icon_html = smarty_function_icon(['name' => $input->icon->text()], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+        $icon_html = \SmartyTiki\FunctionHandler\Icon::render(['name' => $input->icon->text()], TikiLib::lib('smarty')->getEmptyInternalTemplate());
 
         return [
             'icon_html' => $icon_html,

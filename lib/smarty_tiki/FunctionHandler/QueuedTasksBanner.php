@@ -11,9 +11,15 @@ use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use Tiki\TaskQueue\QueuedTaskBanner;
 use TikiLib;
+use SmartyTiki\TikiSmartyExtensionInterface;
 
-class QueuedTasksBanner extends Base
+class QueuedTasksBanner extends Base implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'queued_tasks_banner';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;

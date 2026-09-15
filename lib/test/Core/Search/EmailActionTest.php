@@ -157,6 +157,22 @@ class SearchActionEmailActionTest extends TikiTestCase
         ])));
     }
 
+    public function testExecuteAllowsLiteralFromEmailAddressWithoutDisplayName()
+    {
+        $this->mail->expects($this->once())
+            ->method('setFrom')
+            ->with('selection@example.org', '');
+        $this->mail->expects($this->once())
+            ->method('setSender')
+            ->with('selection@example.org', '');
+        $this->expectSend(['info@example.org'], true);
+
+        $this->assertTrue($this->action->execute($this->createInput([
+            'from' => 'selection@example.org',
+            'to' => ['info@example.org'],
+        ])));
+    }
+
     private function createInput(array $overrides = []): JitFilter
     {
         return new JitFilter(array_merge([

@@ -153,7 +153,7 @@ function wikiplugin_mediaplayer($data, $params)
                     if (! empty($file['filetype']) && $file['fileId'] == $fileId) {
                         $extension = pathinfo($file['filename'], PATHINFO_EXTENSION);
                         $params['type'] = $file['filetype'];
-                        $sourceLink = smarty_modifier_sefurl($fileId, 'display');
+                        $sourceLink = \SmartyTiki\Modifier\Sefurl::apply($fileId, 'display');
                         $fileUrl = $access->absoluteUrl($sourceLink);
                         $params['src'] = $fileUrl;
                     } else {
@@ -317,7 +317,7 @@ function wikiplugin_mediaplayer($data, $params)
             }
 
             if (! empty($fileId)) {
-                $sourceLink = smarty_modifier_sefurl($fileId, 'display');
+                $sourceLink = \SmartyTiki\Modifier\Sefurl::apply($fileId, 'display');
             } else {
                 global $base_url;
                 $sourceLink = $access->absoluteUrl($params['src']);
@@ -338,7 +338,7 @@ function wikiplugin_mediaplayer($data, $params)
 
             if (strtolower($params['type']) === 'txt') {
                 if (! empty($fileId)) {
-                    $sourceLink = smarty_modifier_sefurl($fileId, 'display');
+                    $sourceLink = \SmartyTiki\Modifier\Sefurl::apply($fileId, 'display');
 
                     $filegallib = TikiLib::lib('filegal');
                     $file = $filegallib->get_file_info($fileId);

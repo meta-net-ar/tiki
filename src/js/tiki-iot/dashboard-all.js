@@ -502,7 +502,7 @@ function handleFullscreenChange() {
     }
 }
 
-$("[data-button-open-app]").click(function () {
+$("[data-button-open-app]").on("click", function () {
     const $uuid = $(this).data("button-open-app");
     $(".app-entry").addClass("d-none");
     $(`#${$uuid}`).removeClass("d-none");
@@ -510,7 +510,7 @@ $("[data-button-open-app]").click(function () {
     $(this).addClass("active");
     $(".non-app-selected-warning").fadeOut();
 });
-$("[data-app-control]").click(function (e) {
+$("[data-app-control]").on("click", function (e) {
     e.stopPropagation();
     $(this).tikiModal(" ");
     let state = $(this).prop("checked") ? "y" : "n";
@@ -524,7 +524,7 @@ $("[data-app-control]").click(function (e) {
         location.reload();
     });
 });
-$(".create_app").click(function (e) {
+$(".create_app").on("click", function (e) {
     e.stopPropagation();
     $.openModal({
         title: tr("Create new IoT App"),
@@ -534,7 +534,7 @@ $(".create_app").click(function (e) {
             $(this).find(".modal-content").html(createIotAppFormTemplate);
             $(this)
                 .find(".modal-footer .btn-primary")
-                .click(function (e) {
+                .on("click", function (e) {
                     e.preventDefault();
                     const form = $(this).parents(".modal").find("#create-new-iot-app-form").get(0);
                     form.classList.add("was-validated");
@@ -557,7 +557,7 @@ $(".create_app").click(function (e) {
         },
     });
 });
-$(".edit_app").click(function (e) {
+$(".edit_app").on("click", function (e) {
     e.stopPropagation();
     let app_name = $(this).parents("button").data("app-name");
     let app_uuid = $(this).parents("button").data("button-open-app"); // or app_data.app_uuid
@@ -570,7 +570,7 @@ $(".edit_app").click(function (e) {
             $(this).find(".modal-content").html(modalContent);
             $(this)
                 .find(".modal-footer .btn-primary")
-                .click(function (e) {
+                .on("click", function (e) {
                     e.preventDefault();
                     const form = $(this).parents(".modal").find("#update-iot-app-form").get(0);
                     form.classList.add("was-validated");
@@ -593,7 +593,7 @@ $(".edit_app").click(function (e) {
         },
     });
 });
-$(".delete_app").click(function (e) {
+$(".delete_app").on("click", function (e) {
     e.stopPropagation();
     let app_name = $(this).parents("button").data("app-name");
     let app_uuid = $(this).parents("button").data("button-open-app");
@@ -776,7 +776,7 @@ export function compact(el) {
     grids[id].compact();
 }
 
-$("button[data-bs-target^='#dashboard-tab-pane'").click(function () {
+$("button[data-bs-target^='#dashboard-tab-pane'").on("click", function () {
     let $pane_id = $(this).data("bs-target");
     $($pane_id)
         .not("[half-gauge-updated]")
@@ -833,7 +833,7 @@ $("button[data-bs-target^='#dashboard-tab-pane'").click(function () {
     $($pane_id).attr("gauge-update", true).attr("half-gauge-updated", true);
 });
 
-$("[add-widget-button]").click(function () {
+$("[add-widget-button]").on("click", function () {
     const container = $(this).parents("[new-widget-config]");
     const options = {};
     options.widget = container.find("[name='widget-select']").val();

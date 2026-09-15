@@ -1,27 +1,45 @@
 ---
 post:
-  description: Lock pages
+  description: |
+    Lock one or more wiki pages.
+
+    Send one `items[]` entry per page: `items[]=FirstPage&items[]=SecondPage`.
+    A page that does not exist, or that the caller may not lock, is listed in the
+    error feedback instead.
   requestBody:
     required: true
     content:
       application/x-www-form-urlencoded:
         schema:
           type: object
+          required:
+            - items[]
           properties:
             items[]:
               type: array
-              description: The array of page names to lock
+              description: Names of the pages to lock
+              minItems: 1
               items:
                 type: string
+        encoding:
+          items[]:
+            style: form
+            explode: true
   responses:
     '200':
-      description: lock pages response
+      description: Feedback listing the pages locked, and any that could not be
       content:
         application/json:
           schema:
             $ref: schemas-RefreshFeedbackResponse.yaml
+    '400':
+      description: No pages selected
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
     '403':
-      description: forbidden
+      description: Forbidden, or no selected page may be locked by the caller
       content:
         application/json:
           schema:

@@ -10,7 +10,7 @@ vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
     return {
         ...actual,
-        ElAutocomplete: vi.fn((props, { slots }) => h("div", props, slots.default ? slots.default() : null)),
+        ElAutocomplete: vi.fn((props, { slots }) => h("div", props, slots.default ? slots.default({ item: { value: "Suggestion" } }) : null)),
     };
 });
 

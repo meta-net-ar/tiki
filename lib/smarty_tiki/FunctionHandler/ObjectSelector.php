@@ -9,6 +9,8 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
 /**
  * Variable arguments to be sent as filters for the object list. Filters match the unified search
@@ -24,8 +26,15 @@ use Smarty\Template;
  * The component will build a drop list for the object selector if the results fit in a reasonable amount
  * of space or will use autocomplete on the object title otherwise.
  */
-class ObjectSelector extends Base
+class ObjectSelector extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'object_selector';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;

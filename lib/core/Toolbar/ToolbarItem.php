@@ -104,6 +104,8 @@ abstract class ToolbarItem
             return new ToolbarLinkFile($objectId);
         } elseif ($tagName == 'launchplugins') {
             return new ToolbarLaunchPlugins();
+        } elseif ($tagName == 'newreport') {
+            return new ToolbarNewReport();
         } elseif ($tagName == 'languagecheck') {
             return new ToolbarLanguageCheck();
         } elseif ($tagName == 'filerecording') {
@@ -199,6 +201,7 @@ abstract class ToolbarItem
                     'screencapture',
                     'image',
                     'launchplugins',
+                    'newreport',
 
                     'sheetsave',    // spreadsheet ones
                     'addrow',
@@ -573,7 +576,7 @@ abstract class ToolbarItem
             $iname = 'help';
         }
         $smarty = TikiLib::lib('smarty');
-        return smarty_function_icon(
+        return \SmartyTiki\FunctionHandler\Icon::render(
             [
             'name'   => $iname,
             'ititle' => ':'
@@ -612,6 +615,6 @@ abstract class ToolbarItem
             $params['_menu_text'] = 'y';
             $params['_menu_icon'] = 'y';
         }
-        return smarty_block_self_link($params, $content, $smarty->getEmptyInternalTemplate());
+        return \SmartyTiki\BlockHandler\SelfLink::render($params, $content, $smarty->getEmptyInternalTemplate());
     }
 }

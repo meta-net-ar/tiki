@@ -137,7 +137,7 @@ class Services_Edit_Controller
                 $data = $editlib->partialParseWysiwygToWiki(
                     TikiLib::lib('autosave')->get_autosave($input->editor_id->text(), $input->autoSaveId->text())
                 );
-                $data = $tikilib->convertAbsoluteLinksToRelative($data);
+                $data = $tikilib->convertAbsoluteLinksToRelative($data, $input->is_markdown->int());
                 if ($input->is_markdown->int()) {
                     $data = "{syntax type=markdown}\r\n$data";
                 }
@@ -385,7 +385,7 @@ $(window).on("load", function(){
 
         $display = [];
         foreach ($input->fields as $field) {
-            $html = smarty_function_service_inline($field->fetch->text(), $smarty->getEmptyInternalTemplate());
+            $html = \SmartyTiki\FunctionHandler\ServiceInline::render($field->fetch->text(), $smarty->getEmptyInternalTemplate());
             $display[] = [
                 'label' => $field->label->text(),
                 'field' => new Tiki_Render_Editable($html, [
@@ -569,7 +569,7 @@ $(window).on("load", function(){
 
         $tikilib->set_preference($prefName . 'modified', 'y');
 
-        $newTools = smarty_function_toolbars([
+        $newTools = \SmartyTiki\FunctionHandler\Toolbars::render([
             '_wysiwyg' => 'y',
             '_is_html' => 'y',
             'section' => $section,

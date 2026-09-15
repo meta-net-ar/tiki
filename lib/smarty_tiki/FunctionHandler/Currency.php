@@ -9,9 +9,18 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use SmartyTiki\TikiSmartyExtensionInterface;
+use SmartyTiki\Traits\FunctionHandlerStaticFacadeTrait;
 
-class Currency extends Base
+class Currency extends Base implements TikiSmartyExtensionInterface
 {
+    use FunctionHandlerStaticFacadeTrait;
+
+    public static function getSmartyName(): string
+    {
+        return 'currency';
+    }
+
     public function handle($params, Template $template)
     {
         global $prefs;
@@ -82,9 +91,9 @@ class Currency extends Base
         }
         if ($prepend) {
             if ($export) {
-                $out .= ' ' . smarty_modifier_escape($prepend);
+                $out .= ' ' . \SmartyTiki\Modifier\Escape::apply($prepend);
             } else {
-                $out .= '<span class="formunit">' . smarty_modifier_escape($prepend) . '</span>';
+                $out .= '<span class="formunit">' . \SmartyTiki\Modifier\Escape::apply($prepend) . '</span>';
             }
         }
         if ($sourceCurrency) {
@@ -103,16 +112,16 @@ class Currency extends Base
         }
         if ((isset($reloff) and $reloff > 0) and ($allSymbol != 1)) {
             $format = $part1a . $symbol;
-            $out .= smarty_modifier_money_format($amount, $locale, $currency, $format, 0);
+            $out .= \SmartyTiki\Modifier\MoneyFormat::apply($amount, $locale, $currency, $format, 0);
         } else {
             $format = $part1b . $symbol;
-            $out .= smarty_modifier_money_format($amount, $locale, $currency, $format, 1);
+            $out .= \SmartyTiki\Modifier\MoneyFormat::apply($amount, $locale, $currency, $format, 1);
         }
         if ($append) {
             if ($export) {
-                $out .= ' ' . smarty_modifier_escape($append);
+                $out .= ' ' . \SmartyTiki\Modifier\Escape::apply($append);
             } else {
-                $out .= '<span class="formunit">' . smarty_modifier_escape($append) . '</span>';
+                $out .= '<span class="formunit">' . \SmartyTiki\Modifier\Escape::apply($append) . '</span>';
             }
         }
         if ($export) {
@@ -128,10 +137,10 @@ class Currency extends Base
             foreach ($conversions as $currency => $amount) {
                 if ((isset($reloff) and $reloff > 0) and ($allSymbol != 1)) {
                     $format = $part1a . $symbol;
-                    $out .= smarty_modifier_money_format($amount, $locale, $currency, $format, 0);
+                    $out .= \SmartyTiki\Modifier\MoneyFormat::apply($amount, $locale, $currency, $format, 0);
                 } else {
                     $format = $part1b . $symbol;
-                    $out .= smarty_modifier_money_format($amount, $locale, $currency, $format, 1);
+                    $out .= \SmartyTiki\Modifier\MoneyFormat::apply($amount, $locale, $currency, $format, 1);
                 }
                 $out .= '<br>';
             }

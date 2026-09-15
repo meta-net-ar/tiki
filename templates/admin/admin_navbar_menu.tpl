@@ -187,6 +187,9 @@
                 <a class="dropdown-item" href="tiki-search_stats.php">{tr}Search Statistics{/tr}</a>
             {/if}
             <a class="dropdown-item" href="tiki-admin_security.php">{tr}Security Admin{/tr}</a>
+            {if $prefs.feature_user_encryption eq 'y'}
+                <a class="dropdown-item" href="tiki-admin.php?page=security&cookietab=6">{icon name='key'} {tr}Encryption Keys{/tr}</a>
+            {/if}
             <a class="dropdown-item" href="tiki-check.php">{tr}Server Check{/tr}</a>
             <a class="dropdown-item" href="tiki-admin_sync.php">{tr}Synchronize Dev{/tr}</a>
             {if $tiki_p_clean_cache eq "y"}

@@ -603,6 +603,7 @@ if (TIKI_API) {
     // if the username is already saved in the session, pull it from there
     if (isset($_SESSION["$user_cookie_site"])) {
         $user = $_SESSION["$user_cookie_site"];
+        $userlib->updateLastActivity($user);
         // There could be a case where the session contains a user that doesn't exists in this tiki
         // or that has never used the login step in this tiki.
         // Example : If using the same PHP SESSION cookies for more than one tiki.

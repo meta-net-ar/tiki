@@ -7,8 +7,15 @@
 
 namespace SmartyTiki\Modifier;
 
-class IsoDate
+use SmartyTiki\TikiSmartyExtensionInterface;
+
+class IsoDate implements TikiSmartyExtensionInterface
 {
+    public static function getSmartyName(): string
+    {
+        return 'isodate';
+    }
+
     public function handle($string)
     {
         global $tikilib;

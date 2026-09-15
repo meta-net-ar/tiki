@@ -540,6 +540,7 @@ $smarty->assign('structuresToAdd', []);
 $smarty->assign('showAddToStructureBar', false);
 if (
     $prefs['feature_wiki_structure'] === 'y'
+    && $prefs['wiki_structure_add_to_structure_bar'] === 'y'
     && empty($page_ref_id)
     && strtolower($page) !== 'sandbox'
     && $tikilib->page_exists($page)

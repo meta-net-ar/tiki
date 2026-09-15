@@ -30,8 +30,8 @@ foreach ($accs['data'] as $acc) {
         continue;
     }
 
-    $account = MailIn\Account::fromDb($acc);
     try {
+        $account = MailIn\Account::fromDb($acc);
         $summary = $account->check();
         $mailin_results[] = [
             'account' => $acc['account'],

@@ -382,6 +382,10 @@
                                             {/if}
                                             <a class="dropdown-item" href="tiki-admin_security.php">
                                                 {icon name="user-shield"} <span class="ms-1">{tr}Security Admin{/tr}</span> </a>
+                                            {if $prefs.feature_user_encryption eq 'y'}
+                                                <a class="dropdown-item" href="tiki-admin.php?page=security&cookietab=6">
+                                                    {icon name="key"} <span class="ms-1">{tr}Encryption Keys{/tr}</span> </a>
+                                            {/if}
                                             <a class="dropdown-item" href="tiki-check.php">
                                                 {icon name="server"} <span class="ms-1">{tr}Server Check{/tr}</span> </a>
                                             <a class="dropdown-item" href="tiki-admin_sync.php">
