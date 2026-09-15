@@ -1,7 +1,7 @@
 <div class="d-flex align-items-center gap-2">
     {* avoid Add Event being shown if no calendar is displayed *}
     {if $tiki_p_add_events eq 'y'}
-        <a {if $isInMainCalendar neq 'y'} style="display:none;"{/if} href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' defaultCalendarId=$defaultCalendarId returnURL=$returnURL}" class="btn btn-primary">{icon name='create'} {tr}Add Event{/tr}</a>
+        <a {if $isInMainCalendar neq 'y'} style="display:none;"{/if} href="{service controller='calendar' action='edit_item' defaultCalendarId=$defaultCalendarId returnURL=$returnURL}" class="btn btn-primary add-calendar-event">{icon name='create'} {tr}Add Event{/tr}</a>
     {/if}
 
     {if $tiki_p_admin_calendar eq 'y' or $tiki_p_admin eq 'y'}
