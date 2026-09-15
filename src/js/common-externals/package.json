@@ -14,6 +14,7 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "chart.js": "^4.4.2",
+    "chartjs-v2": "npm:chart.js@2.9.4",
     "clipboard": "^2.0.11",
     "converse.js": "^10.1.7",
     "dompurify": "^2.3.3",
