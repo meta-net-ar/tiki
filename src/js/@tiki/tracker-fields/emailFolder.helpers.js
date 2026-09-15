@@ -17,6 +17,11 @@ export async function updateEmailPreview(href) {
             hm_page_key: requestKey,
         },
         function (res) {
+            if (res.match?.(/"status":\s*"not callable"/)) {
+                getCyphtRequestKey(true); // Refresh the request key, which is the culprit for "not callable" status.
+                return updateEmailPreview(href);
+            }
+
             $(".email-folder-preview").html(`
                 <div class="msg-headers">${res.msg_headers}</div>
                 <div class="msg-body">${res.msg_text}</div>
@@ -48,8 +53,8 @@ export async function updateEmailPreview(href) {
     });
 }
 
-async function getCyphtRequestKey() {
-    if (sessionStorage.getItem("cypht_request_key")) {
+async function getCyphtRequestKey(refresh = false) {
+    if (sessionStorage.getItem("cypht_request_key") && !refresh) {
         return sessionStorage.getItem("cypht_request_key");
     }
 
@@ -57,6 +62,7 @@ async function getCyphtRequestKey() {
         const response = await fetch($.service("cypht", "getRequestKey"));
         const requestKey = await response.json();
         sessionStorage.setItem("cypht_request_key", requestKey);
+        return requestKey;
     } catch (error) {
         showMessage(tr("Failed to launch the request"), "error");
         $.closeModal();
