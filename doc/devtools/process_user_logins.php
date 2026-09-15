@@ -63,7 +63,7 @@ function processUsers(): void
 
     $allUsers = $userTable->fetchAll(
         ['userId', 'email', 'login'],
-        ['userId' => $userTable->not('1')]
+        ['default_admin' => $userTable->not(true)]
     );
 
     $emailRegex = '/(.*?)@(.*?).([^.]+)$/';

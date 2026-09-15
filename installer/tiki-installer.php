@@ -685,7 +685,7 @@ if ($install_step == '10') {
 
         TikiLib::lib('user')->change_login('admin', $admin_username);
 
-        $installer->query("UPDATE `users_users` SET `hash` = ?, `pass_confirm` = ?, `avatarName` = ? WHERE `users_users`.`userId`=1", [
+        $installer->query("UPDATE `users_users` SET `hash` = ?, `pass_confirm` = ?, `avatarName` = ? WHERE `users_users`.`default_admin`=true", [
             TikiLib::lib('user')->hashPassword($admin_password),
             TikiLib::lib('tiki')->now,
             $admin_username
