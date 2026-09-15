@@ -137,7 +137,7 @@ class Services_Edit_Controller
                 $data = $editlib->partialParseWysiwygToWiki(
                     TikiLib::lib('autosave')->get_autosave($input->editor_id->text(), $input->autoSaveId->text())
                 );
-                $data = $tikilib->convertAbsoluteLinksToRelative($data);
+                $data = $tikilib->convertAbsoluteLinksToRelative($data, $input->is_markdown->int());
                 if ($input->is_markdown->int()) {
                     $data = "{syntax type=markdown}\r\n$data";
                 }

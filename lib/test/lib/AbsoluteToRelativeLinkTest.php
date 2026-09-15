@@ -82,6 +82,7 @@ class AbsoluteToRelativeLinkTest extends TestCase
         $this->testReplaceInsidePlugins($baseUrl);
         $this->testOtherMarkups($baseUrl);
         $this->testMixMultipleLinks($baseUrl);
+        $this->testMarkdownExternalLink($base_url);
         $this->testUnescapedLinks($baseUrl);
         $this->testUnescapedLinksReplacement($baseUrl);
     }
@@ -177,6 +178,19 @@ class AbsoluteToRelativeLinkTest extends TestCase
         $expectedLink = '[Documentation|Tiki Documentation]';
         $dataResult = str_replace('#####', $expectedLink, self::DEMO_TEXT);
         $this->assertEquals($dataResult, $dataConverted);
+    }
+
+    /**
+     * @dataProvider urlBases
+     *
+     * @param $baseUrl
+     */
+    public function testMarkdownExternalLink($baseUrl): void
+    {
+        $tikilib = TikiLib::lib('tiki');
+        $data = "{syntax type=\"markdown\" editor=\"plain\"}\n* [Need a new service?](' . $baseUrl . 'DevNewServices)";
+
+        $this->assertSame($data, $tikilib->convertAbsoluteLinksToRelative($data));
     }
 
     /**
