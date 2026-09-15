@@ -5,6 +5,9 @@ import { defineStore } from "pinia";
 // store — see commentsUi.js — so backend sync code never has a reason to touch it.
 export default defineStore("commentsStore", {
     state: () => ({
+        // Tiki object the comments belong to, seeded by the hosting page at mount time.
+        // The backend addresses comments as "<type>:<objectId>", so every API call needs both.
+        context: { type: "", objectId: "" },
         threads: [
             {
                 title: "There should be no titles in replies, only for the thread",
@@ -231,6 +234,9 @@ export default defineStore("commentsStore", {
         },
     },
     actions: {
+        setContext({ type, objectId }) {
+            this.context = { type, objectId };
+        },
         addMessage(title, parentId, author, message, date) {
             let num = this.threads.length + 1;
             var message = {

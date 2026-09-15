@@ -43,10 +43,19 @@
     import PinnedMessages from "./components/PinnedMessages.vue";
     import {provide} from "vue";
     import { computed } from 'vue';
+    import useCommentsStore from "./store/comments";
     import useCommentsUiStore from "./store/commentsUi";
     provide('tr', tr)
 
+    const props = defineProps({
+        customProps: {
+            type: Object
+        }
+    });
+
     const uiStore = useCommentsUiStore();
+
+    useCommentsStore().setContext(props.customProps.commentsContext);
 
     const msgs = computed(() => uiStore.getFilteredParentMessages);
     const pinnedMsgs = computed(() => uiStore.getFilteredPinnedMessages);
