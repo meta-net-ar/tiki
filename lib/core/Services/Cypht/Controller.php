@@ -45,4 +45,19 @@ class Services_Cypht_Controller
         echo $dispatcher->output;
         exit;
     }
+
+    public function actionGetRequestKey($input)
+    {
+        global $tikipath;
+        require_once $tikipath . '/lib/cypht/integration/classes.php';
+
+        $config = new Tiki_Hm_Site_Config_File([], 'cypht');
+        $session = (new Hm_Session_Setup($config))->setup_session();
+        $module_exec = new Hm_Module_Exec($config);
+        $request = new Hm_Request($module_exec->filters, $config);
+
+        Hm_Request_Key::load($session, $request, false);
+
+        return Hm_Request_Key::generate();
+    }
 }

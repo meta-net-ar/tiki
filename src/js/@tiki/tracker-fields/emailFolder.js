@@ -1,3 +1,5 @@
+import { getPreviewNavLinks, submitFolder, updateEmailPreview } from "./emailFolder.helpers";
+
 $(".add-email-folder").on("click", function () {
     const fieldId = $(this).data("fieldId");
     const itemId = $(this).data("itemId");
@@ -18,27 +20,41 @@ $(".add-email-folder").on("click", function () {
     });
 });
 
-function submitFolder(triggerButton, modal, fieldId, itemId) {
-    const folder = $(modal).find("#email-folder-name").val().trim();
-    if (!folder) return;
+const isHoverable = matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-    const buttonContent = $(triggerButton).html();
-    $(triggerButton).html($.BUTTON_LOADER_MARKUP);
-    $.post(
-        $.service("tracker", "addItemEmailFolder"),
-        {
-            folder: folder,
-            fieldId,
-            itemId,
+$(".tracker-email-view-path").on("click", function (e) {
+    if (!isHoverable) return;
+
+    e.preventDefault();
+
+    const navigationLinks = getPreviewNavLinks(this);
+
+    $.openModal({
+        content: `<div class="email-folder-preview">${$.IMPORT_LOADER_MARKUP}</div>`,
+        size: "modal-xl",
+        buttons: [],
+        open: function () {
+            $(this).find(".modal-header").html(`
+                ${navigationLinks}
+                <a href="${$(e.target).attr("href")}" target="_blank" class="ms-auto expand-link">${tr("Expand")} ${$.fn.getIcon("link-external").prop("outerHTML")}</a>
+            `);
         },
-        function (response) {
-            if (response.success) {
-                $.closeModal(modal);
-                showMessage(response.message, "success");
-            }
-        }
-    ).fail(() => {
-        showMessage(tr("An error occurred while saving the folder."), "error");
-        $(triggerButton).html(buttonContent);
     });
-}
+
+    updateEmailPreview($(this).attr("href"));
+});
+
+$(document).on("click", ".nav-email-preview", function (e) {
+    e.preventDefault();
+
+    const modalContent = $(this).closest(".modal-content");
+    modalContent.find(".email-folder-preview").html($.IMPORT_LOADER_MARKUP);
+
+    updateEmailPreview($(this).attr("href"));
+
+    const emailViewPath = $(".tracker-email-view-path[href='" + $(this).attr("href") + "']");
+    const navigationLinks = getPreviewNavLinks(emailViewPath[0]);
+
+    modalContent.find(".modal-header .email-preview-nav").replaceWith(navigationLinks);
+    modalContent.find(".modal-header .expand-link").attr("href", $(this).attr("href"));
+});
