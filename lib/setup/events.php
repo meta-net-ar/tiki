@@ -427,6 +427,10 @@ function tiki_setup_events()
             }
 
             $url = null;
+
+            // TODO: add more cases (features) support!
+            // but other types that get updated multiple times a day if re-sending the same url to
+            // search engines will cause the site to get flagged or blocked.
             switch ($type) {
                 case 'wiki page':
                     $url = filter_out_sefurl('tiki-index.php?page=' . urlencode((string) $object), $type);

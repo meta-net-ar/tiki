@@ -13,7 +13,7 @@ function prefs_indexnow_list()
             'help' => 'https://www.indexnow.org/',
             'type' => 'flag',
             'default' => 'n',
-            'since' => '30',
+            'since' => '30.1',
             'admin' => 'seoprefs',
             'packages_required' => ['melbahja/seo' => '\Melbahja\Seo\Indexing\IndexNowIndexer'],
         ],
@@ -23,7 +23,7 @@ function prefs_indexnow_list()
             'type' => 'text',
             'size' => 32,
             'default' => '',
-            'since' => '30',
+            'since' => '30.1',
             'readonly' => true,
         ],
     ];
