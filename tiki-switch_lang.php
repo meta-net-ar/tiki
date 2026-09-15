@@ -23,6 +23,11 @@ if (isset($_SERVER['HTTP_REFERER'])) {
     $orig_url = $prefs['tikiIndex'];
 }
 
+$requestedLanguage = null;
+if (isset($_REQUEST['language']) && Language::is_valid_language($_REQUEST['language'])) {
+    $requestedLanguage = $_REQUEST['language'];
+}
+
 //for lang_nonswitchingpages
 if ($prefs['feature_lang_nonswitchingpages'] == "y" && ! empty($prefs['feature_lang_nonswitchingpages_names'])) {
     $nopage1 = explode(',', $prefs['feature_lang_nonswitchingpages_names']);
@@ -118,7 +123,7 @@ if (str_contains($orig_url, 'tiki-index.php') || str_contains($orig_url, 'tiki-r
         $pageId = $info['page_id'];
         $type = 'wiki page';
     }
-    $bestLangPageId = $multilinguallib->selectLangObj($type, $pageId, $_REQUEST['language']);
+    $bestLangPageId = $multilinguallib->selectLangObj($type, $pageId, $requestedLanguage);
     if ($pageId != $bestLangPageId) {
         if (! empty($param['page_id'])) {
             $orig_url = preg_replace('/(.*[&?]page_id=)' . $pageId . '(.*)/', '${1}' . $bestLangPageId . '$2', $orig_url);

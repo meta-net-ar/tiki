@@ -52,6 +52,7 @@ $lang = array(
     "Cancel" => "Cancel",
     "Login" => "Log In",
     "Welcome %0" => "Welcome %0",
+    "Traversal Probe" => "Loaded unsafe language file",
     "Link with HTML" => "Click <a href=\"#\">here</a>",
     "Bold text" => "This is <b>bold</b> text",
 );
@@ -129,6 +130,16 @@ $lang = array_replace($lang, $lang_custom);
         $result = $translator->translate('Bold text', []);
         $this->assertStringContainsString('<b>bold</b>', $result);
         $this->assertStringNotContainsString('&lt;b&gt;', $result);
+    }
+
+    public function testPathLikeLanguageIdentifierDoesNotLoadResolvedLanguageFile()
+    {
+        $translator = LanguageTranslator::getInstance('../lang/' . $this->lang, ['skipDb' => true]);
+
+        $this->assertSame(
+            'Traversal Probe',
+            $translator->translate('Traversal Probe', [])
+        );
     }
 
     /**
