@@ -1,5 +1,7 @@
 <?php
 
+use Search\IntegrityException;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -418,6 +420,12 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
     {
+        $galleryId = (int) $this->getOption('galleryId');
+        $gallery = TikiLib::lib('filegal')->get_file_gallery($galleryId, false);
+        if (! $gallery || empty($gallery['galleryId'])) {
+            throw new IntegrityException(tr('%0 field: Gallery #%1 not found', $this->getConfiguration('name'), $galleryId));
+        }
+
         $value = $this->getValue();
         $baseKey = $this->getBaseKey();
         $emails = $this->getConfiguration('emails');
