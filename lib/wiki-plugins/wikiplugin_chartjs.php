@@ -178,8 +178,20 @@ function wikiplugin_chartjs($data, $params)
         return '<div class="tiki-chartjs">' . $canvas . '</div>';
     }
 
-    $non_module_html_content = '<script src="' . NODE_PUBLIC_DIST_PATH . '/chartjs-v2/dist/Chart.bundle.min.js"></script>';
-    $non_module_html_content .= <<<HTML
+    // PDF export: screenshot the chart via a headless browser loading a temp HTML
+    // file over file://. Chart.js must be inlined as a non-module UMD build - module
+    // imports and <script src> don't load over file://, leaving `Chart` undefined.
+    //
+    // CasperJS runs on PhantomJS, which can't execute Chart.js 4 (ES6+ syntax) or its options API
+    // so it needs the v2 bundle specifically.
+    $chartPath = HeadlessBrowserFactory::getHeadlessBrowserType() === HeadlessBrowserFactory::CASPERJS
+        ? TIKI_PATH . '/' . NODE_PUBLIC_DIST_PATH . '/chartjs-v2/dist/Chart.bundle.min.js'
+        : TIKI_PATH . '/' . NODE_PUBLIC_DIST_PATH . '/chart.js/dist/chart.umd.js';
+    $chartLib = is_file($chartPath)
+        ? preg_replace('~^\s*//#\s*sourceMappingURL=.*$~m', '', file_get_contents($chartPath))
+        : '';
+
+    $non_module_html_content = ($chartLib !== '' ? "<script>\n$chartLib\n</script>\n" : '') . <<<HTML
 <div>
     $canvas
 </div>
@@ -188,18 +200,16 @@ function wikiplugin_chartjs($data, $params)
 </script>
 HTML;
 
-    // PDF export related logic
-    if (HeadlessBrowserFactory::getHeadlessBrowserType() === HeadlessBrowserFactory::CASPERJS) {
-        // casperJS uses PhantomJS that does not support ES6, so no support for modules.
-        // We are going to hardcode a reference to the latest version of chart.js 2.x to allow running
-        // the PDF export of the chart without using JS modules.
-        // @tiki-external-link-ok: Chart.js 2.x via CDN for CasperJS/PhantomJS PDF export
+    if ($chartLib !== '') {
+        // A local bundle was found: use it, regardless of the headlessbrowser_chartjs_module pref.
         $html_content = $non_module_html_content;
-    } else {
-        // If the user is using the default ChartJS path, we can use importmap to load the module
-        if ($prefs['headlessbrowser_chartjs_module'] === 'y') {
-            $html_content = generateJsImportmapScripts(true); // generate imports with full URL since we load the html file as file://
-            $html_content .= <<<HTML
+    } elseif (
+        HeadlessBrowserFactory::getHeadlessBrowserType() !== HeadlessBrowserFactory::CASPERJS
+        && $prefs['headlessbrowser_chartjs_module'] === 'y'
+    ) {
+        // Fallback (opt-in): ES module served over HTTP
+        $html_content = generateJsImportmapScripts(true); // full URLs since the html file is loaded via file://
+        $html_content .= <<<HTML
 <div>
     $canvas
 </div>
@@ -210,9 +220,9 @@ HTML;
     $script
 </script>
 HTML;
-        } else {
-            $html_content = $non_module_html_content;
-        }
+    } else {
+        // Last resort (CasperJS, or no bundle available): assume a Chart global is present.
+        $html_content = $non_module_html_content;
     }
     $scriptHash = md5($script);
     $cacheKey = 'chart_';
@@ -249,8 +259,9 @@ HTML;
         }
     }
 
+    $mimeType = str_starts_with(base64_decode(substr($base64, 0, 16)), "\x89PNG") ? 'image/png' : 'image/jpeg';
     $canvas = <<<HTML
-<img src="data:image/jpeg;charset=utf-8;base64, {$base64}"/>
+<img src="data:{$mimeType};base64,{$base64}"/>
 HTML;
 
     return '<div class="tiki-chartjs">' . $canvas . '</div>';
