@@ -636,11 +636,19 @@ class RegistrationLib extends TikiLib
             }
             $js .= '
                         remote: {
-                            url: "validate-ajax.php",
-                            type: "post",
-                            data: {
-                                validator: "username",
-                                input: function() { return $("#login").val(); }
+                            // depends needs `param`, else jQuery Validation replaces this whole rule with `true`
+                            depends: function(element) {
+                                // .attr(), not .data(): .data() coerces a numeric login to Number, breaking !==
+                                var original = $(element).attr("data-original-login");
+                                return typeof original === "undefined" || $(element).val() !== original;
+                            },
+                            param: {
+                                url: "validate-ajax.php",
+                                type: "post",
+                                data: {
+                                    validator: "username",
+                                    input: function() { return $("#login").val(); }
+                                }
                             }
                         }
                     },
