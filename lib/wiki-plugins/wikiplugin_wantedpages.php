@@ -161,10 +161,10 @@ class WikiPluginWantedPages extends PluginsLib
     }
 
     /**
-     * Check if a link is escaped (wrapped in ~np~ tags) in the source page
+     * Check whether every link to $toPage in the source page is escaped (wrapped in ~np~ tags)
      * @param string $fromPageContent The content of the page containing the link
      * @param string $toPage The target page of the link
-     * @return bool True if the link is escaped, false otherwise
+     * @return bool True if the link never appears outside ~np~ tags, false otherwise
      */
     private function isEscapedLink($fromPageContent, $toPage)
     {
@@ -172,12 +172,15 @@ class WikiPluginWantedPages extends PluginsLib
             return false;
         }
 
-        // Check if link is wrapped in ~np~ tags (exact or partial matches within np blocks)
-        // Pattern: ~np~...((PageName))...~/np~ and ~np~...(...(PageName))...~/np~
         $quotedPage = preg_quote($toPage, '/');
-        $escapedPattern = '/~np~[^~]*?\((?:[a-zA-Z0-9_-]+)?\(' . $quotedPage . '\)\).*?~\/np~/s';
+        $linkPattern = '/\((?:[a-zA-Z0-9_-]+)?\(' . $quotedPage . '\)\)/';
 
-        return preg_match($escapedPattern, $fromPageContent) === 1;
+        // a link absent from the content is not escaped, it just comes from somewhere else
+        if (! preg_match($linkPattern, $fromPageContent)) {
+            return false;
+        }
+
+        return ! preg_match($linkPattern, preg_replace('/~np~.*?~\/np~/s', '', $fromPageContent));
     }
 
     public function run($data, $params)
@@ -223,7 +226,6 @@ class WikiPluginWantedPages extends PluginsLib
                 'ELSE tpf.`data` ' .
             'END AS fromPageContent ' .
             'FROM `tiki_links` tl ' .
-            'LEFT JOIN `tiki_pages` tp ON (tl.`toPage` = tp.`pageName` OR tl.`toPage` = tp.`pageSlug`) ' .
             'LEFT JOIN `tiki_pages` tpf ON (tl.`fromPage` = tpf.`pageName`) ' .
             'LEFT JOIN `tiki_tracker_item_fields` ttif ON (' .
                 'SUBSTRING_INDEX(SUBSTRING_INDEX(tl.`fromPage`, \':\', 3), \':\', -1) = ttif.`itemId` ' .
@@ -238,7 +240,20 @@ class WikiPluginWantedPages extends PluginsLib
         if ($categories) {
             $query .= ' INNER JOIN `tiki_objects` AS tob ON (tob.`itemId` = tl.`fromPage` AND tob.`type` = ?) INNER JOIN `tiki_category_objects` AS tc ON (tc.`catObjectId` = tob.`objectId` AND tc.`categId` IN (' . implode(', ', array_fill(0, count($categories), '?')) . '))';
         }
-        $query .= ' WHERE tp.`pageName` IS NULL';
+        // Mirrors the slug variations TikiLib::get_page_info() resolves a link against.
+        // Keep them as separate NOT EXISTS: merging them into an OR costs the index and
+        // turns the query into a full scan of `tiki_pages` for every link.
+        $missingConditions = [
+            'tp.`pageName` = tl.`toPage`',
+            'tp.`pageSlug` = tl.`toPage`',
+            'tp.`pageSlug` = REPLACE(REPLACE(REPLACE(tl.`toPage`, \' \', \'-\'), \'_\', \'-\'), \'+\', \'-\')',
+            'tp.`pageSlug` = REPLACE(REPLACE(REPLACE(tl.`toPage`, \' \', \'_\'), \'-\', \'_\'), \'+\', \'_\')',
+            'tp.`pageSlug` = REPLACE(tl.`toPage`, \' \', \'+\')',
+        ];
+        foreach ($missingConditions as $index => $condition) {
+            $query .= ($index ? ' AND ' : ' WHERE ') .
+                'NOT EXISTS (SELECT 1 FROM `tiki_pages` tp WHERE ' . $condition . ')';
+        }
         if ($skipalias) {
             $query .= ' AND (tor.`relation` IS NULL OR tor.`relation` != \'tiki.link.alias\')';
         }
@@ -323,15 +338,23 @@ class WikiPluginWantedPages extends PluginsLib
         }
 
         $out = [];
-        $linkin  = (! $debug) ? '((' : '~np~'; // this is how toPages are handled
-        $linkout = (! $debug) ? '))' : '~/np~';
+        $parserlib = TikiLib::lib('parser');
         if (is_array($tmp)) {
+            // sort on the raw names, before they are turned into HTML links
+            usort($tmp, function ($a, $b) use ($collect) {
+                return $collect == 'from'
+                    ? [$a[0], $a[1]] <=> [$b[0], $b[1]]
+                    : [$a[1], $a[0]] <=> [$b[1], $b[0]];
+            });
             foreach ($tmp as $row) { // row[toPage, fromPage, reason]
                 if ($debug) { // modified rejected toPages with reason
-                    $row[0] = tr('<em>%0</em>: %1', $row[2], $row[0]);
+                    $row[0] = '~np~' . tr('<em>%0</em>: %1', $row[2], $row[0]) . '~/np~';
+                } elseif (is_object_link($row[0])) {
+                    $row[0] = parse_object_link($row[0]);
+                } else {
+                    $row[0] = $parserlib->get_wiki_link_replacement($row[0]);
                 }
-                $row[0] = is_object_link($row[0]) ? parse_object_link($row[0]) : ($linkin . $row[0] . $linkout); // toPages
-                $row[1] = is_object_link($row[1]) ? parse_object_link($row[1]) : '((' . $row[1] . '))'; // fromPages
+                $row[1] = is_object_link($row[1]) ? parse_object_link($row[1]) : $parserlib->get_wiki_link_replacement($row[1]); // fromPages
 
                 // two identical keys may exist, they can either be displayed
                 // each in its own table row, or be collected in one cell, separated by
@@ -360,13 +383,6 @@ class WikiPluginWantedPages extends PluginsLib
                 }
             } // foreach (received row) is handled
             unset($tmp); // free memory
-        }
-
-        // sort the entries
-        if ($break == 'sep') {
-            sort($out);
-        } else {
-            ksort($out);
         }
 
         $headerwant = tra('Wanted Page');
