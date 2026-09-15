@@ -120,5 +120,26 @@
                 </div>
             {/if}
         </div>
+        {jq}
+            function fitQuickadminMenu(menu) {
+                requestAnimationFrame(function () {
+                    var rect = menu.getBoundingClientRect();
+                    var above = (menu.getAttribute('data-popper-placement') || '').indexOf('top') === 0;
+                    menu.style.maxHeight = ((above ? rect.bottom : window.innerHeight - rect.top) - 8) + 'px';
+                    var dropdown = bootstrap.Dropdown.getInstance(menu.previousElementSibling);
+                    if (dropdown) {
+                        dropdown.update();
+                    }
+                });
+            }
+            $('#quickadmin').on('shown.bs.dropdown', function (e) {
+                fitQuickadminMenu($(e.target).siblings('.dropdown-menu')[0]);
+            });
+            $(window).on('resize scroll', function () {
+                $('#quickadmin .dropdown-menu.show').each(function () {
+                    fitQuickadminMenu(this);
+                });
+            });
+        {/jq}
     {/if}
 {/tikimodule}

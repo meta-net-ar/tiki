@@ -673,6 +673,10 @@ footer.footer .modules > .module:not(.card) {
     }
 }
 
+#quickadmin .dropdown-menu {
+    overflow-y: auto;
+}
+
 // Remove unnecessary card-body horizontal padding in menu module in fixed-width layout side columns to reduce text wrapping and overflow
 .fixed_width {
     .col1,
