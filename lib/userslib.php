@@ -2550,6 +2550,18 @@ class UsersLib extends TikiLib
             $mid .= $mid == '' ? ' where' : ' and';
             $mid .= ' (uu.`waiting` = \'u\' or uu.`waiting` = \'a\' or uu.`waiting` = \'l\')';
             $mmid = $mid;
+        } elseif ($notconfirmed && $notvalidated) {
+            $mid .= $mid == '' ? ' where' : ' and';
+            $mid .= ' (uu.`waiting` = \'u\' or uu.`waiting` = \'a\')';
+            $mmid = $mid;
+        } elseif ($notconfirmed && $accoundLocked) {
+            $mid .= $mid == '' ? ' where' : ' and';
+            $mid .= ' (uu.`waiting` = \'u\' or uu.`waiting` = \'l\')';
+            $mmid = $mid;
+        } elseif ($notvalidated && $accoundLocked) {
+            $mid .= $mid == '' ? ' where' : ' and';
+            $mid .= ' (uu.`waiting` = \'a\' or uu.`waiting` = \'l\')';
+            $mmid = $mid;
         } else {
             if ($notconfirmed) {
                 $mid .= $mid == '' ? ' where' : ' and';
