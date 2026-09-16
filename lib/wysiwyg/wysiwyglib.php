@@ -391,7 +391,7 @@ class WYSIWYGLib
             'domId' => "$dom_id",
             'height' => $prefs['markdown_wysiwyg_height'],
             'previewStyle' => $prefs['markdown_wysiwyg_preview_style'],
-            'initialEditType' => $prefs['markdown_wysiwyg_intitial_edit_type'],
+            'initialEditType' => $prefs['markdown_wysiwyg_initial_edit_type'],
             'usageStatistics' => $prefs['markdown_wysiwyg_usage_statistics'] === 'y',
             'initialValue' => $content,
         ];
