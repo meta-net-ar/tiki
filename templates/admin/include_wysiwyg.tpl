@@ -28,7 +28,7 @@
         <legend class="h3">{tr}Markdown Toast UI WySIWYG{/tr}</legend>
         {preference name=markdown_wysiwyg_height}
         {preference name=markdown_wysiwyg_preview_style}
-        {preference name=markdown_wysiwyg_intitial_edit_type}
+        {preference name=markdown_wysiwyg_initial_edit_type}
         {preference name=markdown_wysiwyg_usage_statistics}
     </fieldset>
     <fieldset>

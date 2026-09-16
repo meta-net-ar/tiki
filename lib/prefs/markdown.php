@@ -74,7 +74,7 @@ function prefs_markdown_list()
                 'feature_wysiwyg',
             ],
         ],
-        'markdown_wysiwyg_intitial_edit_type' => [
+        'markdown_wysiwyg_initial_edit_type' => [
             'name' => tr('WYSIWYG Initial Edit Mode'),
             'description' => tr('WYSIWYG or Markdown.'),
             'type' => 'list',
