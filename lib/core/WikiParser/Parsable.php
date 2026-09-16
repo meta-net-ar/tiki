@@ -380,51 +380,53 @@ if ( \$('#$id') ) {
             TikiLib::lib('parser')->core_options = TikiLib::lib('parser')->option;
         }
 
-        $data = preg_replace('/(\{img [^\}]+li)<x>(nk[^\}]+\})/i', '\\1\\2', $data);
+        try {
+            $data = preg_replace('/(\{img [^\}]+li)<x>(nk[^\}]+\})/i', '\\1\\2', $data);
 
-        /* <x> XSS Sanitization handling */
+            /* <x> XSS Sanitization handling */
 
-        // Fix false positive in wiki syntax
-        //   It can't be done in the sanitizer, that can't know if the input will be wiki parsed or not
-        $data = preg_replace('/(\{img [^\}]+li)<x>(nk[^\}]+\})/i', '\\1\\2', $data);
+            // Fix false positive in wiki syntax
+            //   It can't be done in the sanitizer, that can't know if the input will be wiki parsed or not
+            $data = preg_replace('/(\{img [^\}]+li)<x>(nk[^\}]+\})/i', '\\1\\2', $data);
 
-        // Handle pre- and no-parse sections and plugins
-        $preparsed = ['data' => [],'key' => []];
-        $noparsed = ['data' => [],'key' => []];
-        $this->strip_unparsed_block($data, $noparsed, true);
+            // Handle pre- and no-parse sections and plugins
+            $preparsed = ['data' => [],'key' => []];
+            $noparsed = ['data' => [],'key' => []];
+            $this->strip_unparsed_block($data, $noparsed, true);
 
-        if (! $this->option['noparseplugins'] || $this->option['stripplugins']) {
-            $this->parse_first($data, $preparsed, $noparsed);
-        }
+            if (! $this->option['noparseplugins'] || $this->option['stripplugins']) {
+                $this->parse_first($data, $preparsed, $noparsed);
+            }
 
-        $this->parse_wiki_argvariable($data);
+            $this->parse_wiki_argvariable($data);
 
-        if (! $this->option['noparsefilereferences']) {
-            $data = $this->parseDataFileReferences($data);
-        }
+            if (! $this->option['noparsefilereferences']) {
+                $data = $this->parseDataFileReferences($data);
+            }
 
-        $data = $this->wikiParse($data, $noparsed);
+            $data = $this->wikiParse($data, $noparsed);
 
-        $data = $this->parse_smileys($data);
-        $data = $this->parse_tagged_users($data);
-        $data = $this->parse_data_dynamic_variables($data, $this->option['language']);
+            $data = $this->parse_smileys($data);
+            $data = $this->parse_tagged_users($data);
+            $data = $this->parse_data_dynamic_variables($data, $this->option['language']);
 
-        // Put removed strings back.
-        $this->replace_preparse($data, $preparsed, $noparsed, $this->option['is_html']);
+            // Put removed strings back.
+            $this->replace_preparse($data, $preparsed, $noparsed, $this->option['is_html']);
 
-        // Converts &lt;x&gt; (<x> tag using HTML entities) into the tag <x>. This tag comes from the input sanitizer (XSS filter).
-        // This is not HTML valid and avoids using <x> in a wiki text,
-        //   but hide '<x>' text inside some words like 'style' that are considered as dangerous by the sanitizer.
-        $data = str_replace([ '&lt;x&gt;', '~np~', '~/np~' ], [ '<x>', '~np~', '~/np~' ], $data);
+            // Converts &lt;x&gt; (<x> tag using HTML entities) into the tag <x>. This tag comes from the input sanitizer (XSS filter).
+            // This is not HTML valid and avoids using <x> in a wiki text,
+            //   but hide '<x>' text inside some words like 'style' that are considered as dangerous by the sanitizer.
+            $data = str_replace([ '&lt;x&gt;', '~np~', '~/np~' ], [ '<x>', '~np~', '~/np~' ], $data);
 
-        if ($this->option['typography'] && ! $this->option['wysiwyg']) {
-            $data = typography($data, $this->option['language']);
-        }
-
-        // restore core parser options at the end of parsing
-        TikiLib::lib('parser')->setOptions(TikiLib::lib('parser')->core_options);
-        if ($toplevel) {
-            TikiLib::lib('parser')->core_options = [];
+            if ($this->option['typography'] && ! $this->option['wysiwyg']) {
+                $data = typography($data, $this->option['language']);
+            }
+        } finally {
+            // Restore core parser options even when plugin or wiki parsing throws.
+            TikiLib::lib('parser')->setOptions(TikiLib::lib('parser')->core_options);
+            if ($toplevel) {
+                TikiLib::lib('parser')->core_options = [];
+            }
         }
 
         return $data;

@@ -370,6 +370,48 @@ $lang = array_replace($lang, $lang_custom);
         unset($parserlib->option['wiki_parse_context']);
     }
 
+    public function testFeedbackRenderedDuringWikiParsingDoesNotLeakNoParseMarkers(): void
+    {
+        $parserlib = \TikiLib::lib('parser');
+        $savedOptions = $parserlib->option;
+        $hadFeedback = array_key_exists('tikifeedback', $_SESSION);
+        $savedFeedback = $_SESSION['tikifeedback'] ?? null;
+
+        \Feedback::clear();
+
+        try {
+            // This is the state while wikiplugin_convene() is executing.
+            $parserlib->option['wiki_parse_context'] = true;
+            \Feedback::success('convene Plugin modified by editor.');
+
+            // This is the rendering path used by Feedback::sendHeaders().
+            $html = \SmartyTiki\FunctionHandler\Feedback::render([]);
+            $this->assertTrue($parserlib->option['wiki_parse_context']);
+
+            $repeat = false;
+            $remarksbox = \SmartyTiki\BlockHandler\Remarksbox::render(
+                ['title' => 'Success'],
+                'Body',
+                null,
+                $repeat
+            );
+        } finally {
+            $parserlib->option = $savedOptions;
+            if ($hadFeedback) {
+                $_SESSION['tikifeedback'] = $savedFeedback;
+            } else {
+                unset($_SESSION['tikifeedback']);
+            }
+        }
+
+        $this->assertStringContainsString('Success', $html);
+        $this->assertStringContainsString('convene Plugin modified by editor.', $html);
+        $this->assertStringNotContainsString('~np~', $html);
+        $this->assertStringNotContainsString('~/np~', $html);
+        $this->assertStringNotContainsString('~np~', $remarksbox);
+        $this->assertStringNotContainsString('~/np~', $remarksbox);
+    }
+
     /**
      * Test that tra() function does NOT escape arguments
      * Calling code must escape user input to prevent XSS
