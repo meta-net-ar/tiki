@@ -204,10 +204,6 @@ $imagePath: "/images/";
 }
 
 :root {
-    .ec-event.ec-event-draggable.ec-event-start.ec-event-end.ec-event-past.ec-h-event.tips,
-    .ec-v-event {
-        background: var(--bs-secondary-bg) !important;
-    }
     .ec-event-time,
     .ec-event-title {
         color: var(--bs-body-color) !important;

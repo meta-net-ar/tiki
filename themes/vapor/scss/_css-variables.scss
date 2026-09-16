@@ -196,10 +196,6 @@ body {
 }
 
 :root {
-    .ec-event.ec-event-draggable.ec-event-start.ec-event-end.ec-event-past.ec-h-event.tips,
-    .ec-v-event {
-        background: #7645C0 !important; // --bs-secondary-bg doesn't seem to be set
-    }
     --tiki-code-bg: #546873;
     --tiki-input-color: #{$input-color};
     --tiki-input-bg: #{$input-bg};

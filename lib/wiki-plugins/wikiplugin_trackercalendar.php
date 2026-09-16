@@ -403,9 +403,6 @@ function wikiplugin_trackercalendar($data, $params)
     static $id = 0;
     $headerlib = TikiLib::lib('header');
 
-    $headerlib->add_css('.ec-day-grid > .ec-content, .ec-timeline > .ec-content { white-space: normal; }');
-
-    $headerlib->add_css('.ec-day-grid > .ec-content { white-space: normal; }');
     $headerlib->add_js_module('import "@jquery-tiki/wikiplugin-trackercalendar";');
 
     $jit = new JitFilter($params);
