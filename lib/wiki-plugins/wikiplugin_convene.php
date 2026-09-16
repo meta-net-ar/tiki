@@ -163,7 +163,7 @@ function wikiplugin_convene_info(): array
     ];
 }
 
-function wikiplugin_convene($data, $params): string
+function wikiplugin_convene($data, $params, $offset = 0, $parser = null): string
 {
     $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_convene_info());
 
@@ -366,6 +366,9 @@ function wikiplugin_convene($data, $params): string
 
     // perms for this object
     $currentObject = current_object();
+    if (($parser->option['objectType'] ?? '') === 'wiki page') {
+        $currentObject = ['type' => 'wiki page', 'object' => $parser->option['objectId']];
+    }
     $perms = Perms::get($currentObject);
     $canEdit = $perms->edit;
     if ($params['adminperms'] !== 'y') {
@@ -413,10 +416,11 @@ function wikiplugin_convene($data, $params): string
         send_email_result_vote($vote_infos);
     }
     $conveneData = json_encode($params);
+    $conveneObject = json_encode($currentObject);
 
     $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-convene.js')
         ->add_js("$(function() {
-                \$('#{$params['id']}').setupConvene($conveneData);
+                \$('#{$params['id']}').setupConvene($conveneData, $conveneObject);
             });
         ");
 
