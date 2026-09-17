@@ -46,6 +46,15 @@
                 {createFileInput format='ndjson' label='NDJSON File' fileInputId='ndjsonInputFile' fileAccept='application/x-ndjson'}
             {elseif $format eq 'ical'}
                 {createFileInput format='ical' label='iCal File' fileInputId='icalInputFile' fileAccept='text/calendar'}
+            {elseif $format eq 'excel_paste'}
+                <div class="mb-3">
+                    <label for="paste_data" class="form-label">{tr}Paste data from Excel:{/tr}</label>
+                    <textarea name="paste_data" id="paste_data" class="form-control font-monospace" rows="15"
+                        placeholder="{tr}Copy cells from Excel (including the header row) and paste here.{/tr}"></textarea>
+                    <div class="form-text text-muted">
+                        {tr}Select the cells in Excel starting from the header row and use Ctrl+C / Cmd+C, then paste here. All pasted columns, including the first one, are imported as provided.{/tr}
+                    </div>
+                </div>
             {else}
                 {createFileInput format='csv' label='CSV File' fileInputId='inputFile' fileAccept='text/csv, .tsv'}
                 <div class="form-group">

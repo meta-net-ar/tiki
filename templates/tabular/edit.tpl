@@ -737,6 +737,9 @@
                         <option value="ical"{if $config['format'] eq 'ical'} selected="selected"{/if}>
                             iCal
                         </option>
+                        <option value="excel_paste"{if $config['format'] eq 'excel_paste'} selected="selected"{/if}>
+                            {tr}Excel Copy-Paste{/tr}
+                        </option>
                     </select>
                 </div>
             </div>

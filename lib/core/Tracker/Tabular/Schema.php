@@ -386,6 +386,7 @@ class Schema
                 $name .= '_export_' . $type . '.ics';
                 break;
             default:
+                // 'excel_paste' and 'csv' both export as CSV
                 $writer = new Writer\CsvWriter($filename, $this->getEncoding() ?? '');
                 $name .= '_export_' . $type . '.csv';
         }

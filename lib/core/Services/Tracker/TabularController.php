@@ -570,6 +570,64 @@ class Services_Tracker_TabularController
         $done = false;
         $successImportMsg = tr('Your import was completed successfully.');
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if ($schema->getFormat() === 'excel_paste') {
+                $pasteData = $input->paste_data->none();
+
+                if (empty(trim($pasteData))) {
+                    throw new Services_Exception_MissingValue('paste_data');
+                }
+
+                // Force simple header matching for this import mode.
+                $excelPasteConfig = $info['config'];
+                $excelPasteConfig['simple_headers'] = 1;
+                $schema->loadConfig($excelPasteConfig);
+
+                $tempDir = TIKI_PATH . '/' . TEMP_PATH;
+                if (! is_dir($tempDir) || ! is_writable($tempDir)) {
+                    throw new Services_Exception(tr('Tiki temp folder is not writable.'));
+                }
+
+                $tmpFile = tempnam($tempDir, 'tabular_excel_paste_');
+                file_put_contents($tmpFile, $pasteData);
+
+                $source = new CsvSource($schema, $tmpFile, "\t", $schema->getEncoding());
+                $writer = new TrackerWriter();
+
+                return TikiLib::lib('tiki')->allocate_extra(
+                    'tracker_import_items',
+                    function () use ($writer, $source, $info, $schema, $successImportMsg, $tmpFile) {
+                        try {
+                            $result = $writer->write($source);
+                        } finally {
+                            unlink($tmpFile);
+                        }
+
+                        if (TIKI_API) {
+                            $data = [];
+                            $columns = $schema->getColumns();
+                            foreach ($result as $itemId) {
+                                $entry = new TrackerSourceEntry($itemId);
+                                $row = ['itemId' => $itemId];
+                                foreach ($columns as $column) {
+                                    $row[$column->getLabel()] = $row[$column->getField()] = $entry->render($column, false);
+                                }
+                                $data[] = $row;
+                            }
+                            return $data;
+                        }
+
+                        Feedback::success($successImportMsg);
+                        return [
+                            'FORWARD' => [
+                                'controller' => 'tabular',
+                                'action' => 'list',
+                                'tabularId' => $info['tabularId'],
+                            ]
+                        ];
+                    }
+                );
+            }
+
             $hasUploadedFile = isset($_FILES['file']) && (is_uploaded_file($_FILES['file']['tmp_name']) || is_file($_FILES['file']['tmp_name']));
 
             if (! $hasUploadedFile) {
