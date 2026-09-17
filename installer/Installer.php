@@ -13,7 +13,6 @@ use TikiDb_Bridge;
 use SplSubject;
 use SplObjectStorage;
 use SplObserver;
-use TWVersion;
 use Exception;
 
 /**
@@ -28,6 +27,20 @@ class Installer extends TikiDb_Bridge implements SplSubject
     public $executed = [];
 
     private string $currentPatchName = '';
+
+    /** @var ''|'schema'|'indexing'|'patches'|'scripts' */
+    public string $progressPhase = '';
+
+    /** @var array<string, array{executed: int, total: int}> */
+    public array $progressPhases = [
+        'schema' => ['executed' => 0, 'total' => 0],
+        'indexing' => ['executed' => 0, 'total' => 0],
+        'patches' => ['executed' => 0, 'total' => 0],
+        'scripts' => ['executed' => 0, 'total' => 0],
+    ];
+
+    public int $progressPatchTotal = 0;
+    public int $progressPatchApplied = 0;
 
     public $queries = [
         'currentStmt' => '',
@@ -73,6 +86,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
             $this->runFile(__DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki.sql');
             if ($this->isMySQLFulltextSearchSupported()) {
                 $this->runFile(__DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki_fulltext_indexes.sql', true, true);
+            } else {
+                ProgressBar::streamEmptyPhase('indexing');
             }
             if ($this->useInnoDB) {
                 $this->runFile(__DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki_innodb.sql', true, true);
@@ -120,7 +135,13 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $this->assureDefaultCharSetIsAlignedWithTikiSchema();
         $this->assureInnoDdTableRowFormatIsDynamicOrBetter();
 
-        foreach (Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch) {
+        $pendingPatches = Patch::getPatches([Patch::NOT_APPLIED]);
+        $this->progressPatchTotal = count($pendingPatches);
+        if ($this->progressPatchTotal > 0) {
+            $this->progressPhase = 'patches';
+        }
+
+        foreach ($pendingPatches as $patchName => $patch) {
             try {
                 $this->installPatch($patchName);
             } catch (MySQLWarningException $e) {
@@ -132,6 +153,14 @@ class Installer extends TikiDb_Bridge implements SplSubject
                     return false;
                 }
             }
+        }
+
+        if ($this->progressPatchTotal === 0) {
+            ProgressBar::streamEmptyPhase('patches');
+        }
+
+        if (empty($this->scripts)) {
+            ProgressBar::streamEmptyPhase('scripts');
         }
 
         foreach ($this->scripts as $script) {
@@ -152,6 +181,9 @@ class Installer extends TikiDb_Bridge implements SplSubject
         if (! $force && isset(Patch::$list[$patch]) && Patch::$list[$patch]->isApplied()) {
             throw new Exception('Patch already applied', 3);
         }
+
+        $this->progressPhase = 'patches';
+        ProgressBar::streamPatchStart($this->currentPatchName);
 
         $schema = __DIR__ . "/schema/$patch.sql";
         $script = __DIR__ . "/schema/$patch.php";
@@ -217,6 +249,9 @@ class Installer extends TikiDb_Bridge implements SplSubject
      */
     public function runScript($script)
     {
+        $this->progressPhase = 'scripts';
+        ProgressBar::streamScriptStart($script);
+
         $file = __DIR__ . "/script/$script.php";
 
         if (file_exists($file)) {
@@ -228,6 +263,25 @@ class Installer extends TikiDb_Bridge implements SplSubject
         }
 
         $this->executed[] = $script;
+        ProgressBar::streamScriptComplete($script);
+    }
+
+    public function getCurrentPatchName(): string
+    {
+        return $this->currentPatchName;
+    }
+
+    private function resolveProgressPhase(string $file): string
+    {
+        $base = basename($file);
+        if ($base === 'tiki_fulltext_indexes.sql') {
+            return 'indexing';
+        }
+        if (str_contains($file, DIRECTORY_SEPARATOR . 'schema' . DIRECTORY_SEPARATOR)) {
+            return 'patches';
+        }
+
+        return 'schema';
     }
 
 
@@ -260,10 +314,14 @@ class Installer extends TikiDb_Bridge implements SplSubject
             throw new Exception('Fatal: Cannot open ' . $file);
         }
         $statements = self::splitSqlStatements($command);
+        $phase = $this->resolveProgressPhase($file);
+        $statementCount = count($statements);
 
         $this->queries['currentFile'] = basename($file);
         $this->queries['files'][] = $file;
-        $this->queries['total'] += count($statements);
+        $this->queries['total'] += $statementCount;
+        $this->progressPhase = $phase;
+        $this->progressPhases[$phase]['total'] += $statementCount;
 
         $status = true;
         foreach ($statements as $statement) {
@@ -279,6 +337,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
                 }
             } else {
                 $this->queries['executed'] += 1;
+                $this->progressPhases[$phase]['executed'] += 1;
             }
 
             $this->queries['currentStmt'] = $statement;

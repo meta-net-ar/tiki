@@ -80,26 +80,12 @@ class Patch
     public function record()
     {
         Installer::getInstance()->query("INSERT INTO tiki_schema (patch_name, install_date) VALUES(?, NOW())", [$this->name], countQueries: false);
-        $this->pushPatchNameToBrowser('build_patch', $this->name);
+        ProgressBar::streamPatchComplete($this->name);
         self::$list[$this->name]->setStatus(self::NEWLY_APPLIED);
     }
 
     public function pushPatchNameToBrowser($targetElement, $content)
     {
-        $scripts = <<<HTML
-        <script class="progress_bar_script">
-            var element = parent.document.getElementById("{$targetElement}");
-            if (element) {
-                element.innerHTML = "{$content}";
-            }
-        </script>
-HTML;
-        $working_env = php_sapi_name();
-        if ($working_env != 'cli') {
-            echo $scripts;
-            if (ob_get_level() > 0) {
-                ob_flush();
-            }
-        }
+        ProgressBar::streamPatchComplete($content);
     }
 }

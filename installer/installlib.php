@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Installer\InstallerDatabaseErrorHandler;
 use Tiki\TikiInit;
+use Tiki\Toast;
 
 /**
  * @return bool
@@ -468,7 +469,10 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
             ]
         );
     } catch (Exception $e) {
-        Feedback::error($e->getMessage());
+        Toast::error([
+            'title' => tra('Database connection failed'),
+            'mes' => $e->getMessage(),
+        ]);
     }
     $dbcon = ! empty($dbTiki);
 
@@ -486,12 +490,18 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
                 ]
             );
         } catch (Exception $e) {
-            Feedback::error($e->getMessage());
+            Toast::error([
+                'title' => tra('Database connection failed'),
+                'mes' => $e->getMessage(),
+            ]);
         }
         $dbcon = ! empty($dbTiki);
         // First check that suggested database name will not cause issues
         if (! installer_is_valid_mysql_identifier($dbname)) {
-            Feedback::error(tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+            Toast::error([
+                'title' => tra('Invalid database name'),
+                'mes' => tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."),
+            ]);
             $dbcon = false;
         } elseif ($dbcon) {
             $error = '';
@@ -500,9 +510,15 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
             if (empty($error)) {
                 // assure the DB has the right default encoding (if the DB already existed)
                 $dbTiki->query(installer_build_alter_database_charset_sql($dbname));
-                Feedback::success(tra("Database `%0` was created.", '', false, [$dbname]));
+                Toast::success([
+                    'title' => tra('Database created'),
+                    'mes' => tra("Database `%0` was created.", '', false, [$dbname]),
+                ]);
             } else {
-                Feedback::error(tra("Database `%0` creation failed. You need to create the database.", '', false, [$dbname]));
+                Toast::error([
+                    'title' => tra('Database creation failed'),
+                    'mes' => tra("Database `%0` creation failed. You need to create the database.", '', false, [$dbname]),
+                ]);
             }
 
             try {
@@ -517,10 +533,16 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
                 );
                 $dbcon = ! empty($dbTiki);
             } catch (Exception $e) {
-                Feedback::error($e->getMessage());
+                Toast::error([
+                    'title' => tra('Database connection failed'),
+                    'mes' => $e->getMessage(),
+                ]);
             }
         } else {
-            Feedback::error(tra("Database `%0`. Unable to connect to database.", '', false, [$dbname]));
+            Toast::error([
+                'title' => tra('Unable to connect'),
+                'mes' => tra("Database `%0`. Unable to connect to database.", '', false, [$dbname]),
+            ]);
         }
     }
 
@@ -545,12 +567,18 @@ function createTikiDBUser(&$dbTiki, $host, $user, $pass, $dbname)
 {
     $error = '';
     if (! installer_is_valid_mysql_identifier($dbname)) {
-        Feedback::error(tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+        Toast::error([
+            'title' => tra('Invalid database name'),
+            'mes' => tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."),
+        ]);
         return false;
     }
 
     if (! installer_is_valid_mysql_identifier($user)) {
-        Feedback::error(tra("Invalid database user. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+        Toast::error([
+            'title' => tra('Invalid database user'),
+            'mes' => tra("Invalid database user. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."),
+        ]);
         return false;
     }
 
@@ -558,9 +586,15 @@ function createTikiDBUser(&$dbTiki, $host, $user, $pass, $dbname)
     $dbTiki->queryError($sql, $error);
 
     if (empty($error)) {
-        Feedback::success(tra("User `%0` was created.", '', false, [$user]));
+        Toast::success([
+            'title' => tra('Database user created'),
+            'mes' => tra("User `%0` was created.", '', false, [$user]),
+        ]);
     } else {
-        Feedback::error(tra("User `%0` creation failed.", '', false, [$user]));
+        Toast::error([
+            'title' => tra('Database user creation failed'),
+            'mes' => tra("User `%0` creation failed.", '', false, [$user]),
+        ]);
     }
 
     return empty($error);
