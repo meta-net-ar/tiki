@@ -227,7 +227,7 @@ class Services_File_FinderController
                 $cpath = $input->cpath->text();
                 $reqid = $input->reqid->text();
                 if ($cpath && $reqid) {
-                    setcookie('elfdl' . $reqid, '1', 0, urlencode($cpath));
+                    $url .= (str_contains($url, '?') ? '&' : '?') . http_build_query(['cpath' => $cpath, 'reqid' => $reqid]);
                 }
 
                 TikiLib::lib('access')->redirect($url);
