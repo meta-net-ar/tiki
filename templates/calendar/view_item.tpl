@@ -265,7 +265,7 @@
                     <tr class="url">
                         <th>{tr}Custom url:{/tr}</th>
                         <td>
-                            {if $calitem.customurl neq ''}
+                            {if $calitem.url neq ''}
                                 <a class="url" href="{$calitem.url}">
                                     {$calitem.url|escape}
                                 </a>
