@@ -1,6 +1,10 @@
 ---
 get:
-  description: Get current Tiki API version
+  description: |
+    Return the current Tiki version.
+
+    Answers without authentication. Controlled by the "API version endpoint"
+    preference (`auth_api_tiki_version`), which is enabled by default.
   responses:
     '200':
       description: version response
@@ -11,3 +15,9 @@ get:
             properties:
               version:
                 type: string
+    '403':
+      description: Endpoint disabled by the auth_api_tiki_version preference
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

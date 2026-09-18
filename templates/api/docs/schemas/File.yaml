@@ -54,8 +54,10 @@ properties:
         type: string
       search_data:
         type: string
+        description: Extracted text used for indexing. Omitted when `omit_metadata=1`.
       metadata:
         type: string
+        description: Embedded file metadata such as EXIF. Omitted when `omit_metadata=1`.
       lastModif:
         type: integer
       last_user:
@@ -72,6 +74,7 @@ properties:
         type: integer
       ocr_state:
         type: string
+        description: Text recovered by OCR. Omitted when `omit_metadata=1`.
       visible:
         type: string
       public:
