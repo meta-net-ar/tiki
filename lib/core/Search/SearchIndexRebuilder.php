@@ -8,6 +8,7 @@
 namespace Tiki\Search;
 
 use Feedback;
+use Symfony\Component\Console\Command\Command;
 use Tiki\TaskQueue\Exception\QueueManagerException;
 use Tiki\TaskQueue\QueueManager;
 use Tiki\TaskQueue\Tasks\RebuildIndexTask;
@@ -21,6 +22,34 @@ use TikiLib;
  */
 class SearchIndexRebuilder
 {
+    public const EXIT_INTEGRITY_ERRORS = 2;
+    public const EXIT_SKIPPED_ERRORS = 3;
+
+    public static function resolveExitCode(array $stats): int
+    {
+        $hasIntegrityErrors = false;
+        $hasSkippedErrors = false;
+        foreach (['default', 'fallback'] as $scope) {
+            if (! empty($stats[$scope]['error'])) {
+                return Command::FAILURE;
+            }
+
+            if (! empty($stats[$scope]['skipped_errors'])) {
+                $hasSkippedErrors = true;
+            }
+
+            if (! empty($stats[$scope]['integrity_errors'])) {
+                $hasIntegrityErrors = true;
+            }
+        }
+
+        if ($hasSkippedErrors) {
+            return self::EXIT_SKIPPED_ERRORS;
+        }
+
+        return $hasIntegrityErrors ? self::EXIT_INTEGRITY_ERRORS : Command::SUCCESS;
+    }
+
     /**
      * Executes index rebuild directly or queues it as a task based on configuration
      * This is the main entry point that handles both scenarios

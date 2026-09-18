@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Installer\Installer;
+use Tiki\Search\SearchIndexRebuilder;
 
 require_once('tiki-setup.php');
 global $prefs;
@@ -48,6 +49,11 @@ if (isValidMonitor('DbRequiresUpdate')) {
 
 if (isValidMonitor('SearchIndexRebuildLast')) {
     $result['SearchIndexRebuildLast'] = $tikilib->get_preference('unified_last_rebuild_' . $prefs['unified_engine']);
+}
+
+if (isValidMonitor('SearchIndexRebuildStatus')) {
+    $lastStats = $tikilib->get_preference('unified_last_rebuild_stats_' . $prefs['unified_engine'], [], true);
+    $result['SearchIndexRebuildStatus'] = empty($lastStats) ? 1 : SearchIndexRebuilder::resolveExitCode($lastStats);
 }
 
 if (isValidMonitor('SchedulerLastRun')) {
@@ -153,6 +159,7 @@ function getDefaultMonitorRules()
         'OpCodeStats:public',
         'DbRequiresUpdate:public',
         'SearchIndexRebuildLast:public',
+        'SearchIndexRebuildStatus:public',
         '*:auth'
     ];
 }
