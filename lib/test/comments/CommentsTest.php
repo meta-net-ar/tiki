@@ -86,8 +86,8 @@ class CommentsTest extends TikiTestCase
 
     public function testGetHref(): void
     {
-        $this->assertEquals('tiki-index.php?page=HomePage&amp;threadId=9&amp;comzone=show#threadId9', $this->commentsLib->getHref('wiki page', 'HomePage', 9));
-        $this->assertEquals('tiki-view_blog_post.php?postId=1&amp;threadId=10&amp;comzone=show#threadId10', $this->commentsLib->getHref('blog post', 1, 10));
+        $this->assertEquals('tiki-index.php?page=HomePage&threadId=9&comzone=show#threadId9', $this->commentsLib->getHref('wiki page', 'HomePage', 9));
+        $this->assertEquals('tiki-view_blog_post.php?postId=1&threadId=10&comzone=show#threadId10', $this->commentsLib->getHref('blog post', 1, 10));
     }
 
     public function testGetRootPath(): void

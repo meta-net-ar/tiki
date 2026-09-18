@@ -2938,7 +2938,7 @@ class Comments extends TikiLib
                 $href .= $object . "&threadId=$threadId&cookietab=2#threadId$threadId";
             }
         } else {
-            $href .= $object . "&amp;threadId=$threadId&amp;comzone=show#threadId$threadId";
+            $href .= $object . "&threadId=$threadId&comzone=show#threadId$threadId";
         }
 
         return $href;

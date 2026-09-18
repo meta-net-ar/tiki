@@ -127,12 +127,16 @@
                 && $tiki_p_wiki_view_comments eq 'y'
                 && $tiki_p_read_comments eq 'y'}
 
+                        {jq}{literal}
+                            var id = '#comment-container';
+                            $(document).on("ajaxComplete", function(){$(id).tiki_popover();});
+                            {/literal}
+                        {/jq}
+
                         {* Auto display comments if display by default preference is set *}
                         {if $prefs.wiki_comments_displayed_default eq 'y' && $show_slideshow eq 'n'}
                         {jq}{literal}
-                            var id = '#comment-container';
                             $(id).comment_load('tiki-ajax_services.php?controller=comment&action=list&type=wiki+page&objectId={/literal}{$page|escape:url}{literal}#comment-container');
-                            $(document).on("ajaxComplete", function(){$(id).tiki_popover();});
                             {/literal}
                         {/jq}
                         {/if}

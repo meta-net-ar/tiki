@@ -51,7 +51,7 @@
                             </a>
                         </action>
                         <action>
-                            <a href="{$comments[ix].href|cat:"&amp;comments_threadId=$id&amp;edit_reply=1#form"}">
+                            <a href="{$comments[ix].href|cat:"&comments_threadId=$id&edit_reply=1#form"|escape:'html'}">
                                 {icon name='edit' _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
                             </a>
                         </action>

@@ -58,7 +58,6 @@ class Search_ContentSource_CommentSource implements Search_ContentSource_Interfa
         }
 
         $url = $commentslib->getHref($comment['objectType'], $comment['object'], $objectId);
-        $url = str_replace('&amp;', '&', $url);
 
         $data = [
             'title' => $typeFactory->sortable($comment['title']),
