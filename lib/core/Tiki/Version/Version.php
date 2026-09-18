@@ -6,6 +6,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Tiki_Version_Version
 {
+    private const SUB_VCS = 'vcs';
+    private const SUB_SUFFIXES = ['alpha', 'beta', 'rc', 'pre', self::SUB_VCS];
+
     private $major;
     private $minor;
     private $extra;
@@ -26,7 +29,8 @@ class Tiki_Version_Version
         if ($version instanceof self) {
             return $version;
         } else {
-            preg_match('/^(\d+)\.(\d+)?(\.([\d\.]+))?((alpha|beta|rc|pre|vcs)(\d*))?$/i', $version, $parts);
+            $suffixes = implode('|', self::SUB_SUFFIXES);
+            preg_match('/^(\d+)\.(\d+)?(\.([\d\.]+))?((' . $suffixes . ')(\d*))?$/i', $version, $parts);
             for ($i = 0; 8 > $i; ++$i) {
                 if (! isset($parts[$i])) {
                     $parts[$i] = null;
@@ -42,9 +46,25 @@ class Tiki_Version_Version
         return $this->major;
     }
 
+    public function getMinor()
+    {
+        return $this->minor;
+    }
+
     public function isStable()
     {
         return empty($this->sub);
+    }
+
+    /**
+     * Whether this version string's sub-segment is "vcs" (e.g. "30.1vcs"),
+     * marking it as a VCS/git checkout rather than a tagged release.
+     * Distinct from Checker::isDevelopmentBranch(), which checks the
+     * running install's branch instead of a parsed version string.
+     */
+    public function isVcs(): bool
+    {
+        return strtolower((string) $this->sub) === self::SUB_VCS;
     }
 
     public function isUpgradeTo($version)
