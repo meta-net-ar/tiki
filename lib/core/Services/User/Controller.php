@@ -1326,6 +1326,40 @@ class Services_User_Controller
         return true;
     }
 
+    public function actionSetUserLoginStatus($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+        $util = new Services_Utilities();
+
+        $login_disabled = $input->login_disabled->text();
+
+        if ($util->notConfirmPost()) {
+            $util->setVars($input, [], 'checked');
+            if ($util->itemsCount > 0) {
+                $actionText = $login_disabled === 'y' ? tr('Disable') : tr('Enable');
+                $msg = count($util->items) === 1
+                    ? tr('%0 login for the following user?', $actionText)
+                    : tr('%0 login for the following users?', $actionText);
+
+                return $util->confirm($msg, $actionText);
+            } else {
+                Services_Utilities::modalException(tra('No users were selected. Please select one or more users.'));
+            }
+        } elseif ($util->checkCsrf()) {
+            $util->setVars($input, [], 'items');
+            foreach ($util->items as $user_to_update) {
+                if ($user_to_update != 'admin') {
+                    $res = $this->lib->updateUserLoginStatus($user_to_update, $login_disabled);
+                    if ($res !== true) {
+                        Feedback::error(tr('An error occurred. User %0 login status could not be updated', $user_to_update));
+                    } else {
+                        Feedback::success(tr('User %0 login status updated successfully.', $user_to_update));
+                    }
+                }
+            }
+            return Services_Utilities::refresh();
+        }
+    }
 
     public function action_set_user_lock_status($input)
     {
@@ -1424,6 +1458,18 @@ class Services_User_Controller
         // Set the lock parameter and delegate to action_set_user_lock_status
         $input['lock'] = 'unlock';
         return $this->action_set_user_lock_status($input);
+    }
+
+    public function actionEnableUsersLogin($input)
+    {
+        $input['login_disabled'] = 'n';
+        return $this->actionSetUserLoginStatus($input);
+    }
+
+    public function actionDisableUsersLogin($input)
+    {
+        $input['login_disabled'] = 'y';
+        return $this->actionSetUserLoginStatus($input);
     }
 
     private function updateUserLockStatus($users, $newLockStatus)

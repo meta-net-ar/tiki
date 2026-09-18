@@ -103,24 +103,34 @@ function validate($params)
 
     [$isvalid] = $userlib->validate_user($login, $pass);
 
+    $errorMessage = '';
+    $errorCode = 0;
+
     if (! $isvalid) {
-        $msg = tra('Invalid username or password');
-
-        if ($prefs['intertiki_errfile']) {
-            logit($prefs['intertiki_errfile'], $msg, $login, INTERTIKI_BADUSER, $prefs['known_hosts'][$key]['name']);
-        }
-
-        $logslib->add_log('intertiki', $msg . ' from ' . $prefs['known_hosts'][$key]['name'], $login);
-
+        $errorMessage = tra('Invalid username or password');
         if (! $userlib->user_exists($login)) {
             // slave client is supposed to disguise 102 code as 101 not to show
             // crackers that user does not exists. 102 is required for telling slave
             // to delete user there
-            return new XML_RPC_Response(0, 102, $msg);
+            $errorCode = 102;
         } else {
-            return new XML_RPC_Response(0, 101, $msg);
+            $errorCode = 101;
         }
+    } elseif (! $userlib->canLogin($login)) {
+        $errorMessage = tr('User "%0" is not allowed to log in.', $login);
+        $errorCode = 101;
     }
+
+    if ($errorCode) {
+        if ($prefs['intertiki_errfile']) {
+            logit($prefs['intertiki_errfile'], $errorMessage, $login, INTERTIKI_BADUSER, $prefs['known_hosts'][$key]['name']);
+        }
+
+        $logslib->add_log('intertiki', $errorMessage . ' from ' . $prefs['known_hosts'][$key]['name'], $login);
+
+        return new XML_RPC_Response(0, $errorCode, $errorMessage);
+    }
+
 
     if ($prefs['login_allow_email'] == 'y' && ! $userlib->user_exists($login)) {
         // User is validated, so if no users found, must have succeeded via email.

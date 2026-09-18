@@ -22,6 +22,10 @@ class BasicAuth extends AbstractBasic
             $isvalid = true;
         } else {
             list($isvalid, $user) = TikiLib::lib('user')->validate_user($username, $password);
+
+            if ($isvalid && ! TikiLib::lib('user')->canLogin($username)) {
+                $isvalid = false;
+            }
         }
 
         if ($isvalid) {

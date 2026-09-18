@@ -89,6 +89,10 @@ if ($method === 'check_password') {
     try {
         $validation = $userslib->validate_user($u, $p);
         $ok = is_array($validation) ? $validation[0] : $validation;
+
+        if ($ok && ! $userslib->canLogin($u)) {
+            $ok = false;
+        }
     } catch (\Throwable $e) {
         // Error handling without logging sensitive data
     }
@@ -139,6 +143,10 @@ try {
 // 2) Fallback to Tiki password
 try {
     $ok = (bool) $userslib->validate_user($username, $password);
+
+    if ($ok && ! $userslib->canLogin($username)) {
+        $ok = false;
+    }
 } catch (Throwable $e) {
     $ok = false;
     // Error handling without logging sensitive data

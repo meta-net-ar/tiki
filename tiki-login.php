@@ -163,6 +163,7 @@ if (isset($_REQUEST['su']) && $access->checkCsrf(true)) {
         }
         if ($userlib->user_exists($_REQUEST['username'])) {
             $targetUser = $userlib->get_user_real_case($_REQUEST['username']);
+
             if (strcasecmp($targetUser, $fromUser) === 0) {
                 Feedback::error(tr('You are already logged in as "%0". Please select a different user.', $targetUser));
                 $access->redirect($_SESSION['loginfrom']);
@@ -187,6 +188,11 @@ $requestedUser = trim($_REQUEST['user'] ?? '') ?: false;
 $pass = trim($_REQUEST['pass'] ?? '') ?: false;
 $isvalid = false;
 $isdue = false;
+
+if ($userlib->user_exists($requestedUser) && ! $userlib->canLogin($requestedUser)) {
+    Feedback::errorAndDie(tr('User "%0" is not allowed to log in.', $requestedUser), \Laminas\Http\Response::STATUS_CODE_403);
+}
+
 $bruteForceProperties = function () use ($tikilib) {
     return ['ip' => $tikilib->get_ip_address()];
 };

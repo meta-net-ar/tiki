@@ -3000,6 +3000,7 @@ CREATE TABLE `users_users` (
   `twoFactorAuthGracePeriod` int(11) DEFAULT NULL,
   `twoFactorGracePeriodStart` int(14) DEFAULT NULL,
   `last_mfa_date` bigint DEFAULT NULL,
+  `login_disabled` char(1) default 'n',
   PRIMARY KEY (`userId`),
   UNIQUE KEY `login` (login (191)),
   KEY `registrationDate` (`registrationDate`)

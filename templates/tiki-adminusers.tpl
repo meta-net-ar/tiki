@@ -87,6 +87,24 @@
                             <div class="offset-sm-5 col-sm-7">
                                 <div class="form-check">
                                     <label class="form-check-label">
+                                        <input class="form-check-input" id="filterLoginDisabled" name="filterLoginDisabled" type="checkbox"{if !empty($smarty.request.filterLoginDisabled)} checked="checked"{/if}>{tr}Can't login{/tr}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="offset-sm-5 col-sm-7">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" id="filterLocked" name="filterLocked" type="checkbox"{if !empty($smarty.request.filterLocked)} checked="checked"{/if}>{tr}Account locked{/tr}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="offset-sm-5 col-sm-7">
+                                <div class="form-check">
+                                    <label class="form-check-label">
                                         <input class="form-check-input" id="filterNotValidated" name="filterNotValidated" type="checkbox"{if !empty($smarty.request.filterNotValidated)} checked="checked"{/if}>{tr}User not validated{/tr}
                                     </label>
                                 </div>
@@ -126,6 +144,7 @@
                                         {/if}
                                         <th id="lastlogin">{self_link _sort_arg='sort_mode' _sort_field='currentLogin'}{tr}Last login{/tr}{/self_link}</th>
                                         <th id="registered">{self_link _sort_arg='sort_mode' _sort_field='created'}{tr}Registered{/tr}{/self_link}</th>
+                                        <th id="canlogin">{self_link _sort_arg='sort_mode' _sort_field='login_disabled'}{tr}Can login{/tr}{/self_link}</th>
                                         <th id="groups">{tr}Groups{/tr}</th>
                                         <th id="actions"></th>
                                     </tr>
@@ -193,6 +212,14 @@
                                             <td class="text">
                                                 {if $users[user].registrationDate}
                                                     {$users[user].registrationDate|tiki_short_datetime}
+                                                {/if}
+                                            </td>
+
+                                            <td class="text">
+                                                {if $users[user].login_disabled eq 'y'}
+                                                    <span class="text-danger">{icon name="remove"} {tr}No{/tr}</span>
+                                                {else}
+                                                    <span class="text-success">{icon name="ok"} {tr}Yes{/tr}</span>
                                                 {/if}
                                             </td>
 
@@ -319,6 +346,20 @@
                                                                     </a>
                                                                 </action>
                                                             {/if}
+
+                                                            {if $users[user].login_disabled eq 'y'}
+                                                                <action>
+                                                                    <a href="{bootstrap_modal controller=user action=set_user_login_status checked=$username offset=$offset sort_mode=$sort_mode numrows=$numrows login_disabled=n}">
+                                                                        {icon name="ok" _menu_text='y' _menu_icon='y' alt="{tr}Enable login{/tr}"}
+                                                                    </a>
+                                                                </action>
+                                                            {else}
+                                                                <action>
+                                                                    <a href="{bootstrap_modal controller=user action=set_user_login_status checked=$username offset=$offset sort_mode=$sort_mode numrows=$numrows login_disabled=y}">
+                                                                        {icon name="remove" _menu_text='y' _menu_icon='y' alt="{tr}Disable login{/tr}"}
+                                                                    </a>
+                                                                </action>
+                                                            {/if}
                                                         {/if}
                                                     {/strip}
                                                 {/actions}
@@ -371,6 +412,12 @@
                                 </option>
                                 <option value="unlock_users">
                                     {tr}Unlock accounts{/tr}
+                                </option>
+                                <option value="enable_users_login">
+                                    {tr}Enable login{/tr}
+                                </option>
+                                <option value="disable_users_login">
+                                    {tr}Disable login{/tr}
                                 </option>
                                 {if $prefs.feature_wiki == 'y'}
                                     <option value="email_wikipage">

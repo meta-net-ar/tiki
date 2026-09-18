@@ -474,11 +474,15 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         ];
     }
 
-    $token = TikiLib::lib('api_token')->createToken([
-        'type' => 'kanban',
-        'user' => $user,
-        'expireAfter' => strtotime("+1 hour"),
-    ]);
+    try {
+        $token = TikiLib::lib('api_token')->createToken([
+            'type' => 'kanban',
+            'user' => $user,
+            'expireAfter' => strtotime("+1 hour"),
+        ]);
+    } catch (Exception $e) {
+        return WikiParser_PluginOutput::userError($e->getMessage());
+    }
 
     $smarty = TikiLib::lib('smarty');
     $kanbanData =

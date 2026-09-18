@@ -73,6 +73,8 @@ if (isset($_REQUEST["linkaccount"])) {
     list($isvalid, $newuser, $error) = $userlib->validate_user($_REQUEST["userlogin"], $_REQUEST["userpass"]);
     if (! $isvalid) {
         $smarty->assign('msg', tra('Invalid username or password'));
+    } elseif (! $userlib->canLogin($_REQUEST["userlogin"])) {
+        $smarty->assign('msg', tr('User "%0" is not allowed to log in.', $_REQUEST["userlogin"]));
     } else {
         $facebook_id = $tikilib->get_user_preference($user, 'facebook_id');
         // TODO set other social networking IDs

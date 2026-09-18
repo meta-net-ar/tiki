@@ -30,6 +30,8 @@ $inputConfiguration = [
             'filterEmailNotConfirmed'     => 'alpha',
             'filterNeverLoggedIn'         => 'alpha',
             'filterNotValidated'          => 'alpha',
+            'filterLoginDisabled'         => 'alpha',
+            'filterLocked'                => 'alpha',
             'user'                        => 'int',          //post/get
             'action'                      => 'alpha',        //post
             'genepass'                    => 'password',     //post
@@ -646,7 +648,9 @@ $users = $userlib->get_users(
     $find,
     ! empty($_REQUEST['filterEmailNotConfirmed']),
     ! empty($_REQUEST['filterNotValidated']),
-    ! empty($_REQUEST['filterNeverLoggedIn'])
+    ! empty($_REQUEST['filterNeverLoggedIn']),
+    ! empty($_REQUEST['filterLoginDisabled']),
+    ! empty($_REQUEST['filterLocked'])
 );
 if ($prefs['userTracker'] === 'y') {
     foreach ($users['data'] as &$u) {

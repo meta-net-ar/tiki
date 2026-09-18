@@ -269,6 +269,12 @@ class UsersLib extends TikiLib
         return in_array($group, $this->list_all_groups());
     }
 
+    public function canLogin($user)
+    {
+        $query = 'select `login` from `users_users` where upper(`login`) = ? and `login_disabled` = ?';
+        return $this->getOne($query, [TikiLib::strtoupper($user), 'n']);
+    }
+
     /**
      * Remember-me cookie name and session key, derived from the cookie_name preference.
      * Bootstrap sets global user_cookie_site to this value once for the whole request.
@@ -2467,7 +2473,9 @@ class UsersLib extends TikiLib
         $email = '',
         $notconfirmed = false,
         $notvalidated = false,
-        $neverloggedin = false
+        $neverloggedin = false,
+        $loginDisabled = false,
+        $accoundLocked = false,
     ) {
         global $prefs;
 
@@ -2538,9 +2546,21 @@ class UsersLib extends TikiLib
             $mbindvars = $bindvars;
         }
 
-        if ($notconfirmed && $notvalidated) {
+        if ($notconfirmed && $notvalidated && $accoundLocked) {
+            $mid .= $mid == '' ? ' where' : ' and';
+            $mid .= ' (uu.`waiting` = \'u\' or uu.`waiting` = \'a\' or uu.`waiting` = \'l\')';
+            $mmid = $mid;
+        } elseif ($notconfirmed && $notvalidated) {
             $mid .= $mid == '' ? ' where' : ' and';
             $mid .= ' (uu.`waiting` = \'u\' or uu.`waiting` = \'a\')';
+            $mmid = $mid;
+        } elseif ($notconfirmed && $accoundLocked) {
+            $mid .= $mid == '' ? ' where' : ' and';
+            $mid .= ' (uu.`waiting` = \'u\' or uu.`waiting` = \'l\')';
+            $mmid = $mid;
+        } elseif ($notvalidated && $accoundLocked) {
+            $mid .= $mid == '' ? ' where' : ' and';
+            $mid .= ' (uu.`waiting` = \'a\' or uu.`waiting` = \'l\')';
             $mmid = $mid;
         } else {
             if ($notconfirmed) {
@@ -2554,6 +2574,12 @@ class UsersLib extends TikiLib
                 $mid .= ' uu.`waiting` = \'a\'';
                 $mmid = $mid;
             }
+
+            if ($accoundLocked) {
+                $mid .= $mid == '' ? ' where' : ' and';
+                $mid .= ' uu.`waiting` = \'l\'';
+                $mmid = $mid;
+            }
         }
 
         if ($neverloggedin) {
@@ -2561,6 +2587,13 @@ class UsersLib extends TikiLib
             $mid .= ' (uu.`lastLogin` is null or uu.`lastLogin` = 0)';
             $mmid = $mid;
         }
+
+        if ($loginDisabled) {
+            $mid .= $mid == '' ? ' where' : ' and';
+            $mid .= ' uu.`login_disabled` = \'y\'';
+            $mmid = $mid;
+        }
+
         $query = "select uu.* from `users_users` uu $mid order by " . $this->convertSortMode($sort_mode);
         $query_count = "select count(*) from `users_users` uu $mmid";
         $ret = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
@@ -9234,6 +9267,25 @@ class UsersLib extends TikiLib
 
         // Notify user
         Scheduler_Manager::queueJob('Notify lock status to user', 'UserLockMailerCommandTask', ['user_login' => $user, 'lock_status' => $lock_status]);
+
+        TikiLib::events()->trigger('tiki.user.update', ['type' => 'user', 'object' => $user]);
+
+        return true;
+    }
+
+    public function updateUserLoginStatus($user, $login_disabled)
+    {
+        $cachelib = TikiLib::lib('cache');
+
+        $userexists_cache[$user] = null;
+
+        $res = $this->table('users_users')->update(['login_disabled' => $login_disabled], ['login' => $user]);
+
+        if (! $res->numRows()) {
+            return false;
+        }
+
+        $cachelib->invalidate('userslist');
 
         TikiLib::events()->trigger('tiki.user.update', ['type' => 'user', 'object' => $user]);
 
