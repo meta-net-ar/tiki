@@ -66,6 +66,7 @@ class CookieConsentLib
     {
 
         $requestedCategories = self::getCookieCategories();
+        $currentCategories = self::getConsentPreferences()['categories'];
 
         $disabledCategories = self::getDisabledCookieCategoryKeys();
         if ($disabledCategories) {
@@ -77,6 +78,9 @@ class CookieConsentLib
                     \Feedback::error(tr("Category %0 from pref cookie_consent_disable_builtin_categories not found in: %1", $disabledCategoryKey, implode(', ', array_keys($requestedCategories))));
                 }
             }
+        }
+        foreach ($requestedCategories as $key => & $value) {
+            $value['consent'] = $currentCategories[$key];
         }
         return $requestedCategories;
     }
