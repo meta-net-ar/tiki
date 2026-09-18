@@ -186,6 +186,7 @@
                             {preference name=feature_wiki_userpage_prefix}
                         </div>
                         {preference name=feature_wiki_usrlock}
+                        {preference name=feature_wiki_view_permissions}
                         {preference name=feature_source}
                         {preference name=wiki_feature_copyrights}
                         {preference name=wiki_pagination}

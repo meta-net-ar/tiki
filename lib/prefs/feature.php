@@ -2355,6 +2355,13 @@ function prefs_feature_list($partial = false)
             ],
             'default' => 'n',
         ],
+        'feature_wiki_view_permissions' => [
+            'name' => tra('View page permissions'),
+            'description' => tra('Visualize the permissions applied to a wiki page'),
+            'type' => 'flag',
+            'help' => $wikiFeaturesHelp,
+            'default' => 'n',
+        ],
         'feature_wiki_discuss' => [
             'name' => tra('Discuss pages on forums'),
             'description' => tra('Enabling the option will add, on each wiki page, a Discuss button that links to a forum thread dedicated to discussion of the particular page.'),

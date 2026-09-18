@@ -99,9 +99,16 @@
                             </a>
                         </li>
                     {/if}
+                    {if $prefs.tracker_view_permissions eq 'y'}
+                        <li class="dropdown-item">
+                            <a href="{bootstrap_modal controller=object action=permissions type=trackeritem object=$itemId}">
+                                {icon name="permission"} {tr}View permissions{/tr}
+                            </a>
+                        </li>
+                    {/if}
                     {if $tiki_p_admin_trackers eq "y"}
                         <li class="dropdown-item">
-                            {permission_link mode=text type=trackeritem id=$itemId permType=trackers parentId=$trackerId}
+                            {permission_link mode=text type=trackeritem id=$itemId permType=trackers parentId=$trackerId label="{tr}Edit permissions{/tr}"}
                         </li>
                     {/if}
                     {if $prefs.user_favorites eq 'y' and isset($itemId)}
