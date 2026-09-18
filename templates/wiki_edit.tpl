@@ -1,7 +1,7 @@
 <div class='edit-zone clearfix'> {* grid class col-md-9 was added here for correct layout in form-horizontal (UPDATE: form-horizontal class is obsolete) tracker plugin but nested col-md-9s resulted; testing. *}
     {if $textarea__toolbars ne 'n'}
         <div class='textarea-toolbar nav-justified' id='{$textarea_id|default:editwiki}_toolbar'>
-            {toolbars area_id=$textarea_id|default:editwiki comments=$comments switcheditor=$switcheditor section=$toolbar_section objectId=$objectId syntax=$textarea_syntax}
+            {toolbars area_id=$textarea_id|default:editwiki comments=$comments switcheditor=$switcheditor switchsyntax=$switchsyntax section=$toolbar_section objectId=$objectId syntax=$textarea_syntax}
         </div>
     {/if}
     <textarea {$textarea_attributes}>{$textareadata|escape}</textarea>

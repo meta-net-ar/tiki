@@ -1357,6 +1357,7 @@ $lang_current = array(
 "Preview" => "Aperçu",
 "Wiki Syntax Help" => "Aide de syntaxe Wiki",
 "Markdown Syntax Help" => "Aide sur la syntaxe Markdown",
+"Conversion failed. Please save the page before converting its syntax. The saved page still uses %0 syntax." => "La conversion a échoué. Veuillez enregistrer la page avant de convertir sa syntaxe. La page enregistrée utilise toujours la syntaxe %0.",
 "Plugins" => "Plugiciels",
 "Spreadsheet Help" => "Aide tableur",
 "Edit Help" => "Aide édition",

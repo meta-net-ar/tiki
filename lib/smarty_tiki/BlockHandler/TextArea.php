@@ -152,8 +152,10 @@ class TextArea extends Base implements TikiSmartyExtensionInterface
                 $html = str_replace('class="alert alert-warning alert-dismissible"', 'class="alert alert-warning alert-dismissible" style="display:none;"', $html); // quickfix to stop this box appearing before doc.ready
         }
         $params['switcheditor'] = $params['switcheditor'] ?? 'y';
+        $params['switchsyntax'] = $params['switchsyntax'] ?? 'y';
         $smarty->assign('comments', $params['comments']);   // 3 probably removable assigns
         $smarty->assign('switcheditor', $params['switcheditor']);
+        $smarty->assign('switchsyntax', $params['switchsyntax']);
         $smarty->assign('toolbar_section', $params['section']);
         if ($prefs['feature_ajax'] == 'y' && $prefs['ajax_autosave'] == 'y' && $params['_simple'] == 'n' && $params['autosave'] == 'y') {
             // retrieve autosaved content
@@ -225,7 +227,7 @@ class TextArea extends Base implements TikiSmartyExtensionInterface
 
             $textarea_attributes = '';
             foreach ($params as $k => $v) {
-                if ($k[0] != '_' && ! in_array($k, ['comments', 'switcheditor', 'section', 'area_id', 'autosave'])) {
+                if ($k[0] != '_' && ! in_array($k, ['comments', 'switcheditor', 'switchsyntax', 'section', 'area_id', 'autosave'])) {
                     $textarea_attributes .= ' ' . $k . '="' . $v . '"';
                 }
             }

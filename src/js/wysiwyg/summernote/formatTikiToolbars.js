@@ -26,7 +26,7 @@ export const CUSTOM_ACTIONS = {
 };
 
 export default function (toolbar) {
-    const flattenDepth1 = toolbar.flat(1);
+    const flattenDepth1 = toolbar[0]?.[0] && !Array.isArray(toolbar[0][0]) ? toolbar : toolbar.flat(1);
     const flatten = [];
     const lastGroupsIndexes = [];
     flattenDepth1.forEach((item, index) => {

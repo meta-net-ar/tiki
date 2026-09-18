@@ -168,7 +168,7 @@ function get_default_prefs()
             // cannot contain spaces, commas, forward-slash or pipe chars within tool names
             'toolbar_global' => '
                 bold, italic, underline, strike, sub, sup,-, color, -, tikiimage, tikilink, link, unlink, anchor, -,
-                undo, redo, -, find, replace, -, removeformat, specialchar, smiley | help, launchplugins, switcheditor, autosave, admintoolbar /
+                undo, redo, -, find, replace, -, removeformat, specialchar, smiley | help, launchplugins, switcheditor, switchsyntax, autosave, admintoolbar /
                 format, templates, cut, copy, paste, pastetext, pasteword, -, h1, h2, h3, left, center, -,
                 blockquote, list, numlist, -, pagebreak, rule, -, table, -, source, showblocks, screencapture | fullscreen /
                 style, fontname, fontsize, outdent, indent /

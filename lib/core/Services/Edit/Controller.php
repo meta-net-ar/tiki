@@ -316,7 +316,7 @@ $(window).on("load", function(){
 
     public function action_editor_settings($input)
     {
-        TikiLib::lib('header')->add_js_module('import handleSettings from "@jquery-tiki/tiki-editor_settings"; handleSettings();');
+        TikiLib::lib('header')->add_js_module('import handleEditorSettings from "@jquery-tiki/tiki-editor_settings"; handleEditorSettings();');
         return [
             'title' => tr('Editor Settings'),
             'domId' => $input->domId->word(),
@@ -325,6 +325,22 @@ $(window).on("load", function(){
         ];
     }
 
+    /**
+     * @param $input
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function actionSyntaxSettings($input)
+    {
+        TikiLib::lib('header')->add_js_module('import handleSyntaxSettings from "@jquery-tiki/tiki-syntax_settings"; handleSyntaxSettings();');
+
+        return [
+            'title' => tr('Syntax Settings'),
+            'domId' => $input->domId->word(),
+            'syntax' => $input->syntax->word(),
+        ];
+    }
     /**
      * While the editor settings form is submitted,
      * parsed the data and convert to ma
@@ -336,6 +352,32 @@ $(window).on("load", function(){
      * @throws Exception
      */
     public function actionPostEditorSettings($input)
+    {
+        global $tikilib;
+        $editor = $input->editor->word();
+        $syntax = $input->syntax->word() ?: 'tiki';
+        $data = $input->data->none();
+        $converted = $data;
+        // check if the data is html and convert it to wiki
+        if ($input->is_html->word() === 'y') {
+            $converted = TikiLib::lib('edit')->parseToWiki($data);
+        }
+
+        if ($syntax === 'tiki' && $editor === 'wysiwyg') {
+            $converted = TikiLib::lib('edit')->parseToWysiwyg($converted, true, false, ['wysiwyg' => true, 'html_editor' => true]);
+        }
+
+        return [
+            'wysiwyg' => $input->editor->word() === 'wysiwyg' ? 'y' : 'n',
+            'syntax' => $syntax,
+            'content' => $converted,
+            'domId' => $input->domId->word(),
+            'type' => $input->editor->word(),
+            'domName' => $input->domName->raw(),
+        ];
+    }
+
+    public function actionPostSyntaxSettings($input)
     {
         global $tikilib;
         $editor = $input->editor->word();
@@ -363,10 +405,10 @@ $(window).on("load", function(){
                 $syntax,
                 $page_name
             );
-        }
-
-        if ($syntax === 'tiki' && $editor === 'wysiwyg') {
-            $converted = TikiLib::lib('edit')->parseToWysiwyg($converted, true, false, ['wysiwyg' => true, 'html_editor' => true]);
+        } else {
+            $message = tr('Conversion failed. Please save the page before converting its syntax. The saved page still uses %0 syntax.', $syntax);
+            Feedback::error($message, true);
+            throw new Services_Exception($message, 409);
         }
 
         return [

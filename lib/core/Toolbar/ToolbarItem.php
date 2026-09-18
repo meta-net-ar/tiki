@@ -92,6 +92,8 @@ abstract class ToolbarItem
             return new ToolbarHelptool();
         } elseif ($tagName == 'switcheditor') {
             return new ToolbarSwitchEditor();
+        } elseif ($tagName == 'switchsyntax') {
+            return new ToolbarSwitchSyntax();
         } elseif ($tagName == 'admintoolbar') {
             return new ToolbarAdmin();
         } elseif ($tagName == '-') {
@@ -194,6 +196,7 @@ abstract class ToolbarItem
                     'tikiimage',
                     'tikifile',
                     'switcheditor',
+                    'switchsyntax',
                     'admintoolbar',
                     'nonparsed',
                     'bidiltr',
