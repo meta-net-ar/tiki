@@ -4,6 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use SmartyTiki\BlockHandler\Remarksbox;
+use Tiki\Lib\HtmlTidy\HtmlTidyLib;
+
 /**
  * A text of markup, usually using Tiki's syntax ("wiki syntax"), which can be parsed
  *
@@ -561,6 +565,28 @@ if ( \$('#$id') ) {
             $killtoc = false;
 
             $plugin_result = $this->convert_plugin_output($output, $pluginFormat, $outputFormat);
+
+            if (! empty($plugin_result) && is_string($plugin_result)) {
+                $htmlTidy = new HtmlTidyLib();
+                if ($htmlTidy->isTidyPreviewEnabled()) {
+                    $tidyErrors = $htmlTidy->reportErrors($plugin_result);
+                    if (! empty($tidyErrors) && ! empty($this->option['preview_mode'])) {
+                        $items = implode('', array_map(
+                            fn($e) => '<li>' . htmlspecialchars($e['message'])
+                                . ' <small>(line ' . (int) $e['line'] . ', col ' . (int) $e['column'] . ')</small>'
+                                . '</li>',
+                            $tidyErrors
+                        ));
+                        $box = Remarksbox::render(
+                            ['type' => 'warning', 'title' => tr('HTML markup errors in plugin: %0', $name)],
+                            '<ul>' . $items . '</ul>'
+                                . '<pre><code>' . htmlspecialchars($plugin_result) . '</code></pre>'
+                        );
+                        $plugin_result = $box . $plugin_result;
+                    }
+                }
+            }
+
             if (($this->option['html_editor'] ?? false)) {
                 return $this->convert_plugin_for_html_editor($name, $args, $plugin_result, $data, $info);
             } else {

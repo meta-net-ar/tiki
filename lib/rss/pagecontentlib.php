@@ -5,6 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\HtmlTidy\HtmlTidyLib;
+
 class PageContentLib
 {
     public function augmentInformation($data)
@@ -64,13 +66,8 @@ class PageContentLib
 
     private function tidy($html)
     {
-        if (function_exists('tidy_parse_string')) {
-            $tidy = tidy_parse_string($html, [], 'UTF8');
-            $tidy->cleanRepair();
-            $html = $tidy->value;
-        }
-
-        return $html;
+        $htmlTidyLib = new HtmlTidyLib();
+        return $htmlTidyLib->cleanHtml($html, [], 'UTF8', ['source' => 'rss_content']);
     }
 
     private function getUrls($url)

@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Lib\Diff\DiffUtils;
+use Tiki\Lib\HtmlTidy\HtmlTidyLib;
 
 require_once('../tiki-setup.php');
 
@@ -20,7 +21,7 @@ if (! extension_loaded('http') and ! extension_loaded('curl')) {
     Feedback::errorAndDie(tra('The pecl HTTP extension or the Curl extension is needed to replay the TikiTest'), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
-$smarty->assign('tidy', extension_loaded('tidy'));
+$smarty->assign('tidy', (new HtmlTidyLib())->isTidyLoaded());
 $smarty->assign('http', extension_loaded('http'));
 $smarty->assign('curl', extension_loaded('curl'));
 
@@ -143,7 +144,7 @@ function verif_url($url, $use_tidy = true)
         $buffer = $body;
     }
 
-    if (extension_loaded('tidy')) {
+    if ((new HtmlTidyLib())->isTidyLoaded()) {
         $data = tidy_parse_string($data, [], 'utf8');
         $buffer = tidy_parse_string($buffer, [], 'utf8');
         if ($use_tidy) {

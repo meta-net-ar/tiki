@@ -17,6 +17,7 @@ use Tiki\Package\VendorHelper;
 use Tiki\Profiling\Timer;
 use Tiki\Captcha\CaptchaTypeResolver;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Lib\HtmlTidy\HtmlTidyLib;
 
 //Be careful, composer autoloading isn't available until tiki-setup_base.php is required further down
 
@@ -1031,6 +1032,8 @@ require_once('lib/setup/plugins_actions.php');
 
 if ($tiki_p_admin == 'y') {
     $headerlib->add_jsfile_late('lib/jquery_tiki/tiki-admin.js');
+    // Applies the ?tidy_html_reporting=y|n session toggle.
+    new HtmlTidyLib();
 }
 
 if ($prefs['wikiplugin_addtocart'] == 'y') {

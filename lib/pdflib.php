@@ -8,6 +8,7 @@
 use Mpdf\Mpdf;
 use Tiki\BruteForce\BruteForce;
 use Tiki\Lib\Auth\Tokens;
+use Tiki\Lib\HtmlTidy\HtmlTidyLib;
 use Tiki\Lib\Theme\ThemeLib;
 
 /**
@@ -1962,31 +1963,17 @@ TEXT;
  */
 function cleanHtml($html, $config = null, $encoding = 'utf8')
 {
-    if (extension_loaded('tidy') == true) {
-        $default = [
-            'clean' => true,
-            'output-xhtml' => false,
-            'merge-divs' => false,
-            'show-body-only' => 'auto',
-            'new-blocklevel-tags' => 'pdfsettings pdfpage pdfinclude article aside audio bdi canvas details dialog figcaption figure footer header hgroup main menu menuitem nav section source summary template track video',
-            'new-empty-tags' => 'embed keygen source track wbr',
-            'new-inline-tags' => 'svg audio command datalist embed mark menuitem meter output progress source time video wbr',
-            'repeated-attributes' => 'keep-first',
-            'drop-proprietary-attributes' => false,
-            'wrap' => 0,
-            'coerce-endtags' => true,
-            'quote-ampersand' => true,
-            'quote-marks' => false,
-            'drop-empty-elements' => false,
-        ];
-        $config = (is_array($config) == true) ? array_merge($default, $config) : $default;
-        $html_ = tidy_parse_string($html, $config, $encoding);
-        $html_->cleanRepair();
-
-        return (string) $html_;
+    // new-blocklevel-tags must include both the PDF custom tags and the standard HTML5 tags
+    // from HtmlTidyLib defaults, since the override replaces rather than extends that key.
+    $pdfConfig = [
+        'clean'              => true,
+        'new-blocklevel-tags' => 'pdfsettings pdfpage pdfinclude article aside audio bdi canvas details dialog figcaption figure footer header hgroup main menu menuitem nav section source summary template track video',
+    ];
+    if (is_array($config)) {
+        $pdfConfig = array_merge($pdfConfig, $config);
     }
-
-    return $html;
+    $htmlTidyLib = new HtmlTidyLib();
+    return $htmlTidyLib->cleanHtml($html, $pdfConfig, $encoding, ['source' => 'pdf_generation']);
 }
 
 /**

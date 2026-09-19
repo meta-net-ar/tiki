@@ -53,6 +53,13 @@ function prefs_error_list()
             ],
             'help' => $generalPreferencesHelp,
         ],
+        'error_tracking_enabled_tidy' => [
+            'name'        => tra('Track HTML markup errors (Tidy)'),
+            'description' => tra('Show HTML markup errors inline during wiki page preview. If a DSN is also configured, markup errors from external sources (RSS, PDF export) are additionally reported to the error tracking service (Sentry/GlitchTip).'),
+            'warning'     => tra('PHP Tidy extension: ') . '<strong>' . (extension_loaded('tidy') ? tra('Loaded') : tra('Not loaded')) . '</strong>',
+            'type'        => 'flag',
+            'default'     => 'n',
+        ],
         'error_tracking_dsn'         => [
             'name'        => tra('Data Source Name (DSN)'),
             'description' => tra('DSN used for connect to the error tracking service.'),

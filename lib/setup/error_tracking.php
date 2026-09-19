@@ -72,6 +72,31 @@ class ErrorTracking
     }
 
     /**
+     * Capture a message event (non-exception). Use this for informational reports
+     * such as markup warnings that are not PHP exceptions.
+     *
+     * @param string $message
+     * @param array $tags Optional associative array of tags to attach to this specific event only
+     */
+    public function captureMessage(string $message, array $tags = []): void
+    {
+        if ($this->state === self::STATE_DISABLED) {
+            return;
+        }
+
+        if (empty($tags)) {
+            \Sentry\captureMessage($message);
+        } else {
+            \Sentry\withScope(function (\Sentry\State\Scope $scope) use ($message, $tags) {
+                foreach ($tags as $key => $value) {
+                    $scope->setTag($key, (string) $value);
+                }
+                \Sentry\captureMessage($message);
+            });
+        }
+    }
+
+    /**
      * Capture thrown exception. Exceptions are always added to the exceptions stack.
      *
      * @param \Throwable $exception The exception to capture

@@ -133,6 +133,7 @@
                     <div class="adminoptionboxchild">
                         {preference name=error_tracking_enabled_php}
                         {preference name=error_tracking_enabled_js}
+                        {preference name=error_tracking_enabled_tidy}
                     </div>
                 </div>
                 <div class="adminoptionbox">

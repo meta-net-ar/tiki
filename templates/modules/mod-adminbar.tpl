@@ -211,6 +211,22 @@
                                         </a>
                                     </li>
                                 {/if}
+
+                                {if $prefs.error_tracking_enabled_tidy eq 'y'}
+                                    {if isset($smarty.session.tidy_html_reporting) && $smarty.session.tidy_html_reporting eq 'n'}
+                                        <li class="dropdown-item">
+                                            <a href="{query _type='relative' tidy_html_reporting='y'}">
+                                                {icon name="check"} {tr}Enable HTML markup reporting (this session){/tr}
+                                            </a>
+                                        </li>
+                                    {else}
+                                        <li class="dropdown-item">
+                                            <a href="{query _type='relative' tidy_html_reporting='n'}">
+                                                {icon name="no"} {tr}Disable HTML markup reporting (this session){/tr}
+                                            </a>
+                                        </li>
+                                    {/if}
+                                {/if}
                             </ul>
                         </div>
                     </div>
