@@ -1,4 +1,5 @@
 import { test, expect } from "../../common/test";
+import { useSuiteFixtures } from "../../common/fixtures";
 import {
     login,
     goToEncryptionTab,
@@ -18,6 +19,9 @@ import {
 const STAMP = Date.now();
 const KEY_NAME = `TC05-Before-${STAMP}`;
 const RENAMED = `TC05-After-${STAMP}`;
+
+// The paired teardown removes any key a failed journey left behind.
+useSuiteFixtures(test);
 
 test.describe("TC-05 — Edit key metadata", () => {
     test("Renaming a key through the edit form updates the dashboard row", async ({ page }) => {

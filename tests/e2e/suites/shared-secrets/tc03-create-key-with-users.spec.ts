@@ -1,7 +1,11 @@
 import { test, expect } from "../../common/test";
+import { useSuiteFixtures } from "../../common/fixtures";
 import { login, goToEncryptionTab, openCreateKey, fillKeyForm, applyKeyForm, getShares, backToDashboard, keyRow, deleteKey } from "./helpers";
 
 const KEY_NAME = `TC03-EncKey-${Date.now()}`;
+
+// The paired teardown removes any key a failed journey left behind.
+useSuiteFixtures(test);
 
 test.describe("TC-03 — Create a key shared with users", () => {
     test("Two authorized users produce two shares and both appear on the key's row", async ({ page }) => {
