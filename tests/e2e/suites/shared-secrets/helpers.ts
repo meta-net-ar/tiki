@@ -1,170 +1,136 @@
-import { Page, expect } from "@playwright/test";
+import { Page, Locator, expect } from "@playwright/test";
 import { activateBootstrapTab } from "../../common/ui";
 
 export { login, logout, ADMIN, TEST_USER } from "../../common/auth";
 export { FIXTURE_CMD } from "../../common/fixtures";
 
-// ── Navigation ────────────────────────────────────────────────────────────────
+// The Shared Secrets admin UI is the `sss-admin` Vue micro-frontend, mounted by
+// templates/admin/include_security.tpl inside the Encryption tab. It routes in
+// the client (dashboard / create / edit / shares) with no page reload, so every
+// helper below waits on a rendered heading rather than on a navigation.
 
-// The Encryption tab on tiki-admin.php?page=security
 const ENCRYPTION_TAB_ANCHOR = "a[href='#contentadmin1-encryption']";
 const ENCRYPTION_TAB_PANE = "#contentadmin1-encryption";
+const APP_ROOT = "#single-spa-application\\:\\@vue-mf\\/sss-admin";
+
+const DASHBOARD_HEADING = "Encryption Key Management";
+const CREATE_HEADING = "Create Encryption Key";
+const EDIT_HEADING = "Edit Key";
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+
+export function app(page: Page): Locator {
+    return page.locator(APP_ROOT);
+}
 
 export async function goToEncryptionTab(page: Page) {
     await page.goto("/tiki-admin.php?page=security");
     await page.waitForLoadState("load");
     await activateBootstrapTab(page, ENCRYPTION_TAB_ANCHOR, ENCRYPTION_TAB_PANE);
+    await expectDashboard(page);
 }
 
-export async function openCreateKeyTab(page: Page) {
-    await page.locator("a[href='#contentencryption-2']").click();
-    await page.locator("#contentencryption-2").waitFor({ state: "visible" });
+export async function expectDashboard(page: Page) {
+    await expect(app(page).getByRole("heading", { name: DASHBOARD_HEADING })).toBeVisible();
+    // The table only renders once loadKeys() resolves; waiting for the spinner
+    // to disappear keeps every caller from racing the first fetch.
+    await expect(app(page).locator(".spinner-border")).toHaveCount(0);
 }
 
-export async function openAvailableKeysTab(page: Page) {
-    await page.locator("a[href='#contentencryption-1']").click();
-    await page.locator("#contentencryption-1").waitFor({ state: "visible" });
+export async function openCreateKey(page: Page) {
+    await app(page).getByRole("button", { name: "Create new key" }).click();
+    await expect(app(page).getByRole("heading", { name: CREATE_HEADING })).toBeVisible();
 }
 
-// ── Key creation ──────────────────────────────────────────────────────────────
+export async function openEditKey(page: Page, keyName: string) {
+    await keyRow(page, keyName).getByTitle("Edit key").click();
+    await expect(app(page).getByRole("heading", { name: EDIT_HEADING })).toBeVisible();
+}
 
-export async function createKey(
-    page: Page,
-    name: string,
-    description = "",
-    users: string[] = []
-) {
-    await openCreateKeyTab(page);
-    // Scope to the Create Key tab pane to avoid strict-mode collision
-    // (multiple hidden input[name="name"] fields exist on the page)
-    await page.locator('#contentencryption-2 input[name="name"]').fill(name);
+export async function backToDashboard(page: Page) {
+    await app(page).getByRole("button", { name: "Back to dashboard" }).click();
+    await expectDashboard(page);
+}
+
+// ── The create / edit form ────────────────────────────────────────────────────
+//
+// The form's text inputs carry no id and their labels are not `for`-linked, so
+// each field is reached through the Bootstrap row that holds its label. The user
+// checkboxes do carry ids (`sss-user-<username>`) and are addressed directly.
+
+function field(page: Page, labelText: string): Locator {
+    return app(page).locator(".row", { hasText: labelText }).locator("input, textarea, select").first();
+}
+
+export async function fillKeyForm(page: Page, name: string, description = "", users: string[] = []) {
+    if (name !== "") {
+        await field(page, "Key name or domain").fill(name);
+    }
     if (description) {
-        await page
-            .locator('#contentencryption-2 textarea[name="description"]')
-            .fill(description);
+        await field(page, "Description").fill(description);
     }
-    if (users.length > 0) {
-        // The PHP controller reads users via $input->users->text() then parses via
-        // str_getcsv($value, ',') — it expects a single comma-separated string, NOT
-        // multiple form fields. A native multi-select submits separate users=X&users=Y
-        // pairs, and PHP only captures the last value for a non-array field name.
-        // Fix: remove every element named "users" (native select + Select2 sentinels),
-        // then inject one hidden input with the comma-joined list.
-        await page.evaluate((userList: string[]) => {
-            // Remove native select and any Select2 hidden inputs for "users"
-            document
-                .querySelectorAll('[name="users"]')
-                .forEach((el) => el.remove());
-            // Inject a single hidden input with comma-separated users
-            // The admin security form spans the full page — the tab pane does not wrap it.
-            const form =
-                (document.querySelector(
-                    'form#security, form[action*="tiki-admin"][id]'
-                ) as HTMLFormElement | null) ??
-                (document.querySelector(
-                    'form[action*="tiki-admin"]'
-                ) as HTMLFormElement | null);
-            if (!form) throw new Error("Admin security form not found");
-            const hidden = document.createElement("input");
-            hidden.type = "hidden";
-            hidden.name = "users";
-            hidden.value = userList.join(",");
-            form.appendChild(hidden);
-        }, users);
+    for (const user of users) {
+        const box = app(page).locator(`#sss-user-${user}`);
+        await box.waitFor({ state: "visible" });
+        await box.check();
     }
-    await page.locator('input[type="submit"][value="Apply"]').last().click();
-    await page.waitForLoadState("load");
 }
 
-// Select a user in the Select2 multi-picker via jQuery/Select2 API.
-export async function selectUser(page: Page, username: string) {
-    await page.evaluate((u: string) => {
-        const el = document.querySelector(
-            "#user_selector_1"
-        ) as HTMLSelectElement | null;
-        if (!el) throw new Error("#user_selector_1 not found");
-        for (const opt of el.options) {
-            if (opt.value === u) opt.selected = true;
-        }
-        if ((window as any).jQuery) {
-            (window as any)
-                .jQuery("#user_selector_1")
-                .val(
-                    Array.from(el.options)
-                        .filter((o) => o.selected)
-                        .map((o) => o.value)
-                )
-                .trigger("change");
-        } else {
-            el.dispatchEvent(new Event("change", { bubbles: true }));
-        }
-    }, username);
+export async function applyKeyForm(page: Page) {
+    await app(page).getByRole("button", { name: "Apply" }).click();
 }
 
-// ── Assertions ────────────────────────────────────────────────────────────────
+export async function createKey(page: Page, name: string, description = "", users: string[] = []) {
+    await openCreateKey(page);
+    await fillKeyForm(page, name, description, users);
+    await applyKeyForm(page);
+    await expect(app(page).getByText(`Key “${name}” saved.`)).toBeVisible();
+}
+
+// ── Shares shown once, right after a save ─────────────────────────────────────
 
 export async function getShares(page: Page): Promise<string[]> {
-    // After key creation, shares are shown in a warning remarksbox as an <ol>
-    const items = page.locator(
-        ".remarksbox-warning ol li, .alert-warning ol li"
-    );
-    const count = await items.count();
+    // The post-save table lists one row per holder plus a first row for the
+    // server's own share, which is never disclosed. Only the holder rows carry
+    // a real share value.
+    //
+    // The table renders after save() resolves, so wait for it rather than
+    // reading whatever is on screen the moment Apply was clicked.
+    await expect(app(page).getByText("Save your share now.")).toBeVisible();
+
+    const cells = app(page).locator("table tbody tr td code");
+    const count = await cells.count();
     const shares: string[] = [];
     for (let i = 0; i < count; i++) {
-        shares.push((await items.nth(i).textContent()) ?? "");
+        const text = ((await cells.nth(i).textContent()) ?? "").trim();
+        if (text && text !== "Server share — not disclosed") {
+            shares.push(text);
+        }
     }
-    return shares.map((s) => s.trim()).filter(Boolean);
+    return shares;
+}
+
+// ── The dashboard table ───────────────────────────────────────────────────────
+
+export function keyRow(page: Page, keyName: string): Locator {
+    return app(page).locator("tbody tr").filter({ hasText: keyName });
 }
 
 export async function assertKeyInTable(page: Page, keyName: string) {
-    await openAvailableKeysTab(page);
-    await expect(page.locator("#contentencryption-1 table")).toContainText(
-        keyName
-    );
+    await expect(keyRow(page, keyName)).toHaveCount(1);
 }
 
-// ── Key ID lookup ─────────────────────────────────────────────────────────────
-
-export async function getKeyId(page: Page, keyName: string): Promise<number> {
-    await openAvailableKeysTab(page);
-    const row = page
-        .locator("#contentencryption-1 table tr")
-        .filter({ hasText: keyName });
-    const href =
-        (await row.locator('a[href*="encryption_key"]').getAttribute("href")) ??
-        "";
-    const m = href.match(/encryption_key=(\d+)/);
-    return m ? parseInt(m[1]) : 0;
+export async function assertKeyNotInTable(page: Page, keyName: string) {
+    await expect(keyRow(page, keyName)).toHaveCount(0);
 }
 
-// ── Edit key page ─────────────────────────────────────────────────────────────
+// ── Deletion ──────────────────────────────────────────────────────────────────
+//
+// KeyDashboardPage.deleteKey() gates on a native window.confirm(), so the
+// dialog has to be answered before the click resolves.
 
-export async function goToEditKeyPage(page: Page, keyId: number) {
-    await page.goto(`/tiki-admin.php?page=security&encryption_key=${keyId}`);
-    await page.waitForLoadState("load");
-    await activateBootstrapTab(page, ENCRYPTION_TAB_ANCHOR, ENCRYPTION_TAB_PANE);
-    // The inner Edit Key sub-tab is auto-activated by the template's {jq} snippet
-    await page.locator("#contentencryption-2").waitFor({ state: "visible" });
-}
-
-// ── Delete key ─────────────────────────────────────────────────────────────────
-// confirmPopup() shows a Bootstrap modal (NOT a native dialog).
-// Modal: #bootstrap-modal  Cancel: button.btn-dismiss  Confirm: input[value="OK"]
-
-export async function deleteKey(page: Page, keyName: string) {
-    await openAvailableKeysTab(page);
-    const row = page
-        .locator("#contentencryption-1 table tr")
-        .filter({ hasText: keyName });
-    // Use .first() to be resilient against stale duplicate rows from prior failed test runs
-    await row.locator('button[name="key_delete"]').first().click();
-    // Wait for Bootstrap modal to become visible
-    await page
-        .locator("#bootstrap-modal.show")
-        .waitFor({ state: "visible", timeout: 10000 });
-    // Click OK to confirm deletion
-    await page
-        .locator('#bootstrap-modal input[type="submit"][value="OK"]')
-        .click();
-    await page.waitForLoadState("load");
+export async function deleteKey(page: Page, keyName: string, accept = true) {
+    page.once("dialog", (dialog) => (accept ? dialog.accept() : dialog.dismiss()));
+    await keyRow(page, keyName).getByTitle("Delete key").click();
+    await expect(app(page).locator(".spinner-border")).toHaveCount(0);
 }

@@ -414,6 +414,28 @@ class Services_Encryption_ControllerTest extends TikiTestCase
         });
     }
 
+    public function testRegenerationFromASuppliedOldShareReissuesEveryShare()
+    {
+        $this->shareKeyWithUser(function ($result) {
+            global $user;
+            // The sss-admin edit form posts `regenerate` without an `old_share`, so
+            // it can only regenerate a key the acting user already holds. The
+            // supplied-share path stays reachable through the service and is the
+            // only way an admin who holds nothing can recover a key.
+            $user = 'admin';
+            $regenerated = $this->subject->action_save_key(new JitFilter([
+                'keyId'      => $result['keyId'],
+                'name'       => 'test key',
+                'users'      => 'user1',
+                'regenerate' => 1,
+                'old_share'  => $result['shares'][0],
+            ]));
+
+            $this->assertNotEmpty($regenerated['shares']);
+            $this->assertNotContains($result['shares'][0], $regenerated['shares']);
+        });
+    }
+
     public function testEnterKeySelfHealsStoredShareAfterPasswordChange()
     {
         $this->shareKeyWithUser(function ($result) {
