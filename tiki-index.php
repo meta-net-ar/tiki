@@ -61,6 +61,35 @@ use Tiki\Sections;
 $section = Sections::SECTION_WIKI_PAGE;
 Sections::setCurrentSection($section);
 
+
+global $tikiroot, $base_url;
+$configFile = __DIR__ . '/urls.config.cache.php';
+if (! file_exists($configFile)) {
+    $defaultConfig = <<<CFG
+<?php
+
+return array (
+  'homePageURL' => '',
+  'fallbackURL' => '',
+);
+
+CFG;
+    file_put_contents($configFile, $defaultConfig);
+}
+$config = include $configFile;
+$homePage = $config['homePageURL'];
+$homeSlug = TikiLib::lib('wiki')->get_slug_by_page($homePage);
+$requestSlug = $_GET['page'];
+
+if (! empty($requestSlug)) {
+    $variations = TikiLib::lib('slugmanager')->generateSlugsVariations($requestSlug);
+    if (in_array($homeSlug, $variations)) {
+        $redirectTo = $base_url ?? $tikiroot ?? '/';
+        TikiLib::lib('access')->redirect($redirectTo); //default status code is 302, which is what is needed here given that home page might change
+        exit;
+    }
+}
+
 $multilinguallib = TikiLib::lib('multilingual');
 
 if ($prefs['feature_wiki_structure'] == 'y') {

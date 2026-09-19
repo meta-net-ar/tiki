@@ -13,6 +13,7 @@
  * https://doc.tiki.org/Apache-Clean-URLs
  *
  */
+
 // Adding support for an other web server? Check the end of the file
 use Tiki\TikiInit;
 
@@ -249,6 +250,30 @@ function tiki_route($path)
         '|.*|',
         'tiki-index.php',
         function ($parts) {
+            $configFile = __DIR__ . '/urls.config.cache.php';
+            if (! file_exists($configFile)) {
+                $defaultConfig = <<<CFG
+<?php
+
+return array (
+  'homePageURL' => '',
+  'fallbackURL' => '',
+);
+
+CFG;
+                file_put_contents($configFile, $defaultConfig);
+            }
+            $config = include $configFile;
+            global $tikiroot;
+            $homePage = $config['homePageURL'] ?? 'HomePage';
+            $homeSlug = TikiLib::lib('wiki')->get_slug_by_page($homePage);
+            $requestSlug = str_replace('+', '-', $parts[0]);
+            if ($requestSlug === $homeSlug) {
+                $redirectTo = $config['fallbackURL'] ?? $tikiroot ?? '/';
+                //because tiki setup is not included, this does not work well TikiLib::lib('access')->redirect($redirectTo); //default status code is 302, which is what is needed here given that home page might change
+                header('Location: ' . $redirectTo, true, 302);
+                exit;
+            }
             return ['page' => urldecode($parts[0])];
         }
     );
