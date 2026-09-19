@@ -83,7 +83,7 @@ $requestSlug = $_GET['page'];
 
 if (! empty($requestSlug)) {
     $variations = TikiLib::lib('slugmanager')->generateSlugsVariations($requestSlug);
-    if(in_array($homeSlug, $variations)) {
+    if (in_array($homeSlug, $variations)) {
         $redirectTo = $base_url ?? $tikiroot ?? '/';
         TikiLib::lib('access')->redirect($redirectTo); //default status code is 302, which is what is needed here given that home page might change
         exit;

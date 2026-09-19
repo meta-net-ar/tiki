@@ -4657,14 +4657,14 @@ class TikiLib extends TikiDb_Bridge
 
         $cachelib = TikiLib::lib('cache');
         $cachelib->invalidate('global_preferences');
-        
-        if($name === 'wikiHomePage' || $name === "fallbackBaseUrl"){
+
+        if ($name === 'wikiHomePage' || $name === "fallbackBaseUrl") {
             $config = [
-                'homePageURL' => $name== "wikiHomePage"? $value : (string) $this->get_preference('wikiHomePage', ''),
-                'fallbackURL' => $name == "fallbackBaseUrl"? $value : (string) $this->get_preference('fallbackBaseUrl', ''),
+                'homePageURL' => $name == "wikiHomePage" ? $value : (string) $this->get_preference('wikiHomePage', ''),
+                'fallbackURL' => $name == "fallbackBaseUrl" ? $value : (string) $this->get_preference('fallbackBaseUrl', ''),
             ];
 
-            $configFile = dirname(__DIR__) . '/homepage.config.php';
+            $configFile = dirname(__DIR__) . '/urls.config.cache.php';
 
             file_put_contents(
                 $configFile,
