@@ -560,6 +560,16 @@ class TrackerLib extends TikiLib
     {
         return $this->table('tiki_trackers')->fetchFullRow(['trackerId' => (int) $trackerId]);
     }
+    /**
+     * Return the tracker ID from tracker permanent name.
+     *
+     * @param string $trackerPermName Tracker permanent name.
+     * @return int|false Returns the tracker ID on success, or false if not found.
+     */
+    public function get_trackerIdfromPermName($trackerPermName): int|false
+    {
+        return $this->table('tiki_tracker_options')->fetchOne('trackerId', ['permName' => (string) $trackerPermName]);
+    }
 
     /**
      * Return the raw database row for this tracker field id
@@ -5442,6 +5452,19 @@ class TrackerLib extends TikiLib
     public function get_tracker_by_name($name)
     {
         return $this->trackers()->fetchOne('trackerId', ['name' => $name]);
+    }
+    /**
+     * Returns the Tracker ID from the Permanent Name
+     * @param string $permanentName Tracker's Permanent Name
+     * @return int
+     */
+    public function getTrackerIdByPermanentName(string $permanentName): int
+    {
+        $trackerId = $this->options()->fetchOne('trackerId', ['value' => $permanentName, 'name' => 'permName']);
+        if (! isset($trackerId)) {
+            throw new InvalidArgumentException("The tracker's permanent name is invalid.");
+        }
+        return $trackerId;
     }
 
     public function get_field_by_name($trackerId, $fieldName)
