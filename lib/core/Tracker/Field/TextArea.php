@@ -14,6 +14,12 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
 {
     public static function getManagedTypesInfo(): array
     {
+        global $prefs;
+        $missing_description = '';
+        if ($prefs['feature_wysiwyg'] === 'n') {
+            $missing_description = ' ' . tr('You need to activate WYSIWYG (feature_wysiwyg) feature to benefit from it.');
+        }
+        $wysiwyg_description = tr('Use a rich text editor instead of inputting plain text.') . $missing_description;
         return [
             'a' => [
                 'name' => tr('Text Area'),
@@ -88,7 +94,7 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
                     ],
                     'wysiwyg' => [
                         'name' => tr('Use WYSIWYG'),
-                        'description' => tr('Use a rich text editor instead of inputting plain text.'),
+                        'description' => $wysiwyg_description,
                         'default' => 'n',
                         'filter' => 'alpha',
                         'options' => [

@@ -14,6 +14,11 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         } else {
             $tracker_wikirelation_synctitle = 'n';
         }
+        $missing_description = '';
+        if ($prefs['feature_wysiwyg'] === 'n') {
+            $missing_description = ' ' . tr('You need to activate WYSIWYG (feature_wysiwyg) feature to benefit from it.');
+        }
+        $wysiwyg_description = tr('Use a rich text editor instead of inputting plain text.') . $missing_description;
         return [
             'wiki' => [
                 'name' => tr('Wiki Page'),
@@ -122,7 +127,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                     ],
                     'wysiwyg' => [
                         'name' => tr('Use WYSIWYG'),
-                        'description' => tr('Use a rich text editor instead of inputting plain text.'),
+                        'description' => $wysiwyg_description,
                         'default' => 'n',
                         'filter' => 'alpha',
                         'options' => [
