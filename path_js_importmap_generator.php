@@ -147,6 +147,10 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 /* src/js/tiki-figlet */
                 "@tiki-figlet" => $tikiUrl . JS_ASSETS_PATH . "/tiki-figlet.js",
 
+                /* lib/jsfontpicker */
+                "@tiki-jsfontpicker" => $tikiUrl . "lib/jsfontpicker/fontpicker.js",
+                "@jquery-tiki/tiki-fontpicker_init" => $tikiUrl . "lib/jsfontpicker/tiki-fontpicker_init.js",
+
                 /* src/js/tiki-glightbox */
                 "@tiki-glightbox" => $tikiUrl . JS_ASSETS_PATH . "/tiki-glightbox.js",
 
