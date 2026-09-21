@@ -237,7 +237,11 @@ class WikiLib extends TikiLib
 
     // This method renames a wiki page
     // If you think this is easy you are very very wrong
-    public function wiki_rename_page($oldName, $newName, $renameHomes = true, $user = '', $skipCharsCheck = false)
+    /**
+     * @param string|null $newSlug Slug to use as-is for the renamed page. When null or empty, a slug is generated from $newName.
+     * @throws Exception 1: bad characters, 2: page already exists, 4: slug already in use, 5: slug too long
+     */
+    public function wiki_rename_page($oldName, $newName, $renameHomes = true, $user = '', $skipCharsCheck = false, $newSlug = null)
     {
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
@@ -245,10 +249,6 @@ class WikiLib extends TikiLib
         $newName = trim($newName);
         $oldName = trim($oldName);
 
-        // Check if trying to rename to the same name
-        if ($oldName === $newName) {
-            throw new Exception("Cannot rename page to the same name", 3);
-        }
         if ($this->get_page_info($newName, false, true)) {
             // if it is a case change of same page: allow it, else stop here
             if (strcasecmp(trim($oldName), $newName) <> 0) {
@@ -258,6 +258,33 @@ class WikiLib extends TikiLib
 
         if (! $skipCharsCheck && $this->contains_badchars($newName) && $prefs['wiki_badchar_prevent'] == 'y') {
             throw new Exception("Bad characters", 1);
+        }
+
+        $explicitSlug = $newSlug !== null && trim($newSlug) !== '';
+        if ($explicitSlug) {
+            $slug = trim($newSlug);
+
+            if (mb_strlen($slug) > 160) {
+                throw new Exception("Slug too long", 5);
+            }
+
+            $slugOwner = TikiDb::get()->table('tiki_pages')->fetchOne('pageName', ['pageSlug' => $slug]);
+            if ($slugOwner && strcasecmp($slugOwner, $oldName) !== 0) {
+                throw new Exception("Slug already in use", 4);
+            }
+        } else {
+            $slug = TikiLib::lib('slugmanager')->generate($prefs['wiki_url_scheme'], $newName, $prefs['url_only_ascii'] === 'y');
+        }
+
+        if ($oldName === $newName) {
+            if ($explicitSlug) {
+                $query = 'update `tiki_pages` set `pageSlug`=? where `pageName`=?';
+                $this->query($query, [$slug, $oldName]);
+
+                require_once('lib/search/refresh-functions.php');
+                refresh_index('pages', $oldName);
+            }
+            return true;
         }
 
         // The pre- and post-tags are eating away the max usable page name length
@@ -270,7 +297,6 @@ class WikiLib extends TikiLib
         $query = 'update `tiki_pages` set `pageName`=?, `pageSlug`=NULL where `pageName`=?';
         $this->query($query, [$tmpName, $oldName]);
 
-        $slug = TikiLib::lib('slugmanager')->generate($prefs['wiki_url_scheme'], $newName, $prefs['url_only_ascii'] === 'y');
         $query = 'update `tiki_pages` set `pageName`=?, `pageSlug`=? where `pageName`=?';
         $this->query($query, [$newName, $slug, $tmpName]);
 
@@ -1725,15 +1751,17 @@ class WikiLib extends TikiLib
         }
 
         if ($finalPageName) {
+            $tiki_pages = TikiDb::get()->table('tiki_pages');
+            $slug = $tiki_pages->fetchOne('pageSlug', ['pageName' => $finalPageName]);
+
             if ($prefs['feature_sefurl'] === 'y') {
-                $tiki_pages = TikiDb::get()->table('tiki_pages');
-                $href = urlencode($tiki_pages->fetchOne('pageSlug', ['pageName' => $finalPageName]));
+                $href = urlencode($slug);
                 if (! $href) {
                     // prevent endless loop if empty slug
                     $href = $finalPageName;
                 }
             } else {
-                $href = "$view_script?page=" . urlencode($finalPageName);
+                $href = "$view_script?page=" . urlencode($slug ?: $finalPageName);
             }
         } else {
             $href = "$edit_script?page=" . urlencode($requestedPageName ?? '');

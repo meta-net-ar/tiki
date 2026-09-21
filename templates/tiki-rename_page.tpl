@@ -18,19 +18,22 @@
                 {tr _0=$page_badchars_display|escape}The page name specified contains characters that may render the page hard to access. You may want to consider removing those: <strong>%0</strong>{/tr}
             {/remarksbox}
             <input type="hidden" name="badname" value="{$newname|escape}">
+            <input type="hidden" name="badslug" value="{$newslug|escape}">
             <input type="submit" class="btn btn-primary btn-sm" name="confirm" value="{tr}Use this name anyway{/tr}">
         {/if}
     {/if}
     <label for="newpage" class="col-form-label me-2">{tr}New name{/tr}</label>
-        <input type='text' id='newpage' name='newpage' class="form-control me-3" maxlength="158" value='{$newname|escape}'>
-            {if $prefs.feature_wiki_pagealias eq 'y'}
-                <input type='checkbox' id='semantic_alias' name='semantic_alias' value='y' class="me-2"> {tr}Redirect original page{/tr}
-                <a tabindex="0" target="_blank" data-bs-toggle="popover" data-bs-trigger="hover" title="{tr}301 Redirect - 'moved permanently' HTTP response status code{/tr}" data-bs-content="{tr}Create an SEO-friendly, automatic redirect from old page name to new page name (ex.: for search engines or users that may have bookmarked the page){/tr}">
-                    {icon name='information'}
-                </a>
-            {/if}
+    <input type='text' id='newpage' name='newpage' class="form-control me-3" maxlength="158" value='{$newname|escape}'>
+    <label for="newSlug" class="col-form-label me-2">{tr}New slug{/tr}</label>
+    <input type='text' id='newSlug' name='newslug' class="form-control me-3" maxlength="160" value='{$newslug|escape}'>
+    {if $prefs.feature_wiki_pagealias eq 'y'}
+        <input type='checkbox' id='semantic_alias' name='semantic_alias' value='y' class="me-2"> {tr}Redirect original page{/tr}
+        <a tabindex="0" target="_blank" data-bs-toggle="popover" data-bs-trigger="hover" title="{tr}301 Redirect - 'moved permanently' HTTP response status code{/tr}" data-bs-content="{tr}Create an SEO-friendly, automatic redirect from old page name to new page name (ex.: for search engines or users that may have bookmarked the page){/tr}">
+            {icon name='information'}
+        </a>
+    {/if}
 
-        <input type="submit" class="btn btn-primary ms-3" name="rename" value="{tr}Rename{/tr}">
+    <input type="submit" class="btn btn-primary ms-3" name="rename" value="{tr}Rename{/tr}">
 
 </form>
 

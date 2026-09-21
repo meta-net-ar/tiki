@@ -1,0 +1,2 @@
+ALTER TABLE `tiki_blogs`
+	ADD COLUMN `blogSlug` VARCHAR(160) NULL DEFAULT NULL AFTER `blogId`;

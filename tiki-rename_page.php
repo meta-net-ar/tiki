@@ -16,7 +16,9 @@ $inputConfiguration = [
         'rename'                   => 'bool',             //post
         'confirm'                  => 'bool',             //post
         'badname'                  => 'pagename',             //post
+        'badslug'                  => 'striptags',            //post
         'newpage'                  => 'pagename',         //post
+        'newslug'                  => 'striptags',        //post
         'semantic_alias'           => 'bool',             //post
         ],
     ],
@@ -49,9 +51,14 @@ if (! ($info = $tikilib->get_page_info($page))) {
 // Now check permissions to rename this page
 $access->check_permission(['view', 'rename'], tr('Rename wiki page'), 'wiki page', $page);
 
+$slug = $info['pageSlug'];
+
+$smarty->assign('newslug', $slug);
+
 if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->checkCsrf()) {
     // If the new pagename does match userpage prefix then display an error
     $newName = isset($_REQUEST["confirm"]) ? $_REQUEST['badname'] : $_REQUEST['newpage'];
+    $newSlug = isset($_REQUEST["confirm"]) ? ($_REQUEST['badslug'] ?? null) : ($_REQUEST['newslug'] ?? null);
     if (stristr($newName, $prefs['feature_wiki_userpage_prefix']) == $newName) {
         Feedback::errorAndDie(tra("Cannot rename page because the new name begins with reserved prefix") . ' (' . $prefs['feature_wiki_userpage_prefix'] . ').', \Laminas\Http\Response::STATUS_CODE_409);
     }
@@ -66,12 +73,13 @@ if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->chec
     }
 
     $smarty->assign('newname', $newName);
+    $smarty->assign('newslug', $newSlug);
     $result = false;
     if (! isset($_REQUEST["confirm"]) && $wikilib->contains_badchars($newName)) {
         $smarty->assign('page_badchars_display', $wikilib->get_badchars());
     } else {
         try {
-            $result = $wikilib->wiki_rename_page($page, $newName);
+            $result = $wikilib->wiki_rename_page($page, $newName, true, $user, false, $newSlug);
             if ($result) {
                 Feedback::success(tr('Page renamed'));
             } else {
@@ -85,8 +93,11 @@ if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->chec
                 case 2:
                     Feedback::error(tr('Page already exists'));
                     break;
-                case 3:
-                    Feedback::error(tr('Cannot rename page to the same name'));
+                case 4:
+                    Feedback::error(tr('The slug is already used by another page'));
+                    break;
+                case 5:
+                    Feedback::error(tr('You have exceeded the number of characters allowed (160 max) for the page slug field'));
                     break;
                 default:
                     throw $e;
@@ -103,7 +114,8 @@ if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->chec
         // We'll append on the renamed page's content the following string, where $page is the original name
         // "\r\n~tc~(alias($page))~/tc~"
         // We use the ~tc~ so that it doesn't make the page look ugly
-        if (isset($_REQUEST["semantic_alias"]) && $_REQUEST["semantic_alias"] == "y") {
+        // Skipped when the name is unchanged (slug-only change) to avoid a self-alias
+        if (isset($_REQUEST["semantic_alias"]) && $_REQUEST["semantic_alias"] == "y" && $page !== $newName) {
             if (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP)) {
                 $remoteIp = $_SERVER['REMOTE_ADDR'];
             } else {

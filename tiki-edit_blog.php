@@ -30,6 +30,7 @@ $inputConfiguration = [
             'add_date'                    => 'bool',          //post
             'alwaysOwner'                 => 'bool',          //post
             'title'                       => 'striptags',     //post
+            'slug'                        => 'striptags',     //post
             'description'                 => 'xss',           //post
             'creator'                     => 'string',        //post
             'maxPosts'                    => 'digits',        //post
@@ -77,6 +78,7 @@ $smarty->assign('related_max', 5);
 $smarty->assign('maxPosts', 25);
 $smarty->assign('use_excerpt', 'n');
 $smarty->assign('creator', $user);
+$smarty->assign('slug', '');
 
 
 if (! isset($created)) {
@@ -118,6 +120,7 @@ if (isset($_REQUEST["blogId"]) && $_REQUEST["blogId"] > 0) {
     $smarty->assign('use_excerpt', $data["use_excerpt"]);
     $smarty->assign('creator', $data["user"]);
     $smarty->assign('alwaysOwner', $data["always_owner"]);
+    $smarty->assign('slug', $data["blogSlug"] ?? '');
 }
 
 if (isset($_REQUEST["heading"])) {
@@ -175,6 +178,7 @@ if (isset($_REQUEST["save"]) && $prefs['feature_categories'] == 'y' && $prefs['f
     $use_author = isset($_REQUEST['use_author']) ? 'y' : 'n';
     $add_date = isset($_REQUEST['add_date']) ? 'y' : 'n';
     $alwaysOwner = isset($_REQUEST['alwaysOwner']) ? 'y' : 'n';
+    $slug = $_REQUEST['slug'] ?? null;
 
     if (isset($_REQUEST["save"])) {
         if (isset($_REQUEST["title"], $_REQUEST["description"])) {
@@ -208,7 +212,10 @@ if (isset($_REQUEST["save"]) && $prefs['feature_categories'] == 'y' && $prefs['f
             $post_heading,
             $show_related,
             $related_max,
-            $use_excerpt
+            $use_excerpt,
+            0, //not magic, this is the default value from function signature
+            0,
+            $slug
         );
 
         $cat_type = 'blog';
