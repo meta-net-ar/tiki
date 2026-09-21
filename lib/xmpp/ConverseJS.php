@@ -389,6 +389,7 @@ class ConverseJS
     {
         global $user, $prefs;
         $options = $this->get_options();
+        $this->registerJsDependencies();
 
         if (! isset($options['auto_open'])) {
             $options['auto_open'] = 'n';
@@ -417,8 +418,6 @@ var initializeConverse = function (opts) {
 JS;
 
         if ($prefs['xmpp_conversejs_always_load'] !== 'y') {
-            $this->registerJsDependencies();
-
             $output .= PHP_EOL . ';(function() {';
             $output .= PHP_EOL . '    var link;';
             foreach ($this->get_css_dependencies() as $file) {
