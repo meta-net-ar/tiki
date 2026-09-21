@@ -69,7 +69,11 @@ function wikiplugin_wysiwyg($data, $params)
     }
 
     $contentIsHTML = ! ($params['use_html'] !== 'y');
-    $html = TikiLib::lib('edit')->parseToWysiwyg($data, true, $contentIsHTML, ['page' => $sourcepage, 'html_editor' => true]);
+    $html = TikiLib::lib('edit')->parseToWysiwyg($data, true, $contentIsHTML, [
+        'page' => $sourcepage,
+        'html_editor' => true,
+        'allow_nested_html_editor_plugins' => ['mouseover'],
+    ]);
 
     if (TikiLib::lib('tiki')->user_has_perm_on_object($user, $sourcepage, 'wiki page', 'tiki_p_edit')) {
         $class = "wp_wysiwyg";
