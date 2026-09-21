@@ -3,6 +3,7 @@
  */
 
 import { defaults as defaultControls } from "ol/control";
+import TileState from "ol/TileState";
 
 (function () {
     const defaultVectorColor = "#3399ff";
@@ -17,6 +18,120 @@ import { defaults as defaultControls } from "ol/control";
 
     function getBaseLayers(tiles) {
         const layers = [],
+            bingLayerLoadErrors = {},
+            azureMapsLoadErrors = {},
+            createBingLayer = function (preferenceName, title, imagerySet) {
+                if (!jqueryTiki.bingMapsAPIKey) {
+                    errorLayers.push(preferenceName + " (" + tr("Bing Maps API key missing") + ")");
+                    return null;
+                }
+
+                const source = new ol.source.BingMaps({
+                    key: jqueryTiki.bingMapsAPIKey,
+                    imagerySet: imagerySet,
+                });
+
+                source.on("change", function () {
+                    const errorKey = preferenceName + ":" + imagerySet;
+                    if (source.getState() === "error" && !bingLayerLoadErrors[errorKey]) {
+                        bingLayerLoadErrors[errorKey] = true;
+                        $("#tikifeedback").showError(
+                            tr("Cannot load Bing Maps layer: ") +
+                                preferenceName +
+                                ". " +
+                                tr("Check the Bing Maps API key and Microsoft Bing Maps service access.")
+                        );
+                        // eslint-disable-next-line no-console
+                        console.log("Cannot load Bing Maps layer " + preferenceName + " using imagerySet " + imagerySet);
+                    }
+                });
+
+                return new ol.layer.Tile({
+                    source: source,
+                    title: title,
+                });
+            },
+            createAzureMapsLayer = function (preferenceName, title, tilesetId) {
+                if (!jqueryTiki.azureMapsAPIKey) {
+                    errorLayers.push(preferenceName + " (" + tr("Azure Maps API key missing") + ")");
+                    return null;
+                }
+
+                return new ol.layer.Tile({
+                    source: new ol.source.XYZ({
+                        attributions: '&copy; <a href="https://www.microsoft.com/maps/product/terms.html" target="_blank">Microsoft</a>',
+                        maxZoom: tilesetId === "microsoft.imagery" ? 19 : 22,
+                        tileLoadFunction: function (imageTile, src) {
+                            fetch(src, {
+                                headers: {
+                                    "subscription-key": jqueryTiki.azureMapsAPIKey,
+                                },
+                            })
+                                .then(function (response) {
+                                    if (!response.ok) {
+                                        throw new Error(response.status + " " + response.statusText);
+                                    }
+                                    return response.blob();
+                                })
+                                .then(function (blob) {
+                                    const image = imageTile.getImage(),
+                                        objectUrl = URL.createObjectURL(blob),
+                                        releaseObjectUrl = function () {
+                                            URL.revokeObjectURL(objectUrl);
+                                            image.removeEventListener("load", releaseObjectUrl);
+                                            image.removeEventListener("error", releaseObjectUrl);
+                                        };
+
+                                    image.addEventListener("load", releaseObjectUrl);
+                                    image.addEventListener("error", releaseObjectUrl);
+                                    image.src = objectUrl;
+                                })
+                                .catch(function (error) {
+                                    imageTile.setState(TileState.ERROR);
+                                    if (!azureMapsLoadErrors[preferenceName]) {
+                                        azureMapsLoadErrors[preferenceName] = true;
+                                        $("#tikifeedback").showError(
+                                            tr("Cannot load Azure Maps layer: ") +
+                                                preferenceName +
+                                                ". " +
+                                                tr("Check the Azure Maps API key and account access.")
+                                        );
+                                        // eslint-disable-next-line no-console
+                                        console.log("Cannot load Azure Maps layer " + preferenceName + " using tilesetId " + tilesetId, error);
+                                    }
+                                });
+                        },
+                        tileUrlFunction: function (tileCoord) {
+                            if (!tileCoord) {
+                                return undefined;
+                            }
+
+                            return (
+                                "https://atlas.microsoft.com/map/tile?api-version=2024-04-01" +
+                                "&tilesetId=" +
+                                encodeURIComponent(tilesetId) +
+                                "&zoom=" +
+                                tileCoord[0] +
+                                "&x=" +
+                                tileCoord[1] +
+                                "&y=" +
+                                tileCoord[2] +
+                                "&tileSize=256&view=Auto"
+                            );
+                        },
+                    }),
+                    title: title,
+                });
+            },
+            layerErrorExists = function (name) {
+                for (let index = 0; index < errorLayers.length; index++) {
+                    if (errorLayers[index] === name || errorLayers[index].indexOf(name + " ") === 0) {
+                        return true;
+                    }
+                }
+
+                return false;
+            },
             factories = {
                 openstreetmap: function () {
                     return new ol.layer.Tile({
@@ -25,59 +140,31 @@ import { defaults as defaultControls } from "ol/control";
                     });
                 },
                 bing_road: function () {
-                    return new ol.layer.Tile({
-                        source: new ol.source.BingMaps({
-                            key: jqueryTiki.bingMapsAPIKey,
-                            imagerySet: "Road",
-                        }),
-                        title: "BingRoad",
-                    });
+                    return createBingLayer("bing_road", "BingRoad", "Road");
                 },
                 bing_road_on_demand: function () {
-                    return new ol.layer.Tile({
-                        source: new ol.source.BingMaps({
-                            key: jqueryTiki.bingMapsAPIKey,
-                            imagerySet: "RoadOnDemand",
-                        }),
-                        title: "BingRoadOnDemand",
-                    });
+                    return createBingLayer("bing_road_on_demand", "BingRoadOnDemand", "RoadOnDemand");
                 },
                 bing_aerial: function () {
-                    return new ol.layer.Tile({
-                        source: new ol.source.BingMaps({
-                            key: jqueryTiki.bingMapsAPIKey,
-                            imagerySet: "Aerial",
-                        }),
-                        title: "BingAerial",
-                    });
+                    return createBingLayer("bing_aerial", "BingAerial", "Aerial");
                 },
                 bing_aerial_with_labels: function () {
-                    return new ol.layer.Tile({
-                        source: new ol.source.BingMaps({
-                            key: jqueryTiki.bingMapsAPIKey,
-                            imagerySet: "AerialWithLabels",
-                        }),
-                        title: "BingAerialWithLabels",
-                    });
+                    return createBingLayer("bing_aerial_with_labels", "BingAerialWithLabels", "AerialWithLabelsOnDemand");
                 },
                 bing_ordnance_survey: function () {
-                    return new ol.layer.Tile({
-                        source: new ol.source.BingMaps({
-                            key: jqueryTiki.bingMapsAPIKey,
-                            imagerySet: "ordnanceSurvey",
-                        }),
-                        title: "BingOrdnanceSurvey",
-                    });
+                    return createBingLayer("bing_ordnance_survey", "BingOrdnanceSurvey", "OrdnanceSurvey");
                 },
-                bing_collins_bart: function () {
-                    // Doesn't seem to work?
-                    return new ol.layer.Tile({
-                        source: new ol.source.BingMaps({
-                            key: jqueryTiki.bingMapsAPIKey,
-                            imagerySet: "collinsBart",
-                        }),
-                        title: "BingCollinsBart",
-                    });
+                azure_road: function () {
+                    return createAzureMapsLayer("azure_road", "AzureRoad", "microsoft.base.road");
+                },
+                azure_dark: function () {
+                    return createAzureMapsLayer("azure_dark", "AzureDark", "microsoft.base.darkgrey");
+                },
+                azure_aerial: function () {
+                    return createAzureMapsLayer("azure_aerial", "AzureAerial", "microsoft.imagery");
+                },
+                azure_hybrid: function () {
+                    return createAzureMapsLayer("azure_hybrid", "AzureHybrid", "microsoft.base.hybrid.road");
                 },
                 nextzen: function () {
                     const nextzenRoadStyleCache = {},
@@ -255,7 +342,7 @@ import { defaults as defaultControls } from "ol/control";
                     lyr.set("type", "base");
                     lyr.set("title", k);
                     layers.push(lyr);
-                } else {
+                } else if (!layerErrorExists(name)) {
                     errorLayers.push(name);
                     // eslint-disable-next-line no-console
                     console.log(tr("Cannot create map layer: " + name));
