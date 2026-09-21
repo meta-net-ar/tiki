@@ -546,7 +546,7 @@ function wikiplugin_swiper($data, $params)
     $thumbAfter = '';
     $thumbsSettings = '';
     if ($params['displayThumbnails'] == "y") {
-        $thumbnails = ' <div id="gallery-thumbs' . $uid . '" class="swiper-container gallery-thumbs"><div class="swiper-wrapper">' . $slidesHtml . '</div></div>'   ;
+        $thumbnails = ' <div id="gallery-thumbs' . $uid . '" class="swiper gallery-thumbs"><div class="swiper-wrapper">' . $slidesHtml . '</div></div>'   ;
         $thumbclass = 'gallery-top';
         $swiperOpts = 'var galleryThumbs' . $uid . ' = new Swiper("#gallery-thumbs' . $uid . '", {spaceBetween: 10,
             slidesPerView: 3,
@@ -650,6 +650,6 @@ function wikiplugin_swiper($data, $params)
     $headerlib->add_js(
         '$( document ).ready(function() {' . $swiperOpts . ';$("#swiper-container' . $uid . '").css("max-width",$("#swiper-container' . $uid . '").parent().width());})'
     );
-        $swiperCode = '<div id="swiper-container' . $uid . '" class="swiper-container ' . $thumbclass . '"> <div class="parallax-bg" style="background-image:url(' . $params['parallaxBgImg'] . ')" data-swiper-parallax="-23%"></div> <div class="swiper-wrapper">' . $slidesHtml . '</div><!-- Add Pagination -->' . $paginationDiv . $navigationDiv . '</div>' . $thumbnails;
+        $swiperCode = '<div id="swiper-container' . $uid . '" class="swiper ' . $thumbclass . '"> <div class="parallax-bg" style="background-image:url(' . $params['parallaxBgImg'] . ')" data-swiper-parallax="-23%"></div> <div class="swiper-wrapper">' . $slidesHtml . '</div><!-- Add Pagination -->' . $paginationDiv . $navigationDiv . '</div>' . $thumbnails;
         return $swiperCode;
 }

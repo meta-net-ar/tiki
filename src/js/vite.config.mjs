@@ -157,6 +157,7 @@ export default defineConfig(({ command, mode }) => {
         publicDir: false, //tiki already uses public for other purposes.  If we want to use this feature we can create a src/public folder for it.
         resolve: {
             alias: {
+                "@wysiwyg/summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
                 "moment-timezone": resolve(__dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
                 "html2canvas": "html2canvas-pro",
                 // ui-predicate-vue3
