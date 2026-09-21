@@ -93,7 +93,7 @@ class CookieConsentLib
      */
     public static function initializeConsentPreferences()
     {
-        global $tikilib, $user, $prefs;
+        global $tikilib, $user, $prefs, $jitRequest;
 
         $defaultConsentPreferences = [
             'action' => 'customized',
@@ -139,7 +139,26 @@ class CookieConsentLib
             $consentPreferences = $defaultConsentPreferences;
         }
 
+        if ((! defined('TIKI_API') || ! TIKI_API)
+            && ! $consentPreferences['consentGiven']
+            && (! isset($jitRequest) || ! $jitRequest->offsetExists(self::COOKIE_CONSENT_NAME))
+        ) {
+            self::clearCookiesBeforeConsent();
+        }
+
         return $consentPreferences;
+    }
+
+    /**
+     * Remove existing non-session cookies before the user gives consent.
+     */
+    private static function clearCookiesBeforeConsent(): void
+    {
+        foreach ($_COOKIE as $name => $value) {
+            if (! str_contains($name, session_name())) {
+                setcookie($name, '', time() - 3600);
+            }
+        }
     }
 
     private static function getUserPreference(): ?array
