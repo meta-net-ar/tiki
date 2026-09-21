@@ -139,7 +139,8 @@ class CookieConsentLib
             $consentPreferences = $defaultConsentPreferences;
         }
 
-        if ((! defined('TIKI_API') || ! TIKI_API)
+        if (
+            (! defined('TIKI_API') || ! TIKI_API)
             && ! $consentPreferences['consentGiven']
             && (! isset($jitRequest) || ! $jitRequest->offsetExists(self::COOKIE_CONSENT_NAME))
         ) {
