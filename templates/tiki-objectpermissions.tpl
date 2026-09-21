@@ -207,6 +207,38 @@
                     _sortColumn='parents' _collapseMaxSections=20 _sortColumnDelimiter=',' _selectAllHiddenToo='y'}
             </div>
 
+            {if $prefs.eponymousGroups eq 'y'}
+                <h2>{tr}Eponymous Groups{/tr}</h2>
+                <div class="ts-wrapperdiv mb-3">
+                <table id="{$ts.tableid}" class="table normal table-striped table-hover" data-count="{$eponymous_groups_count|escape}">
+                <thead>
+                    <tr>
+                        <th id="checkbox">
+                            <input name="switcher_eponymous" id="clickall_eponymous" class="form-check-input position-static" type="checkbox" onclick="switchCheckboxes(this.form,'eponymous_group_filter[]',this.checked,true);">
+                            <label class="form-check-label" for="clickall_eponymous">{tr}Select all{/tr}</label>
+                        </th>
+                        <th id="group">{tr}Group name{/tr}</th>
+                        <th id="desc">{tr}Description{/tr}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach item=group from=$eponymous_groups}
+                    <tr>
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="form-check-input" name="eponymous_group_filter[]" value="{$group.id}"{if $group.in_group_filter == 'y'} checked{/if}>
+                        </td>
+                        <td class="group">{$group.groupName|escape}</td>
+                        <td class="desc">{$group.groupDesc|escape}</td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+                </table>
+                </div>
+                {if !$ts.enabled}
+                    {pagination_links cant=$eponymous_groups_count step=$numrows offset=$offset}{/pagination_links}
+                {/if}
+            {/if}
+
             <div class="input_submit_container" style="text-align: center">
                 <input type="submit" class="btn btn-primary btn-sm" name="group_select" value="{tr}Select{/tr}">
             </div>

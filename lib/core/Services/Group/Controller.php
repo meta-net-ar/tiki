@@ -146,7 +146,13 @@ class Services_Group_Controller
                 ];
                 Feedback::success($feedback2);
             }
-            //return to page
+            if (! empty($_SERVER['HTTP_REFERER'])) {
+                parse_str(parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY) ?? '', $refererParams);
+                $viewedGroup = $refererParams['group'] ?? '';
+            }
+            if ($viewedGroup !== '' && in_array($viewedGroup, $deleted, true)) {
+                return Services_Utilities::refresh('queryAndAnchor');
+            }
             return Services_Utilities::refresh('anchor');
         }
     }
@@ -304,6 +310,10 @@ class Services_Group_Controller
             if (! empty($input['name']) && isset($input['olgroup'])) {
                 $newGroupName = trim($input['name']);
                 $userlib = TikiLib::lib('user');
+                $olgroupInfo = $userlib->table('users_groups')->fetchFullRow(['groupName' => $input['olgroup']]);
+                if ($olgroupInfo && ($olgroupInfo['isEponymousGroup'] ?? 'n') === 'y' && $input['olgroup'] !== $newGroupName) {
+                    Services_Utilities::modalException(tra('Eponymous groups cannot be renamed.'));
+                }
                 $users = $userlib->get_group_users($input['name']);
                 if (! empty($users) && $input["isRole"] == "on") {
                     Services_Utilities::modalException(tra('Role groups can\'t have users.'));
@@ -372,6 +382,11 @@ class Services_Group_Controller
                 ];
                 Feedback::error($feedback);
                 return Services_Utilities::refresh('queryAndAnchor');
+            }
+
+            $olgroupInfo = $userlib->table('users_groups')->fetchFullRow(['groupName' => $params['olgroup']]);
+            if ($olgroupInfo && ($olgroupInfo['isEponymousGroup'] ?? 'n') === 'y') {
+                $params['name'] = $params['olgroup'];
             }
 
             $success = $userlib->change_group(

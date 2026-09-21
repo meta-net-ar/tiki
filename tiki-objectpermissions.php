@@ -35,6 +35,7 @@ $inputConfiguration = [
         'staticKeyFiltersForArrays' => [
         'feature_filter'            => 'text',       //post
         'group_filter'              => 'word',       //post
+        'eponymous_group_filter'    => 'int',       //post
         'perm'                      => 'word',       //post
         'old_perm'                  => 'word',       //post
         ],
@@ -185,6 +186,9 @@ if (isset($_REQUEST['group_select'])) {
     if (! isset($_REQUEST['group_filter'])) {
         $_REQUEST['group_filter'] = [];
     }
+    if (! empty($_REQUEST['eponymous_group_filter'])) {
+        $_REQUEST['group_filter'] = array_merge($_REQUEST['group_filter'], $_REQUEST['eponymous_group_filter']);
+    }
     $tikilib->set_user_preference($user, 'objectperm_admin_groups', serialize($_REQUEST['group_filter']));
     $cookietab = '1';
 }
@@ -192,8 +196,46 @@ if (isset($_REQUEST['group_select'])) {
 $group_filter = unserialize($tikilib->get_user_preference($user, 'objectperm_admin_groups') ?? "");
 
 // Get a list of groups
-$groups = $userlib->get_groups_for_permissions();
+$groups = $userlib->get_groups_for_permissions(show_eponymous: 'n', group_filter: $group_filter);
 $smarty->assign_by_ref('groups', $groups['data']);
+
+if ($prefs['eponymousGroups'] === 'y') {
+    if (! isset($_REQUEST['numrows'])) {
+        $numrows = 25;
+    } else {
+        $numrows = $_REQUEST['numrows'];
+    }
+    $smarty->assign('numrows', $numrows);
+    if (! isset($_REQUEST["sort_mode"])) {
+        $sort_mode = 'groupName_asc';
+    } else {
+        $sort_mode = $_REQUEST["sort_mode"];
+    }
+    if (! isset($_REQUEST["offset"])) {
+        $offset = 0;
+    } else {
+        $offset = $_REQUEST["offset"];
+    }
+    $smarty->assign('offset', $offset);
+    if (isset($_REQUEST["initial"])) {
+        $initial = $_REQUEST["initial"];
+    } else {
+        $initial = '';
+    }
+    if (isset($_REQUEST["find"])) {
+        $find = $_REQUEST["find"];
+    } else {
+        $find = '';
+    }
+    $eponymous_groups = $userlib->get_groups_for_permissions('y', 'y', $offset, $numrows, $sort_mode, $find, $initial);
+    $smarty->assign_by_ref('eponymous_groups', $eponymous_groups['data']);
+    $smarty->assign('eponymous_groups_count', $eponymous_groups['cant']);
+    $ts = Table_Check::setVars('permgroups', true);
+    if ($ts['enabled'] && ! $ts['ajax']) {
+        //set tablesorter code
+        Table_Factory::build('TikiPermGroups', ['id' => $ts['tableid'], 'total' => $eponymous_groups['cant']]);
+    }
+}
 
 $OBJECTPERM_ADMIN_MAX_GROUPS = 4;
 
@@ -491,6 +533,19 @@ foreach ($groups['data'] as &$row) {
 //                       'key' => 'perm['.$row['groupName'].']',
 //                       'index' => $groupIndex,
 //                       'inheritance' => $inh);
+}
+
+if ($prefs['eponymousGroups'] === 'y') {
+    $groups['data'] = array_filter($groups['data'], function ($group) {
+        return $group['isEponymousGroup'] !== 'y';
+    });
+    foreach ($eponymous_groups['data'] as &$row) {
+        if ($group_filter !== false && in_array($row['id'], $group_filter)) {
+            $row['in_group_filter'] = 'y';
+        } else {
+            $row['in_group_filter'] = 'n';
+        }
+    }
 }
 
 $smarty->assign('permGroups', $permGroups);

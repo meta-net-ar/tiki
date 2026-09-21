@@ -16,6 +16,15 @@
                     {icon name="trash"} {tr}Clear cache{/tr}
                 </button>
             </form>
+            {if $prefs.eponymousGroups eq 'y'}
+                <form method="post" class="d-inline">
+                    {ticket}
+                    <input type="hidden" name="create_eponymous_groups" value="1">
+                    <button type="submit" class="btn btn-primary" title="{tr}Create eponymous groups for users that don't have ones created. Useful if you turn on the feature after existing users have been created or registered.{/tr}">
+                        {icon name="plus"} {tr}Create Eponymous Groups{/tr}
+                    </button>
+                </form>
+            {/if}
         {/if}
         {button href="tiki-adminusers.php" class="btn btn-primary" _type="link" _icon_name="user" _text="{tr}Admin Users{/tr}"}
         {if $tiki_p_admin eq 'y'} {* only full admins can manage groups, not tiki_p_admin_users *}
@@ -33,6 +42,14 @@
     {* ----------------------- tab with list --------------------------------------- *}
         {if !$ts.ajax}
             <h2>{tr}List of existing groups{/tr}</h2>
+            {if $prefs.eponymousGroups eq 'y'}
+                <div class="mb-3 row">
+                    <div class="col-md-12">
+                        <label for="show_eponymous">{tr}Show eponymous groups in this list{/tr}</label>
+                        <input class="form-check-input" type="checkbox" name="show_eponymous" id="show_eponymous"{if $show_eponymous eq 'y'} checked="checked"{/if} onclick="window.location.href='?show_eponymous=' + (this.checked ? 'y' : 'n')">
+                    </div>
+                </div>
+            {/if}
             {if !$ts.enabled}
                 {include file='find.tpl' find_show_num_rows='y'}
                 {if $pages_count > $maxRecords or !empty($initial) or !empty($find)}
@@ -197,11 +214,14 @@
                 <div class="mb-3 row">
                     <label for="groups_group" class="col-form-label col-md-3">{tr}Group{/tr}</label>
                     <div class="col-md-9">
-                        {if $groupname neq 'Anonymous' and $groupname neq 'Registered' and $groupname neq 'Admins'}
+                        {if $groupname neq 'Anonymous' and $groupname neq 'Registered' and $groupname neq 'Admins' and $isEponymousGroup neq 'y'}
                             <input type="text" name="name" id="groups_group" value="{$groupname|escape}" class="form-control">
                         {else}
                             <input type="hidden" name="name" id="groups_group" value="{$groupname|escape}">
                             {$groupname|escape}
+                            {if $isEponymousGroup eq 'y'}
+                                <div class="form-text">{tr}This group name matches the username and cannot be changed.{/tr}</div>
+                            {/if}
                         {/if}
                     </div>
                 </div>

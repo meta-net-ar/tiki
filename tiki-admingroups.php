@@ -37,6 +37,8 @@ $inputConfiguration = [
             'initial'                   => 'alpha',
             'find'                      => 'groupname',
             'group'                     => 'groupname',
+            'create_eponymous_groups'   => 'text',
+            'show_eponymous'            => 'word',
             'clean'                     => 'alpha',         //post
             'add'                       => 'alpha',         //get
             'export'                    => 'alpha',         //post
@@ -132,6 +134,40 @@ if (isset($_REQUEST['clean']) && $access->checkCsrf()) {
     $cachelib->invalidate('groupIdlist');
     Feedback::success(tr('Group cache cleared'));
 }
+
+if ($prefs['eponymousGroups'] === 'y') {
+    if (! empty($_REQUEST['create_eponymous_groups'])) {
+        $perms = Perms::get();
+        if (! $perms->admin) {
+            Feedback::error(tr('Insufficient permissions to execute the requested action.'));
+        } else {
+            $created = 0;
+            $groups = array_map('strtolower', $userlib->list_all_groups());
+            foreach ($userlib->list_all_users() as $login) {
+                if (! in_array(strtolower($login), $groups)) {
+                    $userlib->createEponymousGroup($login);
+                    $created++;
+                }
+            }
+            $cachelib = TikiLib::lib('cache');
+            $cachelib->invalidate('grouplist');
+            $cachelib->invalidate('groupIdlist');
+            Feedback::success(tr('Created eponymous groups: %0', $created));
+        }
+    }
+
+    $show_eponymous = $_SESSION['show_eponymous'];
+    if (! empty($_REQUEST['show_eponymous'])) {
+        $show_eponymous = $_SESSION['show_eponymous'] = $_REQUEST['show_eponymous'];
+    }
+    if (empty($show_eponymous)) {
+        $show_eponymous = 'n';
+    }
+    $smarty->assign('show_eponymous', $show_eponymous);
+} else {
+    $show_eponymous = null;
+}
+
 if (! isset($_REQUEST['maxRecords'])) {
     $numrows = $maxRecords;
 } else {
@@ -150,7 +186,7 @@ $initial = $_REQUEST["initial"] ?? '';
 $smarty->assign('initial', $initial);
 $find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
-$users = $userlib->get_groups($offset, $numrows, $sort_mode, $find, $initial);
+$users = $userlib->get_groups($offset, $numrows, $sort_mode, $find, $initial, show_eponymous: $show_eponymous);
 
 //add tablesorter sorting and filtering for main group list
 $ts = Table_Check::setVars('admingroups', true);
@@ -162,8 +198,8 @@ if ($ts['enabled'] && ! $ts['ajax']) {
 $inc = [];
 list(   $groupname, $groupdesc, $grouphome, $userstrackerid, $usersfieldid, $grouptrackerid,
         $groupfieldid, $defcatfieldid, $themefieldid, $groupperms, $trackerinfo, $memberslist,
-        $userChoice, $groupdefcat, $grouptheme, $expireAfter, $emailPattern, $anniversary, $prorateInterval, $isRole, $isTplGroup) =
-        ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
+        $userChoice, $groupdefcat, $grouptheme, $expireAfter, $emailPattern, $anniversary, $prorateInterval, $isRole, $isTplGroup, $isEponymousGroup) =
+        ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
 
 if (! empty($_REQUEST["group"])) {
     $re = $userlib->get_group_info($_REQUEST["group"]);
@@ -202,6 +238,9 @@ if (! empty($_REQUEST["group"])) {
     }
     if (isset($re['isTplGroup'])) {
         $isTplGroup = $re['isTplGroup'];
+    }
+    if (isset($re['isEponymousGroup'])) {
+        $isEponymousGroup = $re['isEponymousGroup'];
     }
     if ($prefs['userTracker'] == 'y') {
         if (isset($re["usersTrackerId"]) and $re["usersTrackerId"]) {
@@ -460,6 +499,7 @@ $smarty->assign_by_ref('pages_count', $users["count"]);
 $smarty->assign('group_info', $re);
 $smarty->assign('isRole', $isRole);
 $smarty->assign('isTplGroup', $isTplGroup);
+$smarty->assign('isEponymousGroup', $isEponymousGroup);
 
 // Assign the list of groups
 $smarty->assign_by_ref('users', $users["data"]);

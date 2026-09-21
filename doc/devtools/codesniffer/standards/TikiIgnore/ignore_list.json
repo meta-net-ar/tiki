@@ -2892,6 +2892,9 @@
         "lib/core/Table/Settings/TikiPayment.php": {
             "class:Table_Settings_TikiPayment": true
         },
+        "lib\/core\/Table\/Settings\/TikiPermGroups.php": {
+            "class:Table_Settings_TikiPermGroups": true
+        },
         "lib/core/Table/Settings/TikiAdminGroupsMembers.php": {
             "class:Table_Settings_TikiAdminGroupsMembers": true
         },
@@ -9311,6 +9314,9 @@
         },
         "lib/core/Table/Settings/TikiPayment.php": {
             "Table_Settings_TikiPayment": true
+        },
+        "lib\/core\/Table\/Settings\/TikiPermGroups.php": {
+            "Table_Settings_TikiPermGroups": true
         },
         "lib/core/Table/Settings/TikiAdminGroupsMembers.php": {
             "Table_Settings_TikiAdminGroupsMembers": true
