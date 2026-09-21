@@ -2086,10 +2086,18 @@ class CalendarLib extends TikiLib
 
         if ((isset($_SESSION['CalendarViewList']) && $_SESSION['CalendarViewList'] == 'list') || $listmode) {
             if (is_array($listtikievents)) {
+                $addedEvents = [];
                 foreach ($listtikievents as $le) {
                     if (is_array($le)) {
                         foreach ($le as $e) {
-                            $listevents[] = $e;
+                            // Prevent duplicate all-day events, including multi-day and recurring events
+                            if (isset($e['allday'], $e['calitemId']) && $e['allday'] == 1) {
+                                if (isset($addedEvents[$e['calitemId']])) {
+                                    continue;
+                                }
+                                $addedEvents[$e['calitemId']] = true;
+                            }
+                            $addedEvents[] = $e;
                         }
                     }
                 }
