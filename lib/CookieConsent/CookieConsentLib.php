@@ -17,6 +17,7 @@ class CookieConsentLib
     public const BUILTIN_COOKIE_CATEGORY_FUNCTIONAL = 'functional';
 
     public const COOKIE_CONSENT_NAME = 'cookie_consent';
+    private const COOKIE_REGISTRY_SESSION_KEY = 'cookie_consent_registry';
 
     private static $cookiePath = '';
     private static $cookieSecure = true; // Use HTTPS
@@ -195,6 +196,8 @@ class CookieConsentLib
             }
         }
 
+        self::removeWithdrawnCategoryCookies($preferences['categories']);
+
         $preferences['consentGiven'] = true; // in case trying to update but consentGiven is not set
         // Store the preferences in the cookie
         self::setCookie(
@@ -274,9 +277,60 @@ class CookieConsentLib
                 $secure,
                 $httpOnly
             );
+            self::registerCookie($name, $section, $path, $domain, $secure, $category);
             return true; // Consent was given, cookie was set
         }
         return false; // Consent was NOT given, cookie was NOT set
+    }
+
+    private static function registerCookie(
+        string $name,
+        string $section,
+        string $path,
+        string $domain,
+        bool $secure,
+        string $category
+    ): void {
+        $_SESSION[self::COOKIE_REGISTRY_SESSION_KEY][$category][$section ?: $name] = [
+            'path' => $path,
+            'domain' => $domain,
+            'secure' => $secure,
+        ];
+    }
+
+    /**
+     * Expire cookies registered for categories whose consent was withdrawn.
+     *
+     * Only cookies that were previously allowed and registered by tikiSetCookie()
+     * are removed. Cookies from unchanged or newly denied categories are left alone.
+     *
+     * @param array<string, bool> $categories Current consent status by category.
+     */
+    private static function removeWithdrawnCategoryCookies(array $categories): void
+    {
+        $previousConsent = self::getCookie(self::COOKIE_CONSENT_NAME);
+        $previousPreferences = $previousConsent ? json_decode(urldecode($previousConsent), true) : null;
+        $previousCategories = is_array($previousPreferences) ? ($previousPreferences['categories'] ?? []) : [];
+
+        foreach ($categories as $category => $allowed) {
+            if ($allowed || empty($previousCategories[$category])) {
+                continue;
+            }
+
+            foreach ($_SESSION[self::COOKIE_REGISTRY_SESSION_KEY][$category] ?? [] as $cookieName => $options) {
+                self::setCookie(
+                    $cookieName,
+                    '',
+                    '',
+                    time() - 3600,
+                    $options['path'],
+                    $options['domain'],
+                    $options['secure']
+                );
+                unset($_COOKIE[$cookieName]);
+            }
+            unset($_SESSION[self::COOKIE_REGISTRY_SESSION_KEY][$category]);
+        }
     }
 
     public static function setCookie(
