@@ -289,8 +289,6 @@ class CookieConsentLib
         bool $secure = false,
         bool $httpOnly = false
     ): bool {
-        global $feature_no_cookie;  //This global is undocumented, but I can only find one place that assigns it, and it's not a global there!  benoitg - 2026-06-25
-
         if (TIKI_API) {
             return false;
         }
@@ -311,12 +309,6 @@ class CookieConsentLib
             return self::setCookie($section, $valSection, '', $expire, $path, $domain, $secure, $httpOnly);
         }
 
-        if (! empty($feature_no_cookie)) {
-            // See note at the beginning of function. As far as I can tell, this is unreachable code - benoitg - 2026-06-25
-            $_SESSION['tiki_cookie_jar'][$name] = $value;
-            return true;
-        }
-
         $options = [
             'expires' => $expire,
             'path' => $path,
@@ -333,7 +325,7 @@ class CookieConsentLib
 
     public static function getCookie(string $name, ?string $section = null, ?string $default = null): ?string
     {
-        global $feature_no_cookie, $jitCookie;
+        global $jitCookie;
 
         if ($section) {
             $sectionValue = self::getCookie($section);
@@ -349,7 +341,7 @@ class CookieConsentLib
         if (isset($jitCookie[$name])) {
             return $jitCookie[$name];
         }
-        if ((! empty($feature_no_cookie) || isset($_SESSION['tiki_cookie_jar'][$name])) && isset($_SESSION['tiki_cookie_jar'][$name])) {
+        if (isset($_SESSION['tiki_cookie_jar'][$name])) {
             return $_SESSION['tiki_cookie_jar'][$name];
         }
 

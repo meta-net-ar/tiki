@@ -297,7 +297,6 @@ if (! TIKI_API) {
                 ],
             ];
             CookieConsentLib::setConsentPreferences($consent);
-            $feature_no_cookie = false;  //This isn't a global here, so this set will have no effect! - benoitg - 2026-03-25
         }
         // Retrieve the full consent object
         $consent_preferences = CookieConsentLib::initializeConsentPreferences();

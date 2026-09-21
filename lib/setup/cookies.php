@@ -54,7 +54,7 @@ function setcookie_obeySetCookieParams(string $name, string $value = "", array $
  */
 function getCookie($name, $section = null, $default = null)
 {
-    global $feature_no_cookie, $jitCookie;
+    global $jitCookie;
 
     if (isset($_COOKIE[$name])) {
         $cookie = $_COOKIE[$name];
@@ -68,12 +68,8 @@ function getCookie($name, $section = null, $default = null)
         return $cookie;
     }
 
-    if ($feature_no_cookie || (empty($section) && ! isset($cookie) && isset($_SESSION['tiki_cookie_jar'][$name]))) {
-        if (isset($_SESSION['tiki_cookie_jar'][$name])) {
-            return $_SESSION['tiki_cookie_jar'][$name];
-        } else {
-            return $default;
-        }
+    if (empty($section) && ! isset($cookie) && isset($_SESSION['tiki_cookie_jar'][$name])) {
+        return $_SESSION['tiki_cookie_jar'][$name];
     } elseif ($section) {
         if (isset($_COOKIE[$section])) {
             if (preg_match("/@" . preg_quote($name, '/') . "\:([^@;]*)/", $_COOKIE[$section], $matches)) {

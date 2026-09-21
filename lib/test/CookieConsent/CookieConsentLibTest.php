@@ -27,8 +27,6 @@ class CookieConsentLibTest extends TestCase
 {
     private array $cookieBackup = [];
     private array $sessionBackup = [];
-    private mixed $featureNoCookieBackup = null;
-    private bool $hadFeatureNoCookie = false;
     private mixed $jitCookieBackup = null;
     private bool $hadJitCookie = false;
 
@@ -36,14 +34,11 @@ class CookieConsentLibTest extends TestCase
     {
         $this->cookieBackup = $_COOKIE;
         $this->sessionBackup = $_SESSION ?? [];
-        $this->hadFeatureNoCookie = array_key_exists('feature_no_cookie', $GLOBALS);
-        $this->featureNoCookieBackup = $GLOBALS['feature_no_cookie'] ?? null;
         $this->hadJitCookie = array_key_exists('jitCookie', $GLOBALS);
         $this->jitCookieBackup = $GLOBALS['jitCookie'] ?? null;
 
         $_COOKIE = [];
         $_SESSION['tiki_cookie_jar'] = [];
-        $GLOBALS['feature_no_cookie'] = true;
         $GLOBALS['jitCookie'] = [];
     }
 
@@ -51,12 +46,6 @@ class CookieConsentLibTest extends TestCase
     {
         $_COOKIE = $this->cookieBackup;
         $_SESSION = $this->sessionBackup;
-
-        if ($this->hadFeatureNoCookie) {
-            $GLOBALS['feature_no_cookie'] = $this->featureNoCookieBackup;
-        } else {
-            unset($GLOBALS['feature_no_cookie']);
-        }
 
         if ($this->hadJitCookie) {
             $GLOBALS['jitCookie'] = $this->jitCookieBackup;
@@ -73,14 +62,6 @@ class CookieConsentLibTest extends TestCase
         $this->assertArrayHasKey(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ANALYTICS, $categories);
         $this->assertArrayHasKey(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_MARKETING, $categories);
         $this->assertArrayHasKey(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, $categories);
-    }
-
-    public function testSetCookieStoresValueInSessionCookieJarWhenCookiesAreDisabled(): void
-    {
-        $this->assertTrue(CookieConsentLib::setCookie('plain_cookie', 'plain-value'));
-
-        $this->assertSame('plain-value', CookieConsentLib::getCookie('plain_cookie'));
-        $this->assertSame('plain-value', $_SESSION['tiki_cookie_jar']['plain_cookie']);
     }
 
     public function testGetCookieReadsRegularCookieBeforeSessionCookieJar(): void
