@@ -50,8 +50,7 @@ function setcookie_obeySetCookieParams(string $name, string $value = "", array $
     return setcookie($name, $value, $finalOptions);
 }
 /**
- * This seems to be the mirror function of CookieConsentLib::setCookieSection(), but
- * I am not 100% sure since CookieConsentLib has it's own setCookie() method - benoitg - 2026-03-26
+ * Mirror function of CookieConsentLib::setCookie().
  */
 function getCookie($name, $section = null, $default = null)
 {
