@@ -11,7 +11,7 @@
     <div class="d-flex value-container">
         <input type="hidden" name="params[{$paramName}]" id="label" value="{$pluginArgs[$paramName]}">
         <input type="hidden" name="params[{$paramName}ClassNames]" id="classNames" value="{$pluginArgs[$paramName|cat:'ClassNames']}">
-        <input type="hidden" name="params[{$paramName}Actions]" id="action" value="{$pluginArgs[$paramName|cat:'Action']}">
+        <input type="hidden" name="params[{$paramName}Actions]" id="action" value="{$pluginArgs[$paramName|cat:'Actions']}">
         <div class="btn-container d-flex gap-4 align-items-center flex-wrap">
             <div>
                 <button class="btn btn-light" data-bs-toggle="collapse" data-bs-target="#fields{$paramName}" aria-expanded="false" aria-controls="fields{$paramName}" type="button" aria-label="{tr}Add{/tr}">
