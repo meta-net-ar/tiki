@@ -137,6 +137,70 @@ table.wikiplugin_trackerlist {
     margin-left: 0.3rem;
 }
 
+// /* plugin zones: show which content each wiki plugin produced (see src/js/tiki-plugin-zones) */
+.tiki-plugin-zone-outline {
+    position: absolute;
+    z-index: 1040;
+    display: none;
+    pointer-events: none;
+    border-radius: 0.25rem;
+    outline: 2px solid var(--bs-primary, #0d6efd);
+    outline-offset: 3px;
+    background: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.07);
+
+    &.shown {
+        display: block;
+    }
+
+    // a plugin that renders nothing visible (PluginJq, PluginCss...)
+    &.empty {
+        outline-style: dashed;
+    }
+}
+
+.tiki-plugin-zone-label {
+    position: absolute;
+    top: -1.55rem;
+    inset-inline-start: -3px;
+    padding: 1px 6px;
+    border-radius: 0.25rem 0.25rem 0 0;
+    background: var(--bs-primary, #0d6efd);
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.tiki-plugin-zone-edit {
+    position: absolute;
+    z-index: 1041;
+    display: none;
+    padding: 3px 10px;
+    border: 0;
+    border-radius: 0.25rem 0.25rem 0 0;
+    background: var(--bs-primary, #0d6efd);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.15);
+
+    &.shown {
+        display: block;
+    }
+}
+
+@media print {
+    .tiki-plugin-zone-outline,
+    .tiki-plugin-zone-edit {
+        display: none !important;
+    }
+}
+
 // /* mouseover plugin */
 .plugin-mouseover {
     position: absolute;
