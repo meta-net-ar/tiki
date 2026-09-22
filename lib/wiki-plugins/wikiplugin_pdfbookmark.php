@@ -42,7 +42,7 @@ function wikiplugin_pdfbookmark_info()
 }
 function wikiplugin_pdfbookmark($data, $params)
 {
-    if (isset($_GET['display']) && strpos($_GET['display'], 'pdf') !== false) {
+    if (! empty($_GET['display']) && strstr($_GET['display'], 'pdf') == '') {
         return;
     }
     $paramList = '';
