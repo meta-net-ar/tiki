@@ -297,24 +297,11 @@ if (! TIKI_API) {
                 ],
             ];
             CookieConsentLib::setConsentPreferences($consent);
-            $feature_no_cookie = false;  //This isn't a global here, so this set will have no effect! - benoitg - 2026-03-25
         }
         // Retrieve the full consent object
         $consent_preferences = CookieConsentLib::initializeConsentPreferences();
 
-        /*
-        I don't understand why CookieConsentLib doesn't deal with this at init.
-        Especially since it's not clearing the cookies for a category if one withdraws consent from
-        tiki-user_preferences.php, so tiki essentially lies in that situation -  benoitg - 2026-03-25
-        */
         if (! $consent_preferences['consentGiven'] || $jitRequest->offsetExists('cookie_consent')) {
-            if (! $jitRequest->offsetExists('cookie_consent')) {
-                foreach ($_COOKIE as $k => $v) {
-                    if (! str_contains($k, session_name())) {
-                        setcookie($k, '', time() - 3600);        // unset any previously existing cookies except the session and js detect
-                    }
-                }
-            }
             // Get cookie categories
             $smarty->assign('cookie_categories', CookieConsentLib::getRequestedCookieCategories());
             $cookie_consent_html = $smarty->fetch('cookie_consent.tpl');

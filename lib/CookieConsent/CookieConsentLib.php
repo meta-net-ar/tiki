@@ -17,6 +17,7 @@ class CookieConsentLib
     public const BUILTIN_COOKIE_CATEGORY_FUNCTIONAL = 'functional';
 
     public const COOKIE_CONSENT_NAME = 'cookie_consent';
+    private const COOKIE_REGISTRY_SESSION_KEY = 'cookie_consent_registry';
 
     private static $cookiePath = '';
     private static $cookieSecure = true; // Use HTTPS
@@ -92,7 +93,7 @@ class CookieConsentLib
      */
     public static function initializeConsentPreferences()
     {
-        global $tikilib, $user, $prefs;
+        global $tikilib, $user, $prefs, $jitRequest;
 
         $defaultConsentPreferences = [
             'action' => 'customized',
@@ -138,7 +139,27 @@ class CookieConsentLib
             $consentPreferences = $defaultConsentPreferences;
         }
 
+        if (
+            (! defined('TIKI_API') || ! TIKI_API)
+            && ! $consentPreferences['consentGiven']
+            && (! isset($jitRequest) || ! $jitRequest->offsetExists(self::COOKIE_CONSENT_NAME))
+        ) {
+            self::clearCookiesBeforeConsent();
+        }
+
         return $consentPreferences;
+    }
+
+    /**
+     * Remove existing non-session cookies before the user gives consent.
+     */
+    private static function clearCookiesBeforeConsent(): void
+    {
+        foreach ($_COOKIE as $name => $value) {
+            if (! str_contains($name, session_name())) {
+                setcookie($name, '', time() - 3600);
+            }
+        }
     }
 
     private static function getUserPreference(): ?array
@@ -195,9 +216,11 @@ class CookieConsentLib
             }
         }
 
+        self::removeWithdrawnCategoryCookies($preferences['categories']);
+
         $preferences['consentGiven'] = true; // in case trying to update but consentGiven is not set
         // Store the preferences in the cookie
-        self::setCookieSection(
+        self::setCookie(
             self::COOKIE_CONSENT_NAME,
             json_encode($preferences),
             '',
@@ -248,8 +271,6 @@ class CookieConsentLib
     /**
      * Set a cookie at runtime with the specified category, if allowed.
      *
-     * TODO:  Write a simple setCookie() function to mirror getCookie().  This function's signature is what it is only for legacy reasons - benoitg - 2026-03-25
-     *
      * @return bool Returns true if the cookie was set, false if consent was not given.
      */
     public static function tikiSetCookie(
@@ -266,64 +287,139 @@ class CookieConsentLib
         // Check if the category is allowed
 
         if (self::isCategoryAllowed($category)) {
-            self::setCookieSection(
+            self::setCookie(
                 $name,
                 $value,
                 $section,
                 $expire,
                 $path,
                 $domain,
-                $secure
+                $secure,
+                $httpOnly
             );
+            self::registerCookie($name, $section, $path, $domain, $secure, $category);
             return true; // Consent was given, cookie was set
         }
         return false; // Consent was NOT given, cookie was NOT set
     }
 
-    private static function setCookieSection($name, $value, $section = '', $expire = 0, $path = '', $domain = '', $secure = '')
-    {
-        global $feature_no_cookie;  //This global is undocumented, but I can only find one place that assigns it, and it's not a global there!  benoitg - 2026-06-25
+    private static function registerCookie(
+        string $name,
+        string $section,
+        string $path,
+        string $domain,
+        bool $secure,
+        string $category
+    ): void {
+        $_SESSION[self::COOKIE_REGISTRY_SESSION_KEY][$category][$section ?: $name] = [
+            'path' => $path,
+            'domain' => $domain,
+            'secure' => $secure,
+        ];
+    }
 
+    /**
+     * Expire cookies registered for categories whose consent was withdrawn.
+     *
+     * Only cookies that were previously allowed and registered by tikiSetCookie()
+     * are removed. Cookies from unchanged or newly denied categories are left alone.
+     *
+     * @param array<string, bool> $categories Current consent status by category.
+     */
+    private static function removeWithdrawnCategoryCookies(array $categories): void
+    {
+        $previousConsent = self::getCookie(self::COOKIE_CONSENT_NAME);
+        $previousPreferences = $previousConsent ? json_decode(urldecode($previousConsent), true) : null;
+        $previousCategories = is_array($previousPreferences) ? ($previousPreferences['categories'] ?? []) : [];
+
+        foreach ($categories as $category => $allowed) {
+            if ($allowed || empty($previousCategories[$category])) {
+                continue;
+            }
+
+            foreach ($_SESSION[self::COOKIE_REGISTRY_SESSION_KEY][$category] ?? [] as $cookieName => $options) {
+                self::setCookie(
+                    $cookieName,
+                    '',
+                    '',
+                    time() - 3600,
+                    $options['path'],
+                    $options['domain'],
+                    $options['secure']
+                );
+                unset($_COOKIE[$cookieName]);
+            }
+            unset($_SESSION[self::COOKIE_REGISTRY_SESSION_KEY][$category]);
+        }
+    }
+
+    public static function setCookie(
+        string $name,
+        string $value = '',
+        string $section = '',
+        int $expire = 0,
+        string $path = '',
+        string $domain = '',
+        bool $secure = false,
+        bool $httpOnly = false
+    ): bool {
         if (TIKI_API) {
-            return;
+            return false;
         }
 
         if ($section) {
             $valSection = self::getCookie($section);
             $name2 = '@' . $name . ':';
             if ($valSection) {
-                if (preg_match('/' . preg_quote($name2) . '/', $valSection)) {
-                    $valSection  = preg_replace('/' . preg_quote($name2) . '[^@;]*/', $name2 . $value, $valSection);
+                if (preg_match('/' . preg_quote($name2, '/') . '/', $valSection)) {
+                    $valSection = preg_replace('/' . preg_quote($name2, '/') . '[^@;]*/', $name2 . $value, $valSection);
                 } else {
-                    $valSection = $valSection . $name2 . $value;
+                    $valSection .= $name2 . $value;
                 }
-                self::setCookieSection($section, $valSection, '', $expire, $path, $domain, $secure);
             } else {
                 $valSection = $name2 . $value;
-                self::setCookieSection($section, $valSection, '', $expire, $path, $domain, $secure);
             }
-        } else {
-            if ($feature_no_cookie) {
-                // See note at the begining of fucntion.  As far as I can tell, this is unreachable code - benoitg - 2026-06-25
-                $_SESSION['tiki_cookie_jar'][$name] = $value;
-            } else {
-                $options = [
-                    'expires' => $expire,
-                    'path' => $path,
-                    'domain' => $domain,
-                    'secure' => $secure
-                ];
-                setcookie_obeySetCookieParams($name, $value, $options);
-            }
+
+            return self::setCookie($section, $valSection, '', $expire, $path, $domain, $secure, $httpOnly);
         }
+
+        $options = [
+            'expires' => $expire,
+            'path' => $path,
+            'domain' => $domain,
+            'secure' => $secure,
+            'httponly' => $httpOnly,
+        ];
+        $cookieSet = setcookie_obeySetCookieParams($name, $value, $options);
+        if ($cookieSet) {
+            $_COOKIE[$name] = $value;
+        }
+        return $cookieSet;
     }
 
-    public static function getCookie(string $cockie_name): ?string
+    public static function getCookie(string $name, ?string $section = null, ?string $default = null): ?string
     {
-        $cokie_stored = array_values(array_filter(explode('; ', $_SERVER["HTTP_COOKIE"] ?? ''), function ($cookie) use ($cockie_name) {
-            return strpos($cookie, $cockie_name) !== false;
-        }));
-        return $cokie_stored ? str_replace($cockie_name . '=', '', $cokie_stored[0]) : null;
+        global $jitCookie;
+
+        if ($section) {
+            $sectionValue = self::getCookie($section);
+            if ($sectionValue && preg_match('/@' . preg_quote($name, '/') . '\:([^@;]*)/', $sectionValue, $matches)) {
+                return $matches[1];
+            }
+            return $default;
+        }
+
+        if (isset($_COOKIE[$name])) {
+            return $_COOKIE[$name];
+        }
+        if (isset($jitCookie[$name])) {
+            return $jitCookie[$name];
+        }
+        if (isset($_SESSION['tiki_cookie_jar'][$name])) {
+            return $_SESSION['tiki_cookie_jar'][$name];
+        }
+
+        return $default;
     }
 
     /**
@@ -332,7 +428,7 @@ class CookieConsentLib
     public static function revokeConsent()
     {
         global $tikilib, $user;
-        self::setCookieSection(self::COOKIE_CONSENT_NAME, '', '', time() - 3600, self::$cookiePath, '', self::$cookieSecure);
+        self::setCookie(self::COOKIE_CONSENT_NAME, '', '', time() - 3600, self::$cookiePath, '', self::$cookieSecure);
         if ($user) {
             $tikilib->set_user_preference($user, 'cookie_consent_user_pref', '');
         }
