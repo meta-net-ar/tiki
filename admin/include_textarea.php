@@ -191,6 +191,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+// Read-only export link, no CSRF needed.
+if (! empty($_GET['alias_export'])) {
+    $pluginAliasName = $_GET['alias_export'];
+    $profileYaml = Tiki_Profile_InstallHandler_PluginAlias::dumpExport($pluginAliasName);
+    if ($profileYaml !== false) {
+        include_once 'lib/wiki-plugins/wikiplugin_code.php';
+        $exportHtml = TikiLib::lib('parser')->invokePlugin('code', $profileYaml, ['caption' => 'YAML', 'colors' => 'yaml']);
+        $exportHtml = preg_replace('/~[\/]?np~/', '', $exportHtml);
+        $smarty->assign('plugin_alias_export_html', $exportHtml);
+        $smarty->assign('plugin_alias_export_name', $pluginAliasName);
+        $cookietab = 3; // tab=3 shows the Plugin Aliases tab
+    } else {
+        Feedback::error(tr('Could not export plugin alias %0: alias not found.', htmlspecialchars($pluginAliasName)));
+    }
+}
+
 if (
     isset($_REQUEST['plugin_alias'])
     && $pluginInfo = WikiPlugin_Negotiator_Wiki_Alias::info($_REQUEST['plugin_alias'])

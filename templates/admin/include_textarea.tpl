@@ -254,6 +254,7 @@
                                     <th>{tr}System Name{/tr}</th>
                                     <th>{tr}Base{/tr}</th>
                                     <th>{tr}Edit{/tr}</th>
+                                    <th>{tr}Export{/tr}</th>
                                     <th>{tr}Delete{/tr}</th>
                                 </tr>
                                 {foreach $plugins_alias as $name => $pluginInfo}
@@ -276,6 +277,17 @@
                                             {icon name='pencil' href='tiki-admin.php?page=textarea&plugin_alias='|cat:$name|escape}
                                         </td>
                                         <td>
+                                            {* Read-only export link, no CSRF needed *}
+                                            <a
+                                                href="tiki-admin.php?page=textarea&amp;alias_export={$name|escape}"
+                                                title="{tr}Export as profile YAML{/tr}"
+                                                aria-label="{tr}Export as profile{/tr}"
+                                                class="btn btn-link text-success export-alias"
+                                            >
+                                                {icon name='export'}
+                                            </a>
+                                        </td>
+                                        <td>
                                             {* TODO add confirmation *}
                                             <button data-alias-name="{$name|escape}" title="{tr}Delete this alias{/tr}" aria-label="{tr}Delete{/tr}" value="{$name|escape}" class="btn btn-link text-danger delete-alias">
                                                 {icon name='delete'}
@@ -283,7 +295,7 @@
                                         </td>
                                     </tr>
                                 {foreachelse}
-                                    {norecords _colspan=4}
+                                    {norecords _colspan=7}
                                 {/foreach}
                             </table>
                             <div class="submit">
@@ -297,6 +309,22 @@
                             </div>
                         </div>
                     </fieldset>
+
+                    {if isset($plugin_alias_export_html)}
+                        <div class="alert alert-success mt-3" id="pluginalias_export_result" role="alert">
+                            <h4 class="alert-heading">
+                                {icon name='export'}
+                                {tr _0=$plugin_alias_export_name|escape}Profile YAML for alias: <strong>%0</strong>{/tr}
+                            </h4>
+                            <p class="text-muted small">
+                                {tr _0="<a href=\"https://profiles.tiki.org/Plugin-Alias-Handler\" target=\"_blank\" rel=\"noopener noreferrer\">Plugin Alias Handler</a>"}Copy the YAML snippet below and paste it into your profile file (e.g. <code>profiles/MyProfile/MyProfile.yml</code>). See %0 for the full specification.{/tr}
+                            </p>
+                            {$plugin_alias_export_html}
+                        </div>
+                        {jq}$("a[href='#contentplugin_alias-1']").tab("show");{/jq}
+                        {jq}$(document).ready(function(){ $('#pluginalias_export_result')[0].scrollIntoView({ behavior:'smooth', block:'start' }); });{/jq}
+                    {/if}
+
                     {jq}$('#pluginalias_available legend').trigger('click');{/jq}
                 {/tab}
                 {if not empty($smarty.request.plugin_alias)}

@@ -1,0 +1,23 @@
+permissions: {}
+preferences: {}
+objects:
+  - type: plugin_alias
+    ref: test_alias
+    data:
+      name: test_alias
+      implementation: html
+      description:
+        name: Test Alias
+        description: A test alias for unit tests
+        prefs:
+          - wikiplugin_test_alias
+        validate: none
+        filter: xss
+        inline: false
+        params: {}
+      body:
+        input: ignore
+        default: ''
+        params: {}
+      params:
+        foo: bar
