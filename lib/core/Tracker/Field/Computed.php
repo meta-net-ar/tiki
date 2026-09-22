@@ -13,6 +13,7 @@
 class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
 {
     private mixed $computedValue = null;
+    private bool $computedValueLoaded = false;
 
     public static function getManagedTypesInfo(): array
     {
@@ -69,12 +70,10 @@ class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
             $value = $requestData[$ins_id];
         } elseif ($this->getItemId()) {
             $fields = $this->getTrackerDefinition()->getFields();
-            $values = $this->getItemData();
             $option = $this->getOption('formula');
 
             if ($option) {
-                // Evaluate the formula
-                $value = $this->evaluateFormula($option, $values);
+                $value = $this->getComputedValue();
 
                 $trklib = TikiLib::lib('trk');
 
@@ -97,12 +96,22 @@ class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
 
     public function getValue($default = ''): mixed
     {
-        if ($this->computedValue === null) {
-            $data = $this->getFieldData();
-            $this->computedValue = $data['value'] ?? null;
+        $value = $this->getComputedValue();
+
+        return $value === null ? $default : $value;
+    }
+
+    private function getComputedValue(): mixed
+    {
+        if (! $this->computedValueLoaded) {
+            $formula = $this->getOption('formula');
+            $this->computedValue = $formula && $this->getItemId()
+                ? self::evaluateFormula($formula, $this->getItemData())
+                : null;
+            $this->computedValueLoaded = true;
         }
 
-        return $this->computedValue === null ? $default : $this->computedValue;
+        return $this->computedValue;
     }
 
     public function renderOutput($context = [])
