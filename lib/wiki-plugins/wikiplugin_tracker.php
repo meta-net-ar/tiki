@@ -689,7 +689,7 @@ function wikiplugin_tracker($data, $params)
     $captchalib = TikiLib::lib('captcha');
     $tracker = ! empty($params['trackerId']) ? $params['trackerId'] : $params['tracker'];
     $definition = Tracker_Definition::get($tracker);
-    $params['trackerId'] = $definition?->getInformation()['trackerId'] ?? null;
+    $params['trackerId'] = is_object($definition) ? ($definition->getInformation()['trackerId'] ?? null) : null;
 
     $registrationTrackerId = null;
     $itemId = $params['itemId'] ?? null;
