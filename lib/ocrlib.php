@@ -9,6 +9,7 @@ use thiagoalessio\TesseractOCR\FriendlyErrors;
 use Tiki\Lib\Alchemy;
 use Symfony\Component\Filesystem\Filesystem;
 use Tiki\TikiInit;
+use Tiki\Process\Process;
 
 /**
  *
@@ -63,8 +64,10 @@ class ocrLib extends TikiLib
         if (is_callable('imagepng')) {
             $this->ocrMime = array_merge(self::OCR_MIME_CONVERT, $this->ocrMime);
         }
-        exec($prefs['ocr_pdfimages_path'] . ' -v', $output, $return);
-        if ($return === 0) {
+        $process = Process::fromShellCommandline($prefs['ocr_pdfimages_path'] . ' -v');
+        $process->run();
+        $exitCode = $process->getExitCode();
+        if ($exitCode === 0) {
             $this->ocrMime = array_merge(self::PDF_MIME, $this->ocrMime);
         }
     }
@@ -80,11 +83,6 @@ class ocrLib extends TikiLib
 
     public function whereIsExecutable(string $executable): ?string
     {
-        if (! is_callable('exec')) {
-            throw new Exception('exec() is not enabled. Could not execute command.');
-        }
-        $executable = escapeshellarg($executable);
-
         if (TikiInit::isWindows()) {
             $possibleCommands = [
                 'where ' . $executable . ' 2>&1'
@@ -95,12 +93,13 @@ class ocrLib extends TikiLib
                 'which ' . $executable . ' 2>/dev/null'
             ];
         }
-
         foreach ($possibleCommands as $cmd) {
-            $output = [];
-            $return = 0;
-            exec($cmd, $output, $return);
-            if ($return === 0) {
+            $process = Process::fromShellCommandline($cmd);
+            $process->run();
+            $output = $process->getOutput();
+            $exitCode = $process->getExitCode();
+            if ($exitCode === 0) {
+                $output = preg_split("/\r\n|\r|\n/", $output);
                 $result = trim(array_shift($output));
                 if (! empty($result)) {
                     return $result;
@@ -178,12 +177,11 @@ class ocrLib extends TikiLib
     public function getTesseractVersion(): string
     {
         if (! $this->checkTesseractInstalled()) {
-            if (! function_exists('\exec')) {
-                return ''; // if we can't exec then return an empty string
-            }
-
-            exec('tesseract --version', $output);
-            return $output ? explode(' ', $output[0])[1] : '';
+            $process = Process::fromShellCommandline("tesseract --version");
+            $process->run();
+            $output = $process->getOutput();
+            $output = $output ? preg_split("/\r\n|\r|\n/", $output) : null;
+            return $output ? (explode(' ', $output[0]))[1] : '';
         }
 
         if (! function_exists('\exec')) { // getTesseractVersion will need exec
@@ -212,17 +210,17 @@ class ocrLib extends TikiLib
     public function getTesseractLangs(): array
     {
         if (! $this->checkTesseractInstalled()) {
-            if (! function_exists('\exec')) {
-                return []; // if we can't exec then return an empty array
-            }
             $cmd = TikiLib::lib('ocr')->whereIsExecutable('tesseract');
             if ($cmd) {
-                exec("$cmd --list-langs", $output);
-                array_shift($output);
-                return $output;
-            } else {
                 return [];
             }
+
+            $process = Process::fromShellCommandline("$cmd --list-langs");
+            $process->run();
+            $output = $process->getOutput();
+            $output = preg_split("/\r\n|\r|\n/", $output);
+            array_shift($output);
+            return $output;
         }
 
         if (! function_exists('\exec')) { // getAvailableLanguages will need exec
