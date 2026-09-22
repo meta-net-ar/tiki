@@ -318,8 +318,23 @@ if ( \$('#$id') ) {
 
                 $displayIcon = $prefs['wiki_edit_icons_toggle'] != 'y' || (isset($_COOKIE['wiki_plugin_edit_view']) && $_COOKIE['wiki_plugin_edit_view']);
 
-                $ret .= '~np~' .
-                        '<a id="' . $id . '" href="javascript:void(1)" class="editplugin"' . ' aria-label="Edit plugin" ' . ($displayIcon ? '' : ' style="display:none;"') . '>' .
+                $headerlib->add_js_module('import initPluginZones from "@tiki-plugin-zones"; initPluginZones();');
+
+                $startMarker = '<!--tiki-plugin:start ' . $id . '-->';
+                $endMarker = '<!--tiki-plugin:end ' . $id . '-->';
+                $pluginStart = $match->getStart();
+                $atLineStart = $pluginStart === 0 || substr($matches->getText(), $pluginStart - 1, 1) === "\n";
+
+                if ($atLineStart && preg_match('/^[^<~\p{L}\p{N}]/u', $ret)) {
+                    $ret = $startMarker . "\n" . $ret;
+                } else {
+                    $ret = '~np~' . $startMarker . '~/np~' . $ret;
+                }
+
+                $ret .= '~np~' . $endMarker .
+                        '<a id="' . $id . '" href="javascript:void(1)" class="editplugin"' .
+                        ' data-plugin="' . htmlspecialchars($plugin_name, ENT_QUOTES) . '" data-index="' . (int) $current_index . '"' .
+                        ' aria-label="Edit plugin" ' . ($displayIcon ? '' : ' style="display:none;"') . '>' .
                         \SmartyTiki\FunctionHandler\Icon::render(['name' => 'plugin', 'iclass' => 'tips', 'ititle' => tra('Edit plugin') . ':' . ucfirst($plugin_name)], $smarty->getEmptyInternalTemplate()) .
                         '</a>' .
                         '~/np~';
