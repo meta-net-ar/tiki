@@ -114,9 +114,21 @@
         "vitest" : "https://github.com/vitest-dev/vitest/releases"
     },
     "overrides" : {
-        "dompurify" : "3.3.1"
+        "dompurify" : "3.3.1",
+        "devalue" : "5.8.1",
+        "glob" : "10.5.0",
+        "jspdf" : "4.2.1",
+        "svelte" : "5.51.0",
+        "svgedit" : {
+            "jspdf" : "4.2.1"
+        },
+        "postcss" : "8.5.26",
+        "converse.js" : {
+            "@converse/log" : "0.0.1"
+        }
     },
     "overridesComment" : {
+        "converse.js": "converse.js's own package.json depends on '@converse/log' via 'file:src/log' - a self-referential path into its own package directory. npm's arborist can't resolve that link's target when converse.js is installed as a plain registry dependency (not inside its own monorepo), which crashes any 'npm install' with 'Cannot destructure property package of node.target'. It's also published standalone on the registry with matching content, so overriding it to the registry version sidesteps the broken self-link. (13.0.1 additionally needed a '@converse/headless' override for the same reason - 14.0.0 doesn't depend on that package at all, so it was dropped here rather than left as harmless dead weight.)",
         "dompurify": [
             "This override forces all packages to use DOMPurify v3.3.1 to fix a security vulnerability present in DOMPurify v2.x.",
             "Upgrading from v2 to v3 is safe for our project because we do not support Internet Explorer (IE).",
@@ -125,6 +137,19 @@
             "Toast UI Editor currently depends on DOMPurify v2.x, but its DOMPurify integration",
             "(introduced in https://github.com/nhn/tui.editor/commit/6e5730914902071b54c529673e964a24b58e3eec#diff-e70b3ac7e7e963527907ae78c682a077c1b87015783bdcb150084e023ce17528) is compatible with v3.",
             "For this reason, enforcing DOMPurify v3.2.7 is safe for us. We should remove this override once @toast-ui/editor officially updates to DOMPurify v3 or when we replace/fork it with a maintained version compatible with v3."
+        ],
+        "glob": [
+            "copy-and-watch pins glob 10.3.12 (vulnerable CLI <=10.4.5). Override to 10.5.0; Tiki uses glob programmatically, not the CLI -c/--cmd flag."
+        ],
+        "jspdf": [
+            "npm audit flagged jspdf <= 4.2.0 (critical). Pin 4.2.1 so the root install and svgedit (nested 4.0.0) resolve to a patched release."
+        ],
+        "postcss": [
+            "vue3-sfc-loader -> @vue/component-compiler-utils still pulls PostCSS 7.0.x (npm audit range <=8.5.17: parsing/XSS/sourceMappingURL issues).",
+            "Force PostCSS 8.5.26 everywhere (already used by Vite). Remove when upstream stops depending on PostCSS 7."
+        ],
+        "svelte": [
+            "Svelte is pinned to 5.51.0 (and devalue to 5.8.1) for @event-calendar/core 4.x compatibility: Svelte >= 5.51.1 breaks calendar interactions (https://github.com/vkurko/calendar/issues/623). devalue is overridden separately so we can take the npm audit fix without upgrading Svelte. Upgrade path: @event-calendar/core 5.4.1+ then remove both svelte and devalue overrides."
         ]
     },
     "workspaces": [

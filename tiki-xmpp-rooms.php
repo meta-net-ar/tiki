@@ -20,4 +20,5 @@ $full = array_map(fn($r) => $xmpplib->buildRoomJid($r), $rooms);
 echo json_encode([
     'jid' => $jid,
     'rooms' => array_values(array_unique(array_filter($full))),
+    'dm_partners' => $xmpplib->getKnownDmPartners($user),
 ]);

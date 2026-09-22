@@ -141,6 +141,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-lottie": resolve(__dirname, "tiki-lottie/lottie.js"),
         "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(__dirname, "tiki-toast-ui/toast-index.js"),
+        "xmpp/conversejs-tiki": resolve(__dirname, "../../lib/xmpp/css/conversejs-tiki.scss"),
         "@tiki/modules/search": resolve(__dirname, "@tiki/modules/search.js"),
         "@tiki/plugins/fade": resolve(__dirname, "@tiki/plugins/fade.js"),
         "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
@@ -376,24 +377,39 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/codemirror/mode",
                     },
                     {
-                        src: "node_modules/converse.js/dist/*.min.*",
+                        src: "src/js/common-externals/node_modules/converse.js/dist/*.min.*",
                         dest: "vendor_dist/converse.js/dist",
+                        rename: { stripBase: 6 },
                     },
                     {
-                        src: "node_modules/converse.js/dist/webfonts/*",
+                        src: "src/js/common-externals/node_modules/converse.js/dist/webfonts/*",
                         dest: "vendor_dist/converse.js/dist/webfonts",
+                        rename: { stripBase: 7 },
                     },
                     {
-                        src: "node_modules/converse.js/dist/sounds/*",
+                        src: "src/js/common-externals/node_modules/converse.js/dist/sounds/*",
                         dest: "vendor_dist/converse.js/dist/sounds",
+                        rename: { stripBase: 7 },
                     },
                     {
-                        src: "node_modules/converse.js/dist/locales/*",
-                        dest: "vendor_dist/converse.js/dist/locales",
+                        src: "src/js/common-externals/node_modules/converse.js/dist/chunkjs/locales/*",
+                        dest: "vendor_dist/converse.js/dist/chunkjs/locales",
+                        rename: { stripBase: 8 },
                     },
                     {
-                        src: "node_modules/converse.js/dist/emoji.json",
+                        src: "src/js/common-externals/node_modules/converse.js/dist/chunkjs/locales/dayjs/*",
+                        dest: "vendor_dist/converse.js/dist/chunkjs/locales/dayjs",
+                        rename: { stripBase: 9 },
+                    },
+                    {
+                        src: "src/js/common-externals/node_modules/converse.js/dist/emoji.json",
                         dest: "vendor_dist/converse.js/dist",
+                        rename: { stripBase: 6 },
+                    },
+                    {
+                        src: "src/js/common-externals/node_modules/converse.js/dist/curve25519_compiled.wasm",
+                        dest: "vendor_dist/converse.js/dist",
+                        rename: { stripBase: 6 },
                     },
                     {
                         src: "node_modules/recordrtc/RecordRTC.js",
