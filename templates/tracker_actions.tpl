@@ -8,15 +8,18 @@
 </div>
 <div class="btn-group">
 {if $tiki_p_admin_trackers eq 'y' and !empty($trackerId)}
-    <a class="btn btn-info tracker-properties tips" title=":{tr _0="{$tracker_info.name|escape}"}Edit the configuration properties of tracker “%0”{/tr}" href="{bootstrap_modal controller=tracker action=replace trackerId=$trackerId}">
+    <a class="btn btn-info tracker-properties tips" title=":{tr _0="{$tracker_info.name|escape}"}Edit the configuration properties of tracker "%0"{/tr}" href="{bootstrap_modal controller=tracker action=replace trackerId=$trackerId}">
         {icon name="settings"} {tr}Properties{/tr}
     </a>
-    <a class="btn btn-info tips{if $smarty.server.SCRIPT_NAME|strpos:'tiki-admin_tracker_fields.php' !== false} active{/if}" title=":{tr _0="{$tracker_info.name|escape}"}Configure the data fields for tracker “%0”{/tr}" href="{$trackerId|sefurl:'trackerfields'}">
+    <a class="btn btn-info tips{if $smarty.server.SCRIPT_NAME|strpos:'tiki-admin_tracker_fields.php' !== false} active{/if}" title=":{tr _0="{$tracker_info.name|escape}"}Configure the data fields for tracker "%0"{/tr}" href="{$trackerId|sefurl:'trackerfields'}">
         {icon name="th-list"} {tr}Fields{/tr}
+    </a>
+    <a class="btn btn-info tips{if $smarty.server.SCRIPT_NAME|strpos:'tiki-tracker_overview.php' !== false} active{/if}" title=":{tr _0="{$tracker_info.name|escape}"}Configuration overview for tracker "%0"{/tr}" href="tiki-tracker_overview.php?trackerId={$trackerId|escape:'url'}">
+        {icon name="info-circle"} {tr}Overview{/tr}
     </a>
 {/if}
 {if !empty($trackerId) and $tiki_p_view_trackers eq 'y'}
-    <a class="btn btn-info tips{if $smarty.server.SCRIPT_NAME|strpos:'tiki-view_tracker.php' !== false} active{/if}" title=":{tr _0="{$tracker_info.name|escape}"}List of items for “%0”{/tr}" href="{$trackerId|sefurl:"tracker"}">
+    <a class="btn btn-info tips{if $smarty.server.SCRIPT_NAME|strpos:'tiki-view_tracker.php' !== false} active{/if}" title=":{tr _0="{$tracker_info.name|escape}"}List of items for "%0"{/tr}" href="{$trackerId|sefurl:"tracker"}">
         {icon name="list"} {tr}Items{/tr}
     </a>
 {/if}

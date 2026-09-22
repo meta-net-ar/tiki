@@ -161,6 +161,11 @@
                                     </a>
                                 </action>
                                 <action>
+                                    <a href="tiki-tracker_overview.php?trackerId={$tracker.trackerId|escape:'url'}">
+                                        {icon name='info-circle' _menu_text='y' _menu_icon='y' alt="{tr}Configuration Overview{/tr}"}
+                                    </a>
+                                </action>
+                                <action>
                                     <a href="{service controller=tracker action=replace trackerId=$tracker.trackerId modal=true}"
                                         data-bs-toggle="modal" data-backdrop="static" data-bs-target="#bootstrap-modal"
                                         onclick="$('[data-bs-toggle=popover]').popover('hide');">
