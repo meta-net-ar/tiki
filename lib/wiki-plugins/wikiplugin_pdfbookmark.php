@@ -42,7 +42,7 @@ function wikiplugin_pdfbookmark_info()
 }
 function wikiplugin_pdfbookmark($data, $params)
 {
-    if (defined('TIKI_DISPLAY_CONTAINS_PDF') && TIKI_DISPLAY_CONTAINS_PDF) {
+    if (! defined('TIKI_DISPLAY_CONTAINS_PDF') || ! TIKI_DISPLAY_CONTAINS_PDF) {
         return;
     }
     $paramList = '';
