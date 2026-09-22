@@ -6,10 +6,8 @@ use TikiLib;
 
 class ToolbarSwitchEditor extends ToolbarUtilityItem
 {
-    /**
-     * @var string
-     */
-    public $onClick;
+    private string $onClick = '';
+
     public function __construct()
     {
         global $prefs;
@@ -28,8 +26,7 @@ class ToolbarSwitchEditor extends ToolbarUtilityItem
             ->setMarkdownSyntax('tikiswitch')
             ->setMarkdownWysiwyg('tikiswitch')
             ->setType('SwitchEditor')
-            ->setClass('qt-switcheditor')
-            ->addRequiredPreference('feature_wysiwyg');
+            ->setClass('qt-switcheditor');
     }
 
     public function getWikiHtml(): string
@@ -39,7 +36,7 @@ class ToolbarSwitchEditor extends ToolbarUtilityItem
 
     public function getMarkdownHtml(): string
     {
-        return self::getPlainHtml(true);
+        return $this->getPlainHtml();
     }
 
     /**
@@ -74,26 +71,31 @@ class ToolbarSwitchEditor extends ToolbarUtilityItem
 
     public function getMarkdownWysiwyg(): string
     {
-        global $prefs;
-
         $this->onClick = $this->getWysiwygJs();
 
         if (! empty($this->markdown_wysiwyg)) {
-            if ($prefs['feature_wysiwyg'] == 'y' && $prefs['wysiwyg_optional'] == 'y') {
-                return parent::getMarkdownWysiwyg();
-            }
+            return parent::getMarkdownWysiwyg();
         }
         return '';
     }
 
+    /**
+     * The switch button may be shown when either WYSIWYG or Markdown is enabled,
+     * but only if the user has the dedicated permission to switch editors.
+     * - feature_wysiwyg : WYSIWYG editor is enabled
+     * - wysiwyg_optional : user is allowed to choose the editor mode
+     * - markdown_enabled : Markdown syntax is available
+     * - tiki_p_edit_switch_mode : user has the dedicated permission
+     *
+     * @return bool
+     */
     public function isAccessible(): bool
     {
-        // TODO make object specific check, but we don't know where this toolbar is down here...
-        global $tiki_p_edit_switch_mode;
+        global $prefs, $tiki_p_edit_switch_mode;
 
-        return parent::isAccessible() &&
-            ! isset($_REQUEST['hdr']) &&        // or in section edit
-            $tiki_p_edit_switch_mode === 'y';   // or no perm (new in 7.1)
+        return ($prefs['markdown_enabled'] === 'y' || ($prefs['feature_wysiwyg'] === 'y' && $prefs['wysiwyg_optional'])) &&
+            ! isset($_REQUEST['hdr']) &&
+            $tiki_p_edit_switch_mode === 'y';
     }
 
     /**

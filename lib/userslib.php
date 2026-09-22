@@ -4084,6 +4084,17 @@ class UsersLib extends TikiLib
             return $permissions;
         }
 
+        $edit_switch_mode_desc = tra('Can switch between wiki and WYSIWYG modes while editing');
+        $edit_switch_mode_depancies  = ['feature_wysiwyg'];
+        if ($prefs['markdown_enabled'] == 'y') {
+            $edit_switch_mode_desc = tra('Can switch between wiki syntax to markdown while editing');
+            $edit_switch_mode_depancies = ['markdown_enabled'];
+            if ($prefs['feature_wysiwyg'] == 'y') {
+                $edit_switch_mode_desc = tra('Can switch between wiki syntax and Markdown, and between the wiki and WYSIWYG editor modes while editing');
+                $edit_switch_mode_depancies = ['feature_wysiwyg', 'markdown_enabled'];
+            }
+        }
+
         /**
          * Define master permissions array
          *
@@ -6747,11 +6758,11 @@ class UsersLib extends TikiLib
             ],
             [
                 'name' => 'tiki_p_edit_switch_mode',
-                'description' => tra('Can switch between wiki and WYSIWYG modes while editing'),
+                'description' => $edit_switch_mode_desc,
                 'level' => 'editors',
                 'type' => 'tiki',
                 'admin' => false,
-                'prefs' => ['feature_wysiwyg'],
+                'prefs' => $edit_switch_mode_depancies,
                 'scope' => 'global',
             ],
             [
