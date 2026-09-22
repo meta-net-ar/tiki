@@ -5,9 +5,15 @@
 # All Rights Reserved. See copyright.txt for details and a complete list of authors.
 # Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-set -euo pipefail
+set -euox pipefail
 
 PACKAGE_FILENAME="${PACKAGE_FILENAME:-tiki-package.tar.gz}"
+
+# As it is now this is really mixing concerns and will be extremely hard to maintain.  DRY and separation of concerns.
+#  Some of this is in .gitignore.  If running manually one should really start with git clean.  Not an issue with CI
+#  Some of this is removing things specific to the tarball (node_modules, .git)
+#  Some of this is removing or modifying things normally versioned in git.  I don't think that should be done, but if so it should be it's own list to be maintained and debated
+# benoitg - 2026-09-17
 
 PACKAGE_EXCLUDES=(
     "tests"

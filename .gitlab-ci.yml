@@ -166,6 +166,7 @@ composer:
       - vendor_bundled/vendor/
       - bin/
       # Post-install hook output (Smarty extension map): templates cannot compile without it.
+      # This is a really bad idea, why did ci work before?  It should target specific files.  Two gitlab jobs cannot share the same artifact paths, they will overwrite one-another according to the documenations - benoitg - 2026-09-17
       - private/generated/
     expire_in: 2 days
 
@@ -764,59 +765,61 @@ e2e-suite:
 # Package this Tiki build
 #
 
-.tiki-package-changelog-script: &tiki-package-changelog-script |
-  echo "=> Generate changelog ..."
-  TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"
-  git fetch origin "$TARGET_BRANCH" --tags --depth=1000
-  LAST_TAG=$(git tag --sort=-v:refname | head -n 1)
-  git merge-base --is-ancestor "$LAST_TAG" "origin/$TARGET_BRANCH" || git fetch --unshallow
-  php doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
-  mv generated_changelog.md CHANGELOG.generated.md
+tiki-generate-changelog:
+  stage: package-tiki
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - echo "=> Generate changelog ..."
+    # Next line is for gitlab-ci-local, where the checkout is actually the developper's
+    - rm -rf temp/ci/treeless_checkout
+    - mkdir -p temp/ci/treeless_checkout
+    - cd temp/ci/treeless_checkout
+    # We don't want a shallow clone, but we don't want a full one either: https://github.blog/open-source/git/get-up-to-speed-with-partial-clone-and-shallow-clone/
+    # The previous --unshallow and --depth calls below took 8.5 minutes.  The following takes seconds, probably fractions of a second on gitlab where the repo is local, and includes the full history.  This is what treeless clones were invented for.
+    - git clone --filter=tree:0 --no-checkout "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" .
+    - TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"
+    - echo "TARGET_BRANCH={$TARGET_BRANCH}"
+    # Warning, the following assumes all tags were on the current upstream remote, which for a developper fork or client fork is ... unlikely - benoitg - 2026-09-22
+    - LAST_TAG=$(git tag --sort=-v:refname | head -n 1)
+    - echo "LAST_TAG=${LAST_TAG}"
 
-.tiki-package-base: &tiki-package-base
+    - php ${CI_PROJECT_DIR}/doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
+    - mv generated_changelog.md ${CI_PROJECT_DIR}/CHANGELOG.generated.md
+    # Next line is for gitlab-ci-local, where the checkout is actually the developper's
+    - rm -rf ${CI_PROJECT_DIR}/temp/ci/treeless_checkout
+  artifacts:
+    paths:
+      - CHANGELOG.generated.md
+
+.tiki-package-base:
   stage: package-tiki
   needs:
     - composer
     - node_build
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  cache: [*cache-composercache]
-  allow_failure: true
+  script:
+    - PACKAGE_FILENAME="tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz" src/ci/build_package.sh
   artifacts:
     paths:
       - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
     expire_in: 2 days
 
-# 1. SHALLOW PACKAGING: Fast because it uses a depth of 1 and doesn't need to fetch all tags.'
-tiki-package-shallow:
-  <<: *tiki-package-base
-  variables:
-    GIT_DEPTH: "1"
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE != "merge_train"'
-      when: always
-    - when: never
-  script:
-    - PACKAGE_FILENAME="tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz" src/ci/build_package.sh
-
-# 2. DEEP PACKAGING: Slower because it needs to fetch all tags and apply only on merge requests to the master branch.
-tiki-package-deep:
-  <<: *tiki-package-base
-  variables:
-    GIT_DEPTH: "1000"
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^\d+\.x$/)'
-      when: always
-    - if: '$CI_PROJECT_PATH == "tikiwiki/tiki" && $CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ /^\d+\.x$/)'
-      when: always
-    - when: never
-  script:
-    - *tiki-package-changelog-script
-    - PACKAGE_FILENAME="tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz" src/ci/build_package.sh
-  artifacts:
-    paths:
-      - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
-      - CHANGELOG.generated.md
-    expire_in: 2 days
+tiki-package:
+  extends: .tiki-package-base
+  needs:
+    - composer
+    - node_build
+    - tiki-generate-changelog
+# No reason not to run packaging all the time, changelog generation is fast now.  However, see the comment about tiki-generate-changelog and developper forks above. 
+# If the assumption about tags on developper forks can't be fixed (such as by fetching all the release tags refspect from the upstream repo during changelog generation),
+# rules should be added again not to run changelog generation when not on the main repo. (No changelog being better than a wrong changelog) - benoitg - 2026-09-22
+#  rules:
+#    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^\d+\.x$/)'
+#      when: always
+#    - if: '$CI_PROJECT_PATH == "tikiwiki/tiki" && $CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ /^\d+\.x$/)'
+#      when: always
+#    - when: never
 
 check-directories:
   stage: package-tiki
