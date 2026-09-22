@@ -560,16 +560,6 @@ class TrackerLib extends TikiLib
     {
         return $this->table('tiki_trackers')->fetchFullRow(['trackerId' => (int) $trackerId]);
     }
-    /**
-     * Return the tracker ID from tracker permanent name.
-     *
-     * @param string $trackerPermName Tracker permanent name.
-     * @return int|false Returns the tracker ID on success, or false if not found.
-     */
-    public function get_trackerIdfromPermName($trackerPermName): int|false
-    {
-        return $this->table('tiki_tracker_options')->fetchOne('trackerId', ['permName' => (string) $trackerPermName]);
-    }
 
     /**
      * Return the raw database row for this tracker field id

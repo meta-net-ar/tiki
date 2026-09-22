@@ -69,17 +69,19 @@ class WikiPlugin_Helper
     {
         return [
             'trackerId' => [
-                'required' => false,
+                'required' => true,
                 'name' => tra('Tracker ID'),
                 'description' => tra('Numeric value representing the tracker ID'),
+                'since' => '1',
                 'filter' => 'digits',
                 'profile_reference' => 'tracker',
             ],
-            'trackerPermName' => [
+            'tracker' => [
                 'required' => false,
-                'name' => tra('Tracker Permanent Name'),
-                'description' => tra('Permanent name of the tracker'),
-                'filter' => 'word',
+                'name' => tr('Tracker'),
+                'description' => tr('Tracker ID, or Tracker Permanent Name, if %0.', '<code>usePermNames="y"</code>'),
+                'since' => '30.2',
+                'filter' => 'text',
                 'profile_reference' => 'tracker',
             ],
         ];

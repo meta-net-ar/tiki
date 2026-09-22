@@ -51,7 +51,7 @@ class Tracker_Definition
     public static function get($tracker, bool $useCache = true): Tracker_Definition|false
     {
         $trklib = TikiLib::lib('trk');
-        $trackerId = (is_string($tracker) && !ctype_digit($tracker)) ? $trklib->getTrackerIdByPermanentName($tracker) : $tracker;
+        $trackerId = (is_string($tracker) && ! ctype_digit($tracker)) ? $trklib->getTrackerIdByPermanentName($tracker) : $tracker;
         if (! $trackerId) {
             throw new InvalidArgumentException(tra("trackerId parameter must be present"));
         }

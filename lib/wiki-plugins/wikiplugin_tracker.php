@@ -14,22 +14,6 @@ function wikiplugin_tracker_info()
 {
     $commonTrackerParams = WikiPlugin_Helper::getTrackerCommonParameters();
     $specificParams = [
-        'trackerId' => [
-            'required' => true,
-            'name' => tra('Tracker ID'),
-            'description' => tra('Numeric value representing the tracker ID'),
-            'since' => '1',
-            'filter' => 'digits',
-            'profile_reference' => 'tracker',
-        ],
-        'tracker' => [
-            'required' => true,
-            'name' => tr('Tracker'),
-            'description' => tr('Tracker ID, or Tracker Permanent Name, if %0.', '<code>usePermNames="y"</code>'),
-            'since' => '30.2',
-            'filter' => 'text',
-            'profile_reference' => 'tracker',
-        ],
         'fields' => [
             'required' => false,
             'name' => tra('Fields'),
