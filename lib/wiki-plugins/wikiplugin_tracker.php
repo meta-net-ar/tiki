@@ -450,7 +450,6 @@ function wikiplugin_tracker_info()
                 '<code>autosavefields</code>',
                 '<code>autosavevalues</code>',
                 '<code>usePermNames="y"</code>'
-
             ),
             'since' => '8.0',
             'filter' => 'digits',
