@@ -13,6 +13,7 @@ use TikiLib;
  *
  * @group api-integration-test
  * @group api-trackers
+ * @group tracker
  */
 class ApiTrackersPostTest extends ApiBaseTrackersTest
 {
