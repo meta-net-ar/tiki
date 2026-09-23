@@ -346,12 +346,26 @@ function prefs_wiki_list($partial = false)
             'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_edit_icons_toggle' => [
-            'name' => tra('Only display focused edit icons (for sections and/or plugins) on request'),
-            'description' => tra('Focused edit icons will only display after a per-session "Edit icons" preference is enabled. This preference is defined directly from any wiki page.'),
+            'name' => tra('Only display focused edit icons on request'),
+            'description' => tra('Section edit icons, and plugin edit icons when plugin editing is set to "Icon after the plugin", will only display after a per-session "Edit icons" preference is enabled. This preference is defined directly from any wiki page.'),
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['basic'],
             'help' => $wikiGeneralPreferencesHelp,
+        ],
+        'wiki_edit_plugin_mode' => [
+        'name' => tra('How to offer plugin editing'),
+        'description' => tr('%0Highlight the plugin%1 shows the content a plugin produced when the mouse is over it, with an edit button on its corner, so the feature can be found without knowing the icon. %2 Devices without a mouse always fall back to the icon.', '<em>', '</em>', '<br>'),
+        'type' => 'list',
+        'options' => [
+            'zone' => tra('Highlight the plugin on mouse over'),
+            'both' => tra('Highlight the plugin, and keep the icon after it'),
+            'icon' => tra('Icon after the plugin'),
+        ],
+        'default' => 'zone',
+        'dependencies' => ['wiki_edit_plugin'],
+        'tags' => ['basic'],
+        'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_edit_minor' => [
             'name' => tra('Allow minor edits of wiki pages'),
