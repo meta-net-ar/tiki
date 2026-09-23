@@ -4,7 +4,7 @@
  * All Rights Reserved. See copyright.txt for details and a complete list of authors.
  * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
  *
-**/
+ **/
 
 // The id shape the parser emits. Anything else in a comment is ignored, so a page
 // that contains hand written HTML cannot forge a zone pointing at another element.
@@ -24,7 +24,7 @@ const translate = (text) => (typeof window.tr === "function" ? window.tr(text) :
  */
 export default function initPluginZones(options = {}) {
     const root = options.container || document.querySelector("#page-data > .content") || document.querySelector("#page-data");
-    if (! root || root.tikiPluginZones) {
+    if (!root || root.tikiPluginZones) {
         return null;
     }
 
@@ -60,7 +60,7 @@ export default function initPluginZones(options = {}) {
                 const icon = document.getElementById(zone.id);
                 zone.icon = icon && icon.classList.contains("editplugin") ? icon : null;
                 zone.data = (window.tikiPluginZoneData || {})[zone.id] || null;
-                if (! zone.icon && ! zone.data) {
+                if (!zone.icon && !zone.data) {
                     continue; // neither an edit icon of ours nor parameters: stale or forged markers
                 }
                 zone.name = (zone.icon && zone.icon.dataset.plugin) || (zone.data && zone.data.type) || zone.id;
@@ -101,7 +101,7 @@ export default function initPluginZones(options = {}) {
 
     function nodeInRange(range, node) {
         const parent = node.parentNode;
-        if (! parent) {
+        if (!parent) {
             return false;
         }
         const index = Array.prototype.indexOf.call(parent.childNodes, node);
@@ -174,7 +174,7 @@ export default function initPluginZones(options = {}) {
         const box = visible || { left: iconBox ? iconBox.left : 0, top: iconBox ? iconBox.top : 0, width: 24, height: 24 };
 
         outline.classList.add("shown");
-        outline.classList.toggle("empty", ! visible);
+        outline.classList.toggle("empty", !visible);
         outline.style.left = box.left + scrollX + "px";
         outline.style.top = box.top + scrollY + "px";
         outline.style.width = box.width + "px";
@@ -183,7 +183,7 @@ export default function initPluginZones(options = {}) {
         label.textContent = visible ? zone.name : zone.name + " · " + translate("no visible output");
         label.hidden = withButton; // the button names the plugin already
 
-        if (! withButton) {
+        if (!withButton) {
             button.classList.remove("shown");
             return;
         }
@@ -204,14 +204,11 @@ export default function initPluginZones(options = {}) {
 
     function hide(delay) {
         clearTimeout(hideTimer);
-        hideTimer = setTimeout(
-            () => {
-                outline.classList.remove("shown");
-                button.classList.remove("shown");
-                current = null;
-            },
-            delay || 0
-        );
+        hideTimer = setTimeout(() => {
+            outline.classList.remove("shown");
+            button.classList.remove("shown");
+            current = null;
+        }, delay || 0);
     }
 
     // --- events --------------------------------------------------------------------------
@@ -219,7 +216,7 @@ export default function initPluginZones(options = {}) {
     function bindIcons() {
         for (const zone of zones) {
             const anchor = zone.icon || keyboardStop(zone);
-            if (! anchor || anchor.tikiPluginZone) {
+            if (!anchor || anchor.tikiPluginZone) {
                 continue;
             }
             anchor.tikiPluginZone = true;
@@ -281,7 +278,7 @@ export default function initPluginZones(options = {}) {
     button.addEventListener("click", () => openEditor(current, button));
 
     function openEditor(zone, trigger) {
-        if (! zone) {
+        if (!zone) {
             return;
         }
         if (zone.icon) {
@@ -309,9 +306,7 @@ export default function initPluginZones(options = {}) {
     let refreshTimer = null;
     const ours = (node) => node.nodeType === 1 && node.classList.contains("tiki-plugin-zone-stop");
     new MutationObserver((records) => {
-        const fromUs = records.every(
-            (record) => [...record.addedNodes].every(ours) && [...record.removedNodes].every(ours)
-        );
+        const fromUs = records.every((record) => [...record.addedNodes].every(ours) && [...record.removedNodes].every(ours));
         if (fromUs) {
             return;
         }
