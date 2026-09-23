@@ -211,13 +211,13 @@ export default defineConfig(({ command, mode }) => {
                     "@dicebear/core",
                     /^@jquery-tiki\/.+/,
                     "@lottiefiles/dotlottie-wc",
-                    "@popperjs/core",
+
                     /^@vue-mf\/.+/,
                     /^@vue-widgets\/.+/,
                     "@wysiwyg/summernote",
                     "@zxing/library",
                     "altcha",
-                    "bootstrap",
+
                     "clipboard",
                     "converse.js",
                     "dompurify",
