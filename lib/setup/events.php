@@ -408,6 +408,64 @@ function tiki_setup_events()
         TikiLib::lib('categ')->set_current_object_categories($data["type"], $data["object"]);
     });
 
+    if ($prefs['indexnow_enable'] === 'y') {
+        $events->bind('tiki.save', function ($args) {
+            global $base_url, $prefs;
+
+            $type   = $args['type'] ?? '';
+            $object = $args['object'] ?? '';
+            $key    = $prefs['indexnow_key'] ?? '';
+            if (empty($type) || empty($object) || empty($key)) {
+                return;
+            }
+
+            // skip non public content
+            $perms = Perms::get(['type' => $type, 'object' => $object]);
+            $perms->setGroups(['Anonymous']);
+            if (! $perms->view) {
+                return;
+            }
+
+            $url = null;
+
+            // TODO: add more cases (features) support!
+            // but other types that get updated multiple times a day if re-sending the same url to
+            // search engines will cause the site to get flagged or blocked.
+            switch ($type) {
+                case 'wiki page':
+                    $url = filter_out_sefurl('tiki-index.php?page=' . urlencode((string) $object), $type);
+                    break;
+
+                case 'article':
+                    $url = filter_out_sefurl('tiki-read_article.php?articleId=' . urlencode((string) $object), $type);
+                    break;
+
+                case 'blog':
+                    $url = filter_out_sefurl('tiki-view_blog.php?blogId=' . urlencode((string) $object), $type);
+                    break;
+
+                case 'blog post':
+                    $url = filter_out_sefurl('tiki-view_blog_post.php?postId=' . urlencode((string) $object), $type);
+                    break;
+            }
+
+            if (empty($url)) {
+                return;
+            }
+
+            register_shutdown_function(function () use ($base_url, $url, $key) {
+
+                try {
+                    $indexer = new \Melbahja\Seo\Indexing\IndexNowIndexer($key);
+                    $indexer->submitUrl(rtrim($base_url, '/') . '/' . ltrim($url, '/'));
+                } catch (\Exception $e) {
+                    // log
+                    \Feedback::error($e->getMessage());
+                }
+            });
+        });
+    }
+
     // As PHP's register_shutdown_function might change the working directory, change it back to avoid bugs.
     $events->bindPriority(-20, 'tiki.process.shutdown', 'tiki_shutdown_cwd');
 
