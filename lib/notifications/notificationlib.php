@@ -192,12 +192,14 @@ class NotificationLib extends TikiLib
             'label' => tr('A new topic is posted in the forum') ,
             'type' => 'forum',
             'url' => 'tiki-forums.php',
+            'available' => $prefs['feature_forums'] == 'y'
         ];
 
         $watches['forum_post_topic_and_thread'] = [
             'label' => tr('A new topic or a reply is posted in the forum') ,
             'type' => 'forum',
             'url' => 'tiki-forums.php',
+            'available' => $prefs['feature_forums'] == 'y'
         ];
 
         foreach ($watches as $key => $watch) {
