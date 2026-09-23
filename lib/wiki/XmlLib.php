@@ -397,11 +397,14 @@ class XmlLib extends TikiLib
 
     // Create or update a page from within the Zip file and an xml parsing result
 
-    public function create_page($info, $hits = 0, $data = null, $lastModif = null, $comment = null, $user = 'admin', $ip = '0.0.0.0', $description = '', $lang = '', $is_html = false, $hash = null, $wysiwyg = null, $wiki_authors_style = '', $minor = 0, $created = '')
+    public function create_page($info, $hits = 0, $data = null, $lastModif = null, $comment = null, $user = '', $ip = '0.0.0.0', $description = '', $lang = '', $is_html = false, $hash = null, $wysiwyg = null, $wiki_authors_style = '', $minor = 0, $created = '')
     {
         global $prefs, $tiki_p_wiki_attach_files, $tiki_p_edit_comments, $tikidomain;
         $tikilib = TikiLib::lib('tiki');
 
+        if (! $user) {
+            $user = $this->getDefaultAdminLogin();
+        }
 
         // Get the page content from the Zip file.
 

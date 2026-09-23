@@ -62,7 +62,7 @@ if (empty($_REQUEST['type'])) {
 $smarty->assign('type', $_REQUEST['type']);
 switch ($_REQUEST['type']) {
     case 'file gallery':
-        $objects = $filegallib->list_file_galleries(0, -1, 'name_desc', 'admin', $find_objects, $prefs['fgal_root_id']);
+        $objects = $filegallib->list_file_galleries(0, -1, 'name_desc', TikiLib::lib('user')->getDefaultAdminLogin(), $find_objects, $prefs['fgal_root_id']);
         $smarty->assign_by_ref('objects', $objects["data"]);
         $objects = $objects['data'];
         correct_array($objects, 'galleryId', 'name');

@@ -58,7 +58,8 @@ function sendStructurePage($params)
     $alias = $params->getParam(10);
     $alias = $alias->scalarval();
 
-    if ($user != 'admin' && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
+    $notAdminUser = $userlib->user_has_permission($user, 'tiki_p_admin') ? false : true;
+    if ($notAdminUser && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
         $ok = $userlib->intervalidate($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $user, $pass, false);
     } else {
         list($ok, $user, $error) = $userlib->validate_user($user, $pass, '', '');
@@ -105,7 +106,8 @@ function sendPage($params)
     $pp = $params->getParam(6);
     $description = $pp->scalarval();
 
-    if ($username != 'admin' && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
+    $notAdminUser = $userlib->user_has_permission($username, 'tiki_p_admin') ? false : true;
+    if ($notAdminUser && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
         $ok = $userlib->intervalidate($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $username, $password, false);
     } else {
         list($ok, $username, $error) = $userlib->validate_user($username, $password, '', '');
@@ -179,7 +181,8 @@ function sendArticle($params)
     $pp = $params->getParam(21);
     $rating = $pp->scalarval();
 
-    if ($username != 'admin' && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
+    $notAdminUser = $userlib->user_has_permission($username, 'tiki_p_admin') ? false : true;
+    if ($notAdminUser && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
         $ok = $userlib->intervalidate($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $username, $password, false);
     } else {
         [$ok, $username] = $userlib->validate_user($username, $password, '', '');

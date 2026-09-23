@@ -105,7 +105,7 @@ class FileGalLib extends TikiLib
                 $return = $this->replace_file_gallery(
                     [
                         'name' => $galName,
-                        'user' => 'admin',
+                        'user' => TikiLib::lib('user')->getDefaultAdminLogin(),
                         'type' => 'attachments',
                         'public' => 'y',
                         'visible' => 'y',

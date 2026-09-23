@@ -476,6 +476,7 @@ $smarty->assign('db_requires_update', $installer->requiresUpdate());
 $smarty->assign('missing_patches', $installer->missingPatches());
 $smarty->assign('installer_not_locked', $installer->checkInstallerLocked());
 $smarty->assign('db_engine_type', getCurrentEngine());
+$smarty->assign('using_default_admin_username', TikiLib::lib('user')->getDefaultAdminLogin() === 'admin');
 
 if (empty($_GET)) {
     $where = ! empty($prefs['mailer_queue_max_retries']) ? 'where attempts > ' . $prefs['mailer_queue_max_retries'] : '';

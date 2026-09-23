@@ -1946,7 +1946,7 @@ class WikiLib extends TikiLib
             $homePageContent,
             $tikilib->now,
             'Tiki initialization',
-            'admin',
+            $this->getDefaultAdminLogin(),
             '0.0.0.0',
             '',
             $homePageLang,

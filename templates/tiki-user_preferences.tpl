@@ -28,7 +28,7 @@
                             {tr}User{/tr}
                         </label>
                         <div class="col-md-8">
-                            <input class="form-control" disabled value="{$userinfo.login|escape}">
+                            <input class="form-control" {if $change_login}name="login"{else}disabled{/if} value="{$userinfo.login|escape}">
                             <span class="form-text">
                                 {tr}Last login:{/tr} {$userinfo.lastLogin|tiki_long_datetime}
                             </span>
@@ -719,15 +719,15 @@
                 </form>
             {/tab}
         {/if}
-        {if $prefs.change_password neq 'n' or ! ($prefs.login_is_email eq 'y' and $userinfo.login neq 'admin')}
+        {if $prefs.change_password neq 'n' or ! ($prefs.login_is_email eq 'y' and $userinfo.login neq $admin_username)}
             {tab name="{tr}Account Information{/tr}"}
                 <h2>{tr}Account Information{/tr}</h2>
                 <form action="tiki-user_preferences.php" method="post">
                     {include file='password_jq.tpl'}
                     {ticket}
                     {if $userwatch ne $user}<input type="hidden" name="view_user" value="{$userwatch|escape}">{/if}
-                        {if $prefs.auth_method neq 'cas' || ($prefs.cas_skip_admin eq 'y' && $user eq 'admin')}
-                            {if $prefs.change_password neq 'n' and ($prefs.login_is_email ne 'y' or $userinfo.login eq 'admin')}
+                        {if $prefs.auth_method neq 'cas' || ($prefs.cas_skip_admin eq 'y' && $user eq $admin_username)}
+                            {if $prefs.change_password neq 'n' and ($prefs.login_is_email ne 'y' or $userinfo.login eq $admin_username)}
                                 {remarksbox type="tip" title="{tr}Information{/tr}" close="n"}
                                     {tr}Leave "New password" and "Confirm new password" fields blank to keep current password{/tr}
                                 {/remarksbox}
@@ -747,7 +747,7 @@
                                 <input type="text" class="form-control" id="username-autocomplete" disabled="disabled" value="{$userinfo.login|escape}">
                             </div>
                         </div>
-                        {if $prefs.login_is_email eq 'y' and $userinfo.login neq 'admin'}
+                        {if $prefs.login_is_email eq 'y' and $userinfo.login neq $admin_username}
                             <input type="hidden" name="email" value="{$userinfo.email|escape}">
                         {else}
                             <div class="tiki-form-group row">
@@ -759,7 +759,7 @@
                                 </div>
                             </div>
                         {/if}
-                        {if $prefs.auth_method neq 'cas' || ($prefs.cas_skip_admin eq 'y' && $user eq 'admin')}
+                        {if $prefs.auth_method neq 'cas' || ($prefs.cas_skip_admin eq 'y' && $user eq $admin_username)}
                             {if $tiki_p_admin ne 'y' or $userwatch eq $user}
                                 <div class="tiki-form-group row">
                                     <label class="col-md-4 col-form-label" for="pass">
@@ -908,7 +908,7 @@
     {/if}
     {*Do not give access to tab Account Deletion, if 2FA is required but not enabled by the user, except for the user 'admin'*}
     {if $prefs.twoFactorAuth neq 'y' or $force2FA neq 'y' or ! empty($twoFactorSecret)}
-        {if ($tiki_p_delete_account eq 'y' or ($tiki_p_admin_users eq 'y' and $userwatch ne $user)) and $userinfo.login neq 'admin'}
+        {if ($tiki_p_delete_account eq 'y' or ($tiki_p_admin_users eq 'y' and $userwatch ne $user)) and $userinfo.login neq $admin_username}
             {tab name="{tr}Account Deletion{/tr}"}
                 <div class="jumbotron text-center">
                     <h2>{tr}Account Deletion{/tr}</h2>
@@ -919,7 +919,7 @@
                             <div class="form-check">
                                 <input type='checkbox' class="form-check-input" name='deleteaccountconfirm' id="deleteaccountconfirm" value='1'>
                                 <label for="deleteaccountconfirm" class="form-check-label">
-                                    {tr}Check this box if you really want to delete the account{/tr}
+                                    {tr}Check this box if you really want to delete the account for: {$admin_username}  == {json_encode($userinfo)}{/tr}
                                 </label>
                             </div>
                         </p>

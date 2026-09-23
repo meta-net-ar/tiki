@@ -89,7 +89,7 @@
                     {/if}
                 {elseif $tiki_p_wiki_view_latest eq 'y'}
                     {self_link latest=1 _class="btn btn-warning"}
-                        {if $user eq 'admin' or $prefs.tiki_p_wiki_approve eq 'y'}
+                        {if $user eq $admin_username or $prefs.tiki_p_wiki_approve eq 'y'}
                             {tr}View latest version before editing{/tr}
                         {else}
                             {tr}View latest version{/tr}

@@ -15,7 +15,7 @@ class Tiki_Profile_InstallHandler_Blog extends Tiki_Profile_InstallHandler
         $defaults = [
             'title' => '',
             'description' => '',
-            'user' => 'admin',
+            'user' => TikiLib::lib('user')->getDefaultAdminLogin(),
             'public' => 'n',
             'max_posts' => 10,
             'heading' => '',

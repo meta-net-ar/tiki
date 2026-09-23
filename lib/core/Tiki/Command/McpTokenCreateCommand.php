@@ -7,6 +7,7 @@
 
 namespace Tiki\Command;
 
+use TikiLib;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -23,7 +24,7 @@ class McpTokenCreateCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addArgument('user', InputArgument::OPTIONAL, 'Tiki username the token authenticates as', 'admin')
+            ->addArgument('user', InputArgument::OPTIONAL, 'Tiki username the token authenticates as')
             ->addOption('label', 'l', InputOption::VALUE_REQUIRED, 'Human-readable label for the token', 'MCP Server')
             ->addOption('expire', 'e', InputOption::VALUE_REQUIRED, 'Expiration in days (0 = never)', '0');
     }
@@ -31,6 +32,12 @@ class McpTokenCreateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $user = $input->getArgument('user');
+
+        // Resolve the default admin login at execution time to avoid DB access during command registration.
+        if (empty($user)) {
+            $user = TikiLib::lib('user')->getDefaultAdminLogin();
+        }
+
         $label = $input->getOption('label');
         $expireDays = (int) $input->getOption('expire');
 

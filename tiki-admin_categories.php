@@ -673,7 +673,7 @@ if ($prefs['feature_search'] !== 'y' || $prefs['unified_add_to_categ_search'] !=
             $offset,
             -1,
             'name_desc',
-            'admin',
+            $user,
             $find_objects,
             $prefs['fgal_root_id']
         );

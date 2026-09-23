@@ -250,7 +250,7 @@ class NlLib extends TikiLib
             $result = $this->query($query, $groups);
             while ($res = $result->fetchRow()) {
                 if (empty($res['email'])) {
-                    if ($prefs['login_is_email'] == 'y' && $user != 'admin') {
+                    if ($prefs['login_is_email'] == 'y' && $user != $this->getDefaultAdminLogin()) {
                         $res['email'] = $res['login'];
                     } else {
                         continue;

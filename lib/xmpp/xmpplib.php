@@ -1248,7 +1248,7 @@ class XMPPLib extends TikiLib
 
         try {
             require_once __DIR__ . '/MucJoin.php';
-            $client->send(new \Tiki\Xmpp\MucJoin($roomJid, 'admin'));
+            $client->send(new \Tiki\Xmpp\MucJoin($roomJid, $this->getDefaultAdminLogin()));
 
             if (class_exists('\Tiki\Xmpp\MucConfigure')) {
                 require_once __DIR__ . '/MucConfigure.php';

@@ -2022,6 +2022,11 @@ class TikiLib extends TikiDb_Bridge
         return $data;
     }
 
+    public function getDefaultAdminLogin()
+    {
+        return $this->table('users_users')->fetchOne('login', ['default_admin' => true]);
+    }
+
     // User assigned modules ////
     /*shared*/
     /**
@@ -4983,12 +4988,16 @@ class TikiLib extends TikiDb_Bridge
     /** Create a wiki page
         @param array $hash- lock_it,contributions, contributors
      **/
-    public function create_page($name, $hits, $data, $lastModif, $comment, $user = 'admin', $ip = '0.0.0.0', $description = '', $lang = '', $is_html = false, $hash = null, $wysiwyg = null, $wiki_authors_style = '', $minor = 0, $created = '')
+    public function create_page($name, $hits, $data, $lastModif, $comment, $user = '', $ip = '0.0.0.0', $description = '', $lang = '', $is_html = false, $hash = null, $wysiwyg = null, $wiki_authors_style = '', $minor = 0, $created = '')
     {
         global $prefs, $tracer;
         $parserlib = TikiLib::lib('parser');
         if ($hash === null) {
             $hash = [];
+        }
+
+        if (! $user) {
+            $user = $this->getDefaultAdminLogin();
         }
 
         $tracer->trace('tikilib.create_page', "** invoked");

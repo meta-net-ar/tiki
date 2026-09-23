@@ -197,7 +197,7 @@ class Tiki_Profile_InstallHandler_WikiPage extends Tiki_Profile_InstallHandler
                         $this->content,
                         time(),
                         $this->message,
-                        'admin',
+                        TikiLib::lib('user')->getDefaultAdminLogin(),
                         '0.0.0.0',
                         $this->description,
                         $this->lang,
@@ -238,7 +238,7 @@ class Tiki_Profile_InstallHandler_WikiPage extends Tiki_Profile_InstallHandler
                 $this->message = tra('Page updated by profile installer');
             }
 
-            $tikilib->update_page($finalName, $this->content, $this->message, 'admin', '0.0.0.0', $this->description, 0, $this->lang, $is_html, null, null, $this->wysiwyg, $this->wiki_authors_style);
+            $tikilib->update_page($finalName, $this->content, $this->message, TikiLib::lib('user')->getDefaultAdminLogin(), '0.0.0.0', $this->description, 0, $this->lang, $is_html, null, null, $this->wysiwyg, $this->wiki_authors_style);
         }
 
         global $prefs;

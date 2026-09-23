@@ -137,7 +137,7 @@ class BannerLib extends TikiLib
 
     public function list_banners($offset, $maxRecords, $sort_mode, $find, $user)
     {
-        if ($user == 'admin') {
+        if ($user == $this->getDefaultAdminLogin()) {
             $mid = '';
             $bindvars = [];
         } else {

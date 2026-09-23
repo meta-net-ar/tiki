@@ -18,7 +18,7 @@ $bypass_siteclose_check = true;
 global $user;
 
 require_once('tiki-setup.php');
-$user = 'admin';
+$user = TikiLib::lib('user')->getDefaultAdminLogin();
 
 // thanks Kelvin J on http://www.php.net/manual/en/function.in-array.php
 function in_arrayi($needle, $haystack)
@@ -63,13 +63,13 @@ function processUsers(): void
 
     $allUsers = $userTable->fetchAll(
         ['userId', 'email', 'login'],
-        ['login' => $userTable->not('admin')]
+        ['default_admin' => $userTable->not(true)]
     );
 
     $emailRegex = '/(.*?)@(.*?).([^.]+)$/';
 
     // keep new logins to check for duplicates
-    $newLogins = ['admin'];
+    $newLogins = [$tikilib->getDefaultAdminLogin()];
 
     // grab all the non-email login users here as some will have registered since the initial processing
 

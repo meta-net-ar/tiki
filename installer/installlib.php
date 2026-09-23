@@ -328,7 +328,7 @@ $PHP_CONFIG_FILE_PATH/php.ini or $httpd_conf.
  */
 function has_admin()
 {
-    $query = "select hash from users_users where login='admin'";
+    $query = "select hash from users_users where default_admin=true";
     $res = false;
 
     $db = TikiDb::get();

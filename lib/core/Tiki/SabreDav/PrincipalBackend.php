@@ -79,7 +79,7 @@ class PrincipalBackend extends DAVACL\PrincipalBackend\AbstractBackend implement
                 $principals[] = [
                     'uri' => $uri,
                     $this->fieldMap['name'] => TikiLib::lib('tiki')->get_user_preference($user['login'], 'realName'),
-                    $this->fieldMap['email'] => $prefs['login_is_email'] == 'y' && $user['login'] != 'admin' ? $user['login'] : $user['email'],
+                    $this->fieldMap['email'] => $prefs['login_is_email'] == 'y' && $user['login'] != TikiLib::lib('user')->getDefaultAdminLogin() ? $user['login'] : $user['email'],
                 ];
             }
         } else {

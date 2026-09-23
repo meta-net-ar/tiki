@@ -11,10 +11,10 @@ class MucJoin implements ProtocolImplementationInterface
     private string $nick;
     private int $priority;
 
-    public function __construct(string $roomJid, string $nick = 'admin', int $priority = 1)
+    public function __construct(string $roomJid, string $nick = '', int $priority = 1)
     {
         $this->roomJid = $roomJid;
-        $this->nick    = $nick;
+        $this->nick    = $nick ?: \TikiLib::lib('user')->getDefaultAdminLogin();
         $this->priority = $priority;
     }
 

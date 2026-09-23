@@ -93,7 +93,7 @@ class PageParser
                     'data' => '',
                     'comment' => '',
                     'description' => '',
-                    'user' => 'admin',
+                    'user' => \TikiLib::lib('user')->getDefaultAdminLogin(),
                     'ip' => '0.0.0.0',
                     'lang' => '',
                     'is_html' => false,

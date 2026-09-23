@@ -1,5 +1,5 @@
 {if $field.options_map.type eq 'password'}
-    {if ($prefs.auth_method neq 'cas' || ($prefs.cas_skip_admin eq 'y' && $user eq 'admin')) and $prefs.change_password neq 'n'}
+    {if ($prefs.auth_method neq 'cas' || ($prefs.cas_skip_admin eq 'y' && $user eq $admin_username)) and $prefs.change_password neq 'n'}
         <input type="password" name="{$field.ins_id}" id="{$field.ins_id|escape}" class="form-control">
         <br><i>Leave empty if password is to remain unchanged</i>
     {/if}

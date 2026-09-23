@@ -125,6 +125,9 @@ if ($userwatch != $user) {
     }
 }
 
+$userinfo = $userlib->get_user_info($userwatch);
+$can_change_login = $userwatch === $user && $userinfo['login'] === 'admin';
+
 // Custom fields
 $registrationlib = TikiLib::lib('registration');
 $customfields = $registrationlib->get_customfields();
@@ -180,6 +183,11 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_info"]) && $ac
     if (isset($_POST["homePage"])) {
         $tikilib->set_user_preference($userwatch, 'homePage', $_POST["homePage"]);
     }
+
+    if (isset($_POST["login"]) && $can_change_login) {
+        TikiLib::lib('user')->change_login($userinfo['login'], $_POST["login"]);
+    }
+
     TikiLib::events()->trigger(
         'tiki.user.update',
         [
@@ -453,7 +461,7 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
         ]
     );
 }
-if ($prefs['auth_method'] == 'ldap' && $user == 'admin' && $prefs['ldap_skip_admin'] == 'y') {
+if ($prefs['auth_method'] == 'ldap' && $user == TikiLib::lib('user')->getDefaultAdminLogin() && $prefs['ldap_skip_admin'] == 'y') {
     $change_password = 'y';
     $smarty->assign('change_password', $change_password);
 }
@@ -485,7 +493,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             Feedback::errorAndDie(tra("Invalid password. Your current password is required to change administrative information"), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
-    if (! empty($_POST['email']) && ($prefs['login_is_email'] != 'y' || $user == 'admin') && $_POST['email'] != $userlib->get_user_email($userwatch)) {
+    if (! empty($_POST['email']) && ($prefs['login_is_email'] != 'y' || $user == TikiLib::lib('user')->getDefaultAdminLogin()) && $_POST['email'] != $userlib->get_user_email($userwatch)) {
         if (validate_email($_POST['email'])) {
             $userlib->change_user_email($userwatch, $_POST['email'], $pass);
             Feedback::success(sprintf(tra('Email is set to %s'), $_POST['email']));
@@ -565,7 +573,6 @@ $force2FA = $userlib->forceTwoFactorAuth($userwatch);
 $smarty->assign('force2FA', $force2FA);
 $smarty->assign('twoFactorSecret', $twoFactorSecret);
 
-$userinfo = $userlib->get_user_info($userwatch);
 $generate = isset($_REQUEST['tfagenerate']) || empty($tfaSecret);
 if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] == TwoFactorAuth::TOTP_2FA) {
     $google2fa = new Google2FA();
@@ -631,7 +638,7 @@ if (isset($_POST['deleteaccount']) && $access->checkCsrf(true)) {
         die();
     }
     // Prevent deletion of the built-in admin account
-    if ($deleteUser === 'admin') {
+    if ($deleteUser === TikiLib::lib('user')->getDefaultAdminLogin()) {
         $smarty->assign('msg', tra('The built-in admin account cannot be deleted.'));
         $smarty->display('error.tpl');
         die();
@@ -701,6 +708,7 @@ if (isset($user_preferences[$userwatch]['email is public'])) {
 $tikilib->get_user_preference($userwatch, 'mailCharset', $prefs['default_mail_charset']);
 $tikilib->get_user_preference($userwatch, 'display_12hr_clock', 'n');
 $smarty->assign_by_ref('userinfo', $userinfo);
+$smarty->assign('change_login', $can_change_login);
 //user theme
 $themelib = TikiLib::lib('theme');
 $available_themesandoptions = $themelib->get_available_themesandoptions();

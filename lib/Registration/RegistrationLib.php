@@ -254,7 +254,7 @@ class RegistrationLib extends TikiLib
             // VALIDATE NAME HERE
             $n = strtolower($registration['name']);
             if (
-                $n == 'admin'
+                $n == $this->getDefaultAdminLogin()
                     || $n == 'anonymous'
                     || $n == 'registered'
                     || $n == strtolower(tra('Anonymous'))

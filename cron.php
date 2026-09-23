@@ -42,7 +42,8 @@ if (! isset($_REQUEST['token']) || $_REQUEST['token'] !== $cron_token) {
 $defaultSchedulers = new DefaultSchedulers();
 $defaultSchedulers->checkAndUpdate();
 
-$asUser = 'admin';
+// Admin username
+$asUser = TikiLib::lib('user')->getDefaultAdminLogin();
 
 if (TikiLib::lib('user')->user_exists($asUser)) {
     $permissionContext = new Perms_Context($asUser);

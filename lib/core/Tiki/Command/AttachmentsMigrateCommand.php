@@ -222,7 +222,7 @@ class AttachmentsMigrateCommand extends Command
                         }
                     }
                     if ($updated) {
-                        $tikilib->update_page($pageInfo['pageName'], $matches->getText(), tra('attachment conversion'), 'admin', '127.0.0.1', null, 0, '', null, null, null, '', '', true);
+                        $tikilib->update_page($pageInfo['pageName'], $matches->getText(), tra('attachment conversion'), TikiLib::lib('user')->getDefaultAdminLogin(), '127.0.0.1', null, 0, '', null, null, null, '', '', true);
                     }
                 }
                 $migratedCount++;

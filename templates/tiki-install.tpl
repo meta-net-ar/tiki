@@ -60,30 +60,37 @@
                             {* step 5 *}
                             {call name="printStepItem"
                                 step="5"
-                                title={isset($smarty.post.update)|ternary:"{tr}Review the Upgrade{/tr}":"{tr}Review the Installation{/tr}"}
-                                disabled=$install_step <= 5 && !$tikidb_is20
+                                title="{tr}Set admin credentials{/tr}"
+                                disabled=$install_step <= 5 && $dbcon !='y' || !isset($smarty.post.scratch) || isset($smarty.post.update)
                                 active=$install_step==5}
 
                             {* step 6 *}
                             {call name="printStepItem"
                                 step="6"
-                                title="{tr}Configure the General Settings{/tr}"
-                                disabled=$install_step <= 6 && !$tikidb_is20 || isset($smarty.post.update)
+                                title={isset($smarty.post.update)|ternary:"{tr}Review the Upgrade{/tr}":"{tr}Review the Installation{/tr}"}
+                                disabled=$install_step <= 6 && !$tikidb_is20
                                 active=$install_step==6}
 
                             {* step 7 *}
                             {call name="printStepItem"
                                 step="7"
-                                title="{tr}Last Notes{/tr}"
-                                disabled=$install_step <= 7 && !$tikidb_is20
+                                title="{tr}Configure the General Settings{/tr}"
+                                disabled=$install_step <= 7 && !$tikidb_is20 || isset($smarty.post.update)
                                 active=$install_step==7}
 
                             {* step 8 *}
                             {call name="printStepItem"
                                 step="8"
-                                title="{tr}Enter Your Tiki{/tr}"
+                                title="{tr}Last Notes{/tr}"
                                 disabled=$install_step <= 8 && !$tikidb_is20
                                 active=$install_step==8}
+
+                            {* step 9 *}
+                            {call name="printStepItem"
+                                step="9"
+                                title="{tr}Enter Your Tiki{/tr}"
+                                disabled=$install_step <= 9 && !$tikidb_is20
+                                active=$install_step==9}
                         </ol>
                     </form>{* End of install-menu *}
                     <div class="help-menu menu">
@@ -457,7 +464,7 @@
                                         <p>{tr}Use at your own risk. If the data in the database currently contains improperly converted data, this may make matters worse. Suitable for new installations. Requires ALTER privilege on the database.{/tr}</p>
                                         <p>
                                             <input type="submit" class="btn btn-warning" name="convert_to_utf8" value="{tr}Convert database and tables to UTF-8{/tr}">
-                                            <input type="hidden" name="install_step" value="4">
+                                            <input type="hidden" name="install_step" value="5">
                                             {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
                                             {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
                                         </p>
@@ -574,8 +581,57 @@
                         {/if}
                     </div>{* End of install-step4 *}
 
-                    {elseif $install_step eq '5' or ($dbdone ne 'n')}
+                    {elseif $install_step eq '5'}
+                    {include file='password_jq.tpl' ignorejq='y'}
                     <div class="install-step5">
+                        <h1>{tr}Set admin credentials{/tr}</h1>
+                        <p>{tr}Tiki requires an administrator account to manage the site.{/tr} {tr}You must create the administrator account before continuing.{/tr}</p>
+                        <form action="tiki-install.php" method="post">
+                            <input type="hidden" name="install_step" value="6">
+                            <input type="hidden" name="install_type" value="{$install_type}">
+                            {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
+                            {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
+                            <fieldset>
+                                <legend>{tr}Administrator account{/tr}</legend>
+                                <div class="mb-3 row">
+                                    <label class="col-form-label" for="admin_user">{tr}Admin username:{/tr}</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="admin_user" id="admin_user" value="{if isset($smarty.request.admin_user)}{$smarty.request.admin_user|escape:"html"}{/if}" size="40" />
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-form-label" for="admin_pass">{tr}Admin password:{/tr}</label>
+                                    <div class="col-sm-6">
+                                        <input type="password" class="form-control" name="admin_pass" id="pass1" value="{if isset($smarty.request.admin_pass)}{$smarty.request.admin_pass|escape:"html"}{/if}" size="40" />
+                                        <div>
+                                            <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
+                                            <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-form-label" for="admin_pass2">{tr}Confirm password:{/tr}</label>
+                                    <div class="col-sm-6">
+                                        <input type="password" class="form-control" name="admin_pass2" id="pass2" value="{if isset($smarty.request.admin_pass2)}{$smarty.request.admin_pass2|escape:"html"}{/if}" size="40" />
+                                        <div id="mypassword2_text">
+                                            <div id="match" style="display:none">
+                                                {icon name='ok' istyle='color:#0ca908'} {tr}Passwords match{/tr}
+                                            </div>
+                                            <div id="nomatch" style="display:none">
+                                                {icon name='error' istyle='color:#ff0000'} {tr}Passwords do not match{/tr}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div class="mb-3">
+                                <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
+                            </div>
+                        </form>
+                    </div>{* End of install-step5 *}
+
+                    {elseif $install_step eq '6' or ($dbdone ne 'n')}
+                    <div class="install-step6">
                         <h1>{if isset($smarty.post.update)}{tr}Review the Upgrade{/tr}{else}{tr}Review the Installation{/tr}{/if}</h1>
                         {if $unsupported_mail_queue_cleaned}
                             {remarksbox type=confirm title="{tr}Unsupported Email Queue Cleared{/tr}" close="n"}
@@ -584,10 +640,7 @@
                         {/if}
                         {remarksbox type=confirm title="{if isset($smarty.post.update)}{tr}Upgrade complete{/tr}{else}{tr}Installation complete{/tr}{/if}" close="n"}
                             <p>{tr}Your database has been configured and Tiki is ready to run!{/tr}
-                                {if isset($smarty.post.scratch, $defaultpass)}
-                                    {tr _0="<strong>{$defaultpass}</strong>"}A temporary default password, %0, has been created for the admin account. Please replace it with a password of your choice.{/tr}
-                                {/if}
-                                {tr}You can now log in into Tiki as user <strong>admin</strong> and start configuring the application.{/tr}
+                                {tr}You can now log in into Tiki and start configuring the application.{/tr}
                             </p>
                         {/remarksbox}
                         {if $installer->queries.successful|@count gt 0}
@@ -640,20 +693,17 @@
 
                     <p>&nbsp;</p>
                     <div class="text-center">
-                        <input type="hidden" name="install_step" value="6">
+                        <input type="hidden" name="install_step" value="7">
                         <input type="hidden" name="install_type" value="{$install_type}">
-                        {if isset($smarty.post.scratch)}
-                            {$default_password_field}
-                        {/if}
                         <input type="submit" class="btn btn-primary" value=" {tr}Continue{/tr} ">
                         {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
                         {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
                     </div>
                     </form>
-                </div>{* End of install-step5 *}
+                </div>{* End of install-step6 *}
 
-                {elseif $install_step eq '6'}
-                <div class="install-step6">
+                {elseif $install_step eq '7'}
+                <div class="install-step7">
                     <h1>{tr}Configure General Settings{/tr}</h1>
                     <form action="tiki-install.php" method="post">
                         <div class="clearfix">
@@ -853,19 +903,16 @@
                         <div class="text-center mt-3">
                             {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
                             {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
-                            <input type="hidden" name="install_step" value="7">
+                            <input type="hidden" name="install_step" value="8">
                             <input type="hidden" name="install_type" value="{$install_type}">
-                            {if $install_type eq 'scratch'}
-                                {$default_password_field}
-                            {/if}
                             <input type="hidden" name="general_settings" value="y">
                             <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
                         </div>
                     </form>
-                </div>{* End of install-step6 *}
+                </div>{* End of install-step7 *}
 
-                {elseif $install_step eq '7'}
-                <div class="install-step7">
+                {elseif $install_step eq '8'}
+                <div class="install-step8">
                     <h1>{tr}Last Notes{/tr}</h1>
                     {remarksbox type=note title="{tr}Important{/tr}" close="n"}
                     {tr}Read the following information to ensure that your website data stays protected, your site healthy and you don't unnecessarily loose time or data while setting up your Tiki site now or while maintaining it in the future.{/tr}
@@ -903,17 +950,14 @@
                         <div class="text-center mt-3">
                             {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
                             {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
-                            <input type="hidden" name="install_step" value="8">
+                            <input type="hidden" name="install_step" value="9">
                             <input type="hidden" name="install_type" value="{$install_type}">
-                            {if $install_type eq 'scratch'}
-                                {$default_password_field}
-                            {/if}
                             <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
                         </div>
                     </form>
-                </div>{* End of install-step7 *}
+                </div>{* End of install-step8 *}
 
-                {elseif $install_step eq '8'}
+                {elseif $install_step eq '9'}
                 <div class="install-step8">
                     <h1 class="pagetitle">{tr}Enter Your Tiki{/tr}</h1>
                     {remarksbox type='confirm' title="{tr}Ready to run{/tr}" close="n"}
@@ -928,10 +972,7 @@
                     {/if}
 
                     <p>
-                        {if $install_type eq 'scratch' && isset($defaultpass)}
-                            {tr _0="<strong>{$defaultpass}</strong>"}A temporary default password, %0, has been created for the admin account. Please replace it with a password of your choice.{/tr}
-                        {/if}
-                        {tr}You can now log in into Tiki as user <strong>admin</strong> and start configuring the application.{/tr}
+                        {tr}You can now log in into Tiki and start configuring the application.{/tr}
                     </p>
                     {if isset($smarty.post.update)}
                         <h3>{icon name='information'} {tr}Upgrade{/tr}</h3>
@@ -945,10 +986,7 @@
                                         <input type="hidden" name="multi" value="{$multi|escape}">
                                     {/if}
                                     <input type="hidden" name="install_type" value="{$install_type}">
-                                    {if $install_type eq 'scratch'}
-                                        {$default_password_field}
-                                    {/if}
-                                    <input type="hidden" name="install_step" value="9">
+                                    <input type="hidden" name="install_step" value="10">
                                     <input type="submit" value="{tr}Enter Tiki and Lock Installer{/tr} ({tr}Recommended{/tr})" class="btn btn-primary">
                                 </form>
                             </div>
@@ -959,10 +997,7 @@
                                         <input type="hidden" name="multi" value="{$multi|escape}">
                                     {/if}
                                     <input type="hidden" name="install_type" value="{$install_type}">
-                                    {if $install_type eq 'scratch'}
-                                        {$default_password_field}
-                                    {/if}
-                                    <input type="hidden" name="install_step" value="9">
+                                    <input type="hidden" name="install_step" value="10">
                                     <input type="submit" value="{tr}Enter Tiki Without Locking Installer{/tr}" class="btn btn-warning">
                                     <br><em><span class="text-warning">{icon name="warning"}</span> {tr}Not recommended due to security risk{/tr}.</em>
                                 </form>
@@ -1021,7 +1056,7 @@
                                             </select>
                                             <input type="submit" class="btn btn-danger btn-sm ms-2" name="fix_double_encoding" value="{tr}Click to fix double encoding (dangerous){/tr}">
                                         </div>
-                                        <input type="hidden" name="install_step" value="8">
+                                        <input type="hidden" name="install_step" value="9">
                                     </div>
                                 {else}
                                     <p>{tr}Oops. You need to make sure client charset and database encoding are forced to UTF-8. Reset the database connection to continue.{/tr}</p>
@@ -1030,7 +1065,7 @@
                             </form>
                         {/if}
                     {/if}
-                </div>{* End of install-step8 *}
+                </div>{* End of install-step9 *}
 
                 {/if}{* end elseif $install_step... *}
 
@@ -1076,7 +1111,7 @@
                         {tr}Are you upgrading an existing Tiki site?{/tr}
                         {tr}Go directly to the <strong>Install/Upgrade</strong> step.{/tr}
                         {if $dbcon eq 'y' or isset($smarty.post.scratch) or isset($smarty.post.update)}
-                            {icon name="next" href="#" onclick="$('[name=install_step][value=4]').prop('disabled', false).trigger('click');return false;" title="{tr}Install/Upgrade{/tr}"}
+                            {icon name="next" href="#" onclick="$('[name=install_step][value=5]').prop('disabled', false).trigger('click');return false;" title="{tr}Install/Upgrade{/tr}"}
                         {/if}
                         {/remarksbox}
                     </div>
