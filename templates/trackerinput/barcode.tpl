@@ -4,7 +4,7 @@
     <div id="{$field.ins_id}-scanner-container">
         <div id="qr-reader-{$field.ins_id}" class="mb-2"></div>
         <label for="camera-select-{$field.ins_id}" class="mb-2">{tr}Or use camera to scan{/tr}</label>
-        <select id="camera-select-{$field.ins_id}" class="form-select"></select>
+        <select id="camera-select-{$field.ins_id}" class="form-select" data-needs-element-plus="false"></select>
         <div class="mt-2">
             <button type="button" class="btn btn-primary" id="{$field.ins_id}-start-scanner">
                 {icon name="qrcode"} {tr}Start Scanner{/tr}

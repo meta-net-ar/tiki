@@ -10,7 +10,14 @@ export default function applySelect() {
 }
 
 function transformContainerSelects(containerElement) {
-    const selects = $(containerElement).find("select:not([element-plus-ref])");
+    const selects = $(containerElement)
+        .find("select:not([element-plus-ref])")
+        .filter(function () {
+            if ($(this).attr("data-needs-element-plus") === "false") {
+                return false;
+            }
+            return true;
+        });
     if (selects.length) {
         selects.each(function () {
             const elementUniqueId = "el-" + Math.random().toString(36).substring(7);
