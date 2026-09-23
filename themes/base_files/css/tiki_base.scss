@@ -11,7 +11,6 @@
 // Load bootstrap4c-chosen variables and svn to uri converter
 @import "../../../node_modules/sass-svg-uri/_index.scss";
 
-
 //@import "_bs3-bs4-transition.scss"; obsolete
 //@import "../scss/_tiki-variables.scss";
 //@import "../scss/_tiki-selectors.scss";
@@ -47,6 +46,7 @@
 @import "../scss/_tiki-wikipages_and_plugins";
 @import "../scss/_tiki-multilike";
 @import "../scss/_tiki-installer.scss";
+@import "../scss/_tiki-toast.scss";
 @import "../scss/_tiki-oauthserver.scss";
 @import "../scss/_tiki-menus.scss";
 @import "../scss/_tiki-debugger_console.scss";

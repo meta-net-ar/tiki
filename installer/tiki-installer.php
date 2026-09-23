@@ -10,6 +10,7 @@
 use Tiki\Installer\Installer;
 use Tiki\Installer\Patch;
 use Tiki\Installer\ProgressBar;
+use Tiki\Toast;
 
 //this script may only be included - so its better to die if called directly.
 if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
@@ -294,6 +295,7 @@ if ($max_execution_time != 0) {
 $TWV = new TWVersion();
 $tikiVersionShort = preg_replace('/^(\d+)\..*$/', '\1', $TWV->version);
 $smarty->assign('tiki_version_name', preg_replace('/^(\d+\.\d+)([^\d])/', '\1 \2', $TWV->version));
+$smarty->assign('tiki_version_display', $TWV->getBaseVersion());
 $smarty->assign('tiki_version_short', $tikiVersionShort);
 
 check_session_save_path();
@@ -397,24 +399,51 @@ if (
         )
     ) && isset($_POST['dbinfo'])
 ) {
+    // Normalize DB form fields: strip accidental leading/trailing whitespace
+    // (can stick in the input after a failed attempt and trip name validation).
+    foreach (['host', 'name', 'user', 'pass', 'root_user', 'root_pass'] as $dbFormKey) {
+        if (isset($_POST[$dbFormKey]) && is_string($_POST[$dbFormKey])) {
+            $_POST[$dbFormKey] = trim($_POST[$dbFormKey]);
+            $_REQUEST[$dbFormKey] = $_POST[$dbFormKey];
+        }
+    }
+
     if (! empty($_POST['user']) && strlen($_POST['user']) > 80) {
         $dbconn = false;
-        Feedback::error(tra('Invalid database user.'));
+        Toast::error([
+            'title' => tra('Invalid database user'),
+            'mes' => tra('The database username must be 80 characters or fewer.'),
+        ]);
     } elseif (empty($_POST['user'])) {
         $dbconn = false;
-        Feedback::error(tra('No database user specified'));
+        Toast::error([
+            'title' => tra('Database user required'),
+            'mes' => tra('No database user specified'),
+        ]);
     } elseif (empty($_POST['name'])) {
         $dbconn = false;
-        Feedback::error(tra('No database name specified'));
+        Toast::error([
+            'title' => tra('Database name required'),
+            'mes' => tra('No database name was specified. Enter the name of the database Tiki should use.'),
+        ]);
     } elseif (! installer_is_valid_mysql_identifier($_POST['name'])) {
         $dbconn = false;
-        Feedback::error(tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+        Toast::error([
+            'title' => tra('Invalid database name'),
+            'mes' => tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."),
+        ]);
     } elseif (! installer_is_valid_mysql_identifier($_POST['user'])) {
         $dbconn = false;
-        Feedback::error(tra("Invalid database user. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+        Toast::error([
+            'title' => tra('Invalid database user'),
+            'mes' => tra("Invalid database user. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."),
+        ]);
     } elseif (! empty($_POST['create_new_user']) && file_exists($local)) {
         $dbconn = false;
-        Feedback::error(tra('Creating a new database user is only available during initial installation.'));
+        Toast::error([
+            'title' => tra('Cannot create database user'),
+            'mes' => tra('Creating a new database user is only available during initial installation.'),
+        ]);
     } else {
         if (isset($_POST['force_utf8'])) {
             $client_charset = 'utf8mb4';
@@ -546,9 +575,10 @@ if (
     $smarty->assign('logged', 'y');
 
     if (isset($_POST['scratch'])) {
-        $installer->attach(new ProgressBar());
+        $installer->attach(new ProgressBar('install'));
 
         $installer->cleanInstall();
+        ProgressBar::streamFinalize();
         // Set Administrator password
         $randompass = TikiLib::lib('user')->genPass();
         set_system_administrator_password($randompass);
@@ -569,22 +599,26 @@ if (
 
     if (isset($_POST['update'])) {
         if (! empty($unsupportedMailQueueEntries) && empty($_POST['unsupported_mail_queue_ack'])) {
-            Feedback::error(
-                tr('Please confirm that unsupported queued messages will be deleted by checking the confirmation box before upgrading.')
-            );
+            Toast::error([
+                'title' => tra('Confirmation required'),
+                'mes' => tr('Please confirm that unsupported queued messages will be deleted by checking the confirmation box before upgrading.'),
+            ]);
         } else {
             $hadUnsupportedMails = ! empty($unsupportedMailQueueEntries);
             if ($hadUnsupportedMails && ! empty($_POST['unsupported_mail_queue_ack'])) {
                 $installer->autoRegister = true;
             }
+            $installer->attach(new ProgressBar('upgrade'));
             $installer->update();
+            ProgressBar::streamFinalize();
             $logslib->add_log('install', 'database "' . $dbs_tiki . '" upgraded to latest version');
             $smarty->assign('dbdone', 'y');
             if ($hadUnsupportedMails) {
                 $smarty->assign('unsupported_mail_queue_cleaned', $unsupportedMailQueueEntries);
-                Feedback::success(
-                    tr('%0 unsupported queued email entries have been successfully removed during upgrade.', $unsupportedMailQueueEntries)
-                );
+                Toast::success([
+                    'title' => tra('Queued emails cleaned'),
+                    'mes' => tr('%0 unsupported queued email entries have been successfully removed during upgrade.', $unsupportedMailQueueEntries),
+                ]);
             }
             $install_type = 'update';
         }
@@ -682,7 +716,16 @@ if ($install_step == '9') {
         $u = '';
     }
     if (empty($_REQUEST['multi'])) {
-        $userlib->user_logout($user, false, $u);    // logs out then redirects to home page or $u
+        // Logout without sending Location: user_logout() absolutizes with
+        // $url_scheme, which can become https on php -S (HTTP-only).
+        $userlib->user_logout($user, true, $u);
+        if ($u === '' || $u === null) {
+            $u = $prefs['tikiIndex'] ?? 'tiki-index.php';
+        }
+        if (! preg_match('#^https?://#i', $u)) {
+            $u = $tikiroot . ltrim($u, '/');
+        }
+        header('Location: ' . $u);
     } else {
         $access->redirect('http://' . $_REQUEST['multi'] . $tikiroot . $u, allowExternal: true);     // send to the selected multitiki
     }
@@ -856,8 +899,15 @@ if (isset($_POST['general_settings']) && $_POST['general_settings'] == 'y') {
 $headerlib = TikiLib::lib('header');
 $headerlib->add_js("var tiki_cookie_jar=new Array();");
 $headerlib->add_cssfile('public/generated/js/vendor_dist/bootstrap/dist/css/bootstrap.min.css');
+// Load Bootstrap's JS (Collapse, Dropdown, etc.) and expose it globally, like lib/setup/theme.php does for normal pages.
+// Without this, Bootstrap components such as the accordion/collapse in tiki-install.tpl have no JavaScript to drive them.
+$headerlib->add_js_module('
+    import * as bootstrap from "bootstrap";
+    window.bootstrap = bootstrap;
+');
 $headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
 $headerlib->add_cssfile('themes/base_files/css/tiki_base.css');
+$headerlib->add_cssfile('themes/base_files/css/tiki-toast.css');
 $headerlib->add_jsfile('lib/tiki-js.js');
 $headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery/dist/jquery.min.js");
@@ -942,6 +992,9 @@ if (((isset($value) && $value == 'utf8mb4') || $install_step == '7') && ($db = T
 if ($install_step == '6') {
     $smarty->assign('disableAccounts', list_disable_accounts());
 }
+
+// Toast::* → floating {toast} notifications in the installer UI.
+$smarty->assign('installer_toasts', Toast::get());
 
 $mid_data = $smarty->fetch('tiki-install.tpl');
 $smarty->assign('mid_data', $mid_data);
