@@ -1245,12 +1245,12 @@ class TikiLib extends TikiDb_Bridge
             $bindvars[] = $object;
             $bindvars[] = $info['lang'];
         } elseif ($event == 'forum_post_topic') {
-            $mid = "(`event`=? or `event`=?) and `object`=?";
+            $mid = "(`event`=? or `event`=?) and (`object`=? or `object`='*')";
             $bindvars[] = $event;
             $bindvars[] = 'forum_post_topic_and_thread';
             $bindvars[] = $object;
         } elseif ($event == 'forum_post_thread') {
-            $mid = "(`event`=? and `object`=?) or ( `event`=? and `object`=?)";
+            $mid = "(`event`=? and (`object`=? or `object`='*')) or (`event`=? and (`object`=? or `object`='*'))";
             $bindvars[] = $event;
             $bindvars[] = $object;
             $bindvars[] = 'forum_post_topic_and_thread';
