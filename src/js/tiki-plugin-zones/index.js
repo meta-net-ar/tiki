@@ -4,39 +4,39 @@
  * All Rights Reserved. See copyright.txt for details and a complete list of authors.
  * Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
  *
- * Plugin zones: make it clear which part of the page each wiki plugin produced.
- *
- * 1. Hovering (or focusing) a plugin edit icon highlights the content that plugin produced.
- * 2. Hovering that content highlights it too and shows an "Edit PLUGIN" button on its top
- *    start corner, so the way to edit the plugin can be found without knowing about the icon.
- *
- * The server (WikiParser_Parsable::parse_first()) surrounds the output of every editable
- * plugin with a pair of HTML comments carrying the id of its edit icon:
- *
- *     <!--tiki-plugin:start plugin-edit-box1-->  ...output...  <!--tiki-plugin:end plugin-edit-box1-->
- *     <a id="plugin-edit-box1" class="editplugin" data-plugin="box" data-index="1">...</a>
- *
- * Comments are used rather than a wrapper element because plugin output can be wiki markup
- * parsed afterwards, plain text inside a paragraph, several sibling elements or table content:
- * a wrapper would be split or moved by the HTML parser and would change the page layout.
- * A DOM Range between the two comments covers exactly the plugin's output, whatever its shape.
- */
+**/
 
-const START = /^tiki-plugin:start ([\w-]+)$/;
-const END = /^tiki-plugin:end ([\w-]+)$/;
+// The id shape the parser emits. Anything else in a comment is ignored, so a page
+// that contains hand written HTML cannot forge a zone pointing at another element.
+const ID = "plugin-edit-[a-z0-9_]+\\d+";
+const START = new RegExp("^tiki-plugin:start (" + ID + ")$", "i");
+const END = new RegExp("^tiki-plugin:end (" + ID + ")$", "i");
 const HIDE_DELAY = 250; // ms, time to move the pointer from the content to the button
 const OFFSET = 3; // px, matches the outline-offset of .tiki-plugin-zone-outline
 
 const translate = (text) => (typeof window.tr === "function" ? window.tr(text) : text);
 
-export default function initPluginZones(container) {
-    const root = container || document.querySelector("#page-data > .content") || document.querySelector("#page-data");
+/**
+ * @param {Object} options
+ * @param {string} options.mode "zone" hides the edit icons at rest and relies on the highlight,
+ *                              "both" keeps the icons visible as before. See wiki_edit_plugin_mode.
+ * @param {Element} options.container the page content, for tests
+ */
+export default function initPluginZones(options = {}) {
+    const root = options.container || document.querySelector("#page-data > .content") || document.querySelector("#page-data");
     if (! root || root.tikiPluginZones) {
         return null;
     }
 
+    // The icons are hidden in css rather than here, so that a device without a mouse,
+    // where nothing can be hovered, still shows them.
+    if (options.mode !== "both") {
+        document.body.classList.add("tiki-plugin-zone-mode");
+    }
+
     const rtl = getComputedStyle(root).direction === "rtl";
     let zones = [];
+    let cache = new WeakMap();
     let current = null;
     let hideTimer = null;
     let frame = 0;
@@ -57,8 +57,14 @@ export default function initPluginZones(container) {
                 open.push({ id: match[1], start: comment, depth: open.length });
             } else if ((match = END.exec(text)) && open.length && open[open.length - 1].id === match[1]) {
                 const zone = open.pop();
-                zone.icon = document.getElementById(zone.id);
-                zone.name = (zone.icon && zone.icon.dataset.plugin) || zone.id.replace(/^plugin-edit-/, "").replace(/\d+$/, "");
+                const icon = document.getElementById(zone.id);
+                zone.icon = icon && icon.classList.contains("editplugin") ? icon : null;
+                zone.data = (window.tikiPluginZoneData || {})[zone.id] || null;
+                if (! zone.icon && ! zone.data) {
+                    continue; // neither an edit icon of ours nor parameters: stale or forged markers
+                }
+                zone.name = (zone.icon && zone.icon.dataset.plugin) || (zone.data && zone.data.type) || zone.id;
+                zone.end = comment;
                 zone.range = document.createRange();
                 zone.range.setStartAfter(zone.start);
                 zone.range.setEndBefore(comment);
@@ -103,6 +109,15 @@ export default function initPluginZones(container) {
     }
 
     function zoneAtPoint(target, x, y) {
+        if (cache.has(target)) {
+            return cache.get(target);
+        }
+        const found = findZone(target, x, y);
+        cache.set(target, found);
+        return found;
+    }
+
+    function findZone(target, x, y) {
         for (let node = target; node && node !== root; node = node.parentNode) {
             for (const zone of zones) {
                 if (nodeInRange(zone.range, node)) {
@@ -203,15 +218,38 @@ export default function initPluginZones(container) {
 
     function bindIcons() {
         for (const zone of zones) {
-            if (! zone.icon || zone.icon.tikiPluginZone) {
+            const anchor = zone.icon || keyboardStop(zone);
+            if (! anchor || anchor.tikiPluginZone) {
                 continue;
             }
-            zone.icon.tikiPluginZone = true;
-            zone.icon.addEventListener("mouseenter", () => show(zoneOf(zone.id) || zone, false));
-            zone.icon.addEventListener("focus", () => show(zoneOf(zone.id) || zone, false));
-            zone.icon.addEventListener("mouseleave", () => hide());
-            zone.icon.addEventListener("blur", () => hide());
+            anchor.tikiPluginZone = true;
+            anchor.addEventListener("mouseenter", () => show(zoneOf(zone.id) || zone, false));
+            anchor.addEventListener("focus", () => show(zoneOf(zone.id) || zone, false));
+            anchor.addEventListener("mouseleave", () => hide());
+            anchor.addEventListener("blur", () => hide());
         }
+    }
+
+    /** In zone mode nothing is in the page to tab to, so put a button where the icon used to be. */
+    function keyboardStop(zone) {
+        if (zone.stop) {
+            return zone.stop;
+        }
+        // The zones are rebuilt from the markers on every refresh, so look in the page
+        // rather than trusting the previous object, or a button is added on every pass.
+        const existing = zone.end.nextElementSibling;
+        if (existing && existing.classList.contains("tiki-plugin-zone-stop")) {
+            zone.stop = existing;
+            return existing;
+        }
+        const stop = document.createElement("button");
+        stop.type = "button";
+        stop.className = "tiki-plugin-zone-stop";
+        stop.textContent = translate("Edit plugin") + " " + zone.name.toUpperCase();
+        stop.addEventListener("click", () => openEditor(zoneOf(zone.id) || zone, stop));
+        zone.end.parentNode.insertBefore(stop, zone.end.nextSibling);
+        zone.stop = stop;
+        return stop;
     }
 
     function zoneOf(id) {
@@ -225,8 +263,8 @@ export default function initPluginZones(container) {
         frame = requestAnimationFrame(() => {
             frame = 0;
             const target = event.target;
-            if (target.closest && target.closest("a.editplugin")) {
-                return; // the icon has its own handler
+            if (target.closest && target.closest("a.editplugin, .tiki-plugin-zone-stop")) {
+                return; // those carry their own handlers
             }
             const zone = zoneAtPoint(target, event.clientX, event.clientY);
             if (zone) {
@@ -240,11 +278,19 @@ export default function initPluginZones(container) {
     root.addEventListener("pointerleave", () => hide(HIDE_DELAY));
     button.addEventListener("pointerenter", () => clearTimeout(hideTimer));
     button.addEventListener("pointerleave", () => hide(HIDE_DELAY));
-    button.addEventListener("click", () => {
-        if (current && current.icon) {
-            current.icon.click(); // opens the usual plugin edit form (popupPluginForm)
+    button.addEventListener("click", () => openEditor(current, button));
+
+    function openEditor(zone, trigger) {
+        if (! zone) {
+            return;
         }
-    });
+        if (zone.icon) {
+            zone.icon.click(); // the icon carries its own handler
+        } else if (zone.data && typeof window.popupPluginForm === "function") {
+            const data = zone.data;
+            window.popupPluginForm("editwiki", data.type, data.index, data.page, data.args, data.isMarkdown, data.body, trigger);
+        }
+    }
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
             hide();
@@ -253,6 +299,7 @@ export default function initPluginZones(container) {
 
     function refresh() {
         zones = collectZones();
+        cache = new WeakMap();
         bindIcons();
     }
 
@@ -260,7 +307,14 @@ export default function initPluginZones(container) {
 
     // Pages loaded over ajax, and plugins that rebuild their own content, change the markers.
     let refreshTimer = null;
-    new MutationObserver(() => {
+    const ours = (node) => node.nodeType === 1 && node.classList.contains("tiki-plugin-zone-stop");
+    new MutationObserver((records) => {
+        const fromUs = records.every(
+            (record) => [...record.addedNodes].every(ours) && [...record.removedNodes].every(ours)
+        );
+        if (fromUs) {
+            return;
+        }
         clearTimeout(refreshTimer);
         refreshTimer = setTimeout(refresh, 200);
     }).observe(root, { childList: true, subtree: true });
