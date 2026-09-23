@@ -16,9 +16,9 @@ test.describe("TC-04 — Tracker field encryption", () => {
 
         await login(page, "Test1", "test1pass");
         await page.goto(`/tiki-view_tracker.php?trackerId=${trackerId}`);
-        await page.waitForLoadState("networkidle");
+        await page.waitForLoadState("load");
         await page.locator('a:has-text("Add"), a:has-text("Create"), input[value*="Add"], input[value*="Create"]').first().click();
-        await page.waitForLoadState("networkidle");
+        await expect(page.locator(`input[name="ins_${fieldId}"], textarea[name="ins_${fieldId}"]`)).toBeVisible({ timeout: 20000 });
 
         // Tiki names tracker item inputs ins_{fieldId}.
         await page.locator(`input[name="ins_${fieldId}"], textarea[name="ins_${fieldId}"]`).fill(SECRET_VALUE);
@@ -34,7 +34,7 @@ test.describe("TC-04 — Tracker field encryption", () => {
 
         // The holder reads the plaintext back on the item page.
         await page.goto(`/tiki-view_tracker_item.php?itemId=${itemId}&trackerId=${trackerId}`);
-        await page.waitForLoadState("networkidle");
+        await page.waitForLoadState("load");
         await expect(page.locator("body")).toContainText(SECRET_VALUE);
         await logout(page);
 
@@ -43,9 +43,11 @@ test.describe("TC-04 — Tracker field encryption", () => {
         // testFailDecryptionWhenMissingSharedKey.
         await login(page, "admin", "admin1234");
         await page.goto(`/tiki-view_tracker_item.php?itemId=${itemId}&trackerId=${trackerId}`);
-        await page.waitForLoadState("networkidle");
-        await expect(page.locator("body")).not.toContainText(SECRET_VALUE);
+        await page.waitForLoadState("load");
+        // Wait for the rendered locked badge first, so the negative check below
+        // cannot pass on a page that has not rendered the field yet.
         await expect(page.locator("tiki-encrypted-field[locked]")).toBeVisible();
+        await expect(page.locator("body")).not.toContainText(SECRET_VALUE);
         await logout(page);
     });
 });

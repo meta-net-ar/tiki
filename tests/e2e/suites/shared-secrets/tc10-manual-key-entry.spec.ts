@@ -30,9 +30,9 @@ test.describe("TC-10 — Manual key entry", () => {
         // Test1 holds a share, so it can write the value.
         await login(page, "Test1", "test1pass");
         await page.goto(`/tiki-view_tracker.php?trackerId=${trackerId}`);
-        await page.waitForLoadState("networkidle");
+        await page.waitForLoadState("load");
         await page.locator('a:has-text("Add"), a:has-text("Create"), input[value*="Add"], input[value*="Create"]').first().click();
-        await page.waitForLoadState("networkidle");
+        await expect(page.locator(`input[name="ins_${fieldId}"], textarea[name="ins_${fieldId}"]`)).toBeVisible({ timeout: 20000 });
         await page.locator(`input[name="ins_${fieldId}"], textarea[name="ins_${fieldId}"]`).fill(SECRET_VALUE);
         await page.locator('.modal-footer button:has-text("Create"), button:has-text("Create")').last().click();
         await page.waitForSelector('a[href*="itemId"]', { timeout: 30000 });
@@ -46,9 +46,11 @@ test.describe("TC-10 — Manual key entry", () => {
         // Admin holds none, so the view page shows the locked badge and the entry link.
         await login(page, "admin", "admin1234");
         await page.goto(`/tiki-view_tracker_item.php?itemId=${itemId}&trackerId=${trackerId}`);
-        await page.waitForLoadState("networkidle");
-        await expect(page.locator("body")).not.toContainText(SECRET_VALUE);
+        await page.waitForLoadState("load");
+        // Wait for the rendered locked badge first, so the negative check below
+        // cannot pass on a page that has not rendered the field yet.
         await expect(page.locator("tiki-encrypted-field[locked]")).toBeVisible();
+        await expect(page.locator("body")).not.toContainText(SECRET_VALUE);
 
         const entryLink = page.locator("a.encryption-key-entry");
         await expect(entryLink).toBeVisible();

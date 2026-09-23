@@ -12,11 +12,14 @@ import { login, logout, goToEncryptionTab, openEditKey, applyKeyForm, getShares,
 const fx = useSuiteFixtures(test);
 
 let adminShare: string;
+let testUserShare: string;
 
 test.describe("TC-11 — Key regeneration", () => {
     test("Regenerating re-issues a different share to every holder", async ({ page }) => {
         adminShare = fx.data.adminShare;
+        testUserShare = fx.data.testUserShare;
         expect(adminShare).toBeTruthy();
+        expect(testUserShare).toBeTruthy();
 
         await login(page, "admin", "admin1234");
         await goToEncryptionTab(page);
@@ -32,6 +35,7 @@ test.describe("TC-11 — Key regeneration", () => {
         const shares = await getShares(page);
         expect(shares).toHaveLength(2);
         expect(shares).not.toContain(adminShare);
+        expect(shares).not.toContain(testUserShare);
 
         await logout(page);
     });

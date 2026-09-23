@@ -4,11 +4,11 @@ import { login, logout } from "./helpers";
 
 // TC-06 — Encrypted field unlock flow
 //
-// Two journeys, both driving the `tiki-enter-key-modal` Vue widget that replaced
-// the Smarty enter_key modal:
-//   1. A wrong share is refused: the modal stays open and the field stays locked.
-//   2. The right share unlocks the session: the create-form field becomes writable
-//      and the item view renders the plaintext.
+// Two journeys, both on a tracker create form:
+//   1. A share holder writes the field; a user holding no share sees it locked,
+//      with the entry link that opens the `tiki-enter-key-modal` Vue widget.
+//   2. In that widget a wrong share is refused and the field stays locked; the
+//      right share unlocks it, and the item view renders the plaintext.
 //
 // The per-endpoint assertions this file used to carry live in
 // lib/test/Core/Services/Encryption/ControllerTest.php, where they run on every

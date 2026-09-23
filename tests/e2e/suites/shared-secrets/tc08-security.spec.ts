@@ -9,15 +9,17 @@ import { login, logout, goToEncryptionTab, assertKeyNotInTable, TEST_USER } from
 //
 // The anonymous save_key case used to be test.fixme: action_save_key carried no
 // permission check and an anonymous POST persisted a key. !10189 added
-// Services_Exception_Denied::checkGlobal('tiki_p_admin') and a CSRF ticket gate,
-// so the case is a live regression test again.
+// Services_Exception_Denied::checkGlobal('tiki_p_admin') and a CSRF ticket gate.
+// This journey posts an invalid ticket, so either gate alone keeps it green: it
+// proves an anonymous POST persists nothing, not that the permission check exists.
+// That check is asserted on its own in Encryption/ControllerTest.
 
 test.describe("TC-08 — Security: unauthorized access", () => {
     test("Anonymous and non-admin users reach neither the admin page nor the key endpoints", async ({ page }) => {
         const hackName = `E2E-AnonHack-${Date.now()}`;
 
         await page.goto("/tiki-logout.php");
-        await page.waitForLoadState("networkidle");
+        await page.waitForLoadState("load");
 
         // Anonymous POST to save_key must not persist anything.
         const response = await page.request.post("/tiki-ajax_services.php?controller=encryption&action=save_key", {
