@@ -138,6 +138,45 @@ table.wikiplugin_trackerlist {
 }
 
 // /* plugin zones: show which content each wiki plugin produced (see src/js/tiki-plugin-zones) */
+
+// In "Highlight the plugin on mouse over" mode the icon is still in the page, as the click
+// target and the keyboard stop, but it is taken out of sight where there is a mouse to hover
+// with. Devices without hover keep the icons, and tabbing to one brings it back.
+@media (hover: hover) {
+    .tiki-plugin-zone-mode .editplugin:not(:focus-visible) {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+}
+// The keyboard stop the module puts where the icon used to be, in "Highlight the plugin"
+// mode. Out of sight until tabbed to, and a plain button where there is no mouse to hover with.
+.tiki-plugin-zone-stop {
+    padding: 3px 10px;
+    border: 0;
+    border-radius: 0.25rem;
+    background: var(--bs-primary, #0d6efd);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+@media (hover: hover) {
+    .tiki-plugin-zone-stop:not(:focus-visible) {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+}
+
 .tiki-plugin-zone-outline {
     position: absolute;
     z-index: 1040;
