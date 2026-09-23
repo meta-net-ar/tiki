@@ -66,29 +66,34 @@ class Services_Search_Controller
 
         $formattedStats = null;
         if (! empty($stat)) {
-            $list = false;
-            $unifiedsearchlib->formatStats($stat, function ($line) use (&$msg, &$list) {
-                if (str_starts_with($line, '  ')) {
-                    if (! $list) {
-                        $list = true;
-                        $msg .= "<ul>";
-                    }
-                    $msg .= "<li>$line</li>";
-                } else {
-                    if ($list) {
-                        $list = false;
-                        $msg .= '</ul>';
-                    }
-                    $msg .= "<strong>$line</strong>";
-                }
-            });
-            if ($list) {
-                $msg .= '</ul>';
-            }
-            if ($input->getlaststats->int()) {
-                $formattedStats = $msg;
+            if ($stat['default']['error']) {
+                Feedback::error($stat['default']['error_message']);
+                $num_queries_after = $num_queries_before;
             } else {
-                Feedback::success(['title' => tr('Indexed stats'), 'mes' => $msg]);
+                $list = false;
+                $unifiedsearchlib->formatStats($stat, function ($line) use (&$msg, &$list) {
+                    if (str_starts_with($line, '  ')) {
+                        if (! $list) {
+                            $list = true;
+                            $msg .= "<ul>";
+                        }
+                        $msg .= "<li>$line</li>";
+                    } else {
+                        if ($list) {
+                            $list = false;
+                            $msg .= '</ul>';
+                        }
+                        $msg .= "<strong>$line</strong>";
+                    }
+                });
+                if ($list) {
+                    $msg .= '</ul>';
+                }
+                if ($input->getlaststats->int()) {
+                    $formattedStats = $msg;
+                } else {
+                    Feedback::success(['title' => tr('Indexed stats'), 'mes' => $msg]);
+                }
             }
         }
 
