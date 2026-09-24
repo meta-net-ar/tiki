@@ -106,7 +106,7 @@ function sendForumEmailNotification(
 
     // Users watching this forum or this post
     if ($prefs['feature_user_watches'] == 'y' || $prefs['feature_group_watches'] == 'y') {
-        $nots_raw = $tikilib->get_event_watches($event, $event == 'forum_post_topic' ? $forum_info['forumId'] : $parentId, $forum_info);
+        $nots_raw = $tikilib->get_event_watches($event, in_array($event, ['forum_post_topic', 'forum_post_topic_changed']) ? $forum_info['forumId'] : $parentId, $forum_info);
         $nots = [];
         $users = [];
         foreach ($nots_raw as $n) {
@@ -184,13 +184,10 @@ function sendForumEmailNotification(
             $smarty->assign('mail_contributions', $contributionlib->print_contributions($contributions));
         }
         $smarty->assign('forumId', $forum_info["forumId"]);
-        if ($event == "forum_post_topic") {
-            $smarty->assign('new_topic', 'y');
-            $smarty->assign('threadId', $threadId);
-        } else {
-            $smarty->assign('new_topic', 'n');
-            $smarty->assign('threadId', $threadId);
-        }
+        $smarty->assign('threadId', $threadId);
+        $smarty->assign('new_topic', $event == "forum_post_topic");
+        $smarty->assign('topic_changed', $event == "forum_post_topic_changed");
+        $smarty->assign('thread_changed', $event == "forum_post_thread_changed");
         if ($parentId) {
             $smarty->assign('topicId', $parentId);
         } else {
