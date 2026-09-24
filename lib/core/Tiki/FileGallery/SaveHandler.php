@@ -6,15 +6,11 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\FileGallery;
 
-use Symfony\Component\Console\Helper\Helper;
 use TikiLib;
 use Tiki\FileGallery\File as TikiFile;
 
 class SaveHandler
 {
-    /** Size of the `description` TEXT column of `tiki_files`, in bytes */
-    private const MAX_DESCRIPTION_LENGTH = 65535;
-
     private $file;
     private $filesTable;
     private $fileDraftsTable;
@@ -55,7 +51,6 @@ class SaveHandler
         $initialFileId = $this->file->fileId;
 
         $this->ensureNameLength();
-        $this->ensureRowFitsInDatabase();
 
         if (! $this->file->exists()) {
             $fileId = $this->insertFile();
@@ -260,55 +255,6 @@ class SaveHandler
         if (! empty($this->file->filename) && $f_len($this->file->filename) > 80) {
             $filename = $f_substr($this->file->filename, 0, 38) . '...' . $f_substr($this->file->filename, -38);
             $this->file->setParam('filename', $filename);
-        }
-    }
-
-    /**
-     * The whole row has to be sent to the database server in a single packet, which includes
-     * the file contents when files are stored in the database. Going over max_allowed_packet
-     * drops the connection with an error which cannot be recovered from, and going over the
-     * length of a column aborts the query, so bail out before writing anything.
-     *
-     * @throws StorageLimitException
-     */
-    private function ensureRowFitsInDatabase(): void
-    {
-        $params = $this->file->getParamsForDB();
-        $name = $params['name'] ?? ($params['filename'] ?? '');
-
-        $description = (string)($params['description'] ?? '');
-        if (strlen($description) > self::MAX_DESCRIPTION_LENGTH) {
-            throw new StorageLimitException(tr(
-                'The description of the file "%0" is too long: it uses %1 and the maximum is %2.',
-                $name,
-                Helper::formatMemory(strlen($description)),
-                Helper::formatMemory(self::MAX_DESCRIPTION_LENGTH)
-            ));
-        }
-
-        $maxAllowedPacket = TikiLib::lib('tiki')->getMaxAllowedPacket();
-        if ($maxAllowedPacket <= 0) {
-            // Could not be determined, nothing to compare against
-            return;
-        }
-
-        $length = 0;
-        foreach ($params as $value) {
-            if (is_string($value)) {
-                $length += strlen($value);
-            }
-        }
-        // The query itself and the escaping of the binary data also count towards the packet
-        $required = (int)($length * 1.1) + 8192;
-
-        if ($required > $maxAllowedPacket) {
-            throw new StorageLimitException(tr(
-                'The file "%0" is too large to be stored in the database: about %1 are needed and the database server accepts %2 at most. Please ask an administrator to increase the %3 setting or to store the file galleries in a directory.',
-                $name,
-                Helper::formatMemory($required),
-                Helper::formatMemory($maxAllowedPacket),
-                'max_allowed_packet'
-            ));
         }
     }
 }

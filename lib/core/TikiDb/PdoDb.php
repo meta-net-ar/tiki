@@ -12,6 +12,7 @@ use PDO;
 use TikiDb;
 use TikiLib;
 use Tiki\Profiling\DatabaseQueryLog;
+use Tiki\TikiDb\Exception\PacketTooLarge;
 
 class PdoDb extends TikiDb
 {
@@ -25,10 +26,18 @@ class PdoDb extends TikiDb
      */
     protected static $queryLogHandlerInstalled = false;
 
+    /**
+     * Queries below this size cannot exceed max_allowed_packet, whose smallest documented
+     * default is 1M, so they are not worth measuring against the server setting.
+     */
+    private const PACKET_CHECK_THRESHOLD = 262144;
+
     /** @var $db PDO */
     private $db;
     /** @var $rowCount int*/
     private $rowCount;
+    /** @var $maxAllowedPacket int|null */
+    private $maxAllowedPacket;
 
     /**
      * Tiki\TikiDb\PdoDb constructor.
@@ -55,6 +64,51 @@ class PdoDb extends TikiDb
             return 'NULL';
         }
         return $this->db->quote($str);
+    }
+
+    /**
+     * Maximum size in bytes of a single query the server accepts, 0 when it cannot be determined.
+     * Storing a file in the database sends its contents in one query, so this is what limits the
+     * size of the files a site can hold when file galleries are stored in the database.
+     */
+    public function getMaxAllowedPacket(): int
+    {
+        if ($this->maxAllowedPacket === null) {
+            $this->maxAllowedPacket = 0;
+            $result = $this->fetchAll("SHOW VARIABLES LIKE 'max_allowed_packet'", null, -1, -1, self::ERR_NONE);
+            if (! empty($result[0]['Value'])) {
+                $this->maxAllowedPacket = (int) $result[0]['Value'];
+            }
+        }
+
+        return $this->maxAllowedPacket;
+    }
+
+    /**
+     * Sending a query bigger than max_allowed_packet makes the server drop the connection, and
+     * every following query of the request fails, so refuse it while the connection is still usable.
+     *
+     * @throws PacketTooLarge
+     */
+    private function assertQueryFitsInPacket($query, $values): void
+    {
+        $length = strlen((string) $query);
+        if (is_array($values)) {
+            foreach ($values as $value) {
+                if (is_string($value)) {
+                    $length += strlen($value);
+                }
+            }
+        }
+
+        if ($length < self::PACKET_CHECK_THRESHOLD) {
+            return;
+        }
+
+        $maxAllowedPacket = $this->getMaxAllowedPacket();
+        if ($maxAllowedPacket > 0 && $length > $maxAllowedPacket) {
+            throw new PacketTooLarge($length, $maxAllowedPacket);
+        }
     }
 
     private function doQuery($query, $values, $numrows, $offset, $fetch, array $options)
@@ -99,6 +153,8 @@ class PdoDb extends TikiDb
                 $values = array_values($values);
             }
         }
+
+        $this->assertQueryFitsInPacket($query, $values);
 
         $starttime = $this->startTimer();
         $logHandle = DatabaseQueryLog::logStart($query, $values, $options[self::QUERY_OPTION_LOG_GROUP] ?? 'Ungrouped');

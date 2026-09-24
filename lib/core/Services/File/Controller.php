@@ -4,7 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\FileGallery\StorageLimitException;
+use Tiki\Lib\Filegals\FileGalLib;
+use Tiki\TikiDb\Exception\PacketTooLarge;
 
 class Services_File_Controller
 {
@@ -150,12 +151,10 @@ class Services_File_Controller
                 $size = $file->size->int();
                 $type = $file->type->text();
 
-                // The file is loaded in memory as a whole below (safety scan, image
-                // manipulation, escaping when stored in the database), so make sure enough
-                // memory is left before starting, as a fatal error cannot be recovered from.
-                if (! TikiLib::lib('tiki')->hasMemoryFor($size)) {
+                // Running out of memory below is a fatal error the request cannot recover from
+                if (TikiLib::lib('tiki')->isMemoryLow($size + FileGalLib::FILE_MEMORY_MARGIN)) {
                     throw new Services_Exception(
-                        tr('The file "%0" is too large to be processed with the memory currently available on the server. Please ask an administrator to increase the memory limit.', $name),
+                        tr('Not enough memory left on the server to process the file "%0". Please ask an administrator to increase the memory limit.', $name),
                         413
                     );
                 }
@@ -176,6 +175,10 @@ class Services_File_Controller
         }
         if (! $this->isTypeUploadable($type, $gal_info['type'])) {
             throw new Services_Exception(tr('File could not be uploaded: Type %0 not supported', $type), 406);
+        }
+
+        if (! Feedback::validateFieldLength(tra('Description'), $description, FileGalLib::MAX_FILE_DESCRIPTION_LENGTH)) {
+            throw new Services_Exception(tr('File could not be uploaded: the description is too long'), 406);
         }
 
         if (! $title) {
@@ -211,8 +214,8 @@ class Services_File_Controller
                 } else {
                     $fileId = $this->utilities->uploadFile($gal_info, $name, $size, $type, $data, $asuser, $image_x, $image_y, $description, '', $title, $directoryPattern);
                 }
-            } catch (StorageLimitException $e) {
-                throw new Services_Exception($e->getMessage(), 413);
+            } catch (PacketTooLarge $e) {
+                throw new Services_Exception(tr('The file "%0" could not be stored.', $name) . ' ' . $e->getMessage(), 413);
             }
         } else {
             $fileId = false;

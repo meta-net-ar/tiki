@@ -22,7 +22,7 @@ use Tiki\FileGallery\FileWrapper\WrapperInterface as FileWrapper;
 use Tiki\FileGallery\File as TikiFile;
 use Tiki\FileGallery\FileDraft as TikiFileDraft;
 use Tiki\FileGallery\ImageTransformer;
-use Tiki\FileGallery\StorageLimitException;
+use Tiki\TikiDb\Exception\PacketTooLarge;
 use Tiki\Lib\Filegals\FileIsNotSafeException;
 use Symfony\Component\Filesystem\Filesystem;
 use TikiDb;
@@ -37,6 +37,10 @@ class FileGalLib extends TikiLib
     public const DISPLAY_NAME_PRESERVE = 'preserve';
     public const DISPLAY_NAME_TITLECASE = 'titlecase';
     public const DISPLAY_NAME_SPACE = 'space';
+    /** Size of the `description` column of `tiki_files` */
+    public const MAX_FILE_DESCRIPTION_LENGTH = 65535;
+    /** Memory to keep available for the rest of the request when loading a file in memory */
+    public const FILE_MEMORY_MARGIN = 1048576 * 10;
     private $wikiupMoved = [];
 
     protected static $getGalleriesParentIdsCache = null;
@@ -3498,6 +3502,28 @@ class FileGalLib extends TikiLib
         }
     }
 
+    /**
+     * The description is stored in a TEXT column, anything longer is refused by the database.
+     *
+     * @param string $description   posted description
+     * @param string $name          file the description belongs to, for the error message
+     * @param array  $errors        collected upload errors, appended to when too long
+     */
+    private function isDescriptionLengthValid(string $description, string $name, array &$errors): bool
+    {
+        if (mb_strlen($description) <= self::MAX_FILE_DESCRIPTION_LENGTH) {
+            return true;
+        }
+
+        $errors[] = tr(
+            'The description of "%0" exceeds the number of characters allowed (%1 max).',
+            $name,
+            self::MAX_FILE_DESCRIPTION_LENGTH
+        );
+
+        return false;
+    }
+
     //Note that file edits are handled here along with uploads
     private function actionHandlerUploadFile($params)
     {
@@ -3508,6 +3534,8 @@ class FileGalLib extends TikiLib
 
         $batch_job = false;
         $didFileReplace = false;
+        // The upload form posts through ajax and replaces its progress area with the response,
+        // so what this method prints only makes sense for an ajax submission
         $isAjaxUpload = TikiLib::lib('access')->is_xml_http_request();
         $displayPageNeeded = false;
         $aux = [];
@@ -3553,6 +3581,10 @@ class FileGalLib extends TikiLib
                 $fileInfo['name'] = $params['name'][0];
             }
             if (! empty($params['description'][0])) {
+                if (! $this->isDescriptionLengthValid($params['description'][0], $fileInfo['filename'] ?? '', $errors)) {
+                    Feedback::error(implode('. ', $errors), $isAjaxUpload);
+                    return false;
+                }
                 $fileInfo['description'] = $params['description'][0];
             }
             if (! empty($params['galleryId'][0])) {
@@ -3650,14 +3682,7 @@ class FileGalLib extends TikiLib
                         continue;
                     }
 
-                    // The file is later loaded in memory as a whole (safety scan, image
-                    // manipulation, escaping when stored in the database), so make sure enough
-                    // memory is left before starting, as a fatal error cannot be recovered from.
-                    if (! TikiLib::lib('tiki')->hasMemoryFor($aFiles['userfile']['size'][$key])) {
-                        $errors[] = tr(
-                            'The file "%0" is too large to be processed with the memory currently available on the server. Please ask an administrator to increase the memory limit.',
-                            $aFiles['userfile']['name'][$key]
-                        );
+                    if (! $this->isDescriptionLengthValid($params['description'][$key] ?? '', $name, $errors)) {
                         continue;
                     }
 
@@ -3690,6 +3715,13 @@ class FileGalLib extends TikiLib
                         $logslib->add_log('file_gallery', tra('Errors detected') . '. ' . tra('Check that these paths exist and are writable by the web server') . ': ' . $file_tmp_name . ' ' . $tmp_dest);
                     } else {
                         $logslib->add_log('file_gallery', tra('File added: ') . $tmp_dest . ' ' . tra('by') . ' ' . $user);
+                    }
+
+                    // Running out of memory below is a fatal error the request cannot recover from
+                    if (TikiLib::lib('tiki')->isMemoryLow($size + self::FILE_MEMORY_MARGIN)) {
+                        $errors[] = tr('Not enough memory left on the server to process the file "%0". Please ask an administrator to increase the memory limit.', $name);
+                        @unlink($tmp_dest);
+                        continue;
                     }
 
                     if (false === $data = file_get_contents($tmp_dest)) {
@@ -3762,9 +3794,9 @@ class FileGalLib extends TikiLib
                             }
                             $fileId = $file->replace($data, $type, $title, $name, $image_x, $image_y);
                         }
-                    } catch (StorageLimitException $e) {
-                        // The file cannot be stored, report it as a regular upload error
-                        $errors[] = $e->getMessage();
+                    } catch (PacketTooLarge $e) {
+                        // Too big for the database server, report it like any other upload error
+                        $errors[] = tr('The file "%0" could not be stored.', $name) . ' ' . $e->getMessage();
                         $file->galleryDefinition()->delete($file);
                         unset($data);
                         continue;
@@ -3823,7 +3855,6 @@ class FileGalLib extends TikiLib
                             }
                             $smarty->display("tiki-upload_file_progress.tpl");
                         } else {
-                            // The page displays the uploads it is given, along with the feedback
                             $displayPageNeeded = true;
                         }
                     }
@@ -3833,7 +3864,7 @@ class FileGalLib extends TikiLib
         if (empty($params['returnUrl'])) {
             if (count($errors)) {
                 $errors = implode('. ', $errors);
-                Feedback::error($errors);
+                Feedback::error($errors, $isAjaxUpload);
                 $errors = [];
                 $displayPageNeeded = true;
             }
@@ -3864,8 +3895,8 @@ class FileGalLib extends TikiLib
                 $fileInfo['fileId'] = $file->replace($fileInfo['data'], $fileInfo['filetype'], $fileInfo['name'], $fileInfo['filename']);
                 $fileChangedMessage = tra('File update was successful') . ': ' . $params['name'];
                 $smarty->assign('fileChangedMessage', $fileChangedMessage);
-            } catch (StorageLimitException $e) {
-                // The file cannot be stored, report it as a regular error and keep the properties form
+            } catch (PacketTooLarge $e) {
+                // Too big for the database server, the properties form is displayed again
                 $errors[] = $e->getMessage();
             }
             $cat_type = 'file';
@@ -3904,15 +3935,9 @@ class FileGalLib extends TikiLib
             die;
         }
 
-        // Nothing has been displayed for this upload: either it failed, or it succeeded without
-        // ajax and its progress report would have been displayed without any layout. Errors of
-        // an ajax submission are sent back as a fragment, the way the progress report is, and
-        // any other caller is told to display its page, where the feedback and the list of
-        // uploads show up. File edits are left alone, their page is displayed again in any case.
+        // Nothing was printed for this upload, so tell the caller to display its page, where
+        // the feedback and the uploads it was given show up. File edits keep their own page.
         if ($displayPageNeeded && empty($params['fileId'])) {
-            if ($isAjaxUpload) {
-                echo \SmartyTiki\FunctionHandler\Feedback::render([], $smarty->getEmptyInternalTemplate());
-            }
             return false;
         }
 
