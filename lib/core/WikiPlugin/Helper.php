@@ -67,7 +67,7 @@ class WikiPlugin_Helper
      */
     public static function getCommonParameter($param)
     {
-        $commonParameters =  [
+        $commonParameters = [
             'trackerId' => [
                 'required' => true,
                 'name' => tra('Tracker ID'),
