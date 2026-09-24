@@ -16,7 +16,7 @@ class StemmingTest extends \SearchIndexStemming
     {
         global $prefs;
         $this->old_prefs = $prefs;
-        $prefs['unified_manticore_morphology'] = 'stem_en';
+        $prefs['unified_manticore_settings'] = json_encode(['morphology' => 'stem_en']);
         $prefs['unified_engine'] = 'manticore';
 
         $this->index = $this->createIndex('_stemming');

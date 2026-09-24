@@ -36,6 +36,30 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 
     public static $searchedFields = ['fulltext' => [], 'others' => []];
 
+    public const ALLOWED_INDEX_SETTINGS = [
+        'charset_table',
+        'ignore_chars',
+        'min_word_len',
+        'ngram_len',
+        'ngram_chars',
+        'blend_chars',
+        'blend_mode',
+        'phrase_boundary',
+        'phrase_boundary_step',
+        'overshort_step',
+        'regexp_filter',
+        'dict',
+        'morphology_skip_fields',
+        'min_stemming_len',
+        'index_exact_words',
+        'bigram_index',
+        'bigram_freq_words',
+        'bigram_delimiter',
+        'hitless_words_list',
+        'index_field_lengths',
+        'embedded_limit',
+    ];
+
     public function __construct(Client $client, PdoClient $pdo_client, $index)
     {
         $this->client = $client;
@@ -267,12 +291,42 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         chmod($stopwords_file, 0666);
         umask($old);
 
-        $settings = [
+        $manticoreSettings = $this->getManticoreSettings();
+        $settings = array_merge($manticoreSettings['settings'], [
             'min_infix_len' => 2,
             'stopwords' => $stopwords_file,
-            'morphology' => $prefs['unified_manticore_morphology'] ?? '',
-            // TODO: see what other options to support https://manual.manticoresearch.com/Creating_a_table/NLP_and_tokenization/Low-level_tokenization
+            'morphology' => $manticoreSettings['morphology'],
+        ]);
+
+        return $settings;
+    }
+
+    private function getManticoreSettings(): array
+    {
+        global $prefs;
+
+        $settings = [
+            'morphology' => '',
+            'settings' => [],
         ];
+        $json = (string) ($prefs['unified_manticore_settings'] ?? '');
+        $decoded = json_decode($json, true);
+        if (is_array($decoded)) {
+            if (isset($decoded['morphology']) && is_string($decoded['morphology']) && preg_match('/^[a-zA-Z0-9_*]+(?:\s*,\s*[a-zA-Z0-9_*]+)*$/', $decoded['morphology'])) {
+                $settings['morphology'] = trim($decoded['morphology']);
+            }
+            if (isset($decoded['settings']) && is_array($decoded['settings'])) {
+                foreach ($decoded['settings'] as $key => $value) {
+                    if (is_string($key) && is_scalar($value) && in_array($key, self::ALLOWED_INDEX_SETTINGS, true) && (string) $value !== '') {
+                        $settings['settings'][$key] = (string) $value;
+                    }
+                }
+            }
+        }
+
+        if ($settings['morphology'] === '' && ! empty($prefs['unified_manticore_morphology'])) {
+            $settings['morphology'] = $prefs['unified_manticore_morphology'];
+        }
 
         return $settings;
     }
