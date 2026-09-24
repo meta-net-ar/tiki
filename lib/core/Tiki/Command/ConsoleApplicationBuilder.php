@@ -564,9 +564,6 @@ class ConsoleApplicationBuilder
         $console->setName(tra('Tiki Console Tool'));
         $console->setCatchExceptions(false);
 
-        $commandCalled = $_SERVER['argv'][1] ?? false;
-        $stopAfterRequestedCommand = ! in_array($commandCalled, ['list', 'help'], true);
-
         /**
          * @var  $condition string  The name of the check method to be executed
          * @var  $actions   array   List of actions that should apply to a group of commands
@@ -628,10 +625,6 @@ class ConsoleApplicationBuilder
                     }
                 }
                 $console->add($command);
-                // If the command exactly matches one that was requested, stop processing further commands as they will not be used anyhow.
-                if ($stopAfterRequestedCommand && $commandCalled === $command->getName()) {
-                    break 2;
-                }
             }
         }
 
