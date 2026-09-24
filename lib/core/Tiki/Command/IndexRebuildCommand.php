@@ -23,9 +23,6 @@ use Tiki\Search\SearchIndexRebuilder;
 )]
 class IndexRebuildCommand extends Command
 {
-    private const EXIT_INTEGRITY_ERRORS = 2;
-    private const EXIT_SKIPPED_ERRORS = 3;
-
     protected function configure()
     {
         $this
@@ -248,24 +245,7 @@ class IndexRebuildCommand extends Command
             $this->renderFailureSummary($output, $integrityErrors, $skippedErrors, $catastrophicErrors);
         }
 
-        return $this->resolveExitCode($integrityErrors, $skippedErrors, $catastrophicErrors);
-    }
-
-    private function resolveExitCode(array $integrityErrors, array $skippedErrors, array $catastrophicErrors): int
-    {
-        if (! empty($catastrophicErrors)) {
-            return Command::FAILURE;
-        }
-
-        if (! empty($skippedErrors)) {
-            return self::EXIT_SKIPPED_ERRORS;
-        }
-
-        if (! empty($integrityErrors)) {
-            return self::EXIT_INTEGRITY_ERRORS;
-        }
-
-        return Command::SUCCESS;
+        return SearchIndexRebuilder::resolveExitCode($result);
     }
 
     private function renderFailureSummary(OutputInterface $output, array $integrityErrors, array $skippedErrors, array $catastrophicErrors): void
