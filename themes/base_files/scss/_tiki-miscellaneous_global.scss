@@ -171,6 +171,141 @@ form[name=editpageform] .mb-3 .tab-content .alert-warning {
     display: block;
 }
 
+// Wiki plugin RSS display modes
+.rss-icon {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    flex-shrink: 0;
+    height: 3em;
+    width: 3em;
+}
+
+.rss-lines .rssitem {
+    padding: .25rem 0;
+}
+
+.rss-lines .rssdescription {
+    color: var(--bs-secondary-color);
+    display: -webkit-box;
+    font-size: .95rem;
+    line-height: 1.45;
+    margin-top: .5rem;
+    max-height: calc(1.45em * 4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+}
+
+.rss-item-image {
+    aspect-ratio: 4 / 3;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    border-radius: .375rem;
+    display: block;
+    flex: 0 0 6rem;
+    overflow: hidden;
+    width: 6rem;
+}
+
+.rss-item-image img,
+.rss-card-image-link img {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.rss-cards {
+    display: grid;
+    gap: 1.35rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+.rss-news-card {
+    background: var(--bs-body-bg);
+    border: var(--bs-border-width, 1px) solid rgba(var(--bs-body-color-rgb), .14);
+    border-radius: .5rem;
+    box-shadow: 0 .75rem 1.75rem rgba(var(--bs-body-color-rgb), .08);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0 0 1rem;
+    position: relative;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out, transform .15s ease-in-out;
+}
+
+.rss-news-card:hover {
+    border-color: rgba(var(--bs-body-color-rgb), .2);
+    box-shadow: 0 1rem 2.25rem rgba(var(--bs-body-color-rgb), .12);
+    cursor: pointer;
+    transform: translateY(-2px);
+}
+
+.rss-card-image-link {
+    aspect-ratio: 4 / 3;
+    background: var(--bs-tertiary-bg, #f8f9fa);
+    display: block;
+    flex-shrink: 0;
+    margin: 0 0 1rem;
+    overflow: hidden;
+}
+
+.rss-news-card .articletitle,
+.rss-news-card .articleheadingtext,
+.rss-news-card .rsslabels {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.rss-news-card .articletitle h2 {
+    font-size: 1.1rem;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.rss-news-card .titleb {
+    color: var(--bs-secondary-color);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: .875rem;
+    gap: .5rem;
+    margin-top: .375rem;
+}
+
+.rss-date {
+    align-items: center;
+    display: inline-flex;
+    gap: .25rem;
+}
+
+.rss-news-card .articleheadingtext {
+    color: var(--bs-secondary-color);
+    display: -webkit-box;
+    font-size: .95rem;
+    line-height: 1.45;
+    margin-top: .75rem;
+    max-height: calc(1.45em * 4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+}
+
+.rss-news-card .rsslabels {
+    margin-bottom: 0;
+}
+
+@media (max-width: 575.98px) {
+    .rss-item-image {
+        flex-basis: 4.5rem;
+        width: 4.5rem;
+    }
+}
+
 // Ajax, jquery. etc.
 // Ajax Loading Overlay
 #ajaxLoadingBG {

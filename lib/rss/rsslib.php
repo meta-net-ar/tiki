@@ -16,6 +16,7 @@ class RSSLib extends TikiDb_Bridge
     private static mixed $cachelib = null;
     private static string $cache_feed_key = 'rss_feed';
     private static string $cache_meta_key = 'rss_feed_meta';
+    private static array $rssModuleColumns = [];
     /**
      * Limit of the name field of the tiki_rss_modules table
      */
@@ -388,9 +389,21 @@ class RSSLib extends TikiDb_Bridge
     }
 
     /* replace rss feed in db */
-    public function replace_rss_module($rssId, $name, $description, $url, $refreshMinutes, $showTitle, $showPubDate, $noUpdate = false)
-    {
+    public function replace_rss_module(
+        $rssId,
+        $name,
+        $description,
+        $url,
+        $refreshMinutes,
+        $showTitle,
+        $showPubDate,
+        $noUpdate = false,
+        $showDesc = 'n',
+        $showImage = 'n',
+        $displayMode = 'list'
+    ) {
         $refresh = $this->cacheLifetime($refreshMinutes, TimeUnit::MINUTES);
+        $displayMode = in_array($displayMode, ['list', 'cards'], true) ? $displayMode : 'list';
 
         $data = [
             'name' => $name,
@@ -400,6 +413,17 @@ class RSSLib extends TikiDb_Bridge
             'showTitle' => $showTitle,
             'showPubDate' => $showPubDate,
         ];
+
+        $optionalData = [
+            'showDesc' => $showDesc,
+            'showImage' => $showImage,
+            'displayMode' => $displayMode,
+        ];
+        foreach ($optionalData as $field => $value) {
+            if ($this->rssModuleColumnExists($field)) {
+                $data[$field] = $value;
+            }
+        }
 
         if ($rssId) {
             $this->modules->update($data, ['rssId' => (int) $rssId,]);
@@ -492,6 +516,18 @@ class RSSLib extends TikiDb_Bridge
     public function get_rss_showPubDate($rssId)
     {
         return $this->modules->fetchOne('showPubDate', ['rssId' => $rssId]);
+    }
+
+    private function rssModuleColumnExists(string $column): bool
+    {
+        if (empty(self::$rssModuleColumns)) {
+            $result = $this->fetchAll('SHOW COLUMNS FROM `tiki_rss_modules`', [], -1, -1, TikiDb::ERR_NONE);
+            if (is_array($result)) {
+                self::$rssModuleColumns = array_fill_keys(array_column($result, 'Field'), true);
+            }
+        }
+
+        return isset(self::$rssModuleColumns[$column]);
     }
 
     public function get_feed_items($feeds, $count = 10, $sortBy = 'publication_date', $sortOrder = 'DESC')
@@ -1021,6 +1057,10 @@ class RSSLib extends TikiDb_Bridge
                 'categories' => $categories ? json_encode($categories->getValues()) : json_encode([]),
             ]
         );
+        if (empty($data['content']) && $description !== '') {
+            $data['content'] = TikiFilter::get('purifier')->filter($description);
+        }
+        $data['raw_description'] = $description;
         $data['guid'] = $guid;
         if (method_exists($entry, 'getDateModified') && $updateDate = $entry->getDateModified()) {
             $data['publication_date'] = $updateDate->getTimestamp();
@@ -1094,7 +1134,9 @@ class RSSLib extends TikiDb_Bridge
     private static function extractTtlFromFeed($xml): int
     {
         $DOM = new DOMDocument();
-        $DOM->loadXML($xml);
+        if (! self::loadXML($DOM, $xml)) {
+            return self::DEFAULT_FEED_TTL;
+        }
         $xpath = new DOMXPath($DOM);
 
         $ttlNodes = $xpath->query('//*[local-name()="channel"]/*[local-name()="ttl"]');
@@ -1113,7 +1155,9 @@ class RSSLib extends TikiDb_Bridge
         }
 
         $DOM = new DOMDocument();
-        $DOM->loadXML($feedData);
+        if (! self::loadXML($DOM, $feedData)) {
+            return $feedData;
+        }
         $xpath = new DOMXPath($DOM);
 
         $channelNodes = $xpath->query('//*[local-name()="channel"]');
@@ -1123,6 +1167,17 @@ class RSSLib extends TikiDb_Bridge
             $channelNodes->item(0)->insertBefore($ttlElement, $firstItem);
         }
         return $DOM->saveXML();
+    }
+
+    private static function loadXML(DOMDocument $DOM, string $xml): bool
+    {
+        $previous = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        $loaded = $DOM->loadXML($xml);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        return $loaded;
     }
 
     public function loadRss(array $params): array

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">RSS fallback article image</title>
+  <desc id="desc">Generic article card illustration for feed items without an image.</desc>
+  <rect width="640" height="360" fill="#eef2ff"/>
+  <rect x="78" y="58" width="484" height="244" rx="20" fill="#fff" opacity=".94"/>
+  <rect x="118" y="102" width="178" height="118" rx="14" fill="#2563eb" opacity=".16"/>
+  <path d="M132 198l54-58 40 38 30-28 56 48v28H132z" fill="#2563eb" opacity=".78"/>
+  <circle cx="250" cy="132" r="18" fill="#2563eb" opacity=".42"/>
+  <rect x="336" y="108" width="142" height="16" rx="8" fill="#1e3a8a" opacity=".72"/>
+  <rect x="336" y="146" width="188" height="12" rx="6" fill="#1e3a8a" opacity=".34"/>
+  <rect x="336" y="176" width="164" height="12" rx="6" fill="#1e3a8a" opacity=".28"/>
+  <rect x="118" y="252" width="404" height="10" rx="5" fill="#2563eb" opacity=".18"/>
+</svg>

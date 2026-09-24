@@ -53,12 +53,15 @@
                     <th>{self_link _sort_arg='sort_mode' _sort_field='lastUpdated'}{tr}Last update{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='showTitle'}{tr}Show Title{/tr}{/self_link}</th>
                     <th>{self_link _sort_arg='sort_mode' _sort_field='showPubDate'}{tr}Show Date{/tr}{/self_link}</th>
+                    <th>{tr}Show Description{/tr}</th>
+                    <th>{tr}Show Image{/tr}</th>
+                    <th>{tr}Layout{/tr}</th>
                     <th></th>
                 </tr>
                 {section name=chan loop=$channels}
                     <tr>
                         <td class="id">{$channels[chan].rssId|escape}</td>
-                        <td class="text">
+                        <td class="text text-start">
                             {$channels[chan].name|escape}
                             <span class="form-text">
                                 {if $channels[chan].description}{$channels[chan].description|escape|nl2br}<br>{/if}
@@ -72,6 +75,9 @@
                         </td>
                         <td class="text">{$channels[chan].showTitle|escape}</td>
                         <td class="text">{$channels[chan].showPubDate|escape}</td>
+                        <td class="text">{$channels[chan].showDesc|default:'n'|escape}</td>
+                        <td class="text">{$channels[chan].showImage|default:'n'|escape}</td>
+                        <td class="text">{$channels[chan].displayMode|default:'list'|escape}</td>
                         <td class="action">
                             {actions}
                                 {strip}
@@ -96,7 +102,7 @@
                                         </form>
                                     </action>
                                     <action>
-                                        <a href="tiki-admin_rssmodules.php?offset={$offset|escape}&amp;sort_mode={$sort_mode|escape}&amp;rssId={$channels[chan].rssId|escape}">
+                                        <a href="tiki-admin_rssmodules.php?offset={$offset|escape}&amp;sort_mode={$sort_mode|escape}&amp;rssId={$channels[chan].rssId|escape}&amp;cookietab=2#contentadmin_rssmodules-2">
                                             {icon name='edit' _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
                                         </a>
                                     </action>
@@ -134,7 +140,7 @@
                         </td>
                     </tr>
                 {sectionelse}
-                    {norecords _colspan=6}
+                    {norecords _colspan=9}
                 {/section}
             </table>
 
@@ -191,7 +197,7 @@
                 <div class="col-sm-9 offset-sm-3">
                     <div class="form-check">
                         <label class="form-label form-check-label">
-                            <input type="checkbox" class="form-check-input" name="showTitle" {if $showTitle eq 'y'}checked="checked"{/if}>
+                            <input type="checkbox" class="form-check-input" name="showTitle"{if $showTitle eq 'y'} checked{/if}>
                             {tr}Show feed title{/tr}
                         </label>
                     </div>
@@ -201,9 +207,44 @@
                 <div class="col-sm-9 offset-sm-3">
                     <div class="form-check">
                         <label class="form-label form-check-label">
-                            <input type="checkbox" class="form-check-input" name="showPubDate" {if $showPubDate eq 'y'}checked="checked"{/if}>
+                            <input type="checkbox" class="form-check-input" name="showPubDate"{if $showPubDate eq 'y'} checked{/if}>
                             {tr}Show publish date{/tr}
                         </label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-sm-9 offset-sm-3">
+                    <div class="form-check">
+                        <label class="form-label form-check-label">
+                            <input type="checkbox" class="form-check-input" name="showDesc"{if $showDesc eq 'y'} checked{/if}>
+                            {tr}Show description{/tr}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <div class="col-sm-9 offset-sm-3">
+                    <div class="form-check">
+                        <label class="form-label form-check-label">
+                            <input type="checkbox" class="form-check-input" name="showImage"{if $showImage eq 'y'} checked{/if}>
+                            {tr}Show item image{/tr}
+                        </label>
+                        <div class="form-text">
+                            {tr}In styled lines, show the feed item image. Cards always show an image area and use a simple generic image when the feed item has no image{/tr}.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3 row">
+                <label for="displayMode" class="col-form-label col-sm-3">{tr}Layout{/tr}</label>
+                <div class="col-sm-9">
+                    <select class="form-select" name="displayMode" id="displayMode">
+                        <option value="list" {if $displayMode neq 'cards'}selected="selected"{/if}>{tr}Styled lines{/tr}</option>
+                        <option value="cards" {if $displayMode eq 'cards'}selected="selected"{/if}>{tr}Cards{/tr}</option>
+                    </select>
+                    <div class="form-text">
+                        {tr}Cards display feed items with an image. Use styled lines for the previous compact layout{/tr}.
                     </div>
                 </div>
             </div>

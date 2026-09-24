@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">RSS fallback signal image</title>
+  <desc id="desc">Generic signal illustration for feed items without an image.</desc>
+  <rect width="640" height="360" fill="#f0fdf4"/>
+  <rect x="82" y="62" width="476" height="236" rx="22" fill="#fff" opacity=".94"/>
+  <circle cx="320" cy="180" r="34" fill="#16a34a" opacity=".82"/>
+  <path d="M250 180a70 70 0 0 1 140 0" fill="none" stroke="#16a34a" stroke-linecap="round" stroke-width="18" opacity=".48"/>
+  <path d="M204 180a116 116 0 0 1 232 0" fill="none" stroke="#16a34a" stroke-linecap="round" stroke-width="16" opacity=".32"/>
+  <path d="M158 180a162 162 0 0 1 324 0" fill="none" stroke="#16a34a" stroke-linecap="round" stroke-width="14" opacity=".22"/>
+  <rect x="190" y="238" width="260" height="12" rx="6" fill="#14532d" opacity=".22"/>
+  <rect x="232" y="264" width="176" height="10" rx="5" fill="#14532d" opacity=".16"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">RSS fallback insight image</title>
+  <desc id="desc">Generic insight illustration for feed items without an image.</desc>
+  <rect width="640" height="360" fill="#ecfeff"/>
+  <rect x="76" y="58" width="488" height="244" rx="20" fill="#fff" opacity=".94"/>
+  <circle cx="204" cy="168" r="76" fill="#06b6d4" opacity=".15"/>
+  <path d="M174 184h60v58h-60zm86-44h60v102h-60zm86-58h60v160h-60z" fill="#0891b2" opacity=".78"/>
+  <path d="M166 124l108 46 104-82 78 34" fill="none" stroke="#164e63" stroke-linecap="round" stroke-linejoin="round" stroke-width="14" opacity=".68"/>
+  <circle cx="166" cy="124" r="14" fill="#164e63" opacity=".68"/>
+  <circle cx="274" cy="170" r="14" fill="#164e63" opacity=".68"/>
+  <circle cx="378" cy="88" r="14" fill="#164e63" opacity=".68"/>
+  <circle cx="456" cy="122" r="14" fill="#164e63" opacity=".68"/>
+</svg>

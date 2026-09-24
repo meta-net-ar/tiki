@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">RSS fallback report image</title>
+  <desc id="desc">Generic report illustration for feed items without an image.</desc>
+  <rect width="640" height="360" fill="#f8fafc"/>
+  <rect x="112" y="48" width="416" height="264" rx="18" fill="#fff" stroke="#cbd5e1" stroke-width="2"/>
+  <rect x="154" y="94" width="132" height="16" rx="8" fill="#334155" opacity=".72"/>
+  <rect x="154" y="132" width="318" height="10" rx="5" fill="#64748b" opacity=".32"/>
+  <rect x="154" y="160" width="280" height="10" rx="5" fill="#64748b" opacity=".26"/>
+  <rect x="154" y="188" width="304" height="10" rx="5" fill="#64748b" opacity=".22"/>
+  <rect x="154" y="236" width="74" height="34" rx="8" fill="#14b8a6" opacity=".78"/>
+  <rect x="248" y="212" width="74" height="58" rx="8" fill="#0ea5e9" opacity=".72"/>
+  <rect x="342" y="178" width="74" height="92" rx="8" fill="#6366f1" opacity=".68"/>
+  <rect x="436" y="148" width="36" height="122" rx="8" fill="#f59e0b" opacity=".72"/>
+</svg>

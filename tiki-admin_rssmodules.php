@@ -21,6 +21,9 @@ $inputConfiguration = [
             'refreshMinutes'   => 'int',         //post
             'showTitle'        => 'bool',        //post
             'showPubDate'      => 'bool',        //post
+            'showDesc'         => 'bool',        //post
+            'showImage'        => 'bool',        //post
+            'displayMode'      => 'alpha',       //post
             'save'             => 'alpha',       //post
             'refresh_all'      => 'alpha',       //post
             'refresh'          => 'int',         //post
@@ -29,6 +32,7 @@ $inputConfiguration = [
             'offset'           => 'int',         //get
             'sort_mode'        => 'alnumdash',   //get
             'find'             => 'text',        //get
+            'cookietab'        => 'int',         //get
             'article'          => 'int',         //get
             'view'             => 'int',         //get
         ],
@@ -86,6 +90,9 @@ if (isset($_REQUEST["rssId"])) {
     $info["refresh"] = 1800;
     $info["showTitle"] = 'n';
     $info["showPubDate"] = 'n';
+    $info["showDesc"] = 'n';
+    $info["showImage"] = 'n';
+    $info["displayMode"] = 'list';
 }
 
 if (! isset($_REQUEST["save"])) {
@@ -96,6 +103,9 @@ if (! isset($_REQUEST["save"])) {
     $smarty->assign('refreshSeconds', $info["refresh"]);
     $smarty->assign('showTitle', $info["showTitle"]);
     $smarty->assign('showPubDate', $info["showPubDate"]);
+    $smarty->assign('showDesc', $info["showDesc"] ?? 'n');
+    $smarty->assign('showImage', $info["showImage"] ?? 'n');
+    $smarty->assign('displayMode', $info["displayMode"] ?? 'list');
 }
 
 if ((isset($_REQUEST["refresh_all"]) || ! empty($_REQUEST["refresh"])) && $access->checkCsrf()) {
@@ -233,6 +243,22 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
             $smarty->assign('showPubDate', 'n');
             $info["showPubDate"] = 'n';
         }
+        if (isset($_REQUEST['showDesc']) == 'on') {
+            $smarty->assign('showDesc', 'y');
+            $info["showDesc"] = 'y';
+        } else {
+            $smarty->assign('showDesc', 'n');
+            $info["showDesc"] = 'n';
+        }
+        if (isset($_REQUEST['showImage']) == 'on') {
+            $smarty->assign('showImage', 'y');
+            $info["showImage"] = 'y';
+        } else {
+            $smarty->assign('showImage', 'n');
+            $info["showImage"] = 'n';
+        }
+        $info["displayMode"] = in_array($_REQUEST["displayMode"] ?? 'list', ['list', 'cards'], true) ? $_REQUEST["displayMode"] : 'list';
+        $smarty->assign('displayMode', $info["displayMode"]);
         $result = $rsslib->replace_rss_module(
             $_REQUEST["rssId"],
             $_REQUEST["name"],
@@ -240,7 +266,11 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
             $_REQUEST["url"],
             $_REQUEST["refreshMinutes"],
             $info["showTitle"],
-            $info["showPubDate"]
+            $info["showPubDate"],
+            false,
+            $info["showDesc"],
+            $info["showImage"],
+            $info["displayMode"]
         );
         $smarty->assign('rssId', 0);
         $smarty->assign('name', '');
@@ -249,6 +279,9 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
         $smarty->assign('refreshSeconds', 900);
         $smarty->assign('showTitle', 'n');
         $smarty->assign('showPubDate', 'n');
+        $smarty->assign('showDesc', 'n');
+        $smarty->assign('showImage', 'n');
+        $smarty->assign('displayMode', 'list');
         $cookietab = 1;
         if (is_numeric($result)) {
             if (! empty($_REQUEST["rssId"])) {
@@ -267,7 +300,7 @@ $sort_mode = SortModeValidator::validateSortModeOrFeedback(
     $_REQUEST['sort_mode'] ?? 'name_asc',
     ['tiki_rss_modules']
 );
-$offset = (int)$_REQUEST["offset"] ?? 0;
+$offset = (int)($_REQUEST["offset"] ?? 0);
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';
 if ($prefs['feature_multilingual'] == 'y') {
