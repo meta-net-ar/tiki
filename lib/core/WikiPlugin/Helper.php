@@ -65,9 +65,9 @@ class WikiPlugin_Helper
      *
      * @return array Array of common parameters
      */
-    public static function getTrackerCommonParameters()
+    public static function getCommonParameter($param)
     {
-        return [
+        $commonParameters =  [
             'trackerId' => [
                 'required' => true,
                 'name' => tra('Tracker ID'),
@@ -85,6 +85,10 @@ class WikiPlugin_Helper
                 'profile_reference' => 'tracker',
             ],
         ];
+        if (! isset($commonParameters[$param])) {
+            throw new \Exception(tr('The parameter % does not exist.', $param), 409);
+        }
+        return $commonParameters[$param];
     }
     /**
      * Get trackerId by params.

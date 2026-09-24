@@ -12,643 +12,6 @@ use Tiki\Lib\core\WikiPlugin\Options\BooleanEnglishLetter;
 
 function wikiplugin_tracker_info()
 {
-    $commonTrackerParams = WikiPlugin_Helper::getTrackerCommonParameters();
-    $specificParams = [
-        'fields' => [
-            'required' => false,
-            'name' => tra('Fields'),
-            'description' => tr('Colon-separated list of field IDs, or Field Permanent Names, if %0, to be displayed in the form as input fields.
-                If empty, all fields will be shown. Example: %1', '<code>usePermNames="y"</code>', '<code>2:4:5</code>'),
-            'since' => '1',
-            'separator' => ':',
-            'profile_reference' => 'tracker_field',
-            'parent' => 'input[name="params[trackerId]"]',
-            'parentkey' => 'tracker_id',
-        ],
-        'requiredFields' => [
-            'required' => false,
-            'name' => tra('Required Fields'),
-            'description' => tr('Colon-separated list of field IDs, or Field Permanent Names, if %0, to be required or mandatory in the form as input fields.
-                If empty, all fields will keep the default behavior defined in the fields admin interface. Example: %1', '<code>usePermNames="y"</code>', '<code>2:4:5</code>'),
-            'separator' => ':',
-            'profile_reference' => 'tracker_field',
-            'parent' => 'input[name="params[trackerId]"]',
-            'parentkey' => 'tracker_id',
-        ],
-        'values' => [
-                'required' => false,
-                'name' => tra('Values'),
-                'description' => tr('Colon-separated list of default values corresponding to the %0fields%1 parameter.
-            First value corresponds to first field, second value to second field, etc. Default values can be
-            set by using %0autosavefields%1 and %0autosavevalues%1 as URL parameters.', '<code>', '</code>'),
-                'since' => '2.0',
-                'separator' => ':',
-        ],
-        'action' => [
-            'required' => false,
-            'name' => tra('Action'),
-            'description' => tr(
-                'Colon-separated labels for form submit buttons. Default is %0Save%1. When set to
-                %0NONE%1, the save button will not appear and values will be saved dynamically.',
-                '<code>',
-                '</code>'
-            ),
-            'since' => '1',
-            'separator' => ':',
-            'default' => 'Save'
-        ],
-        'action_style' => [
-            'required' => false,
-            'name' => tra('Action Style'),
-            'description' => tr(
-                'Sets button style classes for action buttons. If multiple buttons have been set
-                in the %0 parameter, the same number of colon-separated styles must be set here. Example:',
-                '<code>action</code>'
-            ) . "<code>btn btn-secondary:btn btn-success:btn btn-primary float-end</code>",
-            'since' => '14.1',
-            'separator' => ':',
-            'default' => 'btn btn-secondary'
-        ],
-        'showtitle' => [
-            'required' => false,
-            'name' => tra('Show Title'),
-            'description' => tra('Display the title of the tracker at the top of the form (not shown by default)'),
-            'since' => '1',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::No->value,
-            'options' => BooleanEnglishLetter::options(),
-        ],
-        'showdesc' => [
-            'required' => false,
-            'name' => tra('Show Description'),
-            'description' => tra('Show the tracker\'s description (not shown by default)'),
-            'since' => '1',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::No->value,
-            'options' => BooleanEnglishLetter::options(),
-        ],
-        'showfieldsdesc' => [
-            'required' => false,
-            'name' => tra('Show Fields Descriptions'),
-            'description' => tra('Show the tracker\'s field descriptions (shown by default)'),
-            'since' => '12.1',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::Yes->value,
-            'options' => BooleanEnglishLetter::options(),
-        ],
-        'showmandatory' => [
-            'required' => false,
-            'name' => tra('Mark Mandatory'),
-            'description' => tra('Indicate mandatory fields with an asterisk (shown by default).'),
-            'since' => '1',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::Yes->value,
-            'options' => BooleanEnglishLetter::options(),
-        ],
-        'showstatus' => [
-            'required' => false,
-            'name' => tra('Show Status'),
-            'description' => tra('Show the status of the items (not shown by default)'),
-            'since' => '5.0',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::No->value,
-            'options' => BooleanEnglishLetter::options(),
-        ],
-        'embedded' => [
-            'required' => false,
-            'name' => tra('Embedded'),
-            'description' => tra('Embedded'),
-            'since' => '1',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::No->value,
-            'options' => BooleanEnglishLetter::options(),
-            'advanced' => true,
-        ],
-        'email' => [
-            'required' => false,
-            'name' => tra('Email'),
-            'description' => tr('To send an email once the tracker item has been created. Format: %0from', '<code>')
-                    . '|' . tra('to') . '|' . tr('template%0', '</code> ') . tr(
-                        'For %0from%1 and %0to%1, use an email address
-                    (separate multiple addresses with a comma), a username, a fieldId of a field containing either an email address or a username,
-                    a fieldId of a UserSelector or GroupSelector field, or "createdBy" or "lastModifBy" for the item creator or modifier.
-                    When username is being used, the email will be sent to the email address of the user on file.
-                    When sending to several emails using different template, provide the template name for the message body for each email;
-                    I.e., the first template will be used for the first to, the second template if exists will be used
-                    for the second from (otherwise the last given template will be used). Each template needs two files, one for the subject one for the body. The subject will be named
-                    template_subject.tpl. All the templates must be in the %0templates/mail%1 directory. Example:
-                    %0webmaster@my.com|a@my.com,b@my.com|templatea.tpl,templateb.tpl%1 (%0templates/mail/tracker_changed_notification.tpl%1
-                    is the default from which you can get inspiration).',
-                        '<code>',
-                        '</code>'
-                    ),
-            'since' => '2.0',
-            'default' => '',
-        ],
-        'emailformat' => [
-            'required' => false,
-            'name' => tra('Email Format'),
-            'description' => tra('Choose between values text or html, depending on the syntax in the template file
-                that will be used'),
-            'since' => '6.1',
-            'default' => 'text',
-        ],
-        'url' => [
-            'required' => false,
-            'name' => tra('URL'),
-            'description' => tr('URL the user is sent to after the form is submitted. The string %0itemId%1 will
-                be replaced with %0itemId=xx%1 where %0xx%1 is the new (or current) itemId. This parameter can be used in combination with the TABS plugin using %0?cookietab=1&itemId%1 (change the cookietab parameter\'s value depending on the tab you want the user to be sent to).', '<code>', '</code>'),
-            'since' => '1',
-            'filter' => 'url',
-            'separator' => ':',
-        ],
-        'urlparams' => [
-            'required' => false,
-            'name' => tr('Keep params in URL'),
-            'description' => tr('Input form parameters (field IDs, or Field Permanent Names, if %0) separated by a colon (%1:%2) to pass them in the URL after the form is submitted and redirected to the URL specified in the %1url%2 param. Example: %1urlparams="1:2:3:trackit"%2. Enter %1*%2 to keep all the submitted parameters in the URL.', '<code>usePermNames="y"</code>', '<code>', '</code>'),
-            'since' => '19.0',
-            'filter' => 'url',
-            'separator' => ':',
-            'advanced' => true,
-        ],
-        'target' => [
-            'required' => false,
-            'name' => tra('URL Target'),
-            'description' => tra('Set the target parameter for the url (determines whether target will open in a
-                new page, etc.)'),
-            'since' => '4.0',
-            'options' => [
-                ['text' => '', 'value' => ''],
-                ['text' => tra('Blank'), 'value' => '_blank'],
-                ['text' => tra('Parent'), 'value' => '_parent'],
-                ['text' => tra('Self'), 'value' => '_self'],
-                ['text' => tra('Top'), 'value' => '_top']
-            ],
-            'advanced' => true,
-        ],
-        'overwrite' => [
-            'required' => false,
-            'name' => tra('Overwrite'),
-            'description' => tr(
-                'Overwrite current field values of the item with the input values. Does not
-                overwrite wiki pages and does not work when the %0discarditem%1 parameter is set to Yes (%0y%1).',
-                '<code>',
-                '</code>'
-            ),
-            'since' => '6.0',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::No->value,
-            'options' => BooleanEnglishLetter::options(),
-            'advanced' => true,
-        ],
-        'sort' => [
-            'required' => false,
-            'name' => tra('Sort'),
-            'description' => tra('Display columns in the order listed in the fields parameter instead of by
-                field ID (field ID order is used by default)'),
-            'since' => '2.0',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::No->value,
-            'options' => BooleanEnglishLetter::options(),
-        ],
-        'preview' => [
-            'required' => false,
-            'name' => tra('Preview'),
-            'description' => tr('To add a preview button with the label set by this parameter. Default:
-                %0Preview%1. Useful to preview the computed fields of an item.', '<code>', '</code>'),
-            'since' => '2.0',
-        ],
-        'reset' => [
-            'required' => false,
-            'name' => tra('Reset'),
-            'description' => tra('Label for the reset button, to return all fields to their default values.'),
-            'since' => '4.2',
-            'default' => null,
-        ],
-        'view' => [
-            'required' => false,
-            'name' => tra('View'),
-            'description' => tr('Determine which items will be affected byt the form. If set to %0user%1 and
-                %0trackerId%1 is not set, then the user tracker associated with the default group will be affected.
-                If %0trackerId%1 is set, then the item associated with the user in that tracker will be affected.
-                    If set to %0page%1, the item associated with that page will be affected (%0trackerId%1 must be
-                    set in this case).', '<code>', '</code>'),
-            'since' => '1',
-            'filter' => 'alpha',
-            'default' => '',
-            'options' => [
-                ['text' => '', 'value' => ''],
-                ['text' => tra('Group'), 'value' => 'group'],
-                ['text' => tra('Page'), 'value' => 'page'],
-                ['text' => tra('User'), 'value' => 'user'],
-                ['text' => tra('User&field'), 'value' => 'userandfield']
-            ]
-        ],
-        'userfieldtofilter' => [
-            'required' => false,
-            'name' => tra('User field to filter'),
-            'description' => tra('User field to filter user tracker items to:') . ' <code>view="user&field"</code>',
-            'since' => '15.3',
-            'default' => '',
-            'advanced' => true,
-        ],
-        'fieldtofilter' => [
-            'required' => false,
-            'name' => tra('Field to filter'),
-            'description' => tra('Field to filter user tracker items to:') . ' <code>view="user&field"</code>',
-            'since' => '15.3',
-            'default' => '',
-            'advanced' => true,
-        ],
-        'fieldtofiltervalue' => [
-            'required' => false,
-            'name' => tra('Field to filter Value'),
-            'description' => tra('Value to filter user tracker items to:') . ' <code>view="user&field"</code>',
-            'since' => '15.3',
-            'default' => '',
-            'advanced' => true,
-        ],
-        'fieldtofiltercriteria' => [
-            'required' => false,
-            'name' => tra('Criteria'),
-            'description' => tra('If more than one item found, will choose under this criteria. Used in combination with:') . '<code>view="user&field"</code>',
-            'since' => '15.3',
-            'default' => '',
-            'options' => [
-                ['text' => '', 'value' => ''],
-                //array('text' => tra('lastModif - Ascending'), 'value' => 'lastModifAsc'),//Not working
-                //array('text' => tra('lastModif - Descending'), 'value' => 'lastModifDesc'),//Not working
-                ['text' => tra('creationDate - Ascending'), 'value' => 'creationAsc'],
-                ['text' => tra('creationDate - Descending'), 'value' => 'creationDesc']
-            ],
-            'advanced' => true,
-        ],
-        'status'                   => [
-            'required' => false,
-            'name' => tra('Status'),
-            'description' => tra('Status of the item used in combination with:') . ' <code>view="user"</code>' . tra('or') . '<code>view="user&field"</code>',
-            'since' => '6.0',
-            'default' => '',
-            'advanced' => true,
-        ],
-        'transactionName'          => [
-            'required' => false,
-            'name' => tra('Transaction name'),
-            'description' => tra('The transaction identifier. This identifier connects the various trackers into a
-                single transaction. Must be unique per transaction. The multiple steps in a single transaction
-                must share the same transaction name.'),
-            'since' => '15.0',
-            'filter' => 'alpha',
-            'advanced' => true,
-        ],
-        'transactionStep'          => [
-            'required' => false,
-            'name' => tra('Transaction Step'),
-            'description' => tr('Transaction step number specifying the order of the transaction steps. The first
-                step must be %0.', '<code>0</code>'),
-            'since' => '15.0',
-            'filter' => 'digits',
-            'advanced' => true,
-        ],
-        'transactionFinalStep'     => [
-            'required'    => false,
-            'name'        => tra('Final Transaction Step'),
-            'description' => tra('Indicate whether this is the final transaction step'),
-            'since'       => '15.0',
-            'filter'      => 'alpha',
-            'default'     => '',
-            'options' => BooleanEnglishLetter::options(''),
-            'advanced' => true,
-        ],
-        'transactionPreviousURL'   => [
-            'required'    => false,
-            'name'        => tr('Transaction previous URL'),
-            'description' => tr('The page to go back to when the "previous" button is clicked.'),
-            'since'       => '18.4',
-            'filter'      => 'url',
-            'default'     => '',
-            'advanced' => true,
-        ],
-        'transactionPreviousLabel' => [
-            'required'    => false,
-            'name'        => tr('Transaction previous button label'),
-            'description' => tr('Text for the "previous" button label.'),
-            'since'       => '18.4',
-            'filter'      => 'text',
-            'default'     => '',
-            'advanced' => true,
-        ],
-        'itemId'                   => [
-            'required' => false,
-            'name' => tra('ItemId'),
-            'description' => tra('ItemId identifying the item to be edited.'),
-            'since' => '3.0',
-            'filter' => 'digits',
-            'profile_reference' => 'tracker_item',
-            'parent' => 'input[name="params[trackerId]"]',
-            'parentkey' => 'tracker_id',
-        ],
-        'ignoreRequestItemId'      => [
-            'required' => false,
-            'name' => tra('Ignore ItemId'),
-            'description' => tr(
-                'Do not filter on the parameter %0itemId%1 if in the url (default is to filter)',
-                '<code>',
-                '</code>'
-            ),
-            'since' => '6.0',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::No->value,
-            'options' => BooleanEnglishLetter::options(),
-            'advanced' => true,
-        ],
-        'tpl'                      => [
-            'required' => false,
-            'name' => tra('Template File'),
-            'description' => tr(
-                'Name of the template used to display the tracker items.  In the template, the
-                smarty variable %0{$f_id}%1 will be replaced with the appropriate input tag, with %0id%1 representing
-                the field ID. The form tag and the submit button are generated by Tiki outside the template',
-                '<code>',
-                '</code>'
-            ),
-            'since' => '2.0',
-            'default' => '',
-        ],
-        'wiki' => [
-            'required' => false,
-            'name' => tra('Wiki'),
-            'description' => tr(
-                'Name of the wiki page containing the template to display the tracker items. This
-                page must have the permission %0tiki_p_use_as_template%1 assigned to the Anonymous group to be used
-                as a template.',
-                '<code>',
-                '</code>'
-            ),
-            'since' => '2.0',
-            'filter' => 'pagename',
-            'default' => '',
-            'profile_reference' => 'wiki_page',
-        ],
-        'newstatus' => [
-            'required' => false,
-            'name' => tra('New Status'),
-            'description' => tra('Default status applied to newly created or saved items.'),
-            'since' => '2.0',
-            'filter' => 'alpha',
-            'default' => '',
-            'options' => TrackerStatuses::options(''),
-        ],
-        'colwidth' => [
-            'required' => false,
-            'name' => tra('Width'),
-            'description' => tra('Specify the width in pixels or percentage of the first column (the labels) in the
-                tracker form.'),
-            'since' => '3.0',
-            'default' => '',
-            'accepted' => '## or ##%',
-            'advanced' => true,
-        ],
-        'autosavefields' => [
-            'required' => false,
-            'name' => tra('Autosave Fields'),
-            'description' => tra('Colon-separated list of field IDs, or Field Permanent Names, if %0, to be automatically filled with values upon
-                save.', '<code>usePermNames="y"</code>'),
-            'since' => '5.0',
-            'filter' => 'text',
-            'separator' => ':',
-            'profile_reference' => 'tracker_field',
-            'parent' => 'input[name="params[trackerId]"]',
-            'parentkey' => 'tracker_id',
-            'advanced' => true,
-        ],
-        'autosavevalues' => [
-            'required' => false,
-            'name' => tra('Autosave Values'),
-            'description' => tr(
-                'Colon-separated values corresponding to %0. Special syntax cases:',
-                '<code>autosavefields</code>'
-            ) . '<br />'
-                . '<code>categories(x)</code> - ' . tr('selects the first child category under a category with ID
-                    %0x%1 for use in a category field', '<code>', '</code>') . '<br />'
-                . '<code>category(x)</code> - ' . tr('selects a category with this ID
-                    %0x%1 for use in a category field', '<code>', '</code>') . '<br />'
-                . '<code>preference(x)</code> - ' . tr('inserts the value of the preference with %0x%1 being the
-                    preference name.', '<code>', '</code>'),
-            'since' => '5.0',
-            'filter' => 'text',
-            'separator' => ':',
-            'advanced' => true,
-        ],
-        'levelupfields' => [
-            'required' => false,
-            'name' => tra('Increase-only Fields'),
-            'description' => tr(
-                'Used with the %0  and %1 parameters. Colon-separated list of field IDs, or Field Permanent Names, if %2, being
-                auto-saved where the specified auto-save value will not take effect if it is less than or equal to
-                the current value of the field',
-                '<code>autosavefields</code>',
-                '<code>autosavevalues</code>',
-                '<code>usePermNames="y"</code>'
-            ),
-            'since' => '8.0',
-            'filter' => 'digits',
-            'separator' => ':',
-            'profile_reference' => 'tracker_field',
-            'parent' => 'input[name="params[trackerId]"]',
-            'parentkey' => 'tracker_id',
-            'advanced' => true,
-        ],
-        'registration' => [
-            'required' => false,
-            'name' => tra('Registration Fields'),
-            'description' => tra('Add registration fields such as Username and Password for use in registration
-                trackers'),
-            'since' => '6.0',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::No->value,
-            'options' => BooleanEnglishLetter::options(),
-        ],
-        'chosenGroup' => [
-            'required' => false,
-            'name' => tra('Register to group'),
-            'description' => tra('The user enters this group via the registration (only a single group name
-                is supported)'),
-            'since' => '15.0',
-            'filter' => 'text',
-            'default' => 'Registered',
-        ],
-        'validateusers' => [
-            'required' => false,
-            'name' => tra('Validate users'),
-            'description' => tra('Here one can overrule the default validate users by e-mail preference.'),
-            'since' => '15.0',
-            'filter' => 'alpha',
-            'options' => BooleanEnglishLetter::options(''),
-        ],
-        'outputtowiki' => [
-            'required' => false,
-            'name' => tra('Output To Wiki'),
-            'description' => tra('Output result to a new wiki page with the name taken from the input for the
-                specified fieldId'),
-            'since' => '6.0',
-            'filter' => 'digits',
-            'default' => '',
-            'profile_reference' => 'tracker_field',
-            'parent' => 'input[name="params[trackerId]"]',
-            'parentkey' => 'tracker_id',
-            'advanced' => true,
-        ],
-        'discarditem' => [
-            'required' => false,
-            'name' => tra('Discard After Output'),
-            'description' => tr('Used with %0 - whether to discard the tracker item itself
-                once the wiki page is created, so that, in effect, the tracker is just a vehicle to create form
-                fields to facilitate creating wiki pages.', '<code>outputtowiki</code>'),
-            'since' => '6.0',
-            'filter' => 'alpha',
-            'default' => '',
-            'options' => BooleanEnglishLetter::options(''),
-            'advanced' => true,
-        ],
-        'outputwiki' => [
-            'required' => false,
-            'name' => tra('Template Page'),
-            'description' => tr(
-                'Name of the wiki page containing the template to format the output to wiki page.
-                Must be set for %0 to work. The template can contain variables to represent fields, for example
-                %1 would result in the value of fieldId 6. Also %2 can be used for the itemId and if you have set
-                %3 to yes, you can use %4 and %5.',
-                '<code>outputtowiki</code>',
-                '<code>{$f_6}</code>',
-                '<code>{$f_itemId}</code>',
-                '<code>register</code>',
-                '<code>{$register_login}</code>',
-                '<code>{$register_email}</code>'
-            ),
-            'since' => '6.0',
-            'filter' => 'pagename',
-            'profile_reference' => 'wiki_page',
-            'advanced' => true,
-        ],
-        'outputwikinamespace' => [
-            'required' => false,
-            'name' => tra('Output Wiki Namespace'),
-            'description' => tra('Name of namespace that is used for the wiki page that is created when outputting
-                to a wiki page.'),
-            'since' => '13.0',
-            'filter' => 'pagename',
-            'default' => '',
-            'advanced' => true,
-        ],
-        'outputwikirelation' => [
-            'required' => false,
-            'name' => tra('Store Relation'),
-            'description' => tr(
-                'Store %0 and %1 relation from the created
-                wiki page when outputting to a wiki page. Optionally, (separate feature to be turned on in admin
-                panel) these relations are used to sync page renames with the field specified in %2,
-                and also optionally to redirect page viewing to the tracker item instead (where you can then
-                include the page if needed).',
-                '<code>tiki.wiki.linkeditem</code>',
-                '<code>tiki.wiki.linkedfield</code>',
-                '<code>outputtowiki</code>'
-            ),
-            'since' => '13.0',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::No->value,
-            'options' => BooleanEnglishLetter::options(),
-            'advanced' => true,
-        ],
-        'fieldsfill' => [
-            'required' => false,
-            'name' => tra('Multiple Fill Fields'),
-            'description' => tr('Colon-separated list of field IDs, or Field Permanent Names, if %0, to be filled with multiple values, to create
-                multiple items in one save. If empty, only one item will be created. Only for
-                item creation. Example: %1', '<code>usePermNames="y"</code>', '<code>2:4:5</code>'),
-            'since' => '9.0',
-            'separator' => ':',
-            'profile_reference' => 'tracker_field',
-            'parent' => 'input[name="params[trackerId]"]',
-            'parentkey' => 'tracker_id',
-            'advanced' => true,
-        ],
-        'fieldsfillseparator' => [
-            'required' => false,
-            'name' => tra('Fill Fields Separator'),
-            'description' => tr('Choose separator between fields in each line of the Multiple Fill text area.
-                Default is pipe (%0|%1).', '<code>', '</code>'),
-            'since' => '9.0',
-            'default' => '|',
-            'advanced' => true,
-        ],
-        'fieldsfilldefaults' => [
-            'required' => false,
-            'name' => tra('Fill Fields Defaults'),
-            'description' => tra('Colon-separated list of default values for Multiple Fill Fields.'),
-            'since' => '9.0',
-            'default' => '',
-            'advanced' => true,
-        ],
-        'fieldsfilllabel' => [
-            'required' => false,
-            'name' => tra('Multiple Fill Fields left Label'),
-            'description' => tr('Explanatory text on the left of the Multiple Fill Fields text area. Default is "Insert one item per line:".'),
-            'since' => '24.4',
-            'filter' => 'text',
-            'advanced' => true,
-        ],
-        'fieldsfilldescription' => [
-            'required' => false,
-            'name' => tra('Multiple Fill Fields bottom description'),
-            'description' => tr('Explanatory text below the Multiple Fill Fields text area. Default is the list of the fields which should be in each line.')
-                . ' ' . tr('Put a space for no visible text below the Multiple Fill Fields text area.'),
-            'since' => '24.4',
-            'filter' => 'text',
-            'advanced' => true,
-        ],
-        'formtag' => [
-            'required' => false,
-            'name' => tra('Embed the tracker in a form tag'),
-            'description' => tr(
-                'If set to Yes (%0), the tracker is contained in a <code>form</code> tag and has action buttons',
-                '<code>y</code>'
-            ),
-            'since' => '6.4',
-            'filter' => 'alpha',
-            'default' => BooleanEnglishLetter::Yes->value,
-            'options' => BooleanEnglishLetter::options(),
-            'advanced' => true,
-        ],
-        'ajax' => [
-            'required' => false,
-            'name' => tra('Use ajax to create/update tracker items'),
-            'description' => tra('Use ajax to create and update tracker items instead of form submission via request variables.'),
-            'default' => 'n',
-        ],
-        'rules' => [
-            'required' => false,
-            'name' => tra('Use field rules'),
-            'description' => tra('Set up rules on field definitions to show and hide fields conditionally.'),
-            'default' => 'n',
-            'advanced' => true,
-            'filter' => 'alpha',
-            'options' => [
-                ['text' => '', 'value' => ''],
-                ['text' => tra('Yes'), 'value' => 'y'],
-                ['text' => tra('No'), 'value' => 'n']
-            ]
-        ],
-        'rulesparent' => [
-            'required' => false,
-            'name' => tra('Field rules parent selector'),
-            'description' => tra('JQuery selector for the parent object to show or hide when executing field rules. Leave empty to use the default selector for the tracker rendering mode.'),
-            'default' => '',
-            'advanced' => true,
-            'filter' => 'text',
-        ],
-    ];
-
     return [
         'name' => tra('Tracker'),
         'documentation' => 'PluginTracker',
@@ -659,7 +22,643 @@ function wikiplugin_tracker_info()
         'iconname' => 'trackers',
         'introduced' => 1,
         'format' => 'html',
-        'params' => array_merge($commonTrackerParams, $specificParams),
+        'params' => [
+            'trackerId' => WikiPlugin_Helper::getCommonParameter('trackerId'),
+            'tracker' => WikiPlugin_Helper::getCommonParameter('tracker'),
+            'fields' => [
+                'required' => false,
+                'name' => tra('Fields'),
+                'description' => tr('Colon-separated list of field IDs, or Field Permanent Names, if %0, to be displayed in the form as input fields.
+                    If empty, all fields will be shown. Example: %1', '<code>usePermNames="y"</code>', '<code>2:4:5</code>'),
+                'since' => '1',
+                'separator' => ':',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[trackerId]"]',
+                'parentkey' => 'tracker_id',
+            ],
+            'requiredFields' => [
+                'required' => false,
+                'name' => tra('Required Fields'),
+                'description' => tr('Colon-separated list of field IDs, or Field Permanent Names, if %0, to be required or mandatory in the form as input fields.
+                    If empty, all fields will keep the default behavior defined in the fields admin interface. Example: %1', '<code>usePermNames="y"</code>', '<code>2:4:5</code>'),
+                'separator' => ':',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[trackerId]"]',
+                'parentkey' => 'tracker_id',
+            ],
+            'values' => [
+                    'required' => false,
+                    'name' => tra('Values'),
+                    'description' => tr('Colon-separated list of default values corresponding to the %0fields%1 parameter.
+                First value corresponds to first field, second value to second field, etc. Default values can be
+                set by using %0autosavefields%1 and %0autosavevalues%1 as URL parameters.', '<code>', '</code>'),
+                    'since' => '2.0',
+                    'separator' => ':',
+            ],
+            'action' => [
+                'required' => false,
+                'name' => tra('Action'),
+                'description' => tr(
+                    'Colon-separated labels for form submit buttons. Default is %0Save%1. When set to
+                    %0NONE%1, the save button will not appear and values will be saved dynamically.',
+                    '<code>',
+                    '</code>'
+                ),
+                'since' => '1',
+                'separator' => ':',
+                'default' => 'Save'
+            ],
+            'action_style' => [
+                'required' => false,
+                'name' => tra('Action Style'),
+                'description' => tr(
+                    'Sets button style classes for action buttons. If multiple buttons have been set
+                    in the %0 parameter, the same number of colon-separated styles must be set here. Example:',
+                    '<code>action</code>'
+                ) . "<code>btn btn-secondary:btn btn-success:btn btn-primary float-end</code>",
+                'since' => '14.1',
+                'separator' => ':',
+                'default' => 'btn btn-secondary'
+            ],
+            'showtitle' => [
+                'required' => false,
+                'name' => tra('Show Title'),
+                'description' => tra('Display the title of the tracker at the top of the form (not shown by default)'),
+                'since' => '1',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::No->value,
+                'options' => BooleanEnglishLetter::options(),
+            ],
+            'showdesc' => [
+                'required' => false,
+                'name' => tra('Show Description'),
+                'description' => tra('Show the tracker\'s description (not shown by default)'),
+                'since' => '1',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::No->value,
+                'options' => BooleanEnglishLetter::options(),
+            ],
+            'showfieldsdesc' => [
+                'required' => false,
+                'name' => tra('Show Fields Descriptions'),
+                'description' => tra('Show the tracker\'s field descriptions (shown by default)'),
+                'since' => '12.1',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::Yes->value,
+                'options' => BooleanEnglishLetter::options(),
+            ],
+            'showmandatory' => [
+                'required' => false,
+                'name' => tra('Mark Mandatory'),
+                'description' => tra('Indicate mandatory fields with an asterisk (shown by default).'),
+                'since' => '1',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::Yes->value,
+                'options' => BooleanEnglishLetter::options(),
+            ],
+            'showstatus' => [
+                'required' => false,
+                'name' => tra('Show Status'),
+                'description' => tra('Show the status of the items (not shown by default)'),
+                'since' => '5.0',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::No->value,
+                'options' => BooleanEnglishLetter::options(),
+            ],
+            'embedded' => [
+                'required' => false,
+                'name' => tra('Embedded'),
+                'description' => tra('Embedded'),
+                'since' => '1',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::No->value,
+                'options' => BooleanEnglishLetter::options(),
+                'advanced' => true,
+            ],
+            'email' => [
+                'required' => false,
+                'name' => tra('Email'),
+                'description' => tr('To send an email once the tracker item has been created. Format: %0from', '<code>')
+                        . '|' . tra('to') . '|' . tr('template%0', '</code> ') . tr(
+                            'For %0from%1 and %0to%1, use an email address
+                        (separate multiple addresses with a comma), a username, a fieldId of a field containing either an email address or a username,
+                        a fieldId of a UserSelector or GroupSelector field, or "createdBy" or "lastModifBy" for the item creator or modifier.
+                        When username is being used, the email will be sent to the email address of the user on file.
+                        When sending to several emails using different template, provide the template name for the message body for each email;
+                        I.e., the first template will be used for the first to, the second template if exists will be used
+                        for the second from (otherwise the last given template will be used). Each template needs two files, one for the subject one for the body. The subject will be named
+                        template_subject.tpl. All the templates must be in the %0templates/mail%1 directory. Example:
+                        %0webmaster@my.com|a@my.com,b@my.com|templatea.tpl,templateb.tpl%1 (%0templates/mail/tracker_changed_notification.tpl%1
+                        is the default from which you can get inspiration).',
+                            '<code>',
+                            '</code>'
+                        ),
+                'since' => '2.0',
+                'default' => '',
+            ],
+            'emailformat' => [
+                'required' => false,
+                'name' => tra('Email Format'),
+                'description' => tra('Choose between values text or html, depending on the syntax in the template file
+                    that will be used'),
+                'since' => '6.1',
+                'default' => 'text',
+            ],
+            'url' => [
+                'required' => false,
+                'name' => tra('URL'),
+                'description' => tr('URL the user is sent to after the form is submitted. The string %0itemId%1 will
+                    be replaced with %0itemId=xx%1 where %0xx%1 is the new (or current) itemId. This parameter can be used in combination with the TABS plugin using %0?cookietab=1&itemId%1 (change the cookietab parameter\'s value depending on the tab you want the user to be sent to).', '<code>', '</code>'),
+                'since' => '1',
+                'filter' => 'url',
+                'separator' => ':',
+            ],
+            'urlparams' => [
+                'required' => false,
+                'name' => tr('Keep params in URL'),
+                'description' => tr('Input form parameters (field IDs, or Field Permanent Names, if %0) separated by a colon (%1:%2) to pass them in the URL after the form is submitted and redirected to the URL specified in the %1url%2 param. Example: %1urlparams="1:2:3:trackit"%2. Enter %1*%2 to keep all the submitted parameters in the URL.', '<code>usePermNames="y"</code>', '<code>', '</code>'),
+                'since' => '19.0',
+                'filter' => 'url',
+                'separator' => ':',
+                'advanced' => true,
+            ],
+            'target' => [
+                'required' => false,
+                'name' => tra('URL Target'),
+                'description' => tra('Set the target parameter for the url (determines whether target will open in a
+                    new page, etc.)'),
+                'since' => '4.0',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Blank'), 'value' => '_blank'],
+                    ['text' => tra('Parent'), 'value' => '_parent'],
+                    ['text' => tra('Self'), 'value' => '_self'],
+                    ['text' => tra('Top'), 'value' => '_top']
+                ],
+                'advanced' => true,
+            ],
+            'overwrite' => [
+                'required' => false,
+                'name' => tra('Overwrite'),
+                'description' => tr(
+                    'Overwrite current field values of the item with the input values. Does not
+                    overwrite wiki pages and does not work when the %0discarditem%1 parameter is set to Yes (%0y%1).',
+                    '<code>',
+                    '</code>'
+                ),
+                'since' => '6.0',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::No->value,
+                'options' => BooleanEnglishLetter::options(),
+                'advanced' => true,
+            ],
+            'sort' => [
+                'required' => false,
+                'name' => tra('Sort'),
+                'description' => tra('Display columns in the order listed in the fields parameter instead of by
+                    field ID (field ID order is used by default)'),
+                'since' => '2.0',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::No->value,
+                'options' => BooleanEnglishLetter::options(),
+            ],
+            'preview' => [
+                'required' => false,
+                'name' => tra('Preview'),
+                'description' => tr('To add a preview button with the label set by this parameter. Default:
+                    %0Preview%1. Useful to preview the computed fields of an item.', '<code>', '</code>'),
+                'since' => '2.0',
+            ],
+            'reset' => [
+                'required' => false,
+                'name' => tra('Reset'),
+                'description' => tra('Label for the reset button, to return all fields to their default values.'),
+                'since' => '4.2',
+                'default' => null,
+            ],
+            'view' => [
+                'required' => false,
+                'name' => tra('View'),
+                'description' => tr('Determine which items will be affected byt the form. If set to %0user%1 and
+                    %0trackerId%1 is not set, then the user tracker associated with the default group will be affected.
+                    If %0trackerId%1 is set, then the item associated with the user in that tracker will be affected.
+                     If set to %0page%1, the item associated with that page will be affected (%0trackerId%1 must be
+                     set in this case).', '<code>', '</code>'),
+                'since' => '1',
+                'filter' => 'alpha',
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Group'), 'value' => 'group'],
+                    ['text' => tra('Page'), 'value' => 'page'],
+                    ['text' => tra('User'), 'value' => 'user'],
+                    ['text' => tra('User&field'), 'value' => 'userandfield']
+                ]
+            ],
+            'userfieldtofilter' => [
+                'required' => false,
+                'name' => tra('User field to filter'),
+                'description' => tra('User field to filter user tracker items to:') . ' <code>view="user&field"</code>',
+                'since' => '15.3',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'fieldtofilter' => [
+                'required' => false,
+                'name' => tra('Field to filter'),
+                'description' => tra('Field to filter user tracker items to:') . ' <code>view="user&field"</code>',
+                'since' => '15.3',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'fieldtofiltervalue' => [
+                'required' => false,
+                'name' => tra('Field to filter Value'),
+                'description' => tra('Value to filter user tracker items to:') . ' <code>view="user&field"</code>',
+                'since' => '15.3',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'fieldtofiltercriteria' => [
+                'required' => false,
+                'name' => tra('Criteria'),
+                'description' => tra('If more than one item found, will choose under this criteria. Used in combination with:') . '<code>view="user&field"</code>',
+                'since' => '15.3',
+                'default' => '',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    //array('text' => tra('lastModif - Ascending'), 'value' => 'lastModifAsc'),//Not working
+                    //array('text' => tra('lastModif - Descending'), 'value' => 'lastModifDesc'),//Not working
+                    ['text' => tra('creationDate - Ascending'), 'value' => 'creationAsc'],
+                    ['text' => tra('creationDate - Descending'), 'value' => 'creationDesc']
+                ],
+                'advanced' => true,
+            ],
+            'status'                   => [
+                'required' => false,
+                'name' => tra('Status'),
+                'description' => tra('Status of the item used in combination with:') . ' <code>view="user"</code>' . tra('or') . '<code>view="user&field"</code>',
+                'since' => '6.0',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'transactionName'          => [
+                'required' => false,
+                'name' => tra('Transaction name'),
+                'description' => tra('The transaction identifier. This identifier connects the various trackers into a
+                    single transaction. Must be unique per transaction. The multiple steps in a single transaction
+                    must share the same transaction name.'),
+                'since' => '15.0',
+                'filter' => 'alpha',
+                'advanced' => true,
+            ],
+            'transactionStep'          => [
+                'required' => false,
+                'name' => tra('Transaction Step'),
+                'description' => tr('Transaction step number specifying the order of the transaction steps. The first
+                    step must be %0.', '<code>0</code>'),
+                'since' => '15.0',
+                'filter' => 'digits',
+                'advanced' => true,
+            ],
+            'transactionFinalStep'     => [
+                'required'    => false,
+                'name'        => tra('Final Transaction Step'),
+                'description' => tra('Indicate whether this is the final transaction step'),
+                'since'       => '15.0',
+                'filter'      => 'alpha',
+                'default'     => '',
+                'options' => BooleanEnglishLetter::options(''),
+                'advanced' => true,
+            ],
+            'transactionPreviousURL'   => [
+                'required'    => false,
+                'name'        => tr('Transaction previous URL'),
+                'description' => tr('The page to go back to when the "previous" button is clicked.'),
+                'since'       => '18.4',
+                'filter'      => 'url',
+                'default'     => '',
+                'advanced' => true,
+            ],
+            'transactionPreviousLabel' => [
+                'required'    => false,
+                'name'        => tr('Transaction previous button label'),
+                'description' => tr('Text for the "previous" button label.'),
+                'since'       => '18.4',
+                'filter'      => 'text',
+                'default'     => '',
+                'advanced' => true,
+            ],
+            'itemId'                   => [
+                'required' => false,
+                'name' => tra('ItemId'),
+                'description' => tra('ItemId identifying the item to be edited.'),
+                'since' => '3.0',
+                'filter' => 'digits',
+                'profile_reference' => 'tracker_item',
+                'parent' => 'input[name="params[trackerId]"]',
+                'parentkey' => 'tracker_id',
+            ],
+            'ignoreRequestItemId'      => [
+                'required' => false,
+                'name' => tra('Ignore ItemId'),
+                'description' => tr(
+                    'Do not filter on the parameter %0itemId%1 if in the url (default is to filter)',
+                    '<code>',
+                    '</code>'
+                ),
+                'since' => '6.0',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::No->value,
+                'options' => BooleanEnglishLetter::options(),
+                'advanced' => true,
+            ],
+            'tpl'                      => [
+                'required' => false,
+                'name' => tra('Template File'),
+                'description' => tr(
+                    'Name of the template used to display the tracker items.  In the template, the
+                    smarty variable %0{$f_id}%1 will be replaced with the appropriate input tag, with %0id%1 representing
+                    the field ID. The form tag and the submit button are generated by Tiki outside the template',
+                    '<code>',
+                    '</code>'
+                ),
+                'since' => '2.0',
+                'default' => '',
+            ],
+            'wiki' => [
+                'required' => false,
+                'name' => tra('Wiki'),
+                'description' => tr(
+                    'Name of the wiki page containing the template to display the tracker items. This
+                    page must have the permission %0tiki_p_use_as_template%1 assigned to the Anonymous group to be used
+                    as a template.',
+                    '<code>',
+                    '</code>'
+                ),
+                'since' => '2.0',
+                'filter' => 'pagename',
+                'default' => '',
+                'profile_reference' => 'wiki_page',
+            ],
+            'newstatus' => [
+                'required' => false,
+                'name' => tra('New Status'),
+                'description' => tra('Default status applied to newly created or saved items.'),
+                'since' => '2.0',
+                'filter' => 'alpha',
+                'default' => '',
+                'options' => TrackerStatuses::options(''),
+            ],
+            'colwidth' => [
+                'required' => false,
+                'name' => tra('Width'),
+                'description' => tra('Specify the width in pixels or percentage of the first column (the labels) in the
+                    tracker form.'),
+                'since' => '3.0',
+                'default' => '',
+                'accepted' => '## or ##%',
+                'advanced' => true,
+            ],
+            'autosavefields' => [
+                'required' => false,
+                'name' => tra('Autosave Fields'),
+                'description' => tra('Colon-separated list of field IDs, or Field Permanent Names, if %0, to be automatically filled with values upon
+                    save.', '<code>usePermNames="y"</code>'),
+                'since' => '5.0',
+                'filter' => 'text',
+                'separator' => ':',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[trackerId]"]',
+                'parentkey' => 'tracker_id',
+                'advanced' => true,
+            ],
+            'autosavevalues' => [
+                'required' => false,
+                'name' => tra('Autosave Values'),
+                'description' => tr(
+                    'Colon-separated values corresponding to %0. Special syntax cases:',
+                    '<code>autosavefields</code>'
+                ) . '<br />'
+                    . '<code>categories(x)</code> - ' . tr('selects the first child category under a category with ID
+                        %0x%1 for use in a category field', '<code>', '</code>') . '<br />'
+                    . '<code>category(x)</code> - ' . tr('selects a category with this ID
+                        %0x%1 for use in a category field', '<code>', '</code>') . '<br />'
+                    . '<code>preference(x)</code> - ' . tr('inserts the value of the preference with %0x%1 being the
+                        preference name.', '<code>', '</code>'),
+                'since' => '5.0',
+                'filter' => 'text',
+                'separator' => ':',
+                'advanced' => true,
+            ],
+            'levelupfields' => [
+                'required' => false,
+                'name' => tra('Increase-only Fields'),
+                'description' => tr(
+                    'Used with the %0  and %1 parameters. Colon-separated list of field IDs, or Field Permanent Names, if %2, being
+                    auto-saved where the specified auto-save value will not take effect if it is less than or equal to
+                    the current value of the field',
+                    '<code>autosavefields</code>',
+                    '<code>autosavevalues</code>',
+                    '<code>usePermNames="y"</code>'
+                ),
+                'since' => '8.0',
+                'filter' => 'digits',
+                'separator' => ':',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[trackerId]"]',
+                'parentkey' => 'tracker_id',
+                'advanced' => true,
+            ],
+            'registration' => [
+                'required' => false,
+                'name' => tra('Registration Fields'),
+                'description' => tra('Add registration fields such as Username and Password for use in registration
+                    trackers'),
+                'since' => '6.0',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::No->value,
+                'options' => BooleanEnglishLetter::options(),
+            ],
+            'chosenGroup' => [
+                'required' => false,
+                'name' => tra('Register to group'),
+                'description' => tra('The user enters this group via the registration (only a single group name
+                    is supported)'),
+                'since' => '15.0',
+                'filter' => 'text',
+                'default' => 'Registered',
+            ],
+            'validateusers' => [
+                'required' => false,
+                'name' => tra('Validate users'),
+                'description' => tra('Here one can overrule the default validate users by e-mail preference.'),
+                'since' => '15.0',
+                'filter' => 'alpha',
+                'options' => BooleanEnglishLetter::options(''),
+            ],
+            'outputtowiki' => [
+                'required' => false,
+                'name' => tra('Output To Wiki'),
+                'description' => tra('Output result to a new wiki page with the name taken from the input for the
+                    specified fieldId'),
+                'since' => '6.0',
+                'filter' => 'digits',
+                'default' => '',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[trackerId]"]',
+                'parentkey' => 'tracker_id',
+                'advanced' => true,
+            ],
+            'discarditem' => [
+                'required' => false,
+                'name' => tra('Discard After Output'),
+                'description' => tr('Used with %0 - whether to discard the tracker item itself
+                    once the wiki page is created, so that, in effect, the tracker is just a vehicle to create form
+                    fields to facilitate creating wiki pages.', '<code>outputtowiki</code>'),
+                'since' => '6.0',
+                'filter' => 'alpha',
+                'default' => '',
+                'options' => BooleanEnglishLetter::options(''),
+                'advanced' => true,
+            ],
+            'outputwiki' => [
+                'required' => false,
+                'name' => tra('Template Page'),
+                'description' => tr(
+                    'Name of the wiki page containing the template to format the output to wiki page.
+                    Must be set for %0 to work. The template can contain variables to represent fields, for example
+                    %1 would result in the value of fieldId 6. Also %2 can be used for the itemId and if you have set
+                    %3 to yes, you can use %4 and %5.',
+                    '<code>outputtowiki</code>',
+                    '<code>{$f_6}</code>',
+                    '<code>{$f_itemId}</code>',
+                    '<code>register</code>',
+                    '<code>{$register_login}</code>',
+                    '<code>{$register_email}</code>'
+                ),
+                'since' => '6.0',
+                'filter' => 'pagename',
+                'profile_reference' => 'wiki_page',
+                'advanced' => true,
+            ],
+            'outputwikinamespace' => [
+                'required' => false,
+                'name' => tra('Output Wiki Namespace'),
+                'description' => tra('Name of namespace that is used for the wiki page that is created when outputting
+                    to a wiki page.'),
+                'since' => '13.0',
+                'filter' => 'pagename',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'outputwikirelation' => [
+                'required' => false,
+                'name' => tra('Store Relation'),
+                'description' => tr(
+                    'Store %0 and %1 relation from the created
+                    wiki page when outputting to a wiki page. Optionally, (separate feature to be turned on in admin
+                    panel) these relations are used to sync page renames with the field specified in %2,
+                    and also optionally to redirect page viewing to the tracker item instead (where you can then
+                    include the page if needed).',
+                    '<code>tiki.wiki.linkeditem</code>',
+                    '<code>tiki.wiki.linkedfield</code>',
+                    '<code>outputtowiki</code>'
+                ),
+                'since' => '13.0',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::No->value,
+                'options' => BooleanEnglishLetter::options(),
+                'advanced' => true,
+            ],
+            'fieldsfill' => [
+                'required' => false,
+                'name' => tra('Multiple Fill Fields'),
+                'description' => tr('Colon-separated list of field IDs, or Field Permanent Names, if %0, to be filled with multiple values, to create
+                    multiple items in one save. If empty, only one item will be created. Only for
+                    item creation. Example: %1', '<code>usePermNames="y"</code>', '<code>2:4:5</code>'),
+                'since' => '9.0',
+                'separator' => ':',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[trackerId]"]',
+                'parentkey' => 'tracker_id',
+                'advanced' => true,
+            ],
+            'fieldsfillseparator' => [
+                'required' => false,
+                'name' => tra('Fill Fields Separator'),
+                'description' => tr('Choose separator between fields in each line of the Multiple Fill text area.
+                    Default is pipe (%0|%1).', '<code>', '</code>'),
+                'since' => '9.0',
+                'default' => '|',
+                'advanced' => true,
+            ],
+            'fieldsfilldefaults' => [
+                'required' => false,
+                'name' => tra('Fill Fields Defaults'),
+                'description' => tra('Colon-separated list of default values for Multiple Fill Fields.'),
+                'since' => '9.0',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'fieldsfilllabel' => [
+                'required' => false,
+                'name' => tra('Multiple Fill Fields left Label'),
+                'description' => tr('Explanatory text on the left of the Multiple Fill Fields text area. Default is "Insert one item per line:".'),
+                'since' => '24.4',
+                'filter' => 'text',
+                'advanced' => true,
+            ],
+            'fieldsfilldescription' => [
+                'required' => false,
+                'name' => tra('Multiple Fill Fields bottom description'),
+                'description' => tr('Explanatory text below the Multiple Fill Fields text area. Default is the list of the fields which should be in each line.')
+                    . ' ' . tr('Put a space for no visible text below the Multiple Fill Fields text area.'),
+                'since' => '24.4',
+                'filter' => 'text',
+                'advanced' => true,
+            ],
+            'formtag' => [
+                'required' => false,
+                'name' => tra('Embed the tracker in a form tag'),
+                'description' => tr(
+                    'If set to Yes (%0), the tracker is contained in a <code>form</code> tag and has action buttons',
+                    '<code>y</code>'
+                ),
+                'since' => '6.4',
+                'filter' => 'alpha',
+                'default' => BooleanEnglishLetter::Yes->value,
+                'options' => BooleanEnglishLetter::options(),
+                'advanced' => true,
+            ],
+            'ajax' => [
+                'required' => false,
+                'name' => tra('Use ajax to create/update tracker items'),
+                'description' => tra('Use ajax to create and update tracker items instead of form submission via request variables.'),
+                'default' => 'n',
+            ],
+            'rules' => [
+                'required' => false,
+                'name' => tra('Use field rules'),
+                'description' => tra('Set up rules on field definitions to show and hide fields conditionally.'),
+                'default' => 'n',
+                'advanced' => true,
+                'filter' => 'alpha',
+                'options' => [
+                    ['text' => '', 'value' => ''],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n']
+                ]
+            ],
+            'rulesparent' => [
+                'required' => false,
+                'name' => tra('Field rules parent selector'),
+                'description' => tra('JQuery selector for the parent object to show or hide when executing field rules. Leave empty to use the default selector for the tracker rendering mode.'),
+                'default' => '',
+                'advanced' => true,
+                'filter' => 'text',
+            ],
+        ],
     ];
 }
 
