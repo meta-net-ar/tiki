@@ -86,6 +86,21 @@ class WikiPlugin_Helper
             ],
         ];
     }
+    /**
+     * Get trackerId by params.
+     *
+     * @return int Tracker ID
+     */
+    public static function getTrackerId($params)
+    {
+        $tracker = ! empty($params['trackerId']) ? $params['trackerId'] : $params['tracker'];
+        if (is_numeric($tracker)) {
+            return (int) $tracker;
+        } else {
+            $definition = Tracker_Definition::get($tracker);
+            return is_object($definition) ? ($definition->getInformation()['trackerId'] ?? null) : null;
+        }
+    }
 
     /**
      * Apply default parameters from plugin info

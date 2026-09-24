@@ -687,10 +687,8 @@ function wikiplugin_tracker($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $captchalib = TikiLib::lib('captcha');
-    $tracker = ! empty($params['trackerId']) ? $params['trackerId'] : $params['tracker'];
-    $definition = Tracker_Definition::get($tracker);
-    $params['trackerId'] = is_object($definition) ? ($definition->getInformation()['trackerId'] ?? null) : null;
-
+    $params['trackerId'] = WikiPlugin_Helper::getTrackerId($params);
+    $definition = Tracker_Definition::get($params['trackerId']);
     $registrationTrackerId = null;
     $itemId = $params['itemId'] ?? null;
     $newItemRate = null;
