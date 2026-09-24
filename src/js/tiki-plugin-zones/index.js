@@ -13,6 +13,7 @@ const START = new RegExp("^tiki-plugin:start (" + ID + ")$", "i");
 const END = new RegExp("^tiki-plugin:end (" + ID + ")$", "i");
 const HIDE_DELAY = 250; // ms, time to move the pointer from the content to the button
 const OFFSET = 3; // px, matches the outline-offset of .tiki-plugin-zone-outline
+const MIN_SIZE = 80; // px, under this the corners are too close together to be worth choosing
 
 const translate = (text) => (typeof window.tr === "function" ? window.tr(text) : text);
 
@@ -38,6 +39,7 @@ export default function initPluginZones(options = {}) {
     let zones = [];
     let cache = new WeakMap();
     let current = null;
+    let corner = null;
     let hideTimer = null;
     let frame = 0;
 
@@ -162,8 +164,11 @@ export default function initPluginZones(options = {}) {
     document.body.appendChild(outline);
     document.body.appendChild(button);
 
-    function show(zone, withButton) {
+    function show(zone, withButton, pointer) {
         clearTimeout(hideTimer);
+        if (zone !== current) {
+            corner = null;
+        }
         current = zone;
 
         const visible = zoneBox(zone);
@@ -192,12 +197,20 @@ export default function initPluginZones(options = {}) {
         button.setAttribute("aria-label", translate("Edit plugin") + " " + zone.name.toUpperCase());
         button.classList.add("shown");
 
-        // A tab on the top start edge, outside the content, so it never covers the plugin's own
-        // controls; tucked inside only when the content touches the top of the page.
         const width = button.offsetWidth;
         const height = button.offsetHeight;
-        const x = rtl ? box.left + box.width + OFFSET - width : box.left - OFFSET;
-        const y = box.top - OFFSET - height + scrollY >= 0 ? box.top - OFFSET - height : box.top;
+        if (!corner) {
+            corner = {
+                right: pointer && box.width > MIN_SIZE ? pointer.x > box.left + box.width / 2 : rtl,
+                bottom: pointer && box.height > MIN_SIZE ? pointer.y > box.top + box.height / 2 : false,
+            };
+        }
+
+        const x = corner.right ? box.left + box.width + OFFSET - width : box.left - OFFSET;
+        let y = corner.bottom ? box.top + box.height + OFFSET : box.top - OFFSET - height;
+        if (y + scrollY < 0) {
+            y = box.top;
+        }
         button.style.left = x + scrollX + "px";
         button.style.top = y + scrollY + "px";
     }
@@ -265,7 +278,7 @@ export default function initPluginZones(options = {}) {
             }
             const zone = zoneAtPoint(target, event.clientX, event.clientY);
             if (zone) {
-                show(zone, true);
+                show(zone, true, { x: event.clientX, y: event.clientY });
             } else if (current) {
                 hide(HIDE_DELAY);
             }
