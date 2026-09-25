@@ -12,9 +12,6 @@
  */
 class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
 {
-    private mixed $computedValue = null;
-    private bool $computedValueLoaded = false;
-
     public static function getManagedTypesInfo(): array
     {
         return [
@@ -70,10 +67,12 @@ class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
             $value = $requestData[$ins_id];
         } elseif ($this->getItemId()) {
             $fields = $this->getTrackerDefinition()->getFields();
+            $values = $this->getItemData();
             $option = $this->getOption('formula');
 
             if ($option) {
-                $value = $this->getComputedValue();
+                // Evaluate the formula
+                $value = $this->evaluateFormula($option, $values);
 
                 $trklib = TikiLib::lib('trk');
 
@@ -92,26 +91,6 @@ class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
         $data['value'] = $value;
 
         return $data;
-    }
-
-    public function getValue($default = ''): mixed
-    {
-        $value = $this->getComputedValue();
-
-        return $value === null ? $default : $value;
-    }
-
-    private function getComputedValue(): mixed
-    {
-        if (! $this->computedValueLoaded) {
-            $formula = $this->getOption('formula');
-            $this->computedValue = $formula && $this->getItemId()
-                ? self::evaluateFormula($formula, $this->getItemData())
-                : null;
-            $this->computedValueLoaded = true;
-        }
-
-        return $this->computedValue;
     }
 
     public function renderOutput($context = [])
@@ -133,17 +112,29 @@ class Tracker_Field_Computed extends \Tracker\Field\AbstractItemField
 
     public static function computeFields($args)
     {
+        $itemId = $args['object'] ?? null;
+
+        if (! $itemId) {
+            return;
+        }
+
         $trklib = TikiLib::lib('trk');
         $definition = Tracker_Definition::get($args['trackerId']);
+        // Ratings and reference replacements carry no usable values, so read them from the item.
+        $values = ! empty($args['values']) ? $args['values'] : $trklib->get_tracker_item($itemId);
+
+        if (! $definition || ! is_array($values)) {
+            return;
+        }
 
         foreach ($definition->getFields() as $field) {
             $fieldId = $field['fieldId'];
 
             if ($field['type'] == 'C') {
                 // Evaluate the formula
-                $value = self::evaluateFormula($field['options_array'][0], $args['values']);
-                $args['values'][$fieldId] = $value;
-                $trklib->modify_field($args['itemId'], $fieldId, $value);
+                $value = self::evaluateFormula($field['options_array'][0], $values);
+                $values[$fieldId] = $value;
+                $trklib->modify_field($itemId, $fieldId, $value);
             }
         }
     }
