@@ -10,6 +10,13 @@ html {
     scroll-padding-top: var(--tiki-anchor-offset);
 }
 
+// Bootstrap's :root { scroll-behavior: smooth } animates #anchor jumps, so a late
+// reflow above the target (e.g. an image loading) leaves the animation heading for
+// its stale destination instead of the corrected one, defeating scroll anchoring.
+:root {
+    scroll-behavior: auto !important;
+}
+
 .navbar-brand {
     --bs-navbar-brand-padding-y: 0.31225rem; // Value based on typical navbar brand font size, etc.
 }

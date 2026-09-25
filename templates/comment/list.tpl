@@ -59,7 +59,6 @@
                                             var $target = $(targetId);
                                             if ($target.length) {
                                                 $target[0].scrollIntoView({
-                                                    behavior: 'smooth',
                                                     block: 'start'
                                                 });
                                                 $target.addClass('comment-highlight');
