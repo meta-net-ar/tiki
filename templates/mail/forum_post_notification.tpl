@@ -1,8 +1,8 @@
 {if $new_topic or $topic_changed}
 {if $new_topic}
-{tr _0=$prefs.mail_template_custom_text}A new message was posted to %0forum:{/tr} {$mail_forum}
+{tr _0=$prefs.mail_template_custom_text}A new message was posted in %0forum:{/tr} {$mail_forum}
 {else}
-{tr _0=$prefs.mail_template_custom_text}A message was updated to %0forum:{/tr} {$mail_forum}
+{tr _0=$prefs.mail_template_custom_text}A message was updated in %0forum:{/tr} {$mail_forum}
 {/if}
 
 {tr}New topic:{/tr} {$mail_topic}
