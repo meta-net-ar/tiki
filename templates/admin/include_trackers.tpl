@@ -53,6 +53,7 @@
                 <legend class="h3">{tr}Field settings{/tr}</legend>
                 {preference name=user_selector_threshold}
                 {preference name=user_selector_realnames_tracker}
+                {preference name=user_selector_drag_between_fields}
                 {preference name=tiki_object_selector_threshold}
                 {preference name=tiki_object_selector_searchfield}
                 {preference name=tiki_object_selector_wildcardsearch}

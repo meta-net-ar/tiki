@@ -90,6 +90,15 @@ class UserSelector extends Base implements TikiSmartyExtensionInterface
             $mt = '';
         }
 
+        /*
+            Every select of the page is turned into an el-select without knowing what it holds:
+            this marker is what tells a user apart from a category or a country.
+        */
+        $dragGroup = '';
+        if ($prefs['user_selector_drag_between_fields'] === 'y' && $params['multiple'] === 'true') {
+            $dragGroup = ' data-drag-group="userselector"';
+        }
+
         $groupNames = [];
         if (is_array($params['groupIds'])) {
             foreach ($params['groupIds'] as $k => $groupId) {
@@ -221,7 +230,7 @@ class UserSelector extends Base implements TikiSmartyExtensionInterface
             $placeholder = ' placeholder="' . htmlspecialchars(tra($params['noneLabel'])) . '"';
         }
 
-        $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . $placeholder . ' style="' . $params['style'] . '" class="form-control">';
+        $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . $placeholder . $dragGroup . ' style="' . $params['style'] . '" class="form-control">';
         if ($params['allowNone'] === 'y' && $params['multiple'] !== 'true') {
             $noneOptionAttributes = (empty($params['user']) ? ' selected="selected"' : '');
             if ($params['noneSelectable'] !== 'y') {

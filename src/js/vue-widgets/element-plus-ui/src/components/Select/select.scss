@@ -27,3 +27,31 @@
     --el-tag-bg-color: var(--bs-secondary-bg);
 
 }
+
+.el-select__selection .el-tag {
+    cursor: grab;
+}
+
+.el-select__selected-item.sortable-chosen .el-tag {
+    cursor: grabbing;
+}
+
+/*
+    Both cursors are ours to draw, the browser having been taken out of the carrying, and both have
+    to reach whatever the pointer can land on: what follows it is closed to it.
+*/
+.carrying-a-value,
+.carrying-a-value * {
+    cursor: grabbing !important;
+}
+
+.refusing-a-value,
+.refusing-a-value * {
+    cursor: not-allowed !important;
+}
+
+.drop-refusal {
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: var(--bs-danger);
+}
