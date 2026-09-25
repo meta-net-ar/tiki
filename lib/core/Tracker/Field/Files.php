@@ -955,7 +955,9 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             $url = \SmartyTiki\Modifier\Sefurl::apply($file['fileId'], 'file');
             $result .= \SmartyTiki\Modifier\Iconify::apply($url, $file['filetype'], $file['fileId'], 1);
             $result .= ' <a href="' . $url . '">' . \SmartyTiki\Modifier\Escape::apply($file['name']) . '</a>';
-            $result .= ' <a href="' . $url . '&amp;display" target="_blank" class="tips cboxElement" title="Preview" data-bs-content="' . \SmartyTiki\Modifier\Escape::apply($file['name']) . '" data-box="box-3" data-bs-original-title="Preview">';
+            // data-is-text tells the lightbox JS not to treat this link as an image preview
+            $isTextFile = str_contains($file['filetype'], 'text/');
+            $result .= ' <a href="' . $url . '&amp;display" target="_blank" class="tips cboxElement" title="Preview" data-bs-content="' . \SmartyTiki\Modifier\Escape::apply($file['name']) . '" data-box="box-3"' . ($isTextFile ? ' data-is-text="1"' : '') . ' data-bs-original-title="Preview">';
             $result .= '<span class="icon icon-view fas fa-search-plus"></span></a><br/>';
         }
 

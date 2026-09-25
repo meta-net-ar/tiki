@@ -480,10 +480,6 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
             $content = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' . "\n" . $content;
         }
 
-        if ($info['filetype'] === 'text/plain') {
-            $content = nl2br($content);
-        }
-
         if ($use_cache && ! empty($content)) {
             // Remove all existing thumbnails for this file, to avoid taking too much disk space
             // (only one thumbnail size is handled at the same time)
@@ -514,18 +510,25 @@ if (
 ) {  // use thumb format
     $info['filetype'] = $mimelib->from_content($info['filename'], $content);
 }
-header('Content-type: ' . $info['filetype']);
+// If the content has not changed, ask the browser to download it (instead of displaying it)
+$downloading = (! $content_changed and ! isset($_GET['display'])) || isset($_GET['pdf']);
+
+// Force text/plain for inline previews of any text/* file (regardless of its real subtype):
+// browsers never execute text/plain as markup, so it's safe to send the raw bytes unescaped
+// below, and they render with line breaks preserved instead of being parsed as markup.
+if (! $downloading && str_contains($info['filetype'], 'text/')) {
+    header('Content-type: text/plain;charset=UTF-8');
+} else {
+    header('Content-type: ' . $info['filetype']);
+}
 
 // IE6 can not download file with / in the name (the / can be there from a previous bug)
 $file = basename($info['filename']);
 
-// If the content has not changed, ask the browser to download it (instead of displaying it)
-if ((! $content_changed and ! isset($_GET['display'])) || isset($_GET['pdf'])) {
+if ($downloading) {
     header("Content-Disposition: attachment; filename=\"$file\"");
-    $downloading  = true;
 } else {
     header("Content-Disposition: filename=\"$file\"");
-    $downloading  = false;
 }
 if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
     $filesize = filesize($filepath);
@@ -536,7 +539,6 @@ if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
             readfile($filepath);
         } else {
             $content = file_get_contents($filepath);
-            $content = htmlspecialchars($content);
             if (function_exists('mb_strlen')) {
                 header('Content-Length: ' . mb_strlen($content));
             } else {
@@ -576,9 +578,6 @@ if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
         }
     }
 } else {
-    if (str_contains($info['filetype'], 'text/') && ! $downloading) {
-        $content = htmlspecialchars($content);
-    }
     if (function_exists('mb_strlen')) {
         // use 8bit encoding which works for binary files as well (resized images end up here)
         header('Content-Length: ' . mb_strlen($content, '8bit'));
