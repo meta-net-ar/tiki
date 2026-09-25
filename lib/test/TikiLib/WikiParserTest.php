@@ -102,6 +102,62 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $this->assertStringNotContainsString('<br /><br /><input type="hidden" name="wysiwyg"', $output);
     }
 
+    /**
+     * @covers ParserLib::parse_data
+     * @covers WikiParser_Parsable::parse
+     */
+    public function testParserStateIsRestoredWhenParsingThrows(): void
+    {
+        global $prefs;
+
+        $parserlib = TikiLib::lib('parser');
+        $savedOptions = $parserlib->option;
+        $savedCoreOptions = $parserlib->core_options;
+        $hadOEmbedPreference = array_key_exists('wikiplugin_oembed', $prefs);
+        $savedOEmbedPreference = $prefs['wikiplugin_oembed'] ?? null;
+        $hadPluginValidationPreference = array_key_exists('wiki_validate_plugin', $prefs);
+        $savedPluginValidationPreference = $prefs['wiki_validate_plugin'] ?? null;
+
+        $exception = null;
+        $wikiParseContextExistsAfterException = null;
+        $coreOptionsAfterException = null;
+
+        try {
+            $parserlib->core_options = [];
+            unset($parserlib->option['wiki_parse_context']);
+            $prefs['wikiplugin_oembed'] = 'y';
+            $prefs['wiki_validate_plugin'] = 'n';
+
+            try {
+                $parserlib->parse_data('{oembed url="not-a-url"}');
+            } catch (Exception $caught) {
+                $exception = $caught;
+            }
+
+            $wikiParseContextExistsAfterException = array_key_exists('wiki_parse_context', $parserlib->option);
+            $coreOptionsAfterException = $parserlib->core_options;
+        } finally {
+            $parserlib->option = $savedOptions;
+            $parserlib->core_options = $savedCoreOptions;
+
+            if ($hadOEmbedPreference) {
+                $prefs['wikiplugin_oembed'] = $savedOEmbedPreference;
+            } else {
+                unset($prefs['wikiplugin_oembed']);
+            }
+
+            if ($hadPluginValidationPreference) {
+                $prefs['wiki_validate_plugin'] = $savedPluginValidationPreference;
+            } else {
+                unset($prefs['wiki_validate_plugin']);
+            }
+        }
+
+        $this->assertInstanceOf(Exception::class, $exception, 'Parsing was expected to throw.');
+        $this->assertFalse($wikiParseContextExistsAfterException, 'wiki_parse_context leaked after the parser exception');
+        $this->assertSame([], $coreOptionsAfterException, 'Top-level core parser options leaked after the parser exception');
+    }
+
     public static function provider(): array
     {
         return [

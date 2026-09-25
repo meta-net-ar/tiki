@@ -1559,14 +1559,16 @@ class ParserLib extends TikiDb_Bridge
         // Save the previous state so we can restore it after parsing
         $previousWikiContext = $this->option['wiki_parse_context'] ?? false;
 
-        $result = (new WikiParser_Parsable($data))->parse($option, empty($this->core_options));
-
-        // Restore the previous wiki_parse_context state to prevent it from leaking
-        // into non-wiki contexts (like menu rendering)
-        if ($previousWikiContext) {
-            $this->option['wiki_parse_context'] = true;
-        } else {
-            unset($this->option['wiki_parse_context']);
+        try {
+            $result = (new WikiParser_Parsable($data))->parse($option, empty($this->core_options));
+        } finally {
+            // Restore the previous wiki_parse_context state even when parsing throws,
+            // preventing it from leaking into non-wiki contexts like menu rendering.
+            if ($previousWikiContext) {
+                $this->option['wiki_parse_context'] = true;
+            } else {
+                unset($this->option['wiki_parse_context']);
+            }
         }
 
         return $result;
