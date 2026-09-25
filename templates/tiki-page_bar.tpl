@@ -11,8 +11,13 @@
                     {tr}Duplicate{/tr}
                 </a>
             {/if}
+            {if $prefs.feature_wiki_view_permissions eq 'y'}
+                <a class="dropdown-item btn btn-link border-0 rounded-0 mb-0 py-0 px-4" style="font-weight: inherit;" href="{bootstrap_modal controller=object action=permissions type='wiki page' object=$page}">
+                    {tr}View permissions{/tr}
+                </a>
+            {/if}
             {if $tiki_p_admin_wiki eq 'y' or $tiki_p_assign_perm_wiki_page eq 'y'}
-                {permission_link mode="dropdown_item" type="wiki page" id=$page permType=wiki title=$page}
+                {permission_link mode="dropdown_item" type="wiki page" id=$page permType=wiki title=$page label="{tr}Edit permissions{/tr}"}
             {/if}
             {if $prefs.feature_page_contribution eq 'y' and $tiki_p_page_contribution_view eq 'y'}
                 {button _keepall='y' href="tiki-page_contribution.php" page=$page _type="link" _class="dropdown-item" _text="{tr}Contributions by author{/tr}"}

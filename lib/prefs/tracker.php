@@ -42,6 +42,13 @@ function prefs_tracker_list()
             'default' => 'n',
             'help' => $trackerSettingsHelp,
         ],
+        'tracker_view_permissions' => [
+            'name' => tr('View tracker item permissions'),
+            'description' => tr('Visualize the permissions applied to a tracker item.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'help' => $trackerSettingsHelp,
+        ],
         'tracker_insert_allowed' => [
             'name' => tr('Trackers available for insertion from wiki pages'),
             'description' => tr('List of tracker IDs made available when attempting to insert'),

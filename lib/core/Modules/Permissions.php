@@ -29,65 +29,33 @@ class Permissions
             return null;
         }
 
-        $parentId = $parentType = $permType = $additional = null;
+        $objectId = null;
 
         switch ($objectType) {
             case 'wiki page':
                 $objectId = ! empty($_REQUEST['page']) ? $_REQUEST['page'] : null;
-                $permType = 'wiki';
                 break;
             case 'file gallery':
-                $filegallib = TikiLib::lib('filegal');
                 $objectId = ! empty($_REQUEST['galleryId']) ? $_REQUEST['galleryId'] : null;
                 if (is_array($objectId)) {
                     $objectId = reset($objectId);
                 }
                 $fileId = ! empty($_REQUEST['fileId']) ? $_REQUEST['fileId'] : null;
                 if ($fileId) {
-                    $parentId = $objectId;
-                    $parentType = $objectType;
                     $objectId = $fileId;
                     $objectType = 'file';
                 }
-                $permType = 'file galleries';
                 break;
             case 'tracker':
                 $objectId = ! empty($_REQUEST['trackerId']) ? $_REQUEST['trackerId'] : null;
                 $itemId = ! empty($_REQUEST['itemId']) ? $_REQUEST['itemId'] : null;
                 if ($itemId) {
                     $item = Tracker_Item::fromId($itemId);
-                    if ($item && ($info = $item->getInfo())) {
-                        $parentId = $info['trackerId'];
-                        $parentType = $objectType;
+                    if ($item && $item->getInfo()) {
                         $objectId = $itemId;
                         $objectType = 'trackeritem';
-                        $additional = ['Special Tracker Permissions:'];
-                        $definition = $item->getDefinition();
-                        $special_perms = ['userCanSeeOwn', 'groupCanSeeOwn', 'writerCanModify', 'writerCanRemove', 'userCanTakeOwnership', 'oneUserItem', 'writerGroupCanModify', 'writerGroupCanRemove', 'adminOnlyViewEditItem'];
-                        foreach ($special_perms as $perm) {
-                            if ($definition->getConfiguration($perm) == 'y') {
-                                $additional[] = '* ' . $perm;
-                            }
-                        }
-                        if (count($additional) == 1) {
-                            $additional = '';
-                        } else {
-                            if ($fields = $definition->getItemOwnerFields()) {
-                                $additional[] = 'Item Owner Fields: ' . implode(', ', $fields);
-                            }
-                            if ($fields = $definition->getItemGroupOwnerFields()) {
-                                $additional[] = 'Item Group Owner Fields: ' . implode(', ', $fields);
-                            }
-                            if ($fields = $definition->getWriterGroupField()) {
-                                $additional[] = 'Item Group Writer Fields: ' . implode(', ', $fields);
-                            }
-                        }
-                        if ($additional) {
-                            $additional = implode('<br>', $additional);
-                        }
                     }
                 }
-                $permType = 'trackers';
                 break;
             case 'forum':
                 $objectId = ! empty($_REQUEST['forumId']) ? $_REQUEST['forumId'] : null;
@@ -96,13 +64,9 @@ class Permissions
                     $threadId = ! empty($_REQUEST['threadId']) ? $_REQUEST['threadId'] : null;
                 }
                 if ($threadId) {
-                    $thread_info = TikiLib::lib('comments')->get_comment($threadId);
-                    $parentId = $thread_info['object'];
-                    $parentType = $objectType;
                     $objectId = $threadId;
                     $objectType = 'thread';
                 }
-                $permType = 'forums';
                 break;
             case 'group':
                 $objectId = ! empty($_REQUEST['group']) ? $_REQUEST['group'] : null;
@@ -110,27 +74,18 @@ class Permissions
             case 'article':
                 $objectId = ! empty($_REQUEST['articleId']) ? $_REQUEST['articleId'] : null;
                 $topicId = ! empty($_REQUEST['topic']) ? $_REQUEST['topic'] : null;
-                if ($objectId) {
-                    $article_data = TikiLib::lib('art')->get_article($objectId);
-                    $parentId = $article_data['topicId'];
-                    $parentType = 'topic';
-                } elseif ($topicId) {
+                if (! $objectId && $topicId) {
                     $objectId = $topicId;
                     $objectType = 'topic';
                 }
-                $permType = 'articles';
                 break;
             case 'blog':
                 $objectId = ! empty($_REQUEST['blogId']) ? $_REQUEST['blogId'] : null;
                 $postId = ! empty($_REQUEST['postId']) ? $_REQUEST['postId'] : null;
                 if ($postId) {
-                    $post_info = TikiLib::lib('blog')->get_post($postId);
-                    $parentId = $post_info['blogId'];
-                    $parentType = $objectType;
                     $objectId = $postId;
                     $objectType = 'blog post';
                 }
-                $permType = 'blogs';
                 break;
             case 'calendar':
                 $objectId = ! empty($_REQUEST['calendarId']) ? $_REQUEST['calendarId'] : null;
@@ -139,16 +94,118 @@ class Permissions
                 }
                 $calitemId = ! empty($_REQUEST['calitemId']) ? $_REQUEST['calitemId'] : $jitRequest->calitemId->int();
                 if ($calitemId) {
-                    $calitem = TikiLib::lib('calendar')->get_item($calitemId);
-                    $parentId = $calitem['calendarId'];
-                    $parentType = $objectType;
                     $objectId = $calitemId;
                     $objectType = 'calendaritem';
                 }
-                $permType = 'calendar';
                 break;
             case 'sheet':
                 $objectId = ! empty($_REQUEST['sheetId']) ? $_REQUEST['sheetId'] : null;
+                break;
+        }
+
+        if ($objectId && ! $this->objectExists($objectType, $objectId)) {
+            return null;
+        }
+
+        return $this->getObjectPermissions($objectType, $objectId);
+    }
+
+    /**
+     * Return the permissions applied to an object
+     *
+     * @param string $objectType
+     * @param mixed $objectId
+     * @return array
+     */
+    public function getObjectPermissions($objectType, $objectId)
+    {
+        $parentId = $parentType = $permType = $additional = null;
+
+        switch ($objectType) {
+            case 'wiki page':
+                $permType = 'wiki';
+                break;
+            case 'file gallery':
+                $permType = 'file galleries';
+                break;
+            case 'file':
+                $file = TikiLib::lib('filegal')->get_file_info($objectId, false, false);
+                $parentId = $file['galleryId'] ?? null;
+                $parentType = 'file gallery';
+                $permType = 'file galleries';
+                break;
+            case 'tracker':
+                $permType = 'trackers';
+                break;
+            case 'trackeritem':
+                $item = Tracker_Item::fromId($objectId);
+                if ($item && ($info = $item->getInfo())) {
+                    $parentId = $info['trackerId'];
+                    $parentType = 'tracker';
+                    $additional = ['Special Tracker Permissions:'];
+                    $definition = $item->getDefinition();
+                    $special_perms = ['userCanSeeOwn', 'groupCanSeeOwn', 'writerCanModify', 'writerCanRemove', 'userCanTakeOwnership', 'oneUserItem', 'writerGroupCanModify', 'writerGroupCanRemove', 'adminOnlyViewEditItem'];
+                    foreach ($special_perms as $perm) {
+                        if ($definition->getConfiguration($perm) == 'y') {
+                            $additional[] = '* ' . $perm;
+                        }
+                    }
+                    if (count($additional) == 1) {
+                        $additional = '';
+                    } else {
+                        if ($fields = $definition->getItemOwnerFields()) {
+                            $additional[] = 'Item Owner Fields: ' . implode(', ', $fields);
+                        }
+                        if ($fields = $definition->getItemGroupOwnerFields()) {
+                            $additional[] = 'Item Group Owner Fields: ' . implode(', ', $fields);
+                        }
+                        if ($fields = $definition->getWriterGroupField()) {
+                            $additional[] = 'Item Group Writer Fields: ' . implode(', ', $fields);
+                        }
+                    }
+                    if ($additional) {
+                        $additional = implode('<br>', $additional);
+                    }
+                }
+                $permType = 'trackers';
+                break;
+            case 'forum':
+                $permType = 'forums';
+                break;
+            case 'thread':
+                $thread_info = TikiLib::lib('comments')->get_comment($objectId);
+                $parentId = $thread_info['object'];
+                $parentType = 'forum';
+                $permType = 'forums';
+                break;
+            case 'article':
+                if ($objectId) {
+                    $parentId = \TikiDb::get()->table('tiki_articles')
+                        ->fetchOne('topicId', ['articleId' => (int) $objectId]);
+                    $parentType = 'topic';
+                }
+                $permType = 'articles';
+                break;
+            case 'topic':
+                $permType = 'articles';
+                break;
+            case 'blog':
+                $permType = 'blogs';
+                break;
+            case 'blog post':
+                $post_info = TikiLib::lib('blog')->get_post($objectId);
+                $parentId = $post_info['blogId'];
+                $parentType = 'blog';
+                $permType = 'blogs';
+                break;
+            case 'calendar':
+                $permType = 'calendar';
+                break;
+            case 'calendaritem':
+                $calitem = TikiLib::lib('calendar')->get_item($objectId);
+                $parentId = $calitem['calendarId'];
+                $parentType = 'calendar';
+                $permType = 'calendar';
                 break;
         }
 
@@ -158,17 +215,33 @@ class Permissions
         $loaded = $accessor->getResolver()->dump();
 
         $results = [];
+        $count = 0;
 
         foreach ($all['data'] as $permDef) {
             foreach ($loaded['perms'] as $perm => $groups) {
                 if ($perm != str_replace('tiki_p_', '', $permDef['name'])) {
                     continue;
                 }
-                $results[$permDef['type']][$perm] = $groups;
+                sort($groups);
+                $results[$permDef['type']][$perm] = [
+                    'description' => $permDef['description'],
+                    'groups' => $groups,
+                ];
+                $count++;
             }
         }
 
+        ksort($results);
+        foreach ($results as &$perms) {
+            ksort($perms);
+        }
+        unset($perms);
+
         $loaded['perms'] = $results;
+        $loaded['count'] = $count;
+        $loaded['type'] = $objectType;
+        $loaded['type_label'] = $this->getObjectTypeLabel($objectType);
+        $loaded['object'] = $objectId;
 
         $smarty = TikiLib::lib('smarty');
         if ($loaded['from'] == 'parent object' && $parentId && $parentType) {
@@ -222,6 +295,110 @@ class Permissions
         $loaded['additional'] = $additional;
 
         return $loaded;
+    }
+
+    /**
+     * Check if the object exists
+     *
+     * @param string $objectType
+     * @param mixed $objectId
+     * @return bool
+     */
+    public function objectExists($objectType, $objectId)
+    {
+        $tables = [
+            'wiki page' => ['tiki_pages', 'pageName'],
+            'file gallery' => ['tiki_file_galleries', 'galleryId'],
+            'file' => ['tiki_files', 'fileId'],
+            'tracker' => ['tiki_trackers', 'trackerId'],
+            'trackeritem' => ['tiki_tracker_items', 'itemId'],
+            'forum' => ['tiki_forums', 'forumId'],
+            'thread' => ['tiki_comments', 'threadId'],
+            'group' => ['users_groups', 'groupName'],
+            'article' => ['tiki_articles', 'articleId'],
+            'topic' => ['tiki_topics', 'topicId'],
+            'blog' => ['tiki_blogs', 'blogId'],
+            'blog post' => ['tiki_blog_posts', 'postId'],
+            'calendar' => ['tiki_calendars', 'calendarId'],
+            'calendaritem' => ['tiki_calendar_items', 'calitemId'],
+            'sheet' => ['tiki_sheets', 'sheetId'],
+        ];
+
+        if (! isset($tables[$objectType])) {
+            return false;
+        }
+
+        [$table, $column] = $tables[$objectType];
+
+        return (bool) \TikiDb::get()->table($table)->fetchCount([$column => $objectId]);
+    }
+
+    /**
+     * Check if the current user can view the object
+     *
+     * @param string $objectType
+     * @param mixed $objectId
+     * @return bool
+     */
+    public function canViewObject($objectType, $objectId)
+    {
+        if ($objectType == 'trackeritem') {
+            $item = Tracker_Item::fromId($objectId);
+            return $item && $item->canView();
+        }
+
+        $viewPerms = [
+            'wiki page' => 'view',
+            'file gallery' => 'view_file_gallery',
+            'file' => 'view_file_gallery',
+            'tracker' => 'view_trackers',
+            'forum' => 'forum_read',
+            'thread' => 'forum_read',
+            'group' => 'group_view',
+            'article' => 'read_article',
+            'topic' => 'read_article',
+            'blog' => 'read_blog',
+            'blog post' => 'read_blog',
+            'calendar' => 'view_calendar',
+            'calendaritem' => 'view_events',
+            'sheet' => 'view_sheet',
+        ];
+
+        if (! isset($viewPerms[$objectType])) {
+            return false;
+        }
+
+        $perm = $viewPerms[$objectType];
+        return \Perms::get(['type' => $objectType, 'object' => $objectId])->$perm;
+    }
+
+    /**
+     * Return the translated label of an object type
+     *
+     * @param string $objectType
+     * @return string
+     */
+    private function getObjectTypeLabel($objectType)
+    {
+        $labels = [
+            'wiki page' => tra('wiki page'),
+            'file gallery' => tra('file gallery'),
+            'file' => tra('file'),
+            'tracker' => tra('tracker'),
+            'trackeritem' => tra('tracker item'),
+            'forum' => tra('forum'),
+            'thread' => tra('forum post'),
+            'group' => tra('group'),
+            'article' => tra('article'),
+            'topic' => tra('topic'),
+            'blog' => tra('blog'),
+            'blog post' => tra('blog post'),
+            'calendar' => tra('calendar'),
+            'calendaritem' => tra('calendar item'),
+            'sheet' => tra('spreadsheet'),
+        ];
+
+        return $labels[$objectType] ?? $objectType;
     }
 
     protected function findObjectType($url)
@@ -305,19 +482,24 @@ class Permissions
             case 'wiki page':
                 return 'wiki';
             case 'file gallery':
+            case 'file':
                 return 'file galleries';
             case 'tracker':
             case 'trackeritem':
                 return 'trackers';
             case 'forum':
+            case 'thread':
                 return 'forums';
             case 'group':
                 return 'group';
-            case 'articles':
+            case 'article':
+            case 'topic':
                 return 'articles';
             case 'blog':
+            case 'blog post':
                 return 'blogs';
             case 'calendar':
+            case 'calendaritem':
                 return 'calendar';
             case 'sheet':
                 return 'sheet';

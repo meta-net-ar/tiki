@@ -23,6 +23,7 @@
                 {preference name="tracker_remote_sync"}
                 {preference name="tracker_tabular_enabled"}
                 {preference name="tracker_clone_item"}
+                {preference name="tracker_view_permissions"}
                 {preference name=allocate_memory_tracker_export_items}
                 {preference name=allocate_time_tracker_export_items}
                 {preference name=allocate_memory_tracker_import_items}

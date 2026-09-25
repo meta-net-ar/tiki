@@ -118,6 +118,24 @@ class Services_Object_Controller
         return $smarty->fetch('object/infobox/activity.tpl');
     }
 
+    public function action_permissions($input)
+    {
+        $type = $input->type->text();
+        $object = $input->object->text();
+
+        $modPermissions = new \Tiki\Modules\Permissions();
+        if (! $modPermissions->objectExists($type, $object)) {
+            throw new Services_Exception_NotFound();
+        }
+        if (! $modPermissions->canViewObject($type, $object)) {
+            throw new Services_Exception_Denied();
+        }
+
+        return [
+            'title' => tr('Permissions overview'),
+            'permissions' => $modPermissions->getObjectPermissions($type, $object),
+        ];
+    }
 
     public function action_lock($input)
     {
