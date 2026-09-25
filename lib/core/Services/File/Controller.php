@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\Filegals\FileGalLib;
+use Tiki\TikiDb\Exception\PacketTooLarge;
+
 class Services_File_Controller
 {
     private $defaultGalleryId = 1;
@@ -149,6 +152,14 @@ class Services_File_Controller
                 $size = $file->size->int();
                 $type = $file->type->text();
 
+                // Running out of memory below is a fatal error the request cannot recover from
+                if (TikiLib::lib('tiki')->isMemoryLow($size + FileGalLib::FILE_MEMORY_MARGIN)) {
+                    throw new Services_Exception(
+                        tr('Not enough memory left on the server to process the file "%0". Please ask an administrator to increase the memory limit.', $name),
+                        413
+                    );
+                }
+
                 $data = file_get_contents($_FILES['data']['tmp_name']);
             } else {
                 $message = $this->getFileUploadErrorMessage($_FILES['data']['error']);
@@ -165,6 +176,10 @@ class Services_File_Controller
         }
         if (! $this->isTypeUploadable($type, $gal_info['type'])) {
             throw new Services_Exception(tr('File could not be uploaded: Type %0 not supported', $type), 406);
+        }
+
+        if (! Feedback::validateFieldLength(tra('Description'), $description, FileGalLib::MAX_FILE_DESCRIPTION_LENGTH)) {
+            throw new Services_Exception(tr('File could not be uploaded: the description is too long'), 406);
         }
 
         if (! $title) {
@@ -190,15 +205,19 @@ class Services_File_Controller
         $util = new Services_Utilities();
         // skip unsetting the CSRF ticket as multiple files might be dropped in the dropzone
         if ($util->isActionPost(false)) {
-            if ($fileId) {
-                // if we are updating a file, we need to get the missing file info from the database
-                $size = $size ?: $fileInfo['filesize'];
-                $type = $type ?: $fileInfo['filetype'];
-                $name = $name ?: $fileInfo['filename'];
-                $title = $title ?: $fileInfo['name'];
-                $this->utilities->updateFile($gal_info, $name, $size, $type, $data, $fileId, $asuser, $title, $description);
-            } else {
-                $fileId = $this->utilities->uploadFile($gal_info, $name, $size, $type, $data, $asuser, $image_x, $image_y, $description, '', $title, $directoryPattern);
+            try {
+                if ($fileId) {
+                    // if we are updating a file, we need to get the missing file info from the database
+                    $size = $size ?: $fileInfo['filesize'];
+                    $type = $type ?: $fileInfo['filetype'];
+                    $name = $name ?: $fileInfo['filename'];
+                    $title = $title ?: $fileInfo['name'];
+                    $this->utilities->updateFile($gal_info, $name, $size, $type, $data, $fileId, $asuser, $title, $description);
+                } else {
+                    $fileId = $this->utilities->uploadFile($gal_info, $name, $size, $type, $data, $asuser, $image_x, $image_y, $description, '', $title, $directoryPattern);
+                }
+            } catch (PacketTooLarge $e) {
+                throw new Services_Exception(tr('The file "%0" could not be stored.', $name) . ' ' . $e->getMessage(), 413);
             }
         } else {
             $fileId = false;

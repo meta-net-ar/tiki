@@ -7,6 +7,7 @@
 namespace Tiki\FileGallery\Manipulator;
 
 use TikiLib;
+use Tiki\Lib\Filegals\FileGalLib;
 
 class EmailParser extends Manipulator
 {
@@ -16,6 +17,12 @@ class EmailParser extends Manipulator
 
         $file = $this->file;
         if ($file->filetype != 'message/rfc822') {
+            return false;
+        }
+
+        // The whole message is pulled in memory on the next line, running out there is fatal
+        if (TikiLib::lib('tiki')->isMemoryLow($file->getWrapper()->getSize() + FileGalLib::FILE_MEMORY_MARGIN)) {
+            \Feedback::error(tr('Not enough memory left on the server to parse the file %0 as an email.', $file->fileId));
             return false;
         }
 

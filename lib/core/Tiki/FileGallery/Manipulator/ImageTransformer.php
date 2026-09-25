@@ -7,6 +7,8 @@
 namespace Tiki\FileGallery\Manipulator;
 
 use Feedback;
+use TikiLib;
+use Tiki\Lib\Filegals\FileGalLib;
 
 class ImageTransformer extends Manipulator
 {
@@ -30,6 +32,12 @@ class ImageTransformer extends Manipulator
         $image_size_y = $args['height'] ?? null;
 
         $gal_info = $this->file->galleryDefinition()->getInfo();
+
+        // The contents are pulled in memory on the next line, running out there is fatal
+        if (TikiLib::lib('tiki')->isMemoryLow($this->file->getWrapper()->getSize() + FileGalLib::FILE_MEMORY_MARGIN)) {
+            Feedback::error(tr('Not enough memory left on the server to resize the image "%0".', $this->file->filename));
+            return;
+        }
 
         $work_file = tempnam($prefs['tmpDir'], "imgresize");
         file_put_contents($work_file, $this->file->getContents());
