@@ -172,6 +172,9 @@ td.url{
                         border-top: none;
                         text-align: left !important;
                         word-break: break-word;
+                        -webkit-hyphens: auto;
+                        -ms-hyphens: auto;
+                        hyphens: auto;
                         &:after {
                             display: block;
                             clear: both;
