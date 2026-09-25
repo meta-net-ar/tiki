@@ -235,6 +235,11 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
     private function getIndexDefinition()
     {
         global $prefs;
+        $defaultFilters = $this->connection->getVersion() >= 7.0 ? ['lowercase', 'asciifolding', 'word_delimiter'] : ['standard', 'lowercase', 'asciifolding', 'word_delimiter'];
+        $defaultIndexFilters = $defaultFilters;
+        if (! empty($prefs['unified_elastic_camel_case']) && $prefs['unified_elastic_camel_case'] === 'y') {
+            $defaultIndexFilters[] = 'autocomplete_ngram';
+        }
         $definition = [
             'analysis' => [
                 'tokenizer' => [
@@ -249,7 +254,7 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                         'char_filter' => [
                             'versions_filter'
                         ],
-                        'filter' => $this->connection->getVersion() >= 7.0 ? ['lowercase', 'asciifolding', 'word_delimiter'] : ['standard', 'lowercase', 'asciifolding', 'word_delimiter'],
+                        'filter' => $defaultIndexFilters,
                     ],
                     'sortable' => [
                         'tokenizer' => 'keyword',
@@ -267,6 +272,11 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                     'tiki_stop' => [
                         'type' => 'stop',
                         'stopwords' => $prefs['unified_stopwords'],
+                    ],
+                    'autocomplete_ngram' => [
+                        'type' => 'edge_ngram',
+                        'min_gram' => 2,
+                        'max_gram' => 15
                     ],
                 ],
                 'char_filter' => [
