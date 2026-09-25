@@ -86,6 +86,7 @@ class HeaderMetaTagsTest extends TikiTestCase
         // Initialize Smarty
         $smarty = \TikiLib::lib('smarty');
         $smarty->assign('prefs', $prefs);
+        $smarty->assign('mid', 'tiki-show_page.tpl');
         // base_url_canonical might not be available in CI, provide default
         $smarty->assign('base_url_canonical', $base_url_canonical ?? 'http://localhost/');
         $smarty->assign('metatag_robotscustom', $metatag_robotscustom);
