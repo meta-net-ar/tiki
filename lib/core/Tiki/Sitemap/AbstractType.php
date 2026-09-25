@@ -179,180 +179,89 @@ abstract class AbstractType
     protected function getTypeDateRanges(string $type, string $split): array
     {
         $tikilib = TikiLib::lib('tiki');
-        $ranges = [];
+        $ranges  = [];
+        $sql     = '';
+        $prefix  = strtolower($type);
 
         switch ($type) {
             case 'Articles':
                 if ($split === 'year') {
-                    $result = $tikilib->fetchAll("SELECT DISTINCT
-                        YEAR(FROM_UNIXTIME(publishDate)) as year,
-                        publishDate as lastMod
-                        FROM tiki_articles
-                        WHERE publishDate IS NOT NULL AND publishDate > 0
-                        ORDER BY year DESC");
-
-                    foreach ($result as $row) {
-                        if ($row['year']) {
-                            $ranges[] = [
-                                'prefix'  => 'articles',
-                                'year'    => $row['year'],
-                                'lastMod' => $row['lastMod']
-                            ];
-                        }
-                    }
+                    $sql = "SELECT YEAR(FROM_UNIXTIME(publishDate)) as year, MAX(publishDate) as lastMod
+                            FROM tiki_articles WHERE publishDate IS NOT NULL AND publishDate > 0
+                            GROUP BY YEAR(FROM_UNIXTIME(publishDate)) ORDER BY year DESC";
                 } elseif ($split === 'year_month') {
-                    $result = $tikilib->fetchAll("SELECT DISTINCT
-                        YEAR(FROM_UNIXTIME(publishDate)) as year,
-                        MONTH(FROM_UNIXTIME(publishDate)) as month,
-                        publishDate as lastMod
-                        FROM tiki_articles
-                        WHERE publishDate IS NOT NULL AND publishDate > 0
-                        ORDER BY year DESC, month DESC");
-
-                    foreach ($result as $row) {
-                        if ($row['year'] && $row['month']) {
-                            $ranges[] = [
-                                'prefix'  => 'articles',
-                                'year'    => $row['year'],
-                                'month'   => str_pad($row['month'], 2, '0', STR_PAD_LEFT),
-                                'lastMod' => $row['lastMod']
-                            ];
-                        }
-                    }
-                } else {
-                    $ranges[] = ['prefix' => 'articles'];
+                    $sql = "SELECT YEAR(FROM_UNIXTIME(publishDate)) as year, MONTH(FROM_UNIXTIME(publishDate)) as month,
+                            MAX(publishDate) as lastMod FROM tiki_articles WHERE publishDate IS NOT NULL AND publishDate > 0
+                            GROUP BY YEAR(FROM_UNIXTIME(publishDate)), MONTH(FROM_UNIXTIME(publishDate)) ORDER BY year DESC, month DESC";
                 }
 
                 break;
 
             case 'Blog':
-                // Combine blogs and posts dates
                 if ($split === 'year') {
-                    $result = $tikilib->fetchAll("SELECT DISTINCT
-                        YEAR(FROM_UNIXTIME(created)) as year,
-                        created as lastMod
-                        FROM tiki_blog_posts
-                        WHERE created IS NOT NULL
-                        ORDER BY year DESC");
-
-                    foreach ($result as $row) {
-                        if ($row['year']) {
-                            $ranges[] = [
-                                'prefix'  => 'blogposts',
-                                'year'    => $row['year'],
-                                'lastMod' => $row['lastMod']
-                            ];
-                        }
-                    }
+                    $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MAX(created) as lastMod
+                            FROM tiki_blog_posts WHERE created IS NOT NULL
+                            GROUP BY YEAR(FROM_UNIXTIME(created)) ORDER BY year DESC";
                 } elseif ($split === 'year_month') {
-                    $result = $tikilib->fetchAll("SELECT DISTINCT
-                        YEAR(FROM_UNIXTIME(created)) as year,
-                        MONTH(FROM_UNIXTIME(created)) as month,
-                        created as lastMod
-                        FROM tiki_blog_posts
-                        WHERE created IS NOT NULL
-                        ORDER BY year DESC, month DESC");
-
-                    foreach ($result as $row) {
-                        if ($row['year'] && $row['month']) {
-                            $ranges[] = [
-                                'prefix'  => 'blogposts',
-                                'year'    => $row['year'],
-                                'month'   => str_pad($row['month'], 2, '0', STR_PAD_LEFT),
-                                'lastMod' => $row['lastMod']
-                            ];
-                        }
-                    }
-                } else {
-                    $ranges[] = ['prefix' => 'blogposts'];
+                    $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MONTH(FROM_UNIXTIME(created)) as month, MAX(created) as lastMod
+                            FROM tiki_blog_posts WHERE created IS NOT NULL
+                            GROUP BY YEAR(FROM_UNIXTIME(created)), MONTH(FROM_UNIXTIME(created)) ORDER BY year DESC, month DESC";
                 }
 
+                $prefix = 'blogposts';
                 break;
 
             case 'Pages':
                 if ($split === 'year') {
-                    $result = $tikilib->fetchAll("SELECT DISTINCT
-                        YEAR(FROM_UNIXTIME(created)) as year,
-                        created as lastMod
-                        FROM tiki_pages
-                        WHERE created IS NOT NULL AND created > 0
-                        ORDER BY year DESC");
-
-                    foreach ($result as $row) {
-                        if ($row['year']) {
-                            $ranges[] = [
-                                'prefix'  => 'pages',
-                                'year'    => $row['year'],
-                                'lastMod' => $row['lastMod']
-                            ];
-                        }
-                    }
-                } elseif ($split === 'year_month') { // year_month
-                    $result = $tikilib->fetchAll("SELECT DISTINCT
-                        YEAR(FROM_UNIXTIME(created)) as year,
-                        MONTH(FROM_UNIXTIME(created)) as month,
-                        created as lastMod
-                        FROM tiki_pages
-                        WHERE created IS NOT NULL AND created > 0
-                        ORDER BY year DESC, month DESC");
-
-                    foreach ($result as $row) {
-                        if ($row['year'] && $row['month']) {
-                            $ranges[] = [
-                                'prefix'  => 'pages',
-                                'year'    => $row['year'],
-                                'month'   => str_pad($row['month'], 2, '0', STR_PAD_LEFT),
-                                'lastMod' => $row['lastMod']
-                            ];
-                        }
-                    }
-                } else {
-                    $ranges[] = ['prefix' => 'pages'];
+                    $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MAX(created) as lastMod
+                            FROM tiki_pages WHERE created IS NOT NULL AND created > 0
+                            GROUP BY YEAR(FROM_UNIXTIME(created)) ORDER BY year DESC";
+                } elseif ($split === 'year_month') {
+                    $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MONTH(FROM_UNIXTIME(created)) as month, MAX(created) as lastMod
+                            FROM tiki_pages WHERE created IS NOT NULL AND created > 0
+                            GROUP BY YEAR(FROM_UNIXTIME(created)), MONTH(FROM_UNIXTIME(created)) ORDER BY year DESC, month DESC";
                 }
 
                 break;
 
             case 'Forums':
                 if ($split === 'year') {
-                    $result = $tikilib->fetchAll("SELECT DISTINCT
-                        YEAR(FROM_UNIXTIME(created)) as year,
-                        created as lastMod
-                        FROM tiki_forums
-                        WHERE created IS NOT NULL AND created > 0
-                        ORDER BY year DESC");
-
-                    foreach ($result as $row) {
-                        if ($row['year']) {
-                            $ranges[] = [
-                                'prefix'  => 'forums',
-                                'year'    => $row['year'],
-                                'lastMod' => $row['lastMod']
-                            ];
-                        }
-                    }
-                } elseif ($split === 'year_month') { // year_month
-                    $result = $tikilib->fetchAll("SELECT DISTINCT
-                        YEAR(FROM_UNIXTIME(created)) as year,
-                        MONTH(FROM_UNIXTIME(created)) as month,
-                        created as lastMod
-                        FROM tiki_forums
-                        WHERE created IS NOT NULL AND created > 0
-                        ORDER BY year DESC, month DESC");
-
-                    foreach ($result as $row) {
-                        if ($row['year'] && $row['month']) {
-                            $ranges[] = [
-                                'prefix'  => 'forums',
-                                'year'    => $row['year'],
-                                'month'   => str_pad($row['month'], 2, '0', STR_PAD_LEFT),
-                                'lastMod' => $row['lastMod']
-                            ];
-                        }
-                    }
-                } else {
-                    $ranges[] = ['prefix' => 'forums'];
+                    $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MAX(created) as lastMod
+                            FROM tiki_forums WHERE created IS NOT NULL AND created > 0
+                            GROUP BY YEAR(FROM_UNIXTIME(created)) ORDER BY year DESC";
+                } elseif ($split === 'year_month') {
+                    $sql = "SELECT YEAR(FROM_UNIXTIME(created)) as year, MONTH(FROM_UNIXTIME(created)) as month, MAX(created) as lastMod
+                            FROM tiki_forums WHERE created IS NOT NULL AND created > 0
+                            GROUP BY YEAR(FROM_UNIXTIME(created)), MONTH(FROM_UNIXTIME(created)) ORDER BY year DESC, month DESC";
                 }
+
                 break;
+
+            // not valid/unrecognized type.
+            default:
+                return [];
+        }
+
+        // valid but no split was used.
+        if ($split !== 'year' && $split !== 'year_month') {
+            return [['prefix' => $prefix]];
+        }
+
+        $result = $tikilib->fetchAll($sql);
+        foreach ($result as $row) {
+            if ($row['year']) {
+                $range = [
+                    'prefix'  => $prefix,
+                    'year'    => $row['year'],
+                    'lastMod' => $row['lastMod']
+                ];
+
+                if ($split === 'year_month' && ! empty($row['month'])) {
+                    $range['month'] = str_pad($row['month'], 2, '0', STR_PAD_LEFT);
+                }
+
+                $ranges[] = $range;
+            }
         }
 
         return $ranges;

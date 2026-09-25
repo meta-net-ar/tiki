@@ -1431,9 +1431,11 @@ class Comments extends TikiLib
      * @param string $sort_mode
      * @param string $find
      * @param int $parentId (0 to get forums without parents, <0 to get all forums, >0 to get forums of specific parent)
+     * @param int $date_min Minimum creation date timestamp
+     * @param int $date_max Maximum creation date timestamp
      * @return array
      */
-    public function list_forums($offset = 0, $maxRecords = -1, $sort_mode = 'name_asc', $find = '', $parentId = 0, $sectionOrder = null)
+    public function list_forums($offset = 0, $maxRecords = -1, $sort_mode = 'name_asc', $find = '', $parentId = 0, $sectionOrder = null, $date_min = 0, $date_max = 0)
     {
         global $prefs;
 
@@ -1457,6 +1459,16 @@ class Comments extends TikiLib
             $bindvars[] = $findesc;
         } else {
             $mid = "";
+        }
+
+        // date filers
+        if ($date_min !== 0 || $date_max !== 0) {
+            if ($date_max <= 0) {
+                $date_max = $this->now;
+            }
+            $mid .= " AND (`tiki_forums`.`created` >= ? AND `tiki_forums`.`created` <= ?) ";
+            $bindvars[] = $date_min;
+            $bindvars[] = $date_max;
         }
 
         if (

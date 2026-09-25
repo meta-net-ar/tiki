@@ -21,51 +21,68 @@ class Pages extends AbstractType
     public function generate(bool $auto = false, ?array $context = null)
     {
         global $tikilib, $prefs;
-        $wikilib = TikiLib::lib('wiki');
-        $priority = [];
 
         if (! $this->checkFeatureAndPermissions('feature_wiki')) {
             return;
         }
 
+        $wikilib         = TikiLib::lib('wiki');
         $multilinguallib = TikiLib::lib('multilingual');
         $isMultilingual  = $prefs['feature_multilingual'] === 'y';
 
-        // In case of multilingual websites.
-        // find pages that are in primary site lang then attach the translations to it.
-        if ($isMultilingual) {
-            $pagesFilter = ['lang' => $prefs['site_language']];
-
-             /** @var \TikiLib $tikilib */
-            $listPages = $tikilib->list_pages(filter: $pagesFilter);
-
-            foreach ($listPages['data'] as &$page) {
-                try {
-                    $translations = $multilinguallib->getTranslations('wiki page', $page['page_id']);
-                    $page['has_translations'] = count($translations) > 1;
-                    $page['translations'] = array_slice($translations, 1);
-                } catch (Exception $e) {
-                    $page['has_translations'] = false;
-                    $page['translations'] = [];
-                }
-            }
-        } else {
-            // fallback to default behavior
-            $listPages = $tikilib->list_pages();
-        }
-
-
         $attributes = TikiLib::lib('attribute')->getAllAttributes("tiki.object.sitemap");
-        $listPages['data'] = array_filter($listPages['data'], function ($page) use ($attributes) {
-            if (isset($attributes[$page['pageName']]) && $attributes[$page['pageName']] !== 'n') {
-                return ($page);
-            }
-        });
-        $priority = array_count_values(array_column($wikilib->getAllBacklinks(), 'toPage'));
+        $priority   = array_count_values(array_column($wikilib->getAllBacklinks(), 'toPage'));
         foreach ($priority as $key => $values) {
             $priority[$key] = '0.8';
         }
         $priority[$prefs['wikiHomePage']] = '1.0';
-        $this->addEntriesToSitemap($listPages, '/tiki-index.php?page=%s', 'pageSlug', null, 'pages.xml', '', 'lastModif', $priority);
+
+        $ranges = $this->getTypeDateRanges('Pages', $prefs['sitemap_split']);
+        foreach ($ranges as $range) {
+            // On automatic mode skip non requested ranges.
+            if (
+                $auto
+                && (intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)
+                    || intval($context['month'] ?? 0) !== intval($range['month'] ?? 0))
+            ) {
+                continue;
+            }
+
+            [$min, $max] = $this->getRangeDateFilters($range);
+
+            $filter = $isMultilingual ? ['lang' => $prefs['site_language']] : [];
+            $listPages = $tikilib->list_pages(
+                date_min: $min,
+                date_max: $max,
+                filter: $filter
+            );
+
+            if ($isMultilingual) {
+                foreach ($listPages['data'] as &$page) {
+                    try {
+                        $translations             = $multilinguallib->getTranslations('wiki page', $page['page_id']);
+                        $page['has_translations'] = count($translations) > 1;
+                        $page['translations']     = array_slice($translations, 1);
+                    } catch (Exception $e) {
+                        $page['has_translations'] = false;
+                        $page['translations']     = [];
+                    }
+                }
+            }
+
+            $listPages['data'] = array_filter($listPages['data'], function ($page) use ($attributes) {
+                return ($attributes[$page['pageName']] ?? 'y') !== 'n';
+            });
+
+            $fileName = $range['prefix'] . '.xml';
+            if (isset($range['year'])) {
+                $fileName = $range['prefix'] . '-' . $range['year'] . '.xml';
+                if (isset($range['month'])) {
+                    $fileName = $range['prefix'] . '-' . $range['year'] . '_' . $range['month'] . '.xml';
+                }
+            }
+
+            $this->addEntriesToSitemap($listPages, '/tiki-index.php?page=%s', 'pageSlug', null, $fileName, '', 'lastModif', $priority);
+        }
     }
 }

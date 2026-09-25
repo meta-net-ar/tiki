@@ -15,7 +15,9 @@ use Tiki\Sitemap\AbstractType;
 class Index extends AbstractType
 {
     /**
-     * Generate Sitemap
+     * Generate Index Sitemap
+     *
+     * NOTE: The index builder dos not have or need a context, this should respond with links to types sitemap links.
      */
     public function generate(bool $auto = false, ?array $context = null)
     {
@@ -33,15 +35,11 @@ class Index extends AbstractType
         }
 
         if ($this->checkFeatureAndPermissions('feature_forums')) {
-            $sitemaps[] = ['prefix' => 'forums'];
-            // TODO: make use of pagination here when list_forums has min/max date ranges.
-            // $sitemaps = array_merge($sitemaps, $this->getTypeDateRanges("Forums", $prefs['sitemap_split']));
+            $sitemaps = array_merge($sitemaps, $this->getTypeDateRanges("Forums", $prefs['sitemap_split']));
         }
 
         if ($this->checkFeatureAndPermissions('feature_wiki')) {
-            $sitemaps[] = ['prefix' => 'pages'];
-            // TODO: make use of pagination here when list_pages has min/max date ranges.
-            // $sitemaps = array_merge($sitemaps, $this->getTypeDateRanges("Pages", $prefs['sitemap_split']));
+            $sitemaps = array_merge($sitemaps, $this->getTypeDateRanges("Pages", $prefs['sitemap_split']));
         }
 
         foreach ($sitemaps as $item) {
