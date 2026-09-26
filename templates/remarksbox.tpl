@@ -8,7 +8,7 @@
         <{$remarksbox_title_tag} class="{$remarksbox_title_class}">
             {if not empty($remarksbox_icon)}{icon name=$remarksbox_icon}&nbsp;{/if}
 
-            <span class="rboxtitle">{tr}{$remarksbox_title|escape}{/tr}</span>
+            <span class="rboxtitle">{tr noparse=n}{$remarksbox_title|escape}{/tr}</span>
         </{$remarksbox_title_tag}>
     {else}
         {if not empty($remarksbox_icon)}{icon name=$remarksbox_icon}{/if}
