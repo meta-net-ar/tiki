@@ -14,6 +14,9 @@ use Tiki\TaskQueue\QueueManager;
 
 class Services_Search_Controller
 {
+    /** Max suggestions returned to the search box */
+    private const AUTOCOMPLETE_MAX_RECORDS = 10;
+
     public function action_help($input)
     {
         return [
@@ -182,6 +185,23 @@ class Services_Search_Controller
             $titleFilter = null;
             $highlightHelper = null;
 
+            // Skip short queries from the search box autocomplete
+            $isAutocomplete = $input->autocomplete->int() === 1;
+            if ($isAutocomplete) {
+                $minChars = max(1, (int) ($prefs['elementplus_autocomplete_search_min_chars'] ?? 3));
+                $needle = trim(str_replace('*', '', (string) ($filter['title'] ?? '')));
+                if (mb_strlen($needle) < $minChars) {
+                    return [
+                        'title' => tr('Lookup Result'),
+                        'resultset' => new Search_ResultSet([], 0, 0, 0),
+                    ];
+                }
+                if (! headers_sent()) {
+                    // Results depend on permissions so only allow private caching
+                    header('Cache-Control: private, max-age=60');
+                }
+            }
+
             /** @var UnifiedSearchLib $lib */
             $lib = TikiLib::lib('unifiedsearch');
 
@@ -211,7 +231,8 @@ class Services_Search_Controller
             }
 
             $query->setOrder($input->sort_order->text() ?: 'title_asc');
-            $query->setRange($input->offset->int(), $input->maxRecords->int() ?: $prefs['maxRecords']);
+            $defaultMaxRecords = $isAutocomplete ? self::AUTOCOMPLETE_MAX_RECORDS : $prefs['maxRecords'];
+            $query->setRange($input->offset->int(), $input->maxRecords->int() ?: $defaultMaxRecords);
 
             $result = $query->search($lib->getIndex());
 
