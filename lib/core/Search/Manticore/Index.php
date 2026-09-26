@@ -37,6 +37,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
     public static $searchedFields = ['fulltext' => [], 'others' => []];
 
     public const ALLOWED_INDEX_SETTINGS = [
+        'morphology',
         'charset_table',
         'ignore_chars',
         'min_word_len',
@@ -292,10 +293,9 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         umask($old);
 
         $manticoreSettings = $this->getManticoreSettings();
-        $settings = array_merge($manticoreSettings['settings'], [
+        $settings = array_merge($manticoreSettings, [
             'min_infix_len' => 2,
             'stopwords' => $stopwords_file,
-            'morphology' => $manticoreSettings['morphology'],
         ]);
 
         return $settings;
@@ -305,27 +305,25 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
     {
         global $prefs;
 
-        $settings = [
-            'morphology' => '',
-            'settings' => [],
-        ];
         $json = (string) ($prefs['unified_manticore_settings'] ?? '');
         $decoded = json_decode($json, true);
-        if (is_array($decoded)) {
-            if (isset($decoded['morphology']) && is_string($decoded['morphology']) && preg_match('/^[a-zA-Z0-9_*]+(?:\s*,\s*[a-zA-Z0-9_*]+)*$/', $decoded['morphology'])) {
-                $settings['morphology'] = trim($decoded['morphology']);
-            }
-            if (isset($decoded['settings']) && is_array($decoded['settings'])) {
-                foreach ($decoded['settings'] as $key => $value) {
-                    if (is_string($key) && is_scalar($value) && in_array($key, self::ALLOWED_INDEX_SETTINGS, true) && (string) $value !== '') {
-                        $settings['settings'][$key] = (string) $value;
-                    }
-                }
-            }
+        if (! is_array($decoded)) {
+            return [];
         }
 
-        if ($settings['morphology'] === '' && ! empty($prefs['unified_manticore_morphology'])) {
-            $settings['morphology'] = $prefs['unified_manticore_morphology'];
+        if (isset($decoded['settings']) && is_array($decoded['settings'])) {
+            $decoded = array_merge($decoded['settings'], array_diff_key($decoded, ['settings' => true]));
+        }
+
+        $settings = [];
+        foreach ($decoded as $key => $value) {
+            if (! is_string($key) || ! is_scalar($value) || ! in_array($key, self::ALLOWED_INDEX_SETTINGS, true) || (string) $value === '') {
+                continue;
+            }
+            if ($key === 'morphology' && ! preg_match('/^[a-zA-Z0-9_*]+(?:\s*,\s*[a-zA-Z0-9_*]+)*$/', (string) $value)) {
+                continue;
+            }
+            $settings[$key] = trim((string) $value);
         }
 
         return $settings;

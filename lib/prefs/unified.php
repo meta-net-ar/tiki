@@ -10,7 +10,7 @@ function prefs_unified_list()
     $configureElasticsearchServiceHelp = 'How-to-configure-Tiki-for-Elasticsearch-Service';
     $manticoreSearchHelp = 'Manticore-Search';
     $pluginListHelp = 'PluginList';
-    $manticoreMorphologyOptions = 'none, lemmatize_ru, lemmatize_uk, lemmatize_en, lemmatize_de, lemmatize_ru_all, lemmatize_uk_all, lemmatize_en_all, lemmatize_de_all, stem_en, stem_ru, stem_enru, stem_cz, stem_ar, soundex, metaphone, icu_chinese, jieba_chinese, libstemmer_*';
+    $manticoreMorphologyOptions = 'none, lemmatize_ru, lemmatize_uk, lemmatize_en, lemmatize_de, lemmatize_de_v2, lemmatize_ru_all, lemmatize_uk_all, lemmatize_en_all, lemmatize_de_all, lemmatize_de_v2_all, stem_en, stem_ru, stem_enru, stem_cz, stem_ar, soundex, metaphone, icu_chinese, jieba_chinese, libstemmer_*';
 
     return [
         'unified_engine' => [
@@ -416,8 +416,8 @@ function prefs_unified_list()
         ],
         'unified_manticore_settings' => [
             'name' => tr('Manticore index settings'),
-            'description' => tr('Optional Manticore morphology and low-level tokenization settings as a JSON object. Only the documented settings are accepted; Tiki-owned settings take precedence.'),
-            'hint' => tra('JSON format:') . "\n{\n  \"morphology\": \"lemmatize_de_v2_all\",\n  \"settings\": {\n    \"charset_table\": \"non_cont, german\"\n  }\n}\n\n" . tra('Documented morphology values:') . ' ' . $manticoreMorphologyOptions . ' ' . tra('Lemmatizers require the matching Manticore language-pack files to be installed.') . ' ' . tra('Recognized low-level settings:') . ' ' . implode(', ', \Search\Manticore\Index::ALLOWED_INDEX_SETTINGS),
+            'description' => tr('Optional Manticore index settings as a JSON object. Only the documented settings are accepted; Tiki-owned settings take precedence.'),
+            'hint' => tra('JSON format:') . "\n{\n  \"morphology\": \"lemmatize_de_v2_all\",\n  \"charset_table\": \"non_cont, german\"\n}\n\n" . tra('Documented morphology values:') . ' ' . $manticoreMorphologyOptions . ' ' . tra('Lemmatizers require the matching Manticore language-pack files to be installed.') . ' ' . tra('Recognized settings:') . ' ' . implode(', ', \Search\Manticore\Index::ALLOWED_INDEX_SETTINGS),
             'type' => 'textarea',
             'size' => 6,
             'default' => '',
