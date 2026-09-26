@@ -17,6 +17,7 @@ class Search_MySql_FieldQueryBuilder
     private $escapeCallback;
     private $stopwords = [];
     private $minTokenSize = 3;
+    private $hasTooShortToken = false;
 
     /**
     * Sets the list of stopwords to be ignored during query building.
@@ -41,6 +42,7 @@ class Search_MySql_FieldQueryBuilder
 
     public function build(Search_Expr_Interface $expr, Search_Type_Factory_Interface $factory)
     {
+        $this->hasTooShortToken = false;
         $invert = false;
         $string = $expr->walk(
             function ($node, $childNodes) use ($factory, &$invert) {
@@ -52,6 +54,7 @@ class Search_MySql_FieldQueryBuilder
                     }
                     // If it's too short, treat it as empty.
                     if (mb_strlen($string) < $this->minTokenSize) {
+                        $this->hasTooShortToken = true;
                         return '';
                     }
                     // If it's a stopword, treat it as an empty token.
@@ -113,6 +116,11 @@ class Search_MySql_FieldQueryBuilder
 
         $string = str_replace('+-', '-', $string);
         return $string;
+    }
+
+    public function hasTooShortToken(): bool
+    {
+        return $this->hasTooShortToken;
     }
 
     public function isInverted()

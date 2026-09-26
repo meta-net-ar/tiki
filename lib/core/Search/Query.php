@@ -148,7 +148,15 @@ class Search_Query implements Search_Query_Interface
 
     public function filterIdentifier($query, $field)
     {
-        $this->addPart(new Search_Expr_Token($query), 'identifier', $field);
+        if (is_array($query)) {
+            $tokens = [];
+            foreach ($query as $q) {
+                $tokens[] = new Search_Expr_Token($q);
+            }
+            $this->addPart(new Search_Expr_Or($tokens), 'identifier', $field);
+        } else {
+            $this->addPart(new Search_Expr_Token($query), 'identifier', $field);
+        }
     }
 
     /**
