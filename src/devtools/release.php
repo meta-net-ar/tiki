@@ -7,10 +7,10 @@
 // ** This is the main script to release Tiki **
 //
 // To get the Tiki release HOWTO, try:
-//    php doc/devtools/release.php --howto
+//    php src/devtools/release.php --howto
 //
 // You can also get a detailed help on this script with:
-//    php doc/devtools/release.php --help
+//    php src/devtools/release.php --help
 //
 
 define('TOOLS', __DIR__);
@@ -27,7 +27,7 @@ chdir(ROOT . '/');
 
 require_once ROOT . '/lib/setup/third_party.php';
 require_once ROOT . '/path_constants.php';
-require_once ROOT . '/' . DEPRECATED_DEVTOOLS_PATH . '/vcscommons.php';
+require_once ROOT . '/' . CI_TOOLS_PATH . '/vcscommons.php';
 
 $phpCommand = $_SERVER['_'] ?? 'php';
 $phpCommandArguments = implode(' ', $_SERVER['argv']);
@@ -135,9 +135,9 @@ if (! $options['no-lang-update'] && important_step("Update language files")) {
 if (! $options['no-changelog-update'] && important_step("Update '" . CHANGELOG_FILENAME . "' file (using final version number '$version')")) {
     $output = [];
     $returnVar = 0;
-    exec("php doc/devtools/generate_changelog.php", $output, $returnVar);
+    exec("php src/ci/generate_changelog.php", $output, $returnVar);
     if ($returnVar === 0) {
-        info(">> Changelog updated successfully using doc/devtools/generate_changelog.php script.");
+        info(">> Changelog updated successfully using src/ci/generate_changelog.php script.");
         important_step("Commit new " . CHANGELOG_FILENAME, true, "[REL] Update " . CHANGELOG_FILENAME . " for $relVersion");
     } else {
         error("Changelog update failed. generate_changelog.php exited with code $returnVar.\nOutput:\n" . implode("\n", $output));
@@ -145,9 +145,9 @@ if (! $options['no-changelog-update'] && important_step("Update '" . CHANGELOG_F
 }
 
 if (! $options['no-copyright-update'] && important_step("Update '" . COPYRIGHTS_FILENAME . "' file (using final version number '$version')")) {
-    passthru("$phpCommand doc/devtools/generate_copyright.php", $exitCode);
+    passthru("$phpCommand src/devtools/generate_copyright.php", $exitCode);
     if ($exitCode === 0) {
-        info("\n>> Copyright updated successfully using doc/devtools/generate_copyright.php script.");
+        info("\n>> Copyright updated successfully using src/devtools/generate_copyright.php script.");
         important_step("Commit new " . COPYRIGHTS_FILENAME, true, "[REL] Update " . COPYRIGHTS_FILENAME . " for $relVersion");
     } else {
         error('Copyrights update failed.');
@@ -445,9 +445,15 @@ function build_packages($releaseVersion)
         die($shellout . "\n");
     }
 
-    $shellout = rrmdir($sourceDir . '/' . DEPRECATED_DEVTOOLS_PATH);
+    $shellout = rrmdir($sourceDir . '/' . CI_TOOLS_PATH);
+    $shellout .= rrmdir($sourceDir . '/' . DEV_SCRIPTS_PATH);
     if ($shellout) {
         die($shellout . "\n");
+    }
+
+    $satisConfig = $sourceDir . '/src/config/satis.json';
+    if (is_file($satisConfig) && ! unlink($satisConfig)) {
+        die("Could not delete $satisConfig\n");
     }
 
     $shellout = rrmdir($sourceDir . '/' . BIN_PATH);
@@ -684,11 +690,11 @@ function important_step($msg, $increment_step = true, $commit_msg = false)
 
 function display_usage()
 {
-    echo "Usage: php doc/devtools/release.php [ Options ] <version-number> [ <subrelease> ]
+    echo "Usage: php src/devtools/release.php [ Options ] <version-number> [ <subrelease> ]
 Examples:
-    php doc/devtools/release.php 2.0 preRC3
-    php doc/devtools/release.php 2.0 RC3
-    php doc/devtools/release.php 2.0
+    php src/devtools/release.php 2.0 preRC3
+    php src/devtools/release.php 2.0 RC3
+    php src/devtools/release.php 2.0
 
 Options:
     --howto                   : display the Tiki release HOWTO

@@ -12,9 +12,9 @@
  */
 
 if ($argc < 3) {
-    $helpMsg = "\nUsage: php doc/devtools/mergelang.php pathToSourceTikiVersion pathToTargetTikiVersion [lang=pt-br,es]\n";
-    $helpMsg .= "\nExamples: \n\t\tphp doc/devtools/mergelang.php /home/user/devel/tiki80 /home/user/deve/tiki60";
-    $helpMsg .= "\n\t\tphp doc/devtools/mergelang.php /home/user/devel/tiki80 /home/user/deve/tiki60 lang=pt-br,es\n\n";
+    $helpMsg = "\nUsage: php src/devtools/mergelang.php pathToSourceTikiVersion pathToTargetTikiVersion [lang=pt-br,es]\n";
+    $helpMsg .= "\nExamples: \n\t\tphp src/devtools/mergelang.php /home/user/devel/tiki80 /home/user/deve/tiki60";
+    $helpMsg .= "\n\t\tphp src/devtools/mergelang.php /home/user/devel/tiki80 /home/user/deve/tiki60 lang=pt-br,es\n\n";
     die($helpMsg);
 }
 

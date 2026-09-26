@@ -33,7 +33,8 @@ const TIKI_CONFIG_FILE_PATH = 'db/local.php';
 /** Location of main sql schema files for install.  For historical reasons some upgrade files are here, but do not confuse with TIKI_UPGRADE_SQL_SCHEMA_PATH */
 const TIKI_BASE_SQL_SCHEMA_PATH = 'db';
 const TIKI_UPGRADE_SQL_SCHEMA_PATH = 'installer/schema';
-const DEPRECATED_DEVTOOLS_PATH = 'doc/devtools';
+const CI_TOOLS_PATH = 'src/ci';
+const DEV_SCRIPTS_PATH = 'src/devtools';
 
 const EXPORT_DUMP_PATH = 'temp/public/dump';
 /** I think this is a remnant of Image Gallery (File gallery stores in storage/fgal by default).  benoitg 2023-04-04 */

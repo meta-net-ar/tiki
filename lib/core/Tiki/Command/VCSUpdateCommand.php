@@ -248,7 +248,7 @@ class VCSUpdateCommand extends Command
     protected function revertComposerHttp()
     {
         global $tikipath;
-        $httpModeFile = $tikipath . 'doc/devtools/composer_http_mode.php';
+        $httpModeFile = $tikipath . 'src/devtools/composer_http_mode.php';
         if (file_exists($httpModeFile)) {
             $this->execCommand("php $httpModeFile revert 2>&1");
         }
@@ -262,7 +262,7 @@ class VCSUpdateCommand extends Command
     protected function executeComposerHttp()
     {
         global $tikipath;
-        $httpModeFile = $tikipath . 'doc/devtools/composer_http_mode.php';
+        $httpModeFile = $tikipath . 'src/devtools/composer_http_mode.php';
         if (file_exists($httpModeFile)) {
             $this->execCommand("php $httpModeFile execute 2>&1");
         }
@@ -352,7 +352,7 @@ class VCSUpdateCommand extends Command
         }
 
         global $tikipath;
-        $httpModeFile = $tikipath . 'doc/devtools/composer_http_mode.php';
+        $httpModeFile = $tikipath . 'src/devtools/composer_http_mode.php';
         if ($noHttps && ! file_exists($httpModeFile)) {
             $logger->error('composer_http_mode.php file not found.');
             return Command::FAILURE;

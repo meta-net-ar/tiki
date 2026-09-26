@@ -190,7 +190,7 @@ class HtaccessChecker
         if (defined('TIKI_PATH')) {
             $tikiPath = rtrim(TIKI_PATH, '/\\');
             $paths[] = $tikiPath . '/storage/tiki-manager/maintenance/.htaccess';
-            $paths[] = $tikiPath . '/doc/devtools/maintenance/.htaccess';
+            $paths[] = $tikiPath . '/src/devtools/maintenance/.htaccess';
 
             $vendorLocations = [
                 $tikiPath . '/vendor/tikiwiki/tiki-manager',

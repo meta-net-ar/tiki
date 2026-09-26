@@ -7,7 +7,6 @@
 namespace TikiDevTools;
 
 require_once(__DIR__ . '/../../path_constants.php');
-use DBDiff;
 use Exception;
 use PDO;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -17,10 +16,14 @@ use TikiDb;
 use TWVersion;
 
 /**
- * Class CheckSqlEngineConversion is a helper to check differences between install a InnoDB Tiki and upgrade from MyISAM
+ * Class CheckSchemaUpgrade is a helper to check differences between upgrade and install a tiki db
  */
-class CheckSqlEngineConversion
+class CheckSchemaUpgrade
 {
+    //These database are actually from here:  https://gitlab.com/tikiwiki/tikiwiki-ci-databases
+    //Todo:  Try to get them from https://gitlab.com/tikiwiki/tikiwiki-ci-databases/-/blob/master/ci_%d.sql.gz and gunzip them, or better yet clone them in the cache and gunzip them
+    private const DB_URL_TEMPLATE = 'http://tiki.org/ci_%d.sql';
+
     private const DB_OLD = 'OLD';
     private const DB_NEW = 'NEW';
 
@@ -55,9 +58,34 @@ class CheckSqlEngineConversion
     protected $newDb;
 
     /**
+     * @var bool if we should use InnoDB
+     */
+    protected $useInnoDB = true;
+
+    /**
      * @var bool If it outputs the execution of db diff
      */
     protected $verbose = false;
+
+    /**
+     * @var string previous major to compare to
+     */
+    protected $previousMajor;
+
+    /**
+     * @var string folder to use for caching db versions
+     */
+    protected $cacheFolder = "dbdiff/cache";
+
+    /**
+     * @var bool Ignore changes in preferences values
+     */
+    protected $ignorePreferenceChanges = true;
+
+    /**
+     * @var bool Remove the collation key from the old databases before loading the database
+     */
+    protected $removeColumnCollateKey = true;
 
     /**
      * CheckSchemaUpgrade constructor.
@@ -65,6 +93,8 @@ class CheckSqlEngineConversion
     public function __construct()
     {
         $this->tikiRoot = dirname(dirname(__DIR__));
+
+        $this->cacheFolder = __DIR__ . '/' . $this->cacheFolder;
     }
 
     /**
@@ -74,7 +104,7 @@ class CheckSqlEngineConversion
     {
         $resultValue = 0;
 
-        $this->printMessage('Check sql engine conversion started: ' . date('c'));
+        $this->printMessage('Check schema updated started: ' . date('c'));
 
         try {
             //
@@ -88,27 +118,28 @@ class CheckSqlEngineConversion
             $tikiVersion = new TWVersion();
 
             //
-            // Run upgrade from previous major (from latest SVN)
+            // Run upgrade from previous major
             //
-            $this->printMessage('Loading database 1 as MyISAM');
+            $this->printMessage('Loading database 1 from previous major version');
             $this->writeLocalConfig($this->oldDb);
             $dbConnectionOld = $this->prepareDb($this->oldDb);
-            $this->runDatabaseInstall(false);
-            $this->printMessage('Updating database 1 from MyISAM to InnoDB');
-            $this->runSqlEngineConversionScript($dbConnectionOld);
+            $this->bootstrapDbWithPreviousMajor($dbConnectionOld);
 
+            $this->printMessage('Updating database 1 from previous major to version ' . $tikiVersion->getVersion());
+            $this->runDatabaseUpdate();
+            $this->printMessage('Updating database 1 done, now scrubbing');
             $this->scrubDbCleanThingsThatShouldChange($dbConnectionOld, $this->oldDb, self::DB_OLD);
-
+            $this->printMessage('Scrubbing database 1 done');
             //
             // Run clean db install
             //
             $this->printMessage('Installing database 2 with version ' . $tikiVersion->getVersion());
             $this->writeLocalConfig($this->newDb);
             $dbConnectionNew = $this->prepareDb($this->newDb);
-            $this->runDatabaseInstall(true);
-
+            $this->runDatabaseInstall();
+            $this->printMessage('Installing database 2 done, now scrubbing');
             $this->scrubDbCleanThingsThatShouldChange($dbConnectionNew, $this->newDb, self::DB_NEW);
-
+            $this->printMessage('Scrubbing database 2 done');
             //
             // Compare the DBS
             //
@@ -137,7 +168,7 @@ class CheckSqlEngineConversion
     {
         $this->printMessageError("\n" . 'How to execute this command:');
         $this->printMessage(
-            'php check_sql_engine_conversion.php [-v] --db1=<user:pass@host:db> --db2=<user:pass@host:db>'
+            'php check_schema_upgrade [-v] [-p] [-e=<MyISAM|InnoDB>] [-m=<major>] --db1=<user:pass@host:db> --db2=<user:pass@host:db>'
         );
         $this->printMessage('db1 and db2 are the databases to be used to load the schema');
         $this->printMessageError('!! Both databases will be erased !!' . "\n");
@@ -151,12 +182,12 @@ class CheckSqlEngineConversion
     protected function checkEnvironment()
     {
         $errors = 0;
-        $dbdiffAutoloadPath = 'dbdiff/vendor/autoload.php';
-        if (! file_exists(__DIR__ . '/' . $dbdiffAutoloadPath)) {
+
+        if (! file_exists(__DIR__ . '/dbdiff/vendor/autoload.php')) {
             $errors++;
-            $this->printMessageError($dbdiffAutoloadPath . ' not available, did you run composer for dbdiff?');
+            $this->printMessageError('dbdiff/vendor/autoload.php not available, did you run composer for dbdiff?');
         } else {
-            require_once __DIR__ . '/' . $dbdiffAutoloadPath;
+            require_once __DIR__ . '/dbdiff/vendor/autoload.php';
         }
 
         if (! file_exists($this->tikiRoot . '/' . PRIMARY_AUTOLOAD_FILE_PATH)) {
@@ -169,9 +200,19 @@ class CheckSqlEngineConversion
             require_once $this->tikiRoot . '/lib/setup/twversion.class.php';
         }
 
-        if (! is_writable($this->tikiRoot . '/' . TIKI_BASE_SQL_SCHEMA_PATH)) {
+        if (! is_dir($this->cacheFolder) && is_writable(dirname($this->cacheFolder))) {
+            mkdir($this->cacheFolder); // attempt to create folder if do not exists
+        }
+        if (! is_writable($this->cacheFolder)) {
+            // actually only a warning
+            $this->printMessageError(
+                $this->cacheFolder . ' not writable, will not be able to cache previous db version'
+            );
+        }
+
+        if (! is_writable($this->tikiRoot . '/db')) {
             $errors++;
-            $this->printMessageError($this->tikiRoot . '/' . TIKI_BASE_SQL_SCHEMA_PATH . ' not writable, can not configure tiki');
+            $this->printMessageError($this->tikiRoot . '/db' . ' not writable, can not configure tiki');
         }
 
         if ($errors > 0) {
@@ -189,7 +230,11 @@ class CheckSqlEngineConversion
     {
         $options = $this->getOpts();
 
+        $this->previousMajor = $this->getOption($options, 'm', 'major');
         $this->verbose = $this->getOption($options, 'v', 'verbose') === false;
+        $this->ignorePreferenceChanges = ! ($this->getOption($options, 'p', 'preferences') === false);
+        $this->useInnoDB = ! (strtolower($this->getOption($options, 'e', 'engine')) === 'myisam');
+        $this->removeColumnCollateKey = ! ($this->getOption($options, 'c', 'keep-collate') === false);
 
         $this->oldDbRaw = $this->getOption($options, null, 'db1');
         $result = $this->parseDbRaw($this->oldDbRaw);
@@ -257,7 +302,7 @@ class CheckSqlEngineConversion
     protected function backupLocalConfig()
     {
         if (file_exists($this->tikiRoot . '/' . TIKI_CONFIG_FILE_PATH)) {
-            $this->localConfig = $this->tikiRoot . '/' . TIKI_BASE_SQL_SCHEMA_PATH . '/sql_engine_conversion_' . uniqid() . '_local.php';
+            $this->localConfig = $this->tikiRoot . '/db/schema_update_' . uniqid() . '_local.php';
             rename($this->tikiRoot . '/' . TIKI_CONFIG_FILE_PATH, $this->localConfig);
             $this->printMessage(
                 'File: ' . $this->tikiRoot . '/' . TIKI_CONFIG_FILE_PATH . "\n" . '    renamed as ' . $this->localConfig
@@ -292,7 +337,7 @@ class CheckSqlEngineConversion
             . '$user_tiki = "' . $dbConfig['user'] . '";' . "\n"
             . '$pass_tiki = "' . $dbConfig['pass'] . '";' . "\n"
             . '$dbs_tiki = "' . $dbConfig['dbs'] . '";' . "\n"
-            . '$client_charset = "utf8mb4";' . "\n";
+            . '$client_charset = "utf8";' . "\n";
 
         file_put_contents($this->tikiRoot . '/' . TIKI_CONFIG_FILE_PATH, $local);
     }
@@ -307,6 +352,7 @@ class CheckSqlEngineConversion
     {
         $db = new PDO('mysql:host=' . $dbConfig['host'], $dbConfig['user'], $dbConfig['pass']);
         $db->query('DROP DATABASE IF EXISTS `' . $dbConfig['dbs'] . '`;');
+        //The default collation for utf8mb4 differs between MySQL 5.7 and 8.0 ( utf8mb4_general_ci for 5.7, utf8mb4_0900_ai_ci for 8.0).  Force utf8mb4_unicode_ci so DBDiff won't get confused
         $db->query(
             'CREATE DATABASE `' . $dbConfig['dbs'] . '` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
         );
@@ -315,29 +361,104 @@ class CheckSqlEngineConversion
     }
 
     /**
-     * Executes the conversion script from MyISAM to InnoDB
-     * @param $dbConnection
+     * Loads the a SQL file from a major into Tiki database (so we can run upgrade)
+     *
+     * @param PDO $dbConnection
      * @return bool
      * @throws Exception
      */
-    protected function runSqlEngineConversionScript($dbConnection)
+    protected function bootstrapDbWithPreviousMajor($dbConnection)
     {
-        $sqlFile = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'db' . DIRECTORY_SEPARATOR . 'tiki_convert_myisam_to_innodb.sql';
+        $TWV = new TWVersion();
+        $velements = explode('.', $TWV->getBaseVersion());
+        $major = (int)$velements[0];
 
-        $sql = file_get_contents($sqlFile);
+        $sql = '';
+
+        if (! empty($this->previousMajor)) {
+            $tryMajor = (int)$this->previousMajor;
+            $sql = $this->loadDbFileByMajor($tryMajor);
+        } else {
+            $tryMajor = $major - 1;
+            while ($tryMajor >= 12) {
+                $sql = $this->loadDbFileByMajor($tryMajor);
+                if (! empty($sql)) {
+                    break;
+                }
+                $tryMajor--;
+            }
+        }
+
+        if ($this->removeColumnCollateKey) {
+            $sql = $this->removeColumnCollateKeyFromSql($sql);
+        }
+
+        $this->printMessage('Loading the database for major version: ' . $tryMajor);
 
         if (! empty($sql)) {
             if ($this->runSQL($sql, $dbConnection) !== false) {
                 return true;
             } else {
                 $err = $dbConnection->errorInfo();
-                $this->printMessageError('Error running the conversion script: ' . json_encode($err));
+                $this->printMessageError('Error running the database load: ' . json_encode($err));
             }
         } else {
             $this->printMessageError('Could not retrieve valid SQL');
         }
 
-        throw new \Exception('Fail to run conversion script from MyISAM to InnoDB');
+        $this->printMessageError(
+            'Failed to load the db for previous Major, last attempt done for version ' . $tryMajor . ' currently at ' . $major
+        );
+
+        throw new \Exception('Fail to load old db');
+    }
+
+    /**
+     * Attempts to load a given major from cache or from the redirect in tiki website
+     *
+     * @param $major
+     * @return bool|string
+     */
+    protected function loadDbFileByMajor($major)
+    {
+        $cachedDbFile = $this->cacheFolder . '/ci_' . $major . '.sql';
+        if (file_exists($cachedDbFile)) {
+            $sql = file_get_contents($cachedDbFile);
+            return $sql;
+        }
+        $dbUrl = sprintf(self::DB_URL_TEMPLATE, $major);
+        $dbContent = file_get_contents($dbUrl);
+        /** @noinspection SyntaxError */
+        if (! empty($dbContent) && str_contains($dbContent, 'CREATE TABLE `tiki_schema`')) { //check that looks like a sql file
+            $sql = $dbContent;
+            file_put_contents($cachedDbFile, $dbContent);
+            return $sql;
+        }
+        $this->printMessageError(
+            "Failed to find the database schema for $major, in either  $cachedDbFile or $dbUrl"
+        );
+        // TODO: try to install old version of Tiki to get the db generated, instead of rely om pre generated files
+
+        return false;
+    }
+
+    /**
+     * Removes COLLATE from being specifically set in the column definition in tables.
+     * @param $sql
+     *
+     * @return string
+     */
+    protected function removeColumnCollateKeyFromSql($sql)
+    {
+        // `user` varchar(40) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+        // will be transformed into
+        // `user` varchar(40) NOT NULL DEFAULT '',
+        $result = preg_replace('/^([[:space:]]*`[^`]*` .*) COLLATE [^ ,]*(.*)$/m', '\1\2', $sql);
+
+        if ($result === null) {
+            return $sql;
+        }
+        return $result;
     }
 
     /**
@@ -347,10 +468,9 @@ class CheckSqlEngineConversion
      *
      * @param string $sql
      * @param PDO $dbConnection
-     * @param bool $convertToInnoDB if should run a automated conversion as part of the script from MyISAM to InnoDB
      * @return bool
      */
-    protected function runSQL($sql, $dbConnection, $convertToInnoDB = false)
+    protected function runSQL($sql, $dbConnection)
     {
         $statements = TikiDb::splitSqlStatements($sql);
 
@@ -358,9 +478,11 @@ class CheckSqlEngineConversion
         foreach ($statements as $statement) {
             if (trim($statement)) {
                 if (preg_match('/^\s*(?!-- )/m', $statement)) {// If statement is not commented
-                    if ($convertToInnoDB) {
+                    if ($this->useInnoDB) {
                         // Convert all MyISAM statments to InnoDB
                         $statement = str_ireplace("MyISAM", "InnoDB", $statement);
+                    } else {
+                        $statement = str_ireplace("InnoDB", "MyISAM", $statement);
                     }
 
                     if ($dbConnection->exec($statement) === false) {
@@ -377,12 +499,40 @@ class CheckSqlEngineConversion
     }
 
     /**
-     * Calls the Tiki console to execute a clean db install
+     * Calls the Tiki console to execute a db update
      *
-     * @param bool $useInnoDB If the db should be bootstrap with InnoDB (true) or MyISAM (false)
      * @throws Exception
      */
-    protected function runDatabaseInstall($useInnoDB)
+    protected function runDatabaseUpdate()
+    {
+        $phpFinder = new PhpExecutableFinder();
+
+        $process = new Process(
+            [
+                $phpFinder->find(),
+                'console.php',
+                'database:update',
+            ]
+        );
+        $process->setWorkingDirectory($this->tikiRoot);
+        $process->setTimeout($this->getProcessTimeout());
+
+        $process->run();
+
+        echo $process->getOutput() . $process->getErrorOutput();
+
+        if ($process->getExitCode() !== 0) {
+            $this->printMessageError('Error while running the database update');
+            throw new Exception('Error db update');
+        }
+    }
+
+    /**
+     * Calls the Tiki console to execute a clean db install
+     *
+     * @throws Exception
+     */
+    protected function runDatabaseInstall()
     {
         $phpFinder = new PhpExecutableFinder();
 
@@ -392,7 +542,7 @@ class CheckSqlEngineConversion
                 'console.php',
                 'database:install',
                 '--useInnoDB',
-                $useInnoDB ? '1' : '0',
+                $this->useInnoDB ? '1' : '0',
             ]
         );
         $process->setWorkingDirectory($this->tikiRoot);
@@ -430,9 +580,66 @@ class CheckSqlEngineConversion
             }
         }
 
+        $dbConnection->exec("DELETE FROM `tiki_preferences` WHERE name LIKE 'unified_%'");
+
+        $dbConnection->exec("DROP TABLE IF EXISTS `index_pref_en`");
+
         // This signing secret is generated per installation, so normalize it
-        // before comparing databases built through separate install flows.
+        // before comparing upgraded and freshly installed databases.
         $dbConnection->exec("UPDATE `tiki_preferences` SET `value` = REPEAT('0', 64) WHERE `name` = 'auth_token_secret'");
+
+        // set a well defined date for some records
+        $dbConnection->exec("UPDATE `tiki_schema` SET `install_date` = '2001-01-01 01:01:01'");
+
+        // remove messages from action log (are not part of the schema)
+        $dbConnection->exec("DELETE FROM `tiki_actionlog`");
+
+
+        // image gallery data was removed from tiki.sql, but preserving data in upgrades just in case, so ignore the differences
+        $dbConnection->exec("DELETE FROM `tiki_live_support_modules` WHERE `name` = 'image galleries'");
+        $dbConnection->exec("DELETE FROM `tiki_actionlog_conf` WHERE `objectType` = 'image gallery'");
+        $dbConnection->exec("DELETE FROM `tiki_score` WHERE `event` LIKE 'tiki.image%'");
+        $dbConnection->exec("DELETE FROM `tiki_menu_options` WHERE `name` = 'Image Galleries'");
+        $dbConnection->exec("DELETE FROM `tiki_menu_options` WHERE `section` = 'feature_image_galleries_comments'");
+
+        // reload tiki_live_support_modules in the upgraded tiki to account for the case where an old entry is removed
+        $dbConnection->exec("CREATE TABLE  `tiki_live_support_modules_tmp` AS SELECT * FROM `tiki_live_support_modules` ORDER BY `modId`");
+        $dbConnection->exec("ALTER TABLE `tiki_live_support_modules_tmp` CHANGE COLUMN `modId` `modId` int NULL");
+        $dbConnection->exec("UPDATE  `tiki_live_support_modules_tmp` SET `modId`=NULL");
+        $dbConnection->exec("DELETE FROM `tiki_live_support_modules`");
+        $dbConnection->exec("ALTER TABLE `tiki_live_support_modules` AUTO_INCREMENT = 1");
+        $dbConnection->exec("INSERT INTO `tiki_live_support_modules` SELECT * FROM `tiki_live_support_modules_tmp`");
+        $dbConnection->exec("DROP TABLE `tiki_live_support_modules_tmp`");
+
+        // reload tiki_menu_options in the upgraded tiki to account for the case where an old entry is removed
+        $dbConnection->exec("CREATE TABLE  `tiki_menu_options_tmp` AS SELECT * FROM `tiki_menu_options` ORDER BY menuId,type,name,url,position");
+        $dbConnection->exec("ALTER TABLE `tiki_menu_options_tmp` CHANGE COLUMN optionId optionId int NULL");
+        $dbConnection->exec("UPDATE  `tiki_menu_options_tmp` SET optionId=NULL");
+        $dbConnection->exec("DELETE FROM `tiki_menu_options`");
+        $dbConnection->exec("ALTER TABLE `tiki_menu_options` AUTO_INCREMENT = 1");
+        $dbConnection->exec("INSERT INTO `tiki_menu_options` SELECT * FROM `tiki_menu_options_tmp`");
+        $dbConnection->exec("DROP TABLE `tiki_menu_options_tmp`");
+
+        // reload tiki_actionlog_conf in the upgraded tiki to account for the case where an old entry is removed
+        $dbConnection->exec("CREATE TABLE  `tiki_actionlog_conf_tmp` AS SELECT * FROM `tiki_actionlog_conf` ORDER BY action,objectType,status");
+        $dbConnection->exec("ALTER TABLE `tiki_actionlog_conf_tmp` CHANGE COLUMN id id int NULL");
+        $dbConnection->exec("UPDATE  `tiki_actionlog_conf_tmp` SET id=NULL");
+        $dbConnection->exec("DELETE FROM `tiki_actionlog_conf`");
+        $dbConnection->exec("ALTER TABLE `tiki_actionlog_conf` AUTO_INCREMENT = 1");
+        $dbConnection->exec("INSERT INTO `tiki_actionlog_conf` SELECT * FROM `tiki_actionlog_conf_tmp`");
+        $dbConnection->exec("DROP TABLE `tiki_actionlog_conf_tmp`");
+
+        // reload tiki_sefurl_regex_out in the upgraded tiki to account for the case where an old entry is removed
+        $dbConnection->exec("CREATE TABLE `tiki_sefurl_regex_out_tmp` AS SELECT * FROM `tiki_sefurl_regex_out` ORDER BY `order`, `id`");
+        $dbConnection->exec("ALTER TABLE `tiki_sefurl_regex_out_tmp` CHANGE COLUMN id id int NULL");
+        $dbConnection->exec("UPDATE `tiki_sefurl_regex_out_tmp` SET id=NULL");
+        $dbConnection->exec("DELETE FROM `tiki_sefurl_regex_out`");
+        $dbConnection->exec("ALTER TABLE `tiki_sefurl_regex_out` AUTO_INCREMENT = 1");
+        $dbConnection->exec("INSERT INTO `tiki_sefurl_regex_out` SELECT * FROM `tiki_sefurl_regex_out_tmp`");
+        $dbConnection->exec("DROP TABLE `tiki_sefurl_regex_out_tmp`");
+
+        // normalize the DB entries to use 4 spaces instead of tabs (after the migration from tabs to spaces)
+        $dbConnection->exec("UPDATE `tiki_score` SET data = REPLACE(data, '	{', '    {')");
     }
 
     /**
@@ -447,10 +654,10 @@ class CheckSqlEngineConversion
         // Build command
         $cmd = [
             'php',
-            'doc/devtools/dbdiff/vendor/bin/dbdiff',
+            'src/ci/dbdiff/vendor/bin/dbdiff',
             "--server1={$this->oldDb['user']}:{$this->oldDb['pass']}@{$this->oldDb['host']}",
             "--server2={$this->newDb['user']}:{$this->newDb['pass']}@{$this->newDb['host']}",
-            "--type=schema",
+            "--type=all",
             "--include=all",
             "--template=" . __DIR__ . "/dbdiff/tiki.tmpl",
             "--nocomments=true",
@@ -492,20 +699,47 @@ class CheckSqlEngineConversion
                 $this->printMessageError("==Errors ==\n$err");
             }
         }
-        $result = trim(file_get_contents($outputFile));
+
+        $originalResult = trim(file_get_contents($outputFile));
         unlink($outputFile);
 
+        if ($this->ignorePreferenceChanges) {
+            $result = $this->filterPreferencesChanges($originalResult);
+        } else {
+            $result = $originalResult;
+        }
+
         if (empty($result)) {
-            $this->printMessage("\n*** Database engine change validated with success! ***\n");
+            $this->printMessage("\n*** Database upgrade validated with success! ***\n");
             return;
         }
 
-        $this->printMessageError("\n*** Issues found while validating database engine change, see below ***\n");
-        $this->printMessageError('== Result of the db Analysis =======================' . "\n");
+        $this->printMessageError("\n*** Issues found while validating database upgrade, see below ***\n");
+        $this->printMessageError('== Result of the db Analysis - missing statements ==');
         echo $result . "\n";
         $this->printMessageError('====================================================' . "\n");
 
         throw new Exception('DB compare error');
+    }
+
+
+    protected function filterPreferencesChanges($results)
+    {
+        $parts = explode("\n", $results);
+        $result = array_filter(
+            $parts,
+            function ($item) {
+                /** @noinspection SyntaxError */
+                if (
+                    strncmp($item, 'DELETE FROM `tiki_preferences`', 30) === 0
+                    || strncmp($item, 'INSERT INTO `tiki_preferences`', 30) === 0
+                ) {
+                    return false;
+                }
+                return true;
+            }
+        );
+        return implode("\n", $result);
     }
 
     /**
@@ -541,11 +775,15 @@ class CheckSqlEngineConversion
      */
     protected function getOpts()
     {
-        $shortOpts = 'v';
+        $shortOpts = 'm:vpe:c';
         $longOpts = [
+            'major:',
             'verbose',
+            'preferences',
+            'engine:',
             'db1:',
             'db2:',
+            'keep-collate',
         ];
         $options = getopt($shortOpts, $longOpts);
 
@@ -581,7 +819,7 @@ class CheckSqlEngineConversion
      */
     protected function getProcessTimeout()
     {
-        $defaultTimeoutForProcess = 120; // 2 minutes
+        $defaultTimeoutForProcess = 300; // 5 minutes
 
         if (isset($_SERVER['TIKI_CI_PROCESS_TIMEOUT'])) {
             return (float)$_SERVER['TIKI_CI_PROCESS_TIMEOUT'];
@@ -596,7 +834,7 @@ if (PHP_SAPI !== 'cli') {
     die("Please run from a shell");
 }
 
-$checker = new CheckSqlEngineConversion();
+$checker = new CheckSchemaUpgrade();
 $errors = $checker->execute();
 if ($errors > 0) {
     exit(1);

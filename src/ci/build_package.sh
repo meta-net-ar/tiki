@@ -17,7 +17,9 @@ PACKAGE_FILENAME="${PACKAGE_FILENAME:-tiki-package.tar.gz}"
 
 PACKAGE_EXCLUDES=(
     "tests"
-    "doc/devtools"
+    "src/ci"
+    "src/devtools"
+    "src/config/satis.json"
     ".git"
     ".gitignore"
     ".composercache"
@@ -65,7 +67,7 @@ echo "=> Optimize language files..."
 
 find lang/ \
     -name language.php \
-    -exec php doc/devtools/stripcomments.php {} \;
+    -exec php src/ci/stripcomments.php {} \;
 
 find lang/ -name 'language.php.old' -delete
 
@@ -83,9 +85,10 @@ for path in "${PACKAGE_EXCLUDES[@]}"; do
     TAR_EXCLUDES+=("--exclude=${path}")
 done
 
-tar \
-    "${TAR_EXCLUDES[@]}" \
-    -pczf "$PACKAGE_FILENAME" \
-    *
+package_tmp_dir="$(mktemp -d)"
+trap 'rm -rf "$package_tmp_dir"' EXIT
+
+tar -pczf "$package_tmp_dir/package.tar.gz" "${TAR_EXCLUDES[@]}" -- .
+mv "$package_tmp_dir/package.tar.gz" "$PACKAGE_FILENAME"
 
 echo "=> Package created: $PACKAGE_FILENAME"

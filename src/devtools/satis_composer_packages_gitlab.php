@@ -108,7 +108,7 @@ function isVersionless($versionless_package_list, $package_name)
 
 function getMasterSatis()
 {
-    $url = 'https://gitlab.com/tikiwiki/tiki/-/raw/master/doc/devtools/satis.json';
+    $url = 'https://gitlab.com/tikiwiki/tiki/-/raw/master/src/config/satis.json';
     $content = file_get_contents($url);
 
     return json_decode($content);

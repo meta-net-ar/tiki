@@ -76,7 +76,4 @@ echo "Update memcache prefix"
 $mysql_command "$TIKI_DBNAME" -e "update tiki_preferences set value = \"DOGFOODtiki_\" where name = \"memcache_prefix\";"
 echo "Remove cdn"
 $mysql_command "$TIKI_DBNAME" -e "update tiki_preferences set value = \"\" where name = \"tiki_cdn\";"
-echo "Upgrading HTACCESS"
-rm .htaccess
-sh doc/devtools/htaccess.sh on
 popd || exit

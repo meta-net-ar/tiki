@@ -708,7 +708,7 @@ composer()
 }
 
 http_composer() {
-    "${PHPCLI}" doc/devtools/composer_http_mode.php execute "$OPT_QUIET"
+    "${PHPCLI}" src/devtools/composer_http_mode.php execute "$OPT_QUIET"
 }
 
 npm_setup() {

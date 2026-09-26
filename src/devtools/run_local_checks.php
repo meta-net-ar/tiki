@@ -13,7 +13,7 @@ if (isset($options['skip-checks'])) {
 if (isset($options['h']) || isset($options['help'])) {
     echo <<<HELP
 Usage:
-  php doc/devtools/run_local_checks.php [options]
+  php src/devtools/run_local_checks.php [options]
 
 Options:
   --skip=1,3,8   Skip checks by step number
@@ -22,10 +22,10 @@ Options:
   -h, --help     Show this help message
 
 Examples:
-  php doc/devtools/run_local_checks.php
-  php doc/devtools/run_local_checks.php --skip=2,5,9
-  php doc/devtools/run_local_checks.php --skip-checks
-  php doc/devtools/run_local_checks.php --stop-on-failure
+  php src/devtools/run_local_checks.php
+  php src/devtools/run_local_checks.php --skip=2,5,9
+  php src/devtools/run_local_checks.php --skip-checks
+  php src/devtools/run_local_checks.php --stop-on-failure
 
 Notes:
   By default, the script attempts to rebase the current branch on top of the
@@ -92,10 +92,10 @@ $tplFiles = filesByExtension($affectedFiles, ['tpl']);
 $steps = [];
 if (hasComposerChanges($affectedFiles)) {
     $steps = [
-        ['Composer extension check', 'php doc/devtools/check_composer_extensions.php'],
+        ['Composer extension check', 'php src/ci/check_composer_extensions.php'],
         ['Composer validate', 'composer validate -d vendor_bundled --no-check-all'],
         ['Composer dry-run update', 'composer update -d vendor_bundled --dry-run'],
-        ['Composer Operator check', 'php doc/devtools/check_caret_operator.php'],
+        ['Composer Operator check', 'php src/ci/check_caret_operator.php'],
     ];
 }
 
@@ -106,7 +106,7 @@ if (! empty($phpFiles)) {
     ];
     $steps[] = [
         'Static security check (PHP)',
-        'php -d display_errors=On doc/devtools/securitycheck.php ' . listFiles($phpFiles),
+        'php -d display_errors=On src/ci/securitycheck.php ' . listFiles($phpFiles),
     ];
     $steps[] = [
         'PHPLint',
@@ -126,13 +126,13 @@ if (! empty($phpFiles)) {
 if (! empty($tplFiles)) {
     $steps[] = [
         'SmartyLint',
-        'php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --rules=doc/devtools/smartyl.rules.xml ' . listFiles($tplFiles),
+        'php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --rules=src/ci/smartyl.rules.xml ' . listFiles($tplFiles),
     ];
     $steps[] = [
         'Smarty syntax check',
-        'php doc/devtools/check_smarty_syntax.php ' . listFiles($tplFiles),
+        'php src/ci/check_smarty_syntax.php ' . listFiles($tplFiles),
     ];
-    $steps[] = ['Translation standards', 'php doc/devtools/check_template_translation_standards.php --all'];
+    $steps[] = ['Translation standards', 'php src/ci/check_template_translation_standards.php --all'];
 }
 
 if (! empty($jsFiles)) {
@@ -142,14 +142,14 @@ if (! empty($jsFiles)) {
     ];
 }
 
-$steps[] = ['BOM encoding', 'php doc/devtools/check_bom_encoding.php'];
-$steps[] = ['Unix line ending', 'php doc/devtools/check_unix_ending_line.php ' . listFiles($affectedFiles)];
-$steps[] = ['Platform binaries', 'php doc/devtools/check_platform_binaries.php'];
+$steps[] = ['BOM encoding', 'php src/ci/check_bom_encoding.php'];
+$steps[] = ['Unix line ending', 'php src/ci/check_unix_ending_line.php ' . listFiles($affectedFiles)];
+$steps[] = ['Platform binaries', 'php src/ci/check_platform_binaries.php'];
 
-$steps[] = ['SQL engine', 'php -d display_errors=On doc/devtools/check_sql_engine.php'];
-$steps[] = ['Schema SQL drop', 'php -d display_errors=On doc/devtools/check_schema_sql_drop.php'];
-$steps[] = ['Schema naming convention', 'php -d display_errors=On doc/devtools/check_schema_naming_convention.php'];
-$steps[] = ['Check packages alphabetical list', 'php doc/devtools/check_alphabetical_list.php'];
+$steps[] = ['SQL engine', 'php -d display_errors=On src/ci/check_sql_engine.php'];
+$steps[] = ['Schema SQL drop', 'php -d display_errors=On src/ci/check_schema_sql_drop.php'];
+$steps[] = ['Schema naming convention', 'php -d display_errors=On src/ci/check_schema_naming_convention.php'];
+$steps[] = ['Check packages alphabetical list', 'php src/ci/check_alphabetical_list.php'];
 
 $failedChecks = [];
 

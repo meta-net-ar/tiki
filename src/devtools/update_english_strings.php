@@ -9,13 +9,13 @@
 // This script is experimental. Always review the changes to language.php file before
 // committing.
 //
-// Also see: doc/devtools/mass_wording_corrections.pl
+// Also see: src/devtools/mass_wording_corrections.pl
 //
 
 use Tiki\Lib\Language\LangStringEscaper;
 
 if ($argc < 3) {
-    die("\nUsage: php doc/devtools/update_english_strings.php \"oldString\" \"newString\"\n\n");
+    die("\nUsage: php src/devtools/update_english_strings.php \"oldString\" \"newString\"\n\n");
 }
 
 set_include_path(get_include_path() . PATH_SEPARATOR . '../../');
