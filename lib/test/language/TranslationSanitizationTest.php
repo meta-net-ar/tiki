@@ -62,8 +62,6 @@ $lang = array(
         $reflection = new \ReflectionClass(LanguageTranslator::class);
         $instancesProperty = $reflection->getProperty('instances');
         $instancesProperty->setValue(null, []);
-        // Clean up to avoid leaking state between tests
-        unset($_SERVER['REQUEST_URI']);
     }
 
     protected function tearDown(): void
@@ -83,6 +81,8 @@ $lang = array(
         $reflection = new \ReflectionClass(LanguageTranslator::class);
         $instancesProperty = $reflection->getProperty('instances');
         $instancesProperty->setValue(null, []);
+        // Clean up to avoid leaking state between tests
+        unset($_SERVER['REQUEST_URI']);
     }
 
     /**

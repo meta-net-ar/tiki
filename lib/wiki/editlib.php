@@ -35,7 +35,19 @@ class EditLib
     // Fields for handling links to external wiki pages
     private $external_wikis = null;
 
-
+    private const HTML_TAGS = [
+        '!DOCTYPE', 'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'base', 'bdo',
+        'bgsound', 'blink', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'col',
+        'colgroup', 'command', 'comme;nt', 'datalist', 'dd', 'del', 'details', 'div', 'dl', 'dt',
+        'embed', 'fieldset', 'figure', 'b', 'i', 'small', 'tt', 'footer', 'form', 'head',
+        'header', 'hgroup', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'html', 'isindex', 'iframe', 'ilayer', 'img',
+        'input', 'ins', 'keygen', 'label', 'layer', 'legend', 'li', 'link', 'map', 'mark',
+        'marquee', 'menu', 'meta', 'meter', 'multicol', 'nav', 'nobr', 'noembed', 'noscript',
+        'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'cite', 'code', 'dfn', 'em',
+        'kbd', 'samp', 'strong', 'var', 'plaintext', 'pre', 'progress', 'q', 'ruby', 'script',
+        'section', 'select', 'spacer', 'span', 's', 'style', 'sub', 'sup', 'table', 'tbody', 'td',
+        'textarea', 'tfoot', 'thead', 'time', 'title', 'tr', 'u', 'ul', 'video', 'wbr', 'xmp', 'strike'
+    ];
     // general
 
     public function make_sure_page_to_be_created_is_not_an_alias($page, $page_info)
@@ -1596,7 +1608,7 @@ class EditLib
         $old_pref = $prefs['wiki_heading_links'];
         $prefs['wiki_heading_links'] = 'n';
         $hashed = [];
-
+        $raw_data = $data;
         if ($target_syntax == 'markdown') {
             // handle some Tiki syntax to Wiki plugins that are not supported in Markdown
             $data = preg_replace('/-=(.+?)=-/', "{DIV(class=titlebar)}$1{DIV}", $data);
@@ -1658,6 +1670,8 @@ class EditLib
         $wikiParserParsable->stripPlugins('maketoc');
         $wikiParserParsable->stripPlugins('wantedpages');
         $wikiParserParsable->stripPlugins('markdown');
+        $wikiParserParsable->stripPlugins('js');
+        $wikiParserParsable->stripPlugins('jq');
         $wikiParserParsable->stripNP();
         $html = $wikiParserParsable->parse([
             'noparseplugins' => true,
@@ -1681,10 +1695,19 @@ class EditLib
         }
 
         if ($target_syntax == 'markdown') {
-            // convert to markdown
+            // convert to Markdown
             if ($source_syntax == 'markdown') {
                 throw new Exception(tr("Content already in markdown syntax."));
             }
+            /*
+           * Check if content is HTML, wiki page can be used as template and have HTML content that can not be converted
+           * to preserve content formating and looks.
+           *
+           */
+            if ($this->isHtmlContent($raw_data)) {
+                return $this->removeSyntaxPlugin($raw_data);
+            }
+
             static $converter = null;
             if (! $converter) {
                 $converter = new League\HTMLToMarkdown\HtmlConverter([
@@ -1697,7 +1720,7 @@ class EditLib
                 $converter->getEnvironment()->addConverter(new StrikeConverter());
             }
 
-            // GithubFlovoredMarkdown uses ~text~ for striking through.
+            // GitHub Flavored Markdown uses ~text~ for striking through.
             // This escapes ~ as in tiki syntax it is printed as it is
             $html = preg_replace('/~/', 'preserveTildeChar', $html);
 
@@ -1835,19 +1858,7 @@ class EditLib
 
     private function preserveInvalidTags(&$data)
     {
-        $validTags = [
-            '!DOCTYPE', 'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'base', 'bdo',
-            'bgsound', 'blink', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'col',
-            'colgroup', 'command', 'comme;nt', 'datalist', 'dd', 'del', 'details', 'div', 'dl', 'dt',
-            'embed', 'fieldset', 'figure', 'b', 'i', 'small', 'tt', 'footer', 'form', 'head',
-            'header', 'hgroup', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'html', 'isindex', 'iframe', 'ilayer', 'img',
-            'input', 'ins', 'keygen', 'label', 'layer', 'legend', 'li', 'link', 'map', 'mark',
-            'marquee', 'menu', 'meta', 'meter', 'multicol', 'nav', 'nobr', 'noembed', 'noscript',
-            'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'cite', 'code', 'dfn', 'em',
-            'kbd', 'samp', 'strong', 'var', 'plaintext', 'pre', 'progress', 'q', 'ruby', 'script',
-            'section', 'select', 'spacer', 'span', 's', 'style', 'sub', 'sup', 'table', 'tbody', 'td',
-            'textarea', 'tfoot', 'thead', 'time', 'title', 'tr', 'u', 'ul', 'video', 'wbr', 'xmp', 'strike'
-        ];
+        $validTags = self::HTML_TAGS;
 
         $invalidTags = [];
         $data = preg_replace_callback("/<(?:\"[^\"]*\"['\"]*|'[^']*'['\"]*|[^'\">])+>/s", function ($m) use (&$invalidTags, $validTags) {
@@ -2151,5 +2162,51 @@ class EditLib
         }
 
         return $style;
+    }
+
+    /**
+     * Determine whether a given string contains HTML markup.
+     *
+     * This method applies multiple regex checks to detect common HTML structures:
+     *  - Doctype declarations (e.g., <!doctype html>)
+     *  - HTML comments (<!-- ... -->)
+     * - Tags matching known HTML elements (from self::HTML_TAGS) or custom elements
+     *
+     * The detection is heuristic: it identifies whether the content appears to be
+     * written as HTML markup, regardless of whether it is strictly valid or well-formed.
+     *
+     * This function does not validate HTML correctness. It may return true for
+     * malformed or incomplete markup, and false for plain text without tags.
+     *
+     * @param string $content The input string to analyze.
+     *
+     * @return bool True if the content is likely HTML code, false otherwise.
+     */
+    private function isHtmlContent(string $content): bool
+    {
+        if (trim($content) === '') {
+            return false;
+        }
+
+        if (preg_match('/<!doctype\s+html\b/i', $content) === 1) {
+            return true;
+        }
+
+        if (preg_match('/<!--(?:.|\R)*?-->/', $content) === 1) {
+            return true;
+        }
+
+        $tagPattern = '/<\s*\/?\s*([a-z][a-z0-9:-]*)(?=[\s\/>])(?:[^<>"\']|"[^"]*"|\'[^\']*\')*\/?>/i';
+        if (preg_match_all($tagPattern, $content, $matches) === false) {
+            return false;
+        }
+
+        foreach ($matches[1] as $tagName) {
+            $tagName = strtolower($tagName);
+            if (in_array($tagName, self::HTML_TAGS, true) || str_contains($tagName, '-')) {
+                return true;
+            }
+        }
+        return false;
     }
 }
