@@ -33,6 +33,18 @@ describe("applyAutocomplete", () => {
         expect(expectedAutoCompleteElement.getAttribute("remote-query-key")).toBe(givenRemoteQueryKey);
     });
 
+    test.each([
+        [3, "3"],
+        [undefined, null],
+    ])("sets the 'min-chars' attribute from options.minChars (%s)", (givenMinChars, expected) => {
+        const givenInput = document.createElement("input");
+        document.body.appendChild(givenInput);
+
+        applyAutocomplete(givenInput, { remoteSourceUrl: "https://foo.bar", minChars: givenMinChars });
+
+        expect(givenInput.nextElementSibling.getAttribute("min-chars")).toBe(expected);
+    });
+
     test("should set the 'transform-result-fn' attribute on the autocomplete element when a transformResultCb is provided", () => {
         const givenInput = document.createElement("input");
         document.body.appendChild(givenInput);
