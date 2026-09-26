@@ -128,8 +128,8 @@ class PdfGenerator
                         ['timeout' => 120]
                     );
                 }
-                if ((isset($params['printpages']) && is_array($params['printpages'])) || (isset($params['printpages']) && is_array($params['printstructures']))) {
-                    if (is_array($params['printpages'])) {
+                if ((isset($params['printpages']) && is_array($params['printpages'])) || (isset($params['printstructures']) && is_array($params['printstructures']))) {
+                    if (isset($params['printpages']) && is_array($params['printpages'])) {
                         $params['printpages'] = implode('&', $params['printpages']);
                     } else {
                         $params['printpages'] = implode('&', $params['printstructures']);
