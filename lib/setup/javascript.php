@@ -262,6 +262,7 @@ if (! timezone) {
     $jqueryTiki['feature_search_show_object_type'] = $prefs['feature_search_show_object_type'] === 'y';
     $jqueryTiki['user_mention_enabled'] = $prefs['feature_tag_users'] === 'y';
     $jqueryTiki['tiki_object_selector_wildcardsearch'] = $prefs['tiki_object_selector_wildcardsearch'] === 'y';
+    $jqueryTiki['autocomplete_search_min_chars'] = max(1, (int) ($prefs['elementplus_autocomplete_search_min_chars'] ?? 3));
 // Check if user has active tasks (Pending or InProgress) to enable smart polling
     $hasActiveJobs = false;
     if (($prefs['feature_queued_tasks'] ?? 'n') === 'y') {
