@@ -1,68 +1,53 @@
-import { test, expect } from '../../common/test';
-import { login, goToEncryptionTab, createKey, getShares, assertKeyInTable, deleteKey, openCreateKeyTab } from './helpers';
+import { test, expect } from "../../common/test";
+import { useSuiteFixtures } from "../../common/fixtures";
+import {
+    login,
+    goToEncryptionTab,
+    openCreateKey,
+    fillKeyForm,
+    applyKeyForm,
+    getShares,
+    backToDashboard,
+    assertKeyInTable,
+    deleteKey,
+    app,
+} from "./helpers";
 
-test.describe('TC-02 — Create a key and verify shares', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page);
-    await goToEncryptionTab(page);
-  });
+const KEY_NAME = `TC02-EncKey-${Date.now()}`;
 
-  test('Creating a key with empty name fails gracefully', async ({ page }) => {
-    await openCreateKeyTab(page);
-    await page.locator('input[type="submit"][value="Apply"]').last().click();
-    await page.waitForLoadState('networkidle');
+// The paired teardown removes any key a failed journey left behind.
+useSuiteFixtures(test);
 
-    // Check that no key with an empty name exists in the table
-    // (Tiki silently rejects empty names — no key is created)
-    await page.locator("a[href='#contentencryption-1']").click();
-    await page.locator('#contentencryption-1').waitFor({ state: 'visible' });
-    const nameCells = page.locator('#contentencryption-1 table td:first-child');
-    const count = await nameCells.count();
-    for (let i = 0; i < count; i++) {
-      const text = await nameCells.nth(i).textContent();
-      // Every key name cell must be non-empty (no blank-name key was created)
-      expect(text?.trim()).not.toBe('');
-    }
-  });
+test.describe("TC-02 — Create a key", () => {
+    test("A created key shows its shares once, then appears in the table without them", async ({ page }) => {
+        await login(page);
+        await goToEncryptionTab(page);
+        await openCreateKey(page);
 
-  test('Creating a key shows shares only once after save', async ({ page }) => {
-    const keyName = `TestKey-${Date.now()}`;
-    // Must select at least one user — otherwise "Key must be shared with minimum of one user"
-    await createKey(page, keyName, 'Automated test key', ['Test1']);
+        // Apply stays disabled until the form carries a name. The controller-side
+        // duplicate and no-shares rules live in Encryption/ControllerTest.
+        await expect(app(page).getByRole("button", { name: "Apply" })).toBeDisabled();
 
-    const shares = await getShares(page);
-    expect(shares.length).toBeGreaterThan(0);
+        await fillKeyForm(page, KEY_NAME, "Created by the e2e suite", ["Test1"]);
+        await applyKeyForm(page);
 
-    // Reload — shares must NOT be shown again
-    await page.reload();
-    await goToEncryptionTab(page);
-    const sharesAfterReload = await getShares(page);
-    expect(sharesAfterReload.length).toBe(0);
+        await expect(app(page).getByText(`Key “${KEY_NAME}” saved.`)).toBeVisible();
+        await expect(app(page).getByText("Save your share now.")).toBeVisible();
 
-    // Cleanup
-    await deleteKey(page, keyName);
-  });
+        const shares = await getShares(page);
+        expect(shares).toHaveLength(1);
+        expect(shares[0].length).toBeGreaterThan(0);
 
-  test('Created key appears in Available keys table', async ({ page }) => {
-    const keyName = `TestKey-Table-${Date.now()}`;
-    await createKey(page, keyName, 'Table test', ['Test1']);
-    await assertKeyInTable(page, keyName);
+        await backToDashboard(page);
+        await assertKeyInTable(page, KEY_NAME);
 
-    // Cleanup
-    await deleteKey(page, keyName);
-  });
+        // Shares are shown once: coming back to the dashboard and reloading must
+        // not surface them again anywhere on the page.
+        await page.reload();
+        await goToEncryptionTab(page);
+        await expect(page.getByText("Save your share now.")).toHaveCount(0);
+        await expect(page.locator("body")).not.toContainText(shares[0]);
 
-  test('Key table row has correct columns', async ({ page }) => {
-    const keyName = `TestKey-Cols-${Date.now()}`;
-    await createKey(page, keyName, '', ['Test1']);
-    await page.locator("a[href='#contentencryption-1']").click();
-
-    const row = page.locator('#contentencryption-1 table tr').filter({ hasText: keyName });
-    await expect(row).toBeVisible();
-    // Edit pencil and delete button present
-    await expect(row.locator('a[href*="encryption_key"]')).toBeVisible();
-    await expect(row.locator('button[name="key_delete"]')).toBeVisible();
-
-    await deleteKey(page, keyName);
-  });
+        await deleteKey(page, KEY_NAME);
+    });
 });

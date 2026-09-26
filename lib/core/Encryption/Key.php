@@ -68,13 +68,6 @@ class Key
         }
     }
 
-    public function manualEntry()
-    {
-        $smarty = TikiLib::lib('smarty');
-        $href = \SmartyTiki\FunctionHandler\BootstrapModal::render(['controller' => 'encryption', 'action' => 'enter_key', 'keyId' => $this->encryption_key['keyId']], $smarty->getEmptyInternalTemplate());
-        return '<a href="' . $href . '" class="encryption-key-entry">' . tr('Try with a manually entered key.') . '</a>';
-    }
-
     /**
      * Checks whether the encryption key can be decrypted with the current user's share.
      *

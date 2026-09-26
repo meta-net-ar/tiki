@@ -32,6 +32,14 @@ function delete_keys_by_name(string $name): int
     return count($matches);
 }
 
+function delete_keys_by_prefix(string $prefix): int
+{
+    $enclib  = TikiLib::lib('encryption');
+    $matches = array_filter($enclib->get_keys(), fn($k) => str_starts_with((string) $k['name'], $prefix));
+    array_walk($matches, fn($k) => $enclib->delete_key($k['keyId']));
+    return count($matches);
+}
+
 function delete_key_by_id(int $keyId): void
 {
     TikiLib::lib('encryption')->delete_key($keyId);

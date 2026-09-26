@@ -301,6 +301,19 @@ class Services_Encryption_Controller
         return $this->encryptionlib->get_encrypted_fields();
     }
 
+    /**
+     * Stores a user-supplied key share in the session after verifying it.
+     *
+     * POST only. The Vue EnterKeyModal component is the sole caller; the legacy
+     * Smarty modal and its GET rendering path were removed along with the rest of
+     * the pre-Vue Shared Secrets UI.
+     *
+     * @param JitFilter $input  POST parameters: keyId (int), shared_key (text)
+     * @return array  closeModal payload
+     * @throws Services_Exception_NotFound     If the key does not exist
+     * @throws Services_Exception_MissingValue If the request is not a POST carrying a share
+     * @throws Services_Exception_FieldError   If the share does not match the key
+     */
     public function action_enter_key($input)
     {
         $encryption_key = $this->encryptionlib->get_key($input->keyId->int());
@@ -340,16 +353,7 @@ class Services_Encryption_Controller
                 return Services_Utilities::closeModal();
             }
         }
-        // GET path: kept for backward compatibility with any non-Vue callers.
-        // The Vue EnterKeyModal component always calls this endpoint via POST only.
-        // This action is not admin-gated (any holder enters their own key), so the
-        // key row must be projected before it is serialized — the raw secret
-        // (Shamir share[0]) and verificationCanary must never leave the server.
-        return [
-            'title' => tr('Enter key'),
-            'encryption_key' => $this->projectKeyForClient($encryption_key),
-            'shared_key' => @$_SESSION['encryption_shared_keys'][$encryption_key['keyId']],
-        ];
+        throw new Services_Exception_MissingValue('shared_key');
     }
 
     /**
@@ -412,55 +416,6 @@ class Services_Encryption_Controller
         } catch (\Tiki\Encryption\Exception $e) {
             return ['value' => null, 'error' => tr('Decryption failed: %0', $e->getMessage())];
         }
-    }
-
-    /**
-     * Verifies that the session key for the given encryption key is correct,
-     * using the verificationCanary stored on the key record.
-     *
-     * Transitional: currently called only by the legacy jQuery tracker-field-unlock.js
-     * for new-item (itemId=0) unlock. The Vue EnterKeyModal component performs the
-     * same verification internally via action_enter_key's canary check, so it does not
-     * call this endpoint directly.
-     *
-     * If no verificationCanary exists (legacy key), verification is skipped
-     * and the action returns {verified: true} — a conservative fallback.
-     *
-     * @param JitFilter $input  POST parameters: keyId (int)
-     * @return array{verified: bool}|array{error: string}
-     */
-    public function action_verify_key($input)
-    {
-        global $user;
-        if (empty($user)) {
-            throw new Services_Exception_Denied(tr('Permission denied'));
-        }
-
-        $keyId = $input->keyId->int();
-        $encryption_key = $this->encryptionlib->get_key($keyId);
-
-        if (empty($encryption_key)) {
-            return ['error' => tr('Key not found.')];
-        }
-
-        if (empty($encryption_key['verificationCanary'])) {
-            // Legacy key without a canary: cannot perform cryptographic
-            // verification. Accept optimistically; enter_key is the only gate.
-            return ['verified' => true];
-        }
-
-        $keyObj = new \Tiki\Encryption\Key($encryption_key['keyId']);
-        try {
-            $verified = $keyObj->decryptData($encryption_key['verificationCanary']);
-        } catch (\Exception $e) {
-            $verified = false;
-        }
-
-        if ($verified !== 'tiki-key-verify-v1') {
-            return ['error' => tr('The entered key is incorrect for this encryption key.')];
-        }
-
-        return ['verified' => true];
     }
 
     /**

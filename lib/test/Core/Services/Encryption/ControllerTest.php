@@ -379,29 +379,60 @@ class Services_Encryption_ControllerTest extends TikiTestCase
         });
     }
 
-    public function testVerifyKeyReturnsErrorForUnknownKey()
-    {
-        global $user;
-        $user = 'admin';
-        $result = $this->subject->action_verify_key(new JitFilter(['keyId' => 999999]));
-        $this->assertArrayHasKey('error', $result);
-        $user = '';
-    }
-
-    public function testVerifyKeyReturnsTrueAfterEnterKey()
+    public function testEnterKeyRejectsAWrongShareFromAUserWithNoStoredShare()
     {
         $this->shareKeyWithUser(function ($result) {
             global $user;
-            // Simulate entering the key via action_enter_key so the session holds the share
+            // A holder of a stored share is verified against that stored share,
+            // so the submitted value is never consulted. The session path this
+            // action exists for is only exercised by a user who holds none.
+            $user = 'admin';
             $_SERVER['REQUEST_METHOD'] = 'POST';
+            $this->expectException(Services_Exception_FieldError::class);
             $this->subject->action_enter_key(new JitFilter([
                 'keyId'      => $result['keyId'],
-                'shared_key' => $result['shares'][0],
+                'shared_key' => 'not-a-valid-share',
+            ]));
+        });
+    }
+
+    public function testEnterKeyRefusesARequestCarryingNoShare()
+    {
+        $this->shareKeyWithUser(function ($result) {
+            $_SERVER['REQUEST_METHOD'] = 'POST';
+            $this->expectException(Services_Exception_MissingValue::class);
+            $this->subject->action_enter_key(new JitFilter(['keyId' => $result['keyId']]));
+        });
+    }
+
+    public function testEnterKeyRefusesAGetRequest()
+    {
+        $this->shareKeyWithUser(function ($result) {
+            $_SERVER['REQUEST_METHOD'] = 'GET';
+            $this->expectException(Services_Exception_MissingValue::class);
+            $this->subject->action_enter_key(new JitFilter(['keyId' => $result['keyId']]));
+        });
+    }
+
+    public function testRegenerationFromASuppliedOldShareReissuesEveryShare()
+    {
+        $this->shareKeyWithUser(function ($result) {
+            global $user;
+            // The sss-admin edit form posts `regenerate` without an `old_share`, so
+            // it can only regenerate a key the acting user already holds. The
+            // supplied-share path stays reachable through the service and is the
+            // only way an admin who holds nothing can recover a key.
+            $user = 'admin';
+            $regenerated = $this->subject->action_save_key(new JitFilter([
+                'keyId'      => $result['keyId'],
+                'name'       => 'test key',
+                'users'      => 'user1',
+                'regenerate' => 1,
+                'old_share'  => $result['shares'][0],
             ]));
 
-            $verified = $this->subject->action_verify_key(new JitFilter(['keyId' => $result['keyId']]));
-            $this->assertArrayHasKey('verified', $verified);
-            $this->assertTrue($verified['verified']);
+            $this->assertNotEmpty($regenerated['shares']);
+            $this->assertNotContains($result['shares'][0], $regenerated['shares']);
         });
     }
 
@@ -514,21 +545,6 @@ class Services_Encryption_ControllerTest extends TikiTestCase
             TikiLib::lib('user')->remove_user('user1');
             $user = '';
         }
-    }
-
-    public function testEnterKeyGetResponseExcludesKeyMaterial()
-    {
-        $this->shareKeyWithUser(function ($result) {
-            // The GET/legacy path is not admin-gated (any holder enters their own
-            // key), so its serialized key row must be projected — the raw secret
-            // (Shamir share[0]) and verificationCanary must never leave the server.
-            $_SERVER['REQUEST_METHOD'] = 'GET';
-            $response = $this->subject->action_enter_key(new JitFilter(['keyId' => $result['keyId']]));
-            $this->assertArrayHasKey('encryption_key', $response);
-            $this->assertEquals($result['keyId'], $response['encryption_key']['keyId']);
-            $this->assertArrayNotHasKey('secret', $response['encryption_key']);
-            $this->assertArrayNotHasKey('verificationCanary', $response['encryption_key']);
-        });
     }
 
     private function shareKeyWithUser($cb)

@@ -1,76 +1,30 @@
-import { test, expect } from '../../common/test';
-import { login, goToEncryptionTab, createKey, getShares, assertKeyInTable, deleteKey, openCreateKeyTab } from './helpers';
+import { test, expect } from "../../common/test";
+import { useSuiteFixtures } from "../../common/fixtures";
+import { login, goToEncryptionTab, openCreateKey, fillKeyForm, applyKeyForm, getShares, backToDashboard, keyRow, deleteKey } from "./helpers";
 
-// TC-03 — Create a key shared with Tiki users (User Encryption enabled)
-// On v27.x: User Encryption IS enabled. Test users Test1 and Test2 are available.
-// Shares are stored in user preferences and displayed once after creation.
+const KEY_NAME = `TC03-EncKey-${Date.now()}`;
 
-test.describe('TC-03 — Create a key with users (User Encryption enabled)', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page);
-    await goToEncryptionTab(page);
-  });
+// The paired teardown removes any key a failed journey left behind.
+useSuiteFixtures(test);
 
-  test('Users selector is visible in Create Key form', async ({ page }) => {
-    await openCreateKeyTab(page);
-    // With User Encryption enabled, the users multi-select is shown.
-    // Field is name="users" (not "users[]"); Select2/Element Plus enhances it.
-    await expect(page.locator('#user_selector_1')).toBeAttached();
-  });
+test.describe("TC-03 — Create a key shared with users", () => {
+    test("Two authorized users produce two shares and both appear on the key's row", async ({ page }) => {
+        await login(page);
+        await goToEncryptionTab(page);
+        await openCreateKey(page);
+        await fillKeyForm(page, KEY_NAME, "", ["Test1", "Test2"]);
+        await applyKeyForm(page);
 
-  test('Creating a key with Test1 generates one share', async ({ page }) => {
-    const keyName = `TC03-Single-${Date.now()}`;
-    await createKey(page, keyName, 'TC-03 single user test', ['Test1']);
+        const shares = await getShares(page);
+        expect(shares).toHaveLength(2);
+        expect(shares[0]).not.toEqual(shares[1]);
 
-    // One share should be shown after creation
-    const shares = await getShares(page);
-    expect(shares.length).toBeGreaterThan(0);
-    // Shares are non-empty strings
-    shares.forEach(s => expect(s.trim()).not.toBe(''));
+        await backToDashboard(page);
+        const row = keyRow(page, KEY_NAME);
+        await expect(row).toContainText("Test1");
+        await expect(row).toContainText("Test2");
+        await expect(row.locator(".badge").first()).toHaveText("2");
 
-    // Cleanup
-    await deleteKey(page, keyName);
-  });
-
-  test('Creating a key with Test1 and Test2 generates two shares', async ({ page }) => {
-    const keyName = `TC03-Multi-${Date.now()}`;
-    await createKey(page, keyName, 'TC-03 multi-user test', ['Test1', 'Test2']);
-
-    const shares = await getShares(page);
-    // Two users = two shares
-    expect(shares.length).toBe(2);
-
-    // Cleanup
-    await deleteKey(page, keyName);
-  });
-
-  test('Key created with users appears in Available keys table with correct user', async ({ page }) => {
-    const keyName = `TC03-Table-${Date.now()}`;
-    await createKey(page, keyName, '', ['Test1']);
-    await assertKeyInTable(page, keyName);
-
-    // Table row should mention Test1
-    const row = page.locator('#contentencryption-1 table tr').filter({ hasText: keyName });
-    await expect(row).toContainText('Test1');
-
-    // Cleanup
-    await deleteKey(page, keyName);
-  });
-
-  test('Shares are not shown after page reload', async ({ page }) => {
-    const keyName = `TC03-Reload-${Date.now()}`;
-    await createKey(page, keyName, '', ['Test1']);
-
-    const sharesBeforeReload = await getShares(page);
-    expect(sharesBeforeReload.length).toBeGreaterThan(0);
-
-    // Reload — shares must be gone (they are one-time display only)
-    await page.reload();
-    await goToEncryptionTab(page);
-    const sharesAfterReload = await getShares(page);
-    expect(sharesAfterReload.length).toBe(0);
-
-    // Cleanup
-    await deleteKey(page, keyName);
-  });
+        await deleteKey(page, KEY_NAME);
+    });
 });

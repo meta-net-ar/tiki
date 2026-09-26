@@ -1,78 +1,23 @@
-import { test, expect } from '../../common/test';
-import { login, goToEncryptionTab, createKey, openAvailableKeysTab } from './helpers';
+import { test } from "../../common/test";
+import { useSuiteFixtures } from "../../common/fixtures";
+import { login, goToEncryptionTab, createKey, backToDashboard, deleteKey, assertKeyInTable, assertKeyNotInTable } from "./helpers";
 
-// confirmPopup() in Tiki shows a Bootstrap modal, NOT a native browser dialog.
-// Modal id: #bootstrap-modal  Cancel: button.btn-dismiss  Confirm: input[value="OK"]
+const KEY_NAME = `TC07-EncKey-${Date.now()}`;
 
-test.describe('TC-07 — Key deletion', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page);
-    await goToEncryptionTab(page);
-  });
+// The paired teardown removes any key a failed journey left behind.
+useSuiteFixtures(test);
 
-  test('Cancel on delete confirmation keeps the key', async ({ page }) => {
-    const keyName = `TestKey-Del-${Date.now()}`;
-    await createKey(page, keyName, '', ['Test1']);
-    await openAvailableKeysTab(page);
+test.describe("TC-07 — Key deletion", () => {
+    test("Dismissing the confirmation keeps the key; accepting it removes the row", async ({ page }) => {
+        await login(page);
+        await goToEncryptionTab(page);
+        await createKey(page, KEY_NAME, "", ["Test1"]);
+        await backToDashboard(page);
 
-    const row = page.locator('#contentencryption-1 table tr').filter({ hasText: keyName });
-    await row.locator('button[name="key_delete"]').first().click();
+        await deleteKey(page, KEY_NAME, false);
+        await assertKeyInTable(page, KEY_NAME);
 
-    // Wait for Bootstrap modal
-    await page.locator('#bootstrap-modal.show').waitFor({ state: 'visible', timeout: 5000 });
-
-    // Click Close (cancel) — key must stay
-    await page.locator('#bootstrap-modal button.btn-dismiss').click();
-    await page.locator('#bootstrap-modal.show').waitFor({ state: 'hidden', timeout: 5000 });
-
-    // Key must still be there
-    await expect(page.locator('#contentencryption-1 table')).toContainText(keyName);
-
-    // Cleanup — now actually delete
-    await row.locator('button[name="key_delete"]').first().click();
-    await page.locator('#bootstrap-modal.show').waitFor({ state: 'visible', timeout: 5000 });
-    await page.locator('#bootstrap-modal input[type="submit"][value="OK"]').click();
-    await page.waitForLoadState('networkidle');
-  });
-
-  test('Confirming delete removes key from table', async ({ page }) => {
-    const keyName = `TestKey-Confirm-Del-${Date.now()}`;
-    await createKey(page, keyName, '', ['Test1']);
-    await openAvailableKeysTab(page);
-
-    const row = page.locator('#contentencryption-1 table tr').filter({ hasText: keyName });
-    await row.locator('button[name="key_delete"]').first().click();
-
-    await page.locator('#bootstrap-modal.show').waitFor({ state: 'visible', timeout: 5000 });
-    await page.locator('#bootstrap-modal input[type="submit"][value="OK"]').click();
-
-    // The confirm submits a POST that deletes the key server-side, but the admin security
-    // page does not refresh the Available keys table in place. Reload the tab fresh so the
-    // assertion reads post-delete server state — waiting on 'networkidle' alone races the
-    // stale in-page DOM and fails non-deterministically.
-    await page.waitForLoadState('networkidle').catch(() => {});
-    await goToEncryptionTab(page);
-    await openAvailableKeysTab(page);
-
-    await expect(page.locator('#contentencryption-1 table')).not.toContainText(keyName);
-  });
-
-  test('Delete confirmation modal mentions data loss warning', async ({ page }) => {
-    const keyName = `TestKey-Warning-${Date.now()}`;
-    await createKey(page, keyName, '', ['Test1']);
-    await openAvailableKeysTab(page);
-
-    const row = page.locator('#contentencryption-1 table tr').filter({ hasText: keyName });
-    await row.locator('button[name="key_delete"]').first().click();
-
-    await page.locator('#bootstrap-modal.show').waitFor({ state: 'visible', timeout: 5000 });
-
-    // The modal title should mention data loss
-    const modalTitle = await page.locator('#bootstrap-modal .modal-title').textContent();
-    expect(modalTitle?.toLowerCase()).toContain('lost');
-
-    // Cleanup — confirm deletion
-    await page.locator('#bootstrap-modal input[type="submit"][value="OK"]').click();
-    await page.waitForLoadState('networkidle');
-  });
+        await deleteKey(page, KEY_NAME, true);
+        await assertKeyNotInTable(page, KEY_NAME);
+    });
 });
