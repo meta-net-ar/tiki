@@ -1,13 +1,14 @@
 import { applyAutocomplete } from "@vue-widgets/el-autocomplete";
 
 export default function autocomplete(element, resourceType, options = {}) {
-    const { url, sourceList, valueKey, transformResultCb, customRemoteQueryKey } = getAutocompleteResources(resourceType, options);
+    const { url, sourceList, valueKey, transformResultCb, customRemoteQueryKey, minChars } = getAutocompleteResources(resourceType, options);
     const autocompleteOptions = {
         remoteSourceUrl: url,
         sourceList,
         valueKey,
         transformResultCb,
         remoteQueryKey: customRemoteQueryKey,
+        minChars: options.minChars ?? minChars,
     };
 
     if (resourceType == "pagename" && ($(element).attr("name") == "highlight" || /^search_mod_input_\d|highlight$/.test($(element).attr("id")))) {
@@ -54,12 +55,15 @@ export function getAutocompleteResources(type, options = {}) {
     let valueKey = null;
     let transformResultCb = null;
     let customRemoteQueryKey = null;
+    // Minimum characters before a remote search
+    let minChars = 1;
 
     const urlParams = new URLSearchParams(window.location.search);
     const excludepage = urlParams.get("page");
 
     switch (type) {
         case "pagename":
+            minChars = 2;
             valueKey = "label";
             remoteSourceUrl =
                 "tiki-listpages.php?listonly&initial=" + (options.initial ? options.initial + "&nonamespace" : "") + "&exclude_page=" + excludepage;
@@ -68,12 +72,15 @@ export function getAutocompleteResources(type, options = {}) {
             remoteSourceUrl = "tiki-ajax_services.php?listonly=groups";
             break;
         case "username":
+            minChars = 2;
             remoteSourceUrl = "tiki-ajax_services.php?listonly=users";
             break;
         case "usersandcontacts":
+            minChars = 2;
             remoteSourceUrl = "tiki-ajax_services.php?listonly=usersandcontacts";
             break;
         case "userrealname":
+            minChars = 2;
             remoteSourceUrl = "tiki-ajax_services.php?listonly=userrealnames";
             break;
         case "tag":
@@ -105,9 +112,11 @@ export function getAutocompleteResources(type, options = {}) {
             remoteSourceUrl = "tiki-ajax_services.php?listonly=references";
             break;
         case "search_module":
+            minChars = jqueryTiki.autocomplete_search_min_chars || 3;
             remoteSourceUrl = $.service("search", "lookup", {
                 "filter~type": options.types,
                 "filter~not_exact": options.excludeIdentifiers,
+                autocomplete: 1, // server enforces min length and result limit
                 format: jqueryTiki.feature_search_show_object_type ? "{title} ({object_type})" : "{title}",
             });
             transformResultCb = (res) => {
@@ -128,5 +137,5 @@ export function getAutocompleteResources(type, options = {}) {
 
     const url = remoteSourceUrl ? window.location.origin + (window.tikiroot || "/") + remoteSourceUrl : null;
 
-    return { url, sourceList, valueKey, transformResultCb, customRemoteQueryKey };
+    return { url, sourceList, valueKey, transformResultCb, customRemoteQueryKey, minChars };
 }
