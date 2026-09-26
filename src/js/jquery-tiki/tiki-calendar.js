@@ -42,7 +42,6 @@ $.fn.setupEventCalendar = function (
             return String(value);
         };
         const maxMonthEventsPerDay = 3;
-        const monthDayHeadFontSize = "0.8rem";
         const monthEventTimeFontSize = "0.7rem";
         const monthEventTitleFontSize = "14px";
         let currentViewType = eventCalendarParams.initialView;
@@ -52,32 +51,71 @@ $.fn.setupEventCalendar = function (
 
         const getDayDateString = (dayElement) => dayElement?.querySelector(":scope > .ec-day-head time")?.getAttribute("datetime") || "";
 
-        const getMainMonthEventsContainer = (dayElement) => {
-            const eventContainers = Array.from(dayElement.querySelectorAll(":scope > .ec-events:not(.ec-preview)"));
-            return eventContainers[eventContainers.length - 1] || null;
+        // EventCalendar 5 renders month events in a single .ec-events layer that overlays the day
+        // grid as a subgrid, instead of nesting them inside each .ec-day. An event is therefore
+        // tied to its day by the inline grid-row / grid-column it carries, using the same
+        // mapping the library itself uses: (row - 1) * columns + (column - 1) into .ec-grid.
+        const getMonthGridEl = () => calendarEl.querySelector(".ec-day-grid .ec-body > .ec-grid");
+
+        const getMonthEventsEl = () => calendarEl.querySelector(".ec-day-grid .ec-body > .ec-events");
+
+        const getMonthColumnCount = () => {
+            const mainEl = calendarEl.querySelector(".ec-day-grid .ec-main");
+            const columns = parseInt(mainEl?.style.getPropertyValue("--ec-grid-cols"), 10);
+            return Number.isFinite(columns) && columns > 0 ? columns : 7;
         };
 
-        const getMonthDayEvents = (dayElement) => {
-            const eventContainer = getMainMonthEventsContainer(dayElement);
-            if (!eventContainer) {
-                return [];
+        // "3 / span 2" -> 3, "2" -> 2. Events are attributed to the day they start on, which is
+        // what the previous per-day containers did for events spanning several days.
+        const getGridStart = (value) => {
+            const start = parseInt(value, 10);
+            return Number.isFinite(start) ? start : null;
+        };
+
+        const getMonthDayIndex = (eventElement, columnCount) => {
+            const column = getGridStart(eventElement.style.gridColumnStart || eventElement.style.gridColumn);
+            const row = getGridStart(eventElement.style.gridRowStart || eventElement.style.gridRow);
+            if (column === null || row === null) {
+                return null;
             }
-            return Array.from(eventContainer.children).filter((eventElement) => eventElement.classList.contains("ec-event"));
+            return (row - 1) * columnCount + column - 1;
+        };
+
+        const getMonthEventsByDay = () => {
+            const eventsEl = getMonthEventsEl();
+            const eventsByDay = new Map();
+            if (!eventsEl) {
+                return eventsByDay;
+            }
+            const columnCount = getMonthColumnCount();
+            Array.from(eventsEl.children).forEach((eventElement) => {
+                if (!eventElement.classList.contains("ec-event") || eventElement.classList.contains("ec-bg-event")) {
+                    return;
+                }
+                const dayIndex = getMonthDayIndex(eventElement, columnCount);
+                if (dayIndex === null) {
+                    return;
+                }
+                if (!eventsByDay.has(dayIndex)) {
+                    eventsByDay.set(dayIndex, []);
+                }
+                eventsByDay.get(dayIndex).push(eventElement);
+            });
+            return eventsByDay;
         };
 
         const clearMonthEventLimit = () => {
             calendarEl.querySelectorAll(".tiki-calendar-month-event-hidden").forEach((eventElement) => {
                 eventElement.classList.remove("tiki-calendar-month-event-hidden");
                 eventElement.hidden = false;
-                eventElement.style.display = "";
             });
             calendarEl.querySelectorAll(".tiki-calendar-month-has-more").forEach((dayElement) => {
                 dayElement.classList.remove("tiki-calendar-month-has-more");
             });
-            calendarEl.querySelectorAll(".tiki-calendar-more-events").forEach((moreButton) => moreButton.remove());
-            calendarEl.querySelectorAll(".ec-day-grid .ec-day > .ec-events").forEach((eventContainer) => {
-                eventContainer.style.paddingBottom = "";
+            calendarEl.querySelectorAll(".tiki-calendar-month-last-visible").forEach((eventElement) => {
+                eventElement.classList.remove("tiki-calendar-month-last-visible");
             });
+            calendarEl.querySelectorAll(".tiki-calendar-more-events").forEach((moreButton) => moreButton.remove());
         };
 
         const applyMonthEventLimit = () => {
@@ -86,37 +124,51 @@ $.fn.setupEventCalendar = function (
                 return;
             }
 
-            calendarEl.querySelectorAll(".ec-day-grid .ec-body .ec-day").forEach((dayElement) => {
-                dayElement.querySelector(":scope > .ec-day-head")?.style.setProperty("font-size", monthDayHeadFontSize);
-                const events = getMonthDayEvents(dayElement);
+            const gridEl = getMonthGridEl();
+            if (!gridEl) {
+                return;
+            }
+
+            getMonthEventsByDay().forEach((events, dayIndex) => {
                 if (events.length <= maxMonthEventsPerDay) {
+                    return;
+                }
+
+                // The library stacks events inside a day with margin-block-start, so that is the
+                // visual order to cut on, not the DOM order.
+                events.sort((first, second) => {
+                    return (parseFloat(first.style.marginBlockStart) || 0) - (parseFloat(second.style.marginBlockStart) || 0);
+                });
+
+                const dayElement = gridEl.children.item(dayIndex);
+                const dayFoot = dayElement?.querySelector(":scope > .ec-day-foot");
+                const dateString = getDayDateString(dayElement);
+                if (!dayFoot || !dateString) {
                     return;
                 }
 
                 events.slice(maxMonthEventsPerDay).forEach((eventElement) => {
                     eventElement.classList.add("tiki-calendar-month-event-hidden");
                     eventElement.hidden = true;
-                    eventElement.style.display = "none";
                 });
 
-                const hiddenEventCount = events.length - maxMonthEventsPerDay;
-                const dateString = getDayDateString(dayElement);
-                const dayFoot = dayElement.querySelector(":scope > .ec-day-foot");
-                const eventContainer = getMainMonthEventsContainer(dayElement);
-                if (!dayFoot || !dateString) {
-                    return;
-                }
+                // .ec-day lays its head and foot out with justify-content: space-between, so the
+                // foot sits on the cell floor, and .ec-events is painted over the day grid. Without
+                // reserving room the button ends up behind the last visible event -- this is what
+                // the per-day event container's padding-bottom used to do before the v5 layout.
+                // Everything here is done with classes, never inline styles: EventCalendar binds
+                // the whole style attribute of an event in a single reactive expression, so any
+                // inline property we set is wiped on the next reposition().
+                const lastVisibleEvent = events[maxMonthEventsPerDay - 1];
+                lastVisibleEvent.classList.add("tiki-calendar-month-last-visible");
 
+                const hiddenEventCount = events.length - maxMonthEventsPerDay;
                 dayElement.classList.add("tiki-calendar-month-has-more");
-                if (eventContainer) {
-                    eventContainer.style.paddingBottom = "1.45rem";
-                }
 
                 const moreButton = document.createElement("button");
                 moreButton.type = "button";
                 moreButton.className = "tiki-calendar-more-events btn btn-link btn-sm p-0";
                 moreButton.dataset.date = dateString;
-                moreButton.style.setProperty("font-size", monthDayHeadFontSize);
                 moreButton.textContent = tr("+%0 more events").replace("%0", hiddenEventCount);
                 moreButton.title = tr("Show all events for this day");
                 dayFoot.appendChild(moreButton);
@@ -378,6 +430,32 @@ $.fn.setupEventCalendar = function (
                 }
             });
         };
+        const durationMatches = (currentDuration, requestedDuration) => {
+            if (!currentDuration) {
+                return false;
+            }
+            const weeks = requestedDuration.weeks || requestedDuration.week || 0;
+            const normalizedDuration = {
+                years: requestedDuration.years || requestedDuration.year || 0,
+                months: requestedDuration.months || requestedDuration.month || 0,
+                days: weeks * 7 + (requestedDuration.days || requestedDuration.day || 0),
+                seconds:
+                    (requestedDuration.hours || requestedDuration.hour || 0) * 60 * 60 +
+                    (requestedDuration.minutes || requestedDuration.minute || 0) * 60 +
+                    (requestedDuration.seconds || requestedDuration.second || 0),
+                inWeeks: Boolean(weeks),
+            };
+
+            return Object.keys(normalizedDuration).every((key) => currentDuration[key] === normalizedDuration[key]);
+        };
+        const setCalendarDuration = (duration) => {
+            // EventCalendar 5 aborts an in-flight event-source request when the active range is
+            // recomputed. Avoid recomputing it when viewDidMount applies the duration the view
+            // already has, otherwise the initial request is cancelled without a replacement.
+            if (!durationMatches(calendarContainer[0].getOption("duration"), duration)) {
+                calendarContainer[0].setOption("duration", duration);
+            }
+        };
         const applyListPeriod = (period) => {
             const normalizedPeriod = normalizeListPeriod(period);
             const selectedPeriod = listPeriodOptions[normalizedPeriod];
@@ -388,7 +466,7 @@ $.fn.setupEventCalendar = function (
             const displayDate =
                 !eventCalendarParams.calendarListBeginsFocus && normalizedPeriod === "year" ? focusDate.clone().startOf("year") : focusDate;
             calendarContainer[0].setOption("date", displayDate.toDate());
-            calendarContainer[0].setOption("duration", getListDuration(selectedPeriod, focusDate));
+            setCalendarDuration(getListDuration(selectedPeriod, focusDate));
             calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                 return moment(dayCell).format("D");
             });
@@ -412,7 +490,7 @@ $.fn.setupEventCalendar = function (
             const normalizedMonthSpan = normalizeMonthRangeSpan(monthSpan);
             activeMonthRangeSpan = normalizedMonthSpan;
             eventCalendarParams.initialMonthRangeSpan = normalizedMonthSpan;
-            calendarContainer[0].setOption("duration", { months: normalizedMonthSpan });
+            setCalendarDuration({ months: normalizedMonthSpan });
             calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                 return moment(dayCell).format(normalizedMonthSpan === 1 ? "D" : "M/D");
             });
@@ -545,13 +623,13 @@ $.fn.setupEventCalendar = function (
                     removeMonthRangeControls();
                     removeListPeriodControls();
                     if (currentViewType == "timeGridWeek" || currentViewType == "listWeek") {
-                        calendarContainer[0].setOption("duration", { weeks: 1 });
+                        setCalendarDuration({ weeks: 1 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
                     if (currentViewType == "timeGridDay" || currentViewType == "listDay") {
-                        calendarContainer[0].setOption("duration", { days: 1 });
+                        setCalendarDuration({ days: 1 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
@@ -559,7 +637,24 @@ $.fn.setupEventCalendar = function (
                 }
                 scheduleMonthEventLimit();
             },
+            eventAllUpdated: function () {
+                // Fires once after every event has been rendered, unlike eventDidMount which fires
+                // per event while positions are still being computed. This is what makes the cap
+                // land on the real per-day grouping instead of a half-laid-out grid.
+                scheduleMonthEventLimit();
+            },
+            loading: function (isLoading) {
+                // Covers refetchEvents() after an edit: datesSet does not fire, and if the refetch
+                // returns no events eventDidMount does not either, which would strand the buttons.
+                if (!isLoading) {
+                    scheduleMonthEventLimit();
+                }
+            },
             datesSet: function (data) {
+                // Runs on every navigation, with or without events. The "+N more" buttons are our
+                // own nodes inside .ec-day-foot, so Svelte never clears them when it re-renders the
+                // grid: without this, they survive into months that have no events at all.
+                scheduleMonthEventLimit();
                 if (data?.view?.type !== "listYear" || !pendingListNavigation) {
                     return;
                 }
@@ -660,7 +755,6 @@ $.fn.setupEventCalendar = function (
                 element.addClass("tips");
                 // surely there's a better way?
                 $(element).parent().tiki_popover();
-                scheduleMonthEventLimit();
             },
             eventClick: function (info) {
                 info.jsEvent.preventDefault();

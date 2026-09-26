@@ -14,7 +14,7 @@
     "async-es": "Used by tiki-async-loop.js"
   },
   "devDependencies": {
-    "@event-calendar/core": "^4.5.1",
+    "@event-calendar/core": "^5.12.3",
     "async-es": "^3.2.6"
   }
 }

@@ -55,17 +55,32 @@ $.fn.addEventCalendarPrint = function (buttonId, calendar) {
                     const pageHeightPx = printableHeight * pxPerMm;
                     const pageNumberX = pageWidthMm - marginRight;
                     const pageNumberY = pageHeightMm - marginBottom;
-                    const rows = $(calendarId + " .ec-days");
+                    // EventCalendar 5 lays the month view out as a CSS Grid: there is no per-week
+                    // row element any more, so rows are rebuilt by grouping day cells that share
+                    // the same offset from the top of the calendar.
+                    // Restricted to the month grid on purpose: in the time-grid views every day
+                    // cell is a full-height column, so they would collapse into a single "row"
+                    // starting below the all-day section and the first page would be cut there.
+                    // With no rows the loop below simply cuts at the exact page height.
                     const containerRect = elementToPrint[0].getBoundingClientRect();
-                    const rowBoundaries = [];
+                    const rowsByTop = new Map();
 
-                    rows.each(function () {
+                    $(calendarId + " .ec-day-grid .ec-body .ec-day").each(function () {
                         const rect = this.getBoundingClientRect();
-                        rowBoundaries.push({
-                            top: rect.top - containerRect.top,
-                            bottom: rect.bottom - containerRect.top,
-                        });
+                        const top = rect.top - containerRect.top;
+                        const bottom = rect.bottom - containerRect.top;
+                        // Round to absorb sub-pixel differences between cells of the same row.
+                        const key = Math.round(top);
+                        const row = rowsByTop.get(key);
+                        if (row) {
+                            row.top = Math.min(row.top, top);
+                            row.bottom = Math.max(row.bottom, bottom);
+                        } else {
+                            rowsByTop.set(key, { top: top, bottom: bottom });
+                        }
                     });
+
+                    const rowBoundaries = Array.from(rowsByTop.values()).sort((a, b) => a.top - b.top);
 
                     const scaleFactor = canvas.height / elementToPrint[0].scrollHeight;
 
