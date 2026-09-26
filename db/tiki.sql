@@ -363,7 +363,7 @@ CREATE TABLE `tiki_blogs` (
   `posts` int(8) default NULL,
   `maxPosts` int(8) default NULL,
   `hits` int(8) default NULL,
-  `activity` decimal(4,2) default NULL,
+  `activity` decimal(5,2) default NULL,
   `heading` text,
   `post_heading` text,
   `use_find` char(1) default NULL,
@@ -918,7 +918,7 @@ CREATE TABLE `tiki_featured_links` (
 DROP TABLE IF EXISTS `tiki_file_galleries`;
 CREATE TABLE `tiki_file_galleries` (
   `galleryId` int(14) NOT NULL auto_increment,
-  `name` varchar(80) NOT NULL default '',
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL default '',
   `type` varchar(20) NOT NULL default 'default',
   `direct` text,
   `template` int(10) default NULL,
@@ -973,7 +973,7 @@ CREATE TABLE `tiki_file_galleries` (
   `icon_fileId` int(14) UNSIGNED NULL DEFAULT NULL,
   `ocr_lang` VARCHAR(255) default NULL,
   PRIMARY KEY (`galleryId`),
-  KEY `parentIdAndName` (`parentId`, name)
+  KEY `parentIdAndName` (`parentId`, `name`(191))
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 INSERT INTO `tiki_file_galleries` (`galleryId`, `name`, `type`, `description`, `visible`, `user`, `public`, `parentId`) VALUES ('1','File Galleries', 'system', '', 'y', 'admin', 'y', -1);
