@@ -13,5 +13,8 @@
     },
     "devDependenciesComment": {
         "sortablejs": "Pinning to 1.14.0 to avoid conflicts with src/common-extarnals/package.json"
+    },
+    "dependencies": {
+        "cropperjs": "2.1.1"
     }
 }

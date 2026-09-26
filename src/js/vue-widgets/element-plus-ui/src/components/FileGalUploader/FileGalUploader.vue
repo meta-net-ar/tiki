@@ -1,5 +1,5 @@
 <script setup>
-import { UploadFilled } from '@element-plus/icons-vue'
+import { UploadFilled, EditPen } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { ajaxUpload as defaultHttpRequest } from 'element-plus/es/components/upload/src/ajax';
 import { ref, onMounted } from 'vue'
@@ -7,6 +7,7 @@ import getUploadData from '../../helpers/fileGalUploader/getUploadData';
 import ConfigWrapper from '../ConfigWrapper.vue';
 import handleTikiFeedback from '../../helpers/fileGalUploader/handleTikiFeedback';
 import getUploadAjaxError from '../../helpers/fileGalUploader/getUploadAjaxError';
+import ImageEditor from './ImageEditor.vue';
 
 const props = defineProps(['accept', 'maxSize', 'maxFiles', 'maxWidth', 'maxHeight', 'vimeoUrl', 'language']);
 const maxSize = JSON.parse(props.maxSize);
@@ -18,6 +19,8 @@ const uploadedFiles = ref([]);
 const totalFilesToUpload = ref(0);
 const completedUploads = ref(0);
 const submitCalled = ref(false);
+const editorFile = ref(null);
+const supportedEditorTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
 onMounted(() => {
     const searcParams = new URLSearchParams(location.search);
@@ -44,6 +47,24 @@ const beforeUpload = (rawFile) => {
         ElMessage.error(`File size cannot exceed ${maxSizeKB}KB`);
         return false;
     }
+}
+
+const isEditableImage = (file) => file?.status === 'ready' && supportedEditorTypes.includes(file.raw?.type);
+const removeFile = (file) => uploadRef.value?.handleRemove(file);
+
+const applyEditedImage = (file) => {
+    if (!editorFile.value) return;
+    if (file.size > maxSize) {
+        ElMessage.error(`Edited file size cannot exceed ${props.maxSize / 1000}KB`);
+        return;
+    }
+
+    file.uid = editorFile.value.uid || editorFile.value.raw?.uid;
+    editorFile.value.raw = file;
+    editorFile.value.name = file.name;
+    editorFile.value.size = file.size;
+    editorFile.value = null;
+    ElMessage.success('Edited image ready to upload');
 }
 
 /**
@@ -157,7 +178,33 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
             <div class="el-upload__text" :data-testid="DATA_TEST_ID.UPLOAD_TEXT">
             Drop file here or <em>click to upload</em>
             </div>
+
+            <template #file="{ file }">
+                <div class="file-gal-upload-file">
+                    <span class="file-gal-upload-file__name">{{ file.name }}</span>
+                    <span v-if="file.status === 'uploading'" role="progressbar" :aria-valuenow="file.percentage" aria-valuemin="0" aria-valuemax="100">
+                        {{ file.percentage }}%
+                    </span>
+                    <span v-else-if="file.status === 'success'">Uploaded</span>
+                    <span class="file-gal-upload-file__actions">
+                        <el-button
+                            v-if="isEditableImage(file)"
+                            size="small"
+                            plain
+                            :aria-label="`Edit ${file.name}`"
+                            @click.stop="editorFile = file"
+                        >
+                            <el-icon><edit-pen /></el-icon> Edit
+                        </el-button>
+                        <el-button size="small" plain type="danger" :aria-label="`Remove ${file.name}`" @click.stop="removeFile(file)">
+                            Remove
+                        </el-button>
+                    </span>
+                </div>
+            </template>
         </el-upload>
+
+        <ImageEditor v-if="editorFile?.raw" :file="editorFile.raw" @apply="applyEditedImage" @cancel="editorFile = null" />
 
         <div v-if="uploadedFiles.length > 0" class="uploaded-files-list">
             <h4>Uploaded Files:</h4>
