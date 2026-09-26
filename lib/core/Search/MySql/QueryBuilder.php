@@ -108,6 +108,18 @@ class Search_MySql_QueryBuilder
                 $this->fieldBuilder->setMinTokenSize($this->getMinTokenSize());
                 $query = $this->fieldBuilder->build($node, $this->factory);
 
+                // If the query contains tokens that are too short, it cannot match any records.
+                if ($this->fieldBuilder->hasTooShortToken()) {
+                    Feedback::warning(
+                        tr(
+                            'The search could not be performed accurately because one or more search terms are shorter than the minimum allowed length (%0 characters).',
+                            $this->getMinTokenSize()
+                        ),
+                        true
+                    );
+                    return '1 = 0';
+                }
+
                 // If the query is empty, it only contained stopwords.
                 if (empty($query) && ! $node instanceof MoreLikeThis) {
                     return '';

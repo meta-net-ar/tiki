@@ -1365,13 +1365,6 @@ class UnifiedSearchLib
             throw new Exception('Invalid filter type provided in query. It must be an array.');
         }
 
-        // If 'content' is specified and shorter than the minimum token length, MySQL engine will treat it as empty and return all items matching the other filters.
-        // To avoid this, we force it to return no results when desired.
-        if (isset($filter['content']) && strlen($filter['content']) < $this->getMinTokenLength() && isset($filter['_reject_short_content'])) {
-            $query->filterType('no_match');
-        }
-        unset($filter['_reject_short_content']);
-
         // Support expert sort configuration via meta-parameter
         if (isset($filter['_sort']) && $filter['_sort']) {
             $query->setOrder($filter['_sort']);
@@ -1445,12 +1438,6 @@ class UnifiedSearchLib
             }
 
             unset($filter['exact']);
-
-
-            $minTokenLength = $this->getMinTokenLength();
-            if (isset($filter['content']) && strlen($filter['content']) < $minTokenLength) {
-                $query->filterType('no_match');
-            }
         }
 
         if (isset($filter['not_exact']) && is_array($filter['not_exact'])) {
@@ -1523,20 +1510,6 @@ class UnifiedSearchLib
         }
 
         return $query;
-    }
-
-    private function getMinTokenLength()
-    {
-        global $prefs;
-        if ($prefs['unified_engine'] === 'mysql') {
-            $minTokenLength = TikiDb::get()->getOne('SELECT @@innodb_ft_min_token_size');
-            if ($minTokenLength) {
-                return (int) $minTokenLength;
-            }
-        }
-
-        // Not applicable for other engines
-        return PHP_INT_MAX;
     }
 
     private function getFilterContentFields()

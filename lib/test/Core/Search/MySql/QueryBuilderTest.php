@@ -35,6 +35,26 @@ class Search_MySql_QueryBuilderTest extends PHPUnit\Framework\TestCase
         );
     }
 
+    public function testShortFulltextQuery()
+    {
+        $expr = new Token('x', 'plaintext', 'contents');
+
+        $this->assertEquals('1 = 0', $this->builder->build($expr));
+    }
+
+    public function testStopwordOnlyQueryIsNotTreatedAsTooShort()
+    {
+        global $prefs;
+
+        $initialPrefs = $prefs;
+        $prefs['unified_stopwords'] = ['the'];
+
+        $this->assertEquals('1 = 0', $this->builder->build(new Token('x', 'plaintext', 'contents')));
+        $this->assertEquals('', $this->builder->build(new Token('the', 'plaintext', 'contents')));
+
+        $prefs = $initialPrefs;
+    }
+
     public function testSimplePhrase()
     {
         $expr = new Token('Hello World', 'plaintext', 'contents', 1.5);
