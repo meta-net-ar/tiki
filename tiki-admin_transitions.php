@@ -156,7 +156,7 @@ if (count($available_states) > 0) {
     $cleanStringData = function (string $s): string {
         $s = preg_replace('/\s+/u', ' ', $s ?? '');
         $s = str_replace(['"', "\r", "\n"], ['\"', '', ''], $s);
-        return trim($s);
+        return trim($s, " \n\r\t\v\x00");
     };
 
     $buildMermaidData = function (array $states, array $transitions) use ($cleanStringData): string {
@@ -181,7 +181,7 @@ if (count($available_states) > 0) {
 
             $edge = $cleanStringData((string)($tr['name'] ?? ''));
             if (! empty($tr['preserve'])) {
-                $edge = trim($edge . ' (preserve)');
+                $edge = trim($edge . ' (preserve)', " \n\r\t\v\x00");
             }
 
             $lines[] = $edge ? "{$from} --> {$to} : {$edge}" : "{$from} --> {$to}";

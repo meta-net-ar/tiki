@@ -53,7 +53,7 @@ class CslStyleManager
 
     public function resolveStylePath(string $styleName): string
     {
-        $styleName = preg_replace('/\.csl$/i', '', trim($styleName));
+        $styleName = preg_replace('/\.csl$/i', '', trim($styleName, " \n\r\t\v\x00"));
         if ($styleName === '' || preg_match('/[^a-zA-Z0-9._-]/', $styleName)) {
             throw new RuntimeException('Invalid CSL style name.');
         }
@@ -148,7 +148,7 @@ class CslStyleManager
         }
 
         if (! flock($handle, LOCK_EX | LOCK_NB)) {
-            $existingPid = trim(stream_get_contents($handle));
+            $existingPid = trim(stream_get_contents($handle), " \n\r\t\v\x00");
             $extra = $existingPid !== '' ? ' (PID ' . $existingPid . ')' : '';
             fclose($handle);
             throw new RuntimeException('zotero:csl:update is already running' . $extra . '.');
@@ -238,7 +238,7 @@ class CslStyleManager
     {
         global $prefs;
 
-        $configured = trim((string) ($prefs['zotero_pandoc_csl_archive_url'] ?? ''));
+        $configured = trim((string) ($prefs['zotero_pandoc_csl_archive_url'] ?? ''), " \n\r\t\v\x00");
         if ($configured === '') {
             return self::DEFAULT_CSL_STYLES_ARCHIVE_URLS;
         }
@@ -312,7 +312,7 @@ class CslStyleManager
 
     private function resolveFilePath(string $path, array $prefixCandidates = []): ?string
     {
-        $trimmed = trim($path);
+        $trimmed = trim($path, " \n\r\t\v\x00");
         if ($trimmed === '') {
             return null;
         }

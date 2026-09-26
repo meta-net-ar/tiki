@@ -1119,7 +1119,7 @@ EXPORT;
         $csvRows = [];
 
         foreach ($rows as $row) {
-            if (trim($row) === '') {
+            if (trim($row, " \n\r\t\v\x00") === '') {
                 continue;
             }
             // since field may have comma or quotes or tab in it

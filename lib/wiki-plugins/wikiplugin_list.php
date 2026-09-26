@@ -248,8 +248,8 @@ function wikiplugin_list($data, $params)
         if (! is_null($params['cachepurgerules'])) {
             foreach ($params['cachepurgerules'] as $r) {
                 $parts = explode(':', $r, 2);
-                $cleanrule['type'] = trim($parts[0]);
-                $cleanrule['object'] = trim($parts[1]);
+                $cleanrule['type'] = trim($parts[0], " \n\r\t\v\x00");
+                $cleanrule['object'] = trim($parts[1], " \n\r\t\v\x00");
                 $rules[] = $cleanrule;
             }
         }

@@ -474,7 +474,7 @@ SQL;
 
     $statements = explode(";", $query);
     foreach ($statements as $q) {
-        if (! empty(trim($q))) {
+        if (! empty(trim($q, " \n\r\t\v\x00"))) {
             $installer->query($q);
         }
     }
@@ -653,7 +653,7 @@ SQL;
 
     $statements = explode(";", $query);
     foreach ($statements as $q) {
-        if (! empty(trim($q))) {
+        if (! empty(trim($q, " \n\r\t\v\x00"))) {
             $installer->query($q);
         }
     }

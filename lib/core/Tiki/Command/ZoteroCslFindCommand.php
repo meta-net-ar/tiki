@@ -41,7 +41,7 @@ class ZoteroCslFindCommand extends Command
             return Command::FAILURE;
         }
 
-        $searchTerm = trim((string) $input->getArgument('search_term'));
+        $searchTerm = trim((string) $input->getArgument('search_term'), " \n\r\t\v\x00");
         if ($searchTerm === '') {
             $output->writeln('Usage: php console.php zotero:csl:find [search_term]');
             $output->writeln('');

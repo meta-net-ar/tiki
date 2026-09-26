@@ -99,7 +99,7 @@ class WikiParser_Parsable extends ParserLib
 
         $data = $matches->getText();
         if ($found) {
-            $data = ltrim($data);
+            $data = ltrim($data, " \n\r\t\v\x00");
         }
 
         // if we removed the syntax plugin then clean up the leftover linefeed

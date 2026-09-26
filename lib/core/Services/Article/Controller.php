@@ -48,7 +48,7 @@ class Services_Article_Controller
             'body'        => $body,
             // `content` is an alias of the full readable text (heading + body)
             // so ingestion has a single field to chunk and store.
-            'content'     => trim($heading . "\n\n" . $body),
+            'content'     => trim($heading . "\n\n" . $body, " \n\r\t\v\x00"),
             'lang'        => $lang,
             'url'         => $url,
             'lastModif'   => $lastModif,
@@ -330,7 +330,7 @@ class Services_Article_Controller
             if (! $data) {
                 throw new Services_Exception_FieldError($input->errorfield->text() ?: 'url', tr('Content could not be loaded.'));
             }
-            $data['content'] = trim($data['content']) == '' ? $data['content'] : '~np~' . $data['content'] . '~/np~';
+            $data['content'] = trim($data['content'], " \n\r\t\v\x00") == '' ? $data['content'] : '~np~' . $data['content'] . '~/np~';
             $data['description'] = '';
             $data['author'] = '';
             $topicId = $input->topicId->int();

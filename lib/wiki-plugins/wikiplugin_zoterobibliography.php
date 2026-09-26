@@ -159,7 +159,7 @@ function zoteroBibliographyContentFromContext()
     }
 
     // Save flow fallback where global $page may be empty, but request still carries page name.
-    $requestPage = isset($_REQUEST['page']) ? trim((string) $_REQUEST['page']) : '';
+    $requestPage = isset($_REQUEST['page']) ? trim((string) $_REQUEST['page'], " \n\r\t\v\x00") : '';
     if ($requestPage !== '') {
         $pageInfo = $tikilib->get_page_info($requestPage);
         if (! empty($pageInfo['data'])) {
@@ -216,7 +216,7 @@ function zoteroBibliographyExtractCitationKeys($content)
             $parts = explode(';', $match);
 
             foreach ($parts as $part) {
-                $part = trim($part);
+                $part = trim($part, " \n\r\t\v\x00");
                 $part = preg_replace('/^[-@]+/', '', $part);
                 if ($part === '') {
                     continue;
@@ -285,11 +285,11 @@ function zoteroBibliographyGenerate($keys, $libraryPath, $stylePath, &$renderSuc
         $renderSucceeded = false;
         return zoteroBibliographyAlert(
             'danger',
-            tr('Bibliography rendering failed: %0', trim($process->getErrorOutput())),
+            tr('Bibliography rendering failed: %0', trim($process->getErrorOutput(), " \n\r\t\v\x00")),
             true
         );
     }
 
     $renderSucceeded = true;
-    return trim($process->getOutput());
+    return trim($process->getOutput(), " \n\r\t\v\x00");
 }

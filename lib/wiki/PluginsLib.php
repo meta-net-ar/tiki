@@ -96,7 +96,7 @@ class PluginsLib extends TikiLib
                 if (isset($args[$arg]) && $args[$arg]) {
                     $args[$arg] = explode($this->separator, $args[$arg]);
                     foreach ($args[$arg] as $id => $value) {
-                        $args[$arg][$id] = trim($value);
+                        $args[$arg][$id] = trim($value, " \n\r\t\v\x00");
                     }
                 } else {
                     $args[$arg] = [];

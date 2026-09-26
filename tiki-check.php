@@ -1179,8 +1179,8 @@ if (function_exists('exec')) {
             continue;
         }
 
-        $cliCommand = trim($output);
-        exec(escapeshellcmd(trim($cliCommand)) . ' --version', $output);
+        $cliCommand = trim($output, " \n\r\t\v\x00");
+        exec(escapeshellcmd(trim($cliCommand, " \n\r\t\v\x00")) . ' --version', $output);
         foreach ($output as $line) {
             $parts = explode(' ', $line);
             if ($parts[0] === 'PHP') {
@@ -1327,7 +1327,7 @@ if (function_exists('opcache_get_configuration') && (ini_get('opcache.enable') =
 
 // memory_limit
 $memory_limit = ini_get('memory_limit');
-$s = trim($memory_limit);
+$s = trim($memory_limit, " \n\r\t\v\x00");
 $last = strtolower(substr($s, -1));
 if (! is_numeric($last)) {
     $s = substr($s, 0, -1);
@@ -1672,7 +1672,7 @@ if ($max_file_uploads) {
 }
 // upload_max_filesize
 $upload_max_filesize = ini_get('upload_max_filesize');
-$s = trim($upload_max_filesize);
+$s = trim($upload_max_filesize, " \n\r\t\v\x00");
 $last = strtolower(substr($s, -1));
 $s = substr($s, 0, -1);
 switch ($last) {
@@ -1710,7 +1710,7 @@ if ($s >= 8 * 1024 * 1024) {
 
 // post_max_size
 $post_max_size = ini_get('post_max_size');
-$s = trim($post_max_size);
+$s = trim($post_max_size, " \n\r\t\v\x00");
 $last = strtolower(substr($s, -1));
 $s = substr($s, 0, -1);
 switch ($last) {
@@ -3686,7 +3686,7 @@ if (! empty($ssl_issues)) {
 }
 
 if (! empty($sensitiveDataDetectedFiles)) {
-    $files = ' (Files: ' . trim(implode(', ', $sensitiveDataDetectedFiles)) . ')';
+    $files = ' (Files: ' . trim(implode(', ', $sensitiveDataDetectedFiles), " \n\r\t\v\x00") . ')';
     $tiki_security['Sensitive Data Exposure'] = array(
         'fitness' => tra('risky'),
         'fitness_status' => FITNESS_STATUS_RISKY,
@@ -3750,8 +3750,8 @@ function processKeyFields(&$alterTableFile, $tableName, $keyFields, $isUnique = 
     $indexNameField = $isUnique ? 2 : 1;
     $indexColumnsField = $isUnique ? 3 : 3;
     $indexType = $isUnique ? 'UNIQUE' : $keyFields[2];
-    $keyFields[$indexNameField] = strtolower(trim(preg_replace('/\s+/', '', $keyFields[$indexNameField])));
-    $keyFields[$indexColumnsField] = strtolower(trim(preg_replace(array('/(\s+)|(\([^)]*\))/'), array('', ''), $keyFields[$indexColumnsField])));
+    $keyFields[$indexNameField] = strtolower(trim(preg_replace('/\s+/', '', $keyFields[$indexNameField]), " \n\r\t\v\x00"));
+    $keyFields[$indexColumnsField] = strtolower(trim(preg_replace(array('/(\s+)|(\([^)]*\))/'), array('', ''), $keyFields[$indexColumnsField]), " \n\r\t\v\x00"));
     $alterTableFile[$tableName][$keyLen] = array(
         'INDEX_NAME' => $keyFields[$indexNameField],
         'INDEX_COLUMNS' => $keyFields[$indexColumnsField],
@@ -3770,7 +3770,7 @@ function check_db_mismatches()
     if (is_array($alterTables) && count($alterTables)) {
         foreach ($alterTables[0] as $alterTable) {
             preg_match('/ALTER TABLE[\s\t]*`?(\w+)`?/', $alterTable, $matches);
-            $tableName = strtolower(trim($matches[1]));
+            $tableName = strtolower(trim($matches[1], " \n\r\t\v\x00"));
             preg_match(
                 "/(ADD (INDEX|KEY) [^ ]+) \((.+)\)/",
                 $alterTable,
@@ -3795,7 +3795,7 @@ function check_db_mismatches()
 
     foreach ($tables[0] as $table) {
         preg_match('/CREATE TABLE[\s\t]*`?(\w+)`?/', $table, $matches);
-        $tableName = strtolower(trim($matches[1]));
+        $tableName = strtolower(trim($matches[1], " \n\r\t\v\x00"));
         $sqlFileTables[$tableName] = array();
 
         //preg_match_all('/^[\s\t]*`?(?!CREATE|KEY|PRIMARY|UNIQUE|INDEX)(\w+)`?/m', $table, $fields);
@@ -3806,7 +3806,7 @@ function check_db_mismatches()
 
         foreach ($types as $k => $type) {
             $types[$k] = preg_replace_callback('/(\w+)\s*\((.*?)\)/', function ($matches) {
-                $inner = trim(preg_replace('/\s*,\s*/', ',', $matches[2]));
+                $inner = trim(preg_replace('/\s*,\s*/', ',', $matches[2]), " \n\r\t\v\x00");
                 return $matches[1] . '(' . $inner . ')';
             }, $type);
         }
@@ -5485,7 +5485,7 @@ class BenchmarkPhp
 
         $isMariaDB = stripos($arr_row['version'], 'mariadb') !== false;
         preg_match('/(\d+\.\d+)/', $arr_row['version'], $matches);
-        $dbVersion = ! empty($matches[1]) ? trim($matches[1]) : '0.0';
+        $dbVersion = ! empty($matches[1]) ? trim($matches[1], " \n\r\t\v\x00") : '0.0';
         $useEncode = ($isMariaDB || version_compare($dbVersion, '8.0', '<'));
         $query = $useEncode
             ? "SELECT BENCHMARK(1000000, ENCODE('hello', RAND()));"

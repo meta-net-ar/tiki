@@ -12,7 +12,7 @@ $matches = [];
 
 foreach (['require', 'require-dev'] as $section) {
     foreach ($data[$section] as $package => $constraint) {
-        if (is_string($constraint) && str_starts_with(trim($constraint), '^')) {
+        if (is_string($constraint) && str_starts_with(trim($constraint, " \n\r\t\v\x00"), '^')) {
             $matches[$package] = $constraint;
         }
     }

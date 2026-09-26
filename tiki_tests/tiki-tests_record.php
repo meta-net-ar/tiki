@@ -20,9 +20,9 @@ $smarty->assign('tidy', extension_loaded('tidy'));
 $smarty->assign('http', extension_loaded('http'));
 $smarty->assign('curl', extension_loaded('curl'));
 
-if (isset($_POST['action']) and isset($_POST['filename']) and trim($_POST['filename']) != '') {
+if (isset($_POST['action']) and isset($_POST['filename']) and trim($_POST['filename'], " \n\r\t\v\x00") != '') {
     CookieConsentLib::tikiSetCookie('tikitest_record', '1', CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0, '/');
-    CookieConsentLib::tikiSetCookie('tikitest_filename', trim($_POST['filename']), CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0, '/');
+    CookieConsentLib::tikiSetCookie('tikitest_filename', trim($_POST['filename'], " \n\r\t\v\x00"), CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0, '/');
     if (isset($_REQUEST['current_session'])) {
         header('Location: ../tiki-index.php');
     } else {

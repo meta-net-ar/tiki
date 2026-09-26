@@ -35,12 +35,12 @@ class Scheduler_Task_HTTPGetCommandTask extends Scheduler_Task_CommandTask
                 $this->logger->debug(tra('Using basic authentication'));
             }
 
-            $additionalHeaders = trim($params['additional_http_headers']);
+            $additionalHeaders = trim($params['additional_http_headers'], " \n\r\t\v\x00");
 
             if (! empty($additionalHeaders)) {
                 $additionalHeaders = explode("\n", $additionalHeaders);
                 $additionalHeaders = array_map(function ($value) {
-                    return trim($value);
+                    return trim($value, " \n\r\t\v\x00");
                 }, $additionalHeaders);
                 $this->logger->debug(tra('Including additional headers'));
                 $client->setHeaders($additionalHeaders);

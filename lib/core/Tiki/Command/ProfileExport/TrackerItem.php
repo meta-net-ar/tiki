@@ -95,7 +95,7 @@ class TrackerItem extends ObjectWriter
      */
     protected function filterFields($exportFields, $fieldFilterList)
     {
-        if (empty(trim($fieldFilterList))) {
+        if (empty(trim($fieldFilterList, " \n\r\t\v\x00"))) {
             return $exportFields;
         }
 
@@ -123,7 +123,7 @@ class TrackerItem extends ObjectWriter
     protected function generateListItemsFilter($itemFilterList)
     {
         $listItemsFilter = '';
-        if (! empty(trim($itemFilterList))) {
+        if (! empty(trim($itemFilterList, " \n\r\t\v\x00"))) {
             $itemFilterList = array_map('trim', explode(',', $itemFilterList));
 
             $listItemsFilter = ['tti.`itemId`' => $itemFilterList];

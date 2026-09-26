@@ -98,9 +98,9 @@ if (isset($credit_types) && is_array($credit_types)) {
 // Add a new credit type with better validation
 if (! empty($_POST['new_credit_type']) && ! empty($_POST['display_text']) && ! empty($_POST['unit_text']) && isset($_POST['is_static_level'])) {
     $creditslib->updateCreditType(
-        trim($_POST['new_credit_type']),
-        trim($_POST['display_text']),
-        trim($_POST['unit_text']),
+        trim($_POST['new_credit_type'], " \n\r\t\v\x00"),
+        trim($_POST['display_text'], " \n\r\t\v\x00"),
+        trim($_POST['unit_text'], " \n\r\t\v\x00"),
         $_POST['is_static_level'],
         (int) ($_POST['scaling_divisor'] ?? 1)
     );

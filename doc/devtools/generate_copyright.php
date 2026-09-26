@@ -43,7 +43,7 @@ function update_copyright_file($newVersion)
 
         list($name, $email, $ts) = explode('||', $line);
 
-        $key = strtolower(trim($email));
+        $key = strtolower(trim($email, " \n\r\t\v\x00"));
 
         if (! isset($contributors[$key])) {
             $contributors[$key] = [

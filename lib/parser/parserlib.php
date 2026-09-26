@@ -1583,8 +1583,8 @@ class ParserLib extends TikiDb_Bridge
      */
     protected function colorAttrEscape($matches)
     {
-        $matches[1] = trim($matches[1]);
-        $matches[3] = trim($matches[3]);
+        $matches[1] = trim($matches[1], " \n\r\t\v\x00");
+        $matches[3] = trim($matches[3], " \n\r\t\v\x00");
 
         $esc = new Laminas\Escaper\Escaper();
         $color = ! empty($matches[1]) ? 'color:' . str_replace('&#x23;', '#', $esc->escapeHtmlAttr($matches[1])) : '';
@@ -1619,10 +1619,10 @@ class ParserLib extends TikiDb_Bridge
         preg_match('(\s*$)', $data, $ewhite);
 
         // remove all the whitespace
-        $data = trim($data);
+        $data = trim($data, " \n\r\t\v\x00");
         $data = $this->parse_data($data, $options);
         // remove whitespace that was added while parsing (yes it does happen)
-        $data = trim($data);
+        $data = trim($data, " \n\r\t\v\x00");
 
         if ($inlineFirstP) {
             $data = preg_replace('/^(\s*?)<p>/', '$1<p style="display:inline-block">', ' ' . $data);
@@ -1839,7 +1839,7 @@ class ParserLib extends TikiDb_Bridge
                 $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\">$link</a>$ext_icon $cosa", $data);
             } else {
                 $link2 = str_replace("/", "\/", preg_quote($link));
-                $link = trim($link);
+                $link = trim($link, " \n\r\t\v\x00");
                 $link = str_replace('"', '%22', $link);
                 $data = str_replace("|nocache", "", $data);
 
@@ -2681,16 +2681,16 @@ class ParserLib extends TikiDb_Bridge
             $current_title_num = '';
             $numbering_remove = 0;
 
-            $line = rtrim($line); // Trim off trailing white space
+            $line = rtrim($line, " \n\r\t\v\x00"); // Trim off trailing white space
             // Check for titlebars...
             // NOTE: that title bar should start at the beginning of the line and
             //     be alone on that line to be autoaligned... otherwise, it is an old
             //     styled title bar...
-            if (substr(ltrim($line), 0, 2) == '-=' && substr($line, -2, 2) == '=-') {
+            if (substr(ltrim($line, " \n\r\t\v\x00"), 0, 2) == '-=' && substr($line, -2, 2) == '=-') {
                 // Close open paragraph and lists, but not div's
                 $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 1, 1, 0);
                 //
-                $align_len = strlen($line) - strlen(ltrim($line));
+                $align_len = strlen($line) - strlen(ltrim($line, " \n\r\t\v\x00"));
 
                 // My textarea size is about 120 space chars.
                 //define('TEXTAREA_SZ', 120);
@@ -2714,7 +2714,7 @@ class ParserLib extends TikiDb_Bridge
                 }
 
                 //
-                $line = trim($line);
+                $line = trim($line, " \n\r\t\v\x00");
                 $line = '<div class="titlebar"' . $align . '>' . substr($line, 2, strlen($line) - 4) . '</div>';
                 $data .= $line . "\n";
                 // TODO: Case is handled ...  no need to check other conditions
@@ -2870,7 +2870,7 @@ class ParserLib extends TikiDb_Bridge
                     // but not paragraph or div's. If we are
                     // closing a list, there really shouldn't be a
                     // paragraph open anyway.
-                    if (trim($line) !== '') {
+                    if (trim($line, " \n\r\t\v\x00") !== '') {
                         $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 0, 1, 0);
                     }
 
@@ -2972,7 +2972,7 @@ class ParserLib extends TikiDb_Bridge
 
                         // Generate the final title text
                         $title_text_base_raw = substr($line, $hdrlevel + $addremove);
-                        $title_text_base = $support_numbering ? ltrim($title_text_base_raw) : $title_text_base_raw;
+                        $title_text_base = $support_numbering ? ltrim($title_text_base_raw, " \n\r\t\v\x00") : $title_text_base_raw;
                         $title_text = $current_title_real_num . $title_text_base;
 
                         // Remove HTML tags from Tiki syntax
@@ -3070,7 +3070,7 @@ class ParserLib extends TikiDb_Bridge
                                 && strpos($line, "-->") !== (strlen($line) - 3)
                                 && $this->option['process_wiki_paragraphs']
                         ) {
-                            $tline = trim(str_replace('&nbsp;', '', $this->unprotectSpecialChars($line, true)));
+                            $tline = trim(str_replace('&nbsp;', '', $this->unprotectSpecialChars($line, true)), " \n\r\t\v\x00");
 
                             if ($prefs['feature_wiki_paragraph_formatting'] == 'y') {
                                 if (count($lines) > 1 || $this->option['min_one_paragraph']) {  // don't apply wiki para if only single line so you can have inline includes
@@ -3482,7 +3482,7 @@ class ParserLib extends TikiDb_Bridge
 
             $prefixes = explode(',', $prefs["wiki_prefixalias_tokens"]);
             foreach ($prefixes as $p) {
-                $p = trim($p);
+                $p = trim($p, " \n\r\t\v\x00");
                 if (strlen($p) > 0 && mb_strtolower(substr($pageName, 0, strlen($p))) == mb_strtolower($p)) {
                     $toPage = $p;
                     $tokens = 'prefixalias';

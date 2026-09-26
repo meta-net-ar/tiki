@@ -157,7 +157,8 @@ class Services_Tracker_CalendarController
                                     'item'    => $item->getData(),
                                     'process' => 'y',
                                 ]
-                            )
+                            ),
+                            " \n\r\t\v\x00"
                         );
                         if ($val) {
                             if (count($fields) > 1) {
@@ -246,7 +247,7 @@ class Services_Tracker_CalendarController
         if (empty($map) && ! empty($colormap)) {
             foreach (explode('|', $colormap) as $color) {
                 $colorMapParts = explode(',', $color);
-                $map[trim($colorMapParts[0])] = trim($colorMapParts[1]);
+                $map[trim($colorMapParts[0], " \n\r\t\v\x00")] = trim($colorMapParts[1], " \n\r\t\v\x00");
             }
         }
 

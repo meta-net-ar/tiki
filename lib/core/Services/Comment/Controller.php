@@ -156,7 +156,7 @@ class Services_Comment_Controller
 
         $errors = [];
         $titleRaw = $input->title->xss();
-        $data = trim($input->data->wikicontent());
+        $data = trim($input->data->wikicontent(), " \n\r\t\v\x00");
 
         if ($prefs['comments_notitle'] == 'y') {
             $title = 'Untitled';
@@ -167,7 +167,7 @@ class Services_Comment_Controller
 
         $tikilib = TikiLib::lib('tiki');
         $data = $tikilib->convertAbsoluteLinksToRelative($data);
-        $title = trim($title);
+        $title = trim($title, " \n\r\t\v\x00");
 
         $watch = $input->watch->text();
         $contributions = [];
@@ -400,8 +400,8 @@ class Services_Comment_Controller
         $errors = [];
 
         if ($input->edit->int()) {
-            $title = trim($input->title->xss());
-            $data = trim($input->data->wikicontent());
+            $title = trim($input->title->xss(), " \n\r\t\v\x00");
+            $data = trim($input->data->wikicontent(), " \n\r\t\v\x00");
 
             $tikilib = TikiLib::lib('tiki');
             $data = $tikilib->convertAbsoluteLinksToRelative($data);

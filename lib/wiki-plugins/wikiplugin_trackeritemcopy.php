@@ -177,7 +177,7 @@ function wikiplugin_trackeritemcopy($data, $params)
                         if ($h["value"] == '-randomstring-') {
                             $h["value"] = $trklib->genPass();
                         } elseif (str_starts_with($h["value"], 'f_')) {
-                            $sourceFieldId = (int) trim(substr($h["value"], 2));
+                            $sourceFieldId = (int) trim(substr($h["value"], 2), " \n\r\t\v\x00");
                             $h["value"] = $trklib->get_item_value($trackerId, $itemId, $sourceFieldId);
                         }
                         $ins_fields_final["data"][] = $h;

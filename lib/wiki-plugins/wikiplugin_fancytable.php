@@ -406,7 +406,7 @@ function process_section($data, $type, $line_sep, $cellbeg, $cellend, $widths, $
 
     //Each row
     foreach ($lines as $line) {
-        $line = trim($line);
+        $line = trim($line, " \n\r\t\v\x00");
         if (strlen($line) > 0) {
             if ($type == 'bs') {
                 $cellbeg = "\r\t\t\t" . '<td';

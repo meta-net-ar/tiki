@@ -281,7 +281,7 @@ class dataToFieldHandler
     {
         global $tikilib;
 
-        $checkedData = trim($data);
+        $checkedData = trim($data, " \n\r\t\v\x00");
         if (empty($checkedData) || empty(self::$itemStack)) {
             return $data;
         }

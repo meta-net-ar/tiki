@@ -39,8 +39,8 @@ class Multilingual_Aligner_SentenceAlignments
 
         foreach ($this->alignment_table as $key => $val) {
             if ($k == 1) {
-                $sentences = $segmentor->segment(trim($key));
-                if (strcmp(trim($sentences[0]), trim($source_lng_sentence)) == 0) { //if one of those is matched
+                $sentences = $segmentor->segment(trim($key, " \n\r\t\v\x00"));
+                if (strcmp(trim($sentences[0], " \n\r\t\v\x00"), trim($source_lng_sentence, " \n\r\t\v\x00")) == 0) { //if one of those is matched
                     $found = 1;
                     for ($j = 1, $l = 1, $count_sentences = count($sentences); $j < $count_sentences; $l++) {
                         $flag = 0;
@@ -49,7 +49,7 @@ class Multilingual_Aligner_SentenceAlignments
                             break;
                         }
 
-                        if (strcmp(trim($sentence_array[$index + $l]), trim($sentences[$j])) != 0) {
+                        if (strcmp(trim($sentence_array[$index + $l], " \n\r\t\v\x00"), trim($sentences[$j], " \n\r\t\v\x00")) != 0) {
                             if ($sentence_array[$index + $l] == "" || $sentence_array[$index + $l][0] != "+") { //if it is an added sentence
                                 $found = 0;
                                 break;
@@ -70,8 +70,8 @@ class Multilingual_Aligner_SentenceAlignments
                     } //if
                 } //if
             } else {
-                $sentences = $segmentor->segment(trim($val));
-                if (strcmp(trim($sentences[0]), trim($source_lng_sentence)) == 0) { //if one of those is matched
+                $sentences = $segmentor->segment(trim($val, " \n\r\t\v\x00"));
+                if (strcmp(trim($sentences[0], " \n\r\t\v\x00"), trim($source_lng_sentence, " \n\r\t\v\x00")) == 0) { //if one of those is matched
                     $found = 1;
                     for ($j = $i + 1, $l = 1, $count_sentences = count($sentences); $j < $count_sentences; $l++) {
                         $flag = 0;
@@ -80,7 +80,7 @@ class Multilingual_Aligner_SentenceAlignments
                             break;
                         }
 
-                        if (strcmp(trim($sentence_array[$index + $l]), trim($sentences[$j])) != 0) {
+                        if (strcmp(trim($sentence_array[$index + $l], " \n\r\t\v\x00"), trim($sentences[$j], " \n\r\t\v\x00")) != 0) {
                             if ($sentence_array[$index + $l] == "" || $sentence_array[$index + $l][0] != "+") { //if it is an added sentence
                                 $found = 0;
                                 break;
@@ -116,9 +116,9 @@ class Multilingual_Aligner_SentenceAlignments
             foreach ($this->alignment_table as $key => $val) {
                 $start++;
                 $sent_ind = 0;
-                $sentences = $segmentor->segment(trim($key));
+                $sentences = $segmentor->segment(trim($key, " \n\r\t\v\x00"));
                 for ($j = 0, $count_sentences = count($sentences); $j < $count_sentences; $j++) {
-                    $sentences[$j] = trim($sentences[$j]);
+                    $sentences[$j] = trim($sentences[$j], " \n\r\t\v\x00");
                 }
 
                 while (1) {
@@ -134,8 +134,8 @@ class Multilingual_Aligner_SentenceAlignments
                         $index1;
                     }
 
-                    $temp1 = trim($temp1);
-                    $temp2 = trim($temp2);
+                    $temp1 = trim($temp1, " \n\r\t\v\x00");
+                    $temp2 = trim($temp2, " \n\r\t\v\x00");
 
                     if (($c = $this->strpos_function($temp1, $temp2)) != -1 && $c == 0) {
                         $found = 1;
@@ -229,9 +229,9 @@ class Multilingual_Aligner_SentenceAlignments
             foreach ($this->alignment_table as $key => $val) {
                 $start++;
                 $sent_ind = 0;
-                $sentences = $segmentor->segment(trim($val));
+                $sentences = $segmentor->segment(trim($val, " \n\r\t\v\x00"));
                 for ($j = 0, $count_sentences = count($sentences); $j < $count_sentences; $j++) {
-                    $sentences[$j] = trim($sentences[$j]);
+                    $sentences[$j] = trim($sentences[$j], " \n\r\t\v\x00");
                 }
 
                 while (1) {
@@ -247,8 +247,8 @@ class Multilingual_Aligner_SentenceAlignments
                         $index1;
                     }
 
-                    $temp1 = trim($temp1);
-                    $temp2 = trim($temp2);
+                    $temp1 = trim($temp1, " \n\r\t\v\x00");
+                    $temp2 = trim($temp2, " \n\r\t\v\x00");
 
                     if (($c = $this->strpos_function($temp1, $temp2)) != -1 && $c == 0) {
                         $found = 1;

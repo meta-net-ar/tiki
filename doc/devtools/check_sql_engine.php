@@ -105,7 +105,7 @@ class CheckSqlEngine
                 $this->printMessageError($message, $output_path);
 
                 if ($should_fix) {
-                    $queries[$i] = rtrim(str_replace($matches[0], 'ENGINE=MyISAM', $queries[$i]));
+                    $queries[$i] = rtrim(str_replace($matches[0], 'ENGINE=MyISAM', $queries[$i]), " \n\r\t\v\x00");
                 }
             }
 
@@ -115,7 +115,7 @@ class CheckSqlEngine
                 $this->printMessageError($message, $output_path);
 
                 if ($should_fix) {
-                    $queries[$i] = rtrim(str_replace($matches[0], '', $queries[$i]));
+                    $queries[$i] = rtrim(str_replace($matches[0], '', $queries[$i]), " \n\r\t\v\x00");
                 }
             }
         }

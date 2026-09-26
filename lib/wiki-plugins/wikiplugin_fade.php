@@ -141,13 +141,13 @@ function wikiplugin_fade($body, $params)
     $headerlib = TikiLib::lib('header');
     $headerlib->add_js_module('import "@tiki/plugins/fade";');
 
-    $body = trim($body);
+    $body = trim($body, " \n\r\t\v\x00");
     $body = TikiLib::lib('parser')->parse_data($body);
 
     $groupNorm = wikiplugin_fade_normalize_group($params['fade_group'] ?? '');
     $isExpanded = wikiplugin_fade_resolve_expanded($params);
 
-    $summaryRaw = trim((string) ($params['summary'] ?? ''));
+    $summaryRaw = trim((string) ($params['summary'] ?? ''), " \n\r\t\v\x00");
     $hasSummary = $summaryRaw !== '';
     $summaryHtml = '';
     if ($hasSummary) {
@@ -158,7 +158,7 @@ function wikiplugin_fade($body, $params)
 
     $defaultLabel = tra('Unspecified label');
     $userLabelRaw = (string) ($params['label'] ?? '');
-    $userSetCustomLabel = trim($userLabelRaw) !== '' && $userLabelRaw !== $defaultLabel;
+    $userSetCustomLabel = trim($userLabelRaw, " \n\r\t\v\x00") !== '' && $userLabelRaw !== $defaultLabel;
     $toggleEsc = htmlspecialchars((string) $params['label'], ENT_QUOTES, 'UTF-8');
     $fadeSummaryAriaLabel = htmlspecialchars(tra('Show or hide details'), ENT_QUOTES, 'UTF-8');
     $fadeSummaryAriaAttr = $hasSummary ? ' aria-label="' . $fadeSummaryAriaLabel . '"' : '';
@@ -184,7 +184,7 @@ function wikiplugin_fade($body, $params)
         $showLeftArrow = $iconParam === 'y';
         $showChevron = $iconParam === '';
 
-        $wrapperClass = 'wikiplugin-fade card ' . trim($params['class'] ?? '');
+        $wrapperClass = 'wikiplugin-fade card ' . trim($params['class'] ?? '', " \n\r\t\v\x00");
         if ($showLeftArrow) {
             $wrapperClass .= ' wikiplugin-fade--icon';
         }
@@ -197,7 +197,7 @@ function wikiplugin_fade($body, $params)
         if ($isExpanded) {
             $wrapperClass .= ' wikiplugin-fade--initial-open';
         }
-        $wrapperClass = trim($wrapperClass);
+        $wrapperClass = trim($wrapperClass, " \n\r\t\v\x00");
 
         if ($hasSummary && $userSetCustomLabel) {
             $headerInner = '<div class="wikiplugin-fade__summary-stack flex-grow-1 min-w-0">'
@@ -237,8 +237,8 @@ function wikiplugin_fade($body, $params)
     if ($isExpanded) {
         $outerClass .= ' wikiplugin-fade--initial-open';
     }
-    if (trim($params['class'] ?? '') !== '') {
-        $outerClass .= ' ' . trim($params['class']);
+    if (trim($params['class'] ?? '', " \n\r\t\v\x00") !== '') {
+        $outerClass .= ' ' . trim($params['class'], " \n\r\t\v\x00");
     }
 
     $linkClasses = 'wpfade-legacy-toggle';
@@ -267,7 +267,7 @@ function wikiplugin_fade($body, $params)
 
 function wikiplugin_fade_normalize_group($group)
 {
-    $group = trim((string) $group);
+    $group = trim((string) $group, " \n\r\t\v\x00");
     if ($group === '') {
         return '';
     }
@@ -279,7 +279,7 @@ function wikiplugin_fade_normalize_group($group)
 function wikiplugin_fade_resolve_expanded(array $params)
 {
     global $prefs;
-    $ex = trim((string) ($params['expanded'] ?? ''));
+    $ex = trim((string) ($params['expanded'] ?? ''), " \n\r\t\v\x00");
     if ($ex === 'y') {
         return true;
     }

@@ -54,7 +54,7 @@ function test_callback($buffer)
         return $buffer;
     }
 
-    $filename = basename(trim($_COOKIE['tikitest_filename']));
+    $filename = basename(trim($_COOKIE['tikitest_filename'], " \n\r\t\v\x00"));
     if (isset($_COOKIE['tikitest_filename'])) {
         $xml_file = __DIR__ . "/tests/" . $filename . ".xml";
     } else {

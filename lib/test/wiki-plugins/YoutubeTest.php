@@ -24,7 +24,7 @@ class WikiPlugin_YoutubeTest extends PHPUnit\Framework\TestCase
             $result = $result->toWiki();
         }
         $this->assertIsString($result);
-        if (strpos($result, 'alert') !== false || trim($result) === '~np~~/np~') {
+        if (strpos($result, 'alert') !== false || trim($result, " \n\r\t\v\x00") === '~np~~/np~') {
             $this->assertIsString($result);
         } else {
             $this->assertStringContainsString('~np~', $result);

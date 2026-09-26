@@ -234,7 +234,7 @@ function wikiplugin_addtocart($data, $params)
         $_SESSION['forceanon'] = 'y';
     }
     foreach ($params as &$p) {
-        $p = trim($p);          // remove some line ends picked up in pretty tracker
+        $p = trim($p, " \n\r\t\v\x00");          // remove some line ends picked up in pretty tracker
     }
 
     $params['price'] = preg_replace('/[^-?\d^\.^,]/', '', $params['price']);

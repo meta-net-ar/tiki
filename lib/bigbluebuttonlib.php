@@ -154,7 +154,7 @@ class BigBlueButtonLib
             preg_match('!\(([^\)]+)\)!', $values['fullName'], $match);
             $values['fullName'] = $match[1];
         } else {
-            $values['fullName'] = trim(preg_replace('!\(([^\)]+)\)!', '', $values['fullName'] ?? ''));
+            $values['fullName'] = trim(preg_replace('!\(([^\)]+)\)!', '', $values['fullName'] ?? ''), " \n\r\t\v\x00");
         }
         return $values;
     }

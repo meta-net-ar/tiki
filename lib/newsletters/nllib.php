@@ -649,7 +649,7 @@ class NlLib extends TikiLib
         $hasValidMx = false;
         if (! empty($mxHosts)) {
             foreach ($mxHosts as $mxHost) {
-                $mxHost = trim($mxHost);
+                $mxHost = trim($mxHost, " \n\r\t\v\x00");
                 if (! empty($mxHost) && $mxHost !== '.') {
                     $hasValidMx = true;
                     break;
@@ -1806,7 +1806,7 @@ class NlLib extends TikiLib
                     }
                     $this->delete_edition_subscriber($info['editionId'], $us);
                     $logStatus = 'OK';
-                    $this->logEmailStatus($zmail, '', trim($zmail->getSubject()), 'From Send Method nllib');
+                    $this->logEmailStatus($zmail, '', trim($zmail->getSubject(), " \n\r\t\v\x00"), 'From Send Method nllib');
                 } catch (TransportExceptionInterface | \Throwable $e) {
                     $errorMsg = $e->getMessage();
 
@@ -1865,7 +1865,7 @@ class NlLib extends TikiLib
                     $errors[] = ["user" => $us['user'], "email" => $email, "msg" => $errorMsg];
                     $this->mark_edition_subscriber($info['editionId'], $us);
                     $logStatus = 'Error';
-                    $this->logEmailStatus($zmail ?: tiki_get_basic_mail(), $errorMsg, $zmail ? trim($zmail->getSubject()) : '', 'From Send Method nllib');
+                    $this->logEmailStatus($zmail ?: tiki_get_basic_mail(), $errorMsg, $zmail ? trim($zmail->getSubject(), " \n\r\t\v\x00") : '', 'From Send Method nllib');
                 }
             } else {
                 $errorMsg = tr('Potential cross site forgery request detected');

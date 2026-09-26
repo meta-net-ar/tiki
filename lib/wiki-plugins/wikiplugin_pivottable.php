@@ -825,7 +825,7 @@ function wikiplugin_pivottable($data, $params)
                     continue;
                 }
                 $replacement = array_map(function ($value) use ($row, $field) {
-                    return array_merge($row, [$field => ltrim($value)]);
+                    return array_merge($row, [$field => ltrim($value, " \n\r\t\v\x00")]);
                 }, $splitted);
             }
             array_splice($pivotData, $key, 1, $replacement);
@@ -840,7 +840,7 @@ function wikiplugin_pivottable($data, $params)
     }
     if (! empty($params['cols'])) {
         foreach ($params['cols'] as $colName) {
-            if ($params['data'][0] !== 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($colName), $definitions)) {
+            if ($params['data'][0] !== 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($colName, " \n\r\t\v\x00"), $definitions)) {
                 $cols[] = $field['name'];
             } else {
                 $cols[] = $colName;
@@ -854,7 +854,7 @@ function wikiplugin_pivottable($data, $params)
     if (! empty($params['rows'])) {
         $params['rows'] = array_filter($params['rows']);
         foreach ($params['rows'] as $rowName) {
-            if ($params['data'][0] !== 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($rowName), $definitions)) {
+            if ($params['data'][0] !== 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($rowName, " \n\r\t\v\x00"), $definitions)) {
                 $rows[] = $field['name'];
             } else {
                 $rows[] = $rowName;
@@ -866,7 +866,7 @@ function wikiplugin_pivottable($data, $params)
     if (! empty($params['vals'])) {
         $params['vals'] = array_filter($params['vals']);
         foreach ($params['vals'] as $valName) {
-            if ($params['data'][0] !== 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($valName), $definitions)) {
+            if ($params['data'][0] !== 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($valName, " \n\r\t\v\x00"), $definitions)) {
                 $vals[] = $field['name'];
             } else {
                 $vals[] = $valName;
@@ -902,10 +902,10 @@ function wikiplugin_pivottable($data, $params)
     if (! empty($params['aggregateDetails']) && ! empty($params['aggregateDetails'][0])) {
         $aggregateDetails = [];
         foreach ($params['aggregateDetails'] as $fieldName) {
-            if ($params['data'][0] != 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($fieldName), $definitions)) {
+            if ($params['data'][0] != 'activitystream' && $field = wikiplugin_pivottable_field_from_definitions(trim($fieldName, " \n\r\t\v\x00"), $definitions)) {
                 $aggregateDetails[] = $field['name'];
             } else {
-                $aggregateDetails[] = trim($fieldName);
+                $aggregateDetails[] = trim($fieldName, " \n\r\t\v\x00");
             }
         }
         foreach ($pivotData as &$row) {

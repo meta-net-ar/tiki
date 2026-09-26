@@ -71,8 +71,8 @@ if (isset($_REQUEST["save"])) {
     $access->checkCsrf();
     $access->check_permission('tiki_p_admin_faqs');
 
-    $title = trim($_REQUEST["title"] ?? '');
-    $description = trim($_REQUEST["description"] ?? '');
+    $title = trim($_REQUEST["title"] ?? '', " \n\r\t\v\x00");
+    $description = trim($_REQUEST["description"] ?? '', " \n\r\t\v\x00");
     $canSuggest = (isset($_REQUEST["canSuggest"]) && $_REQUEST["canSuggest"] === 'on') ? 'y' : 'n';
     $submittedFaqId = (int) ($_REQUEST["faqId"] ?? 0);
 

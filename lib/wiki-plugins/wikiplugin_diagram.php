@@ -112,7 +112,7 @@ function wikiplugin_diagram($data, $params)
     $compressXml = ! (($prefs['fgal_use_diagram_compression_by_default'] !== 'y'));
     $compressXmlParam = false;
 
-    if (empty($params['fileId']) && empty(trim($data)) && ! empty($params['template'])) {
+    if (empty($params['fileId']) && empty(trim($data, " \n\r\t\v\x00")) && ! empty($params['template'])) {
         $params['fileId'] = $template;
     }
 

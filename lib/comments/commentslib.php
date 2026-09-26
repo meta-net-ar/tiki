@@ -375,7 +375,7 @@ class Comments extends TikiLib
 
         // for any reason my sybase test machine adds a space to
         // the inbound_imap_server field in the table.
-        $info["inbound_imap_server"] = trim($info["inbound_imap_server"]);
+        $info["inbound_imap_server"] = trim($info["inbound_imap_server"], " \n\r\t\v\x00");
 
         if (empty($info["inbound_imap_server"])) {
             return;
@@ -559,7 +559,8 @@ class Comments extends TikiLib
                         "",
                         $parsedMessage->getHeaderValue('Subject')
                     )
-                )
+                ),
+                " \n\r\t\v\x00"
             );
             $title = $this->cleanQuotes($title);
 
@@ -3279,7 +3280,7 @@ class Comments extends TikiLib
 
         if ($anonymous_name) {
             // The leading tab is for recognizing anonymous entries. Normal usernames don't start with a tab
-            $userName = "\t" . trim($anonymous_name);
+            $userName = "\t" . trim($anonymous_name, " \n\r\t\v\x00");
         } elseif (! $userName) {
             $userName = tra('Anonymous');
         } elseif ($userName) {
@@ -4014,7 +4015,7 @@ class Comments extends TikiLib
         $data = strip_tags($data);
         $data = str_replace($noparsed['key'], $noparsed['data'], $data);
 
-        $params['comments_data'] = rtrim($data);
+        $params['comments_data'] = rtrim($data, " \n\r\t\v\x00");
 
         if (! isset($params['comment_topictype'])) {
             $params['comment_topictype'] = 'n';
@@ -4040,7 +4041,7 @@ class Comments extends TikiLib
             $params['comment_topicsmiley'] = '';
         }
         if (isset($params['anonymous_name'])) {
-            $params['anonymous_name'] = trim(strip_tags($params['anonymous_name']));
+            $params['anonymous_name'] = trim(strip_tags($params['anonymous_name']), " \n\r\t\v\x00");
         } else {
             $params['anonymous_name'] = '';
         }

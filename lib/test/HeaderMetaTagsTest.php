@@ -307,7 +307,7 @@ class HeaderMetaTagsTest extends TikiTestCase
                         $valueEnd++;
                     }
                     $unquotedValue = substr($attributes, $valueStart, $valueEnd - $valueStart);
-                    if (trim($unquotedValue) !== '') {
+                    if (trim($unquotedValue, " \n\r\t\v\x00") !== '') {
                         $this->fail("W3C HTML5: Meta tag has unquoted attribute value for '$name': $unquotedValue in $attributes");
                     }
                     $pos = $valueEnd;

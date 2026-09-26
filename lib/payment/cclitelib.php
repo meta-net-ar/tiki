@@ -335,7 +335,7 @@ class CCLiteLib extends TikiDb_Bridge
                         if ($res && ! preg_match('/404 Not Found/', $res)) {                            // seems to return a 404 :(
                             $logon = curl_exec($ch);    // retry login
                         } else {
-                            $err_msg = trim($results[0]);
+                            $err_msg = trim($results[0], " \n\r\t\v\x00");
                             $logon = 'failed';
                         }
                     }
@@ -344,10 +344,10 @@ class CCLiteLib extends TikiDb_Bridge
                 // e.g. test_user at test_reg is not active: confirm or contact the administrator <a href="http://example.org/cgi-bin/cclite.cgi">Try again?</a>
                 // check for other errors & remove cclite link
                 if (preg_match('/^(.*?' . $username . '.*' . $registry . '[^<]*)/mi', $logon, $results)) {
-                    $err_msg = trim($results[0]);
+                    $err_msg = trim($results[0], " \n\r\t\v\x00");
                     $logon = 'failed';  // error in $results[0]
                 } elseif (preg_match('/HTTP\/1.1 302/mis', $logon) && preg_match('/<BODY.*?>(.*)<\/BODY>/mis', $logon, $results)) {
-                    $err_msg = trim(strip_tags($results[0], '<br>'));
+                    $err_msg = trim(strip_tags($results[0], '<br>'), " \n\r\t\v\x00");
                     //$logon = 'failed';
                 }
             }

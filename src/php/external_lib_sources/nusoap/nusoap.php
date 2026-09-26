@@ -2797,7 +2797,7 @@ class soap_transport_http extends nusoap_base {
             return $new;
         }
         $temp = substr($buffer,0,$chunkend);
-        $chunk_size = hexdec( trim($temp) );
+        $chunk_size = hexdec( trim($temp, " \n\r\t\v\x00") );
         $chunkstart = $chunkend + strlen($lb);
         // while (chunk-size > 0) {
         while ($chunk_size > 0) {
@@ -2827,7 +2827,7 @@ class soap_transport_http extends nusoap_base {
                 break; //Just in case we got a broken connection
             }
             $temp = substr($buffer,$chunkstart,$chunkend-$chunkstart);
-            $chunk_size = hexdec( trim($temp) );
+            $chunk_size = hexdec( trim($temp, " \n\r\t\v\x00") );
             $chunkstart = $chunkend;
         }
         return $new;
@@ -2966,7 +2966,7 @@ class soap_transport_http extends nusoap_base {
 
             $tmp = fgets($this->fp, 256);
             $tmplen = strlen($tmp);
-            $this->debug("read line of $tmplen bytes: " . trim($tmp));
+            $this->debug("read line of $tmplen bytes: " . trim($tmp, " \n\r\t\v\x00"));
 
             if ($tmplen == 0) {
                 $this->incoming_payload = $data;
@@ -2996,23 +2996,23 @@ class soap_transport_http extends nusoap_base {
         $this->incoming_payload .= $data;
         $this->debug('found end of headers after length ' . strlen($data));
         // process headers
-        $header_data = trim(substr($data,0,$pos));
+        $header_data = trim(substr($data,0,$pos), " \n\r\t\v\x00");
         $header_array = explode($lb,$header_data);
         $this->incoming_headers = array();
         $this->incoming_cookies = array();
         foreach($header_array as $header_line){
             $arr = explode(':',$header_line, 2);
             if(count($arr) > 1){
-                $header_name = strtolower(trim($arr[0]));
-                $this->incoming_headers[$header_name] = trim($arr[1]);
+                $header_name = strtolower(trim($arr[0], " \n\r\t\v\x00"));
+                $this->incoming_headers[$header_name] = trim($arr[1], " \n\r\t\v\x00");
                 if ($header_name == 'set-cookie') {
                     // TODO: allow multiple cookies from parseCookie
-                    $cookie = $this->parseCookie(trim($arr[1]));
+                    $cookie = $this->parseCookie(trim($arr[1], " \n\r\t\v\x00"));
                     if ($cookie) {
                         $this->incoming_cookies[] = $cookie;
                         $this->debug('found cookie: ' . $cookie['name'] . ' = ' . $cookie['value']);
                     } else {
-                        $this->debug('did not find cookie in ' . trim($arr[1]));
+                        $this->debug('did not find cookie in ' . trim($arr[1], " \n\r\t\v\x00"));
                     }
                 }
             } elseif (isset($header_name)) {
@@ -3048,7 +3048,7 @@ class soap_transport_http extends nusoap_base {
                     $this->setError('socket read of chunk length timed out');
                     return false;
                 }
-                $content_length = hexdec(trim($tmp));
+                $content_length = hexdec(trim($tmp, " \n\r\t\v\x00"));
                 $this->debug("chunk length $content_length");
             }
             $strlen = 0;
@@ -3141,9 +3141,9 @@ class soap_transport_http extends nusoap_base {
         while ($this->isSkippableCurlHeader($data)) {
             $this->debug("Found HTTP header to skip");
             if ($pos = strpos($data,"\r\n\r\n")) {
-                $data = ltrim(substr($data,$pos));
+                $data = ltrim(substr($data,$pos), " \n\r\t\v\x00");
             } elseif($pos = strpos($data,"\n\n") ) {
-                $data = ltrim(substr($data,$pos));
+                $data = ltrim(substr($data,$pos), " \n\r\t\v\x00");
             }
         }
 
@@ -3152,9 +3152,9 @@ class soap_transport_http extends nusoap_base {
             $data = $savedata;
             while (preg_match('/^HTTP\/1.1 100/',$data)) {
                 if ($pos = strpos($data,"\r\n\r\n")) {
-                    $data = ltrim(substr($data,$pos));
+                    $data = ltrim(substr($data,$pos), " \n\r\t\v\x00");
                 } elseif($pos = strpos($data,"\n\n") ) {
-                    $data = ltrim(substr($data,$pos));
+                    $data = ltrim(substr($data,$pos), " \n\r\t\v\x00");
                 }
             }
         }
@@ -3169,25 +3169,25 @@ class soap_transport_http extends nusoap_base {
             $this->setError('no proper separation of headers and document');
             return false;
         }
-        $header_data = trim(substr($data,0,$pos));
+        $header_data = trim(substr($data,0,$pos), " \n\r\t\v\x00");
         $header_array = explode($lb,$header_data);
-        $data = ltrim(substr($data,$pos));
+        $data = ltrim(substr($data,$pos), " \n\r\t\v\x00");
         $this->debug('found proper separation of headers and document');
         $this->debug('cleaned data, stringlen: '.strlen($data));
         // clean headers
         foreach ($header_array as $header_line) {
             $arr = explode(':',$header_line,2);
             if(count($arr) > 1){
-                $header_name = strtolower(trim($arr[0]));
-                $this->incoming_headers[$header_name] = trim($arr[1]);
+                $header_name = strtolower(trim($arr[0], " \n\r\t\v\x00"));
+                $this->incoming_headers[$header_name] = trim($arr[1], " \n\r\t\v\x00");
                 if ($header_name == 'set-cookie') {
                     // TODO: allow multiple cookies from parseCookie
-                    $cookie = $this->parseCookie(trim($arr[1]));
+                    $cookie = $this->parseCookie(trim($arr[1], " \n\r\t\v\x00"));
                     if ($cookie) {
                         $this->incoming_cookies[] = $cookie;
                         $this->debug('found cookie: ' . $cookie['name'] . ' = ' . $cookie['value']);
                     } else {
-                        $this->debug('did not find cookie in ' . trim($arr[1]));
+                        $this->debug('did not find cookie in ' . trim($arr[1], " \n\r\t\v\x00"));
                     }
                 }
             } elseif (isset($header_name)) {
@@ -3222,7 +3222,7 @@ class soap_transport_http extends nusoap_base {
                  // parse elements into array
                  $digestElements = explode(',', $digestString);
                  foreach ($digestElements as $val) {
-                     $tempElement = explode('=', trim($val), 2);
+                     $tempElement = explode('=', trim($val, " \n\r\t\v\x00"), 2);
                      $digestRequest[$tempElement[0]] = str_replace("\"", '', $tempElement[1]);
                  }
 
@@ -6865,7 +6865,7 @@ class nusoap_parser extends nusoap_base {
             } elseif (isset($this->message[$pos]['xattrs'])) {
                 if (isset($this->message[$pos]['nil']) && $this->message[$pos]['nil']) {
                     $this->message[$pos]['xattrs']['!'] = null;
-                } elseif (isset($this->message[$pos]['cdata']) && trim($this->message[$pos]['cdata']) != '') {
+                } elseif (isset($this->message[$pos]['cdata']) && trim($this->message[$pos]['cdata'], " \n\r\t\v\x00") != '') {
                     if (isset($this->message[$pos]['type'])) {
                         $this->message[$pos]['xattrs']['!'] = $this->decodeSimple($this->message[$pos]['cdata'], $this->message[$pos]['type'],
                             $this->message[$pos]['type_namespace'] ?? ''
@@ -7130,7 +7130,7 @@ class nusoap_parser extends nusoap_base {
                 }
             }
             // handle simpleContent
-            if (isset($this->message[$pos]['cdata']) && trim($this->message[$pos]['cdata']) != '') {
+            if (isset($this->message[$pos]['cdata']) && trim($this->message[$pos]['cdata'], " \n\r\t\v\x00") != '') {
                 $this->debug('in buildVal, handling simpleContent');
                 if (isset($this->message[$pos]['type'])) {
                     $params['!'] = $this->decodeSimple(

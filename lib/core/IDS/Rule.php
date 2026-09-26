@@ -97,7 +97,7 @@ class IDS_Rule
         }
 
         foreach ($tags as $key => $tag) {
-            $tags[$key] = trim($tag);
+            $tags[$key] = trim($tag, " \n\r\t\v\x00");
         }
 
         $this->tags = $tags;

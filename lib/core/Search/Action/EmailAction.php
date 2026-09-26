@@ -143,7 +143,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             }
             foreach ($data->file_attachments->text() as $fileAttIds) {
                 if (is_string($fileAttIds)) {
-                    $fileAttIds = preg_split('/\s*,\s*/', trim($fileAttIds));
+                    $fileAttIds = preg_split('/\s*,\s*/', trim($fileAttIds, " \n\r\t\v\x00"));
                 }
                 if (is_array($fileAttIds)) {
                     $fileIds = array_merge($fileIds, $fileAttIds);
@@ -203,7 +203,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             $options['is_html'] = true;
         }
 
-        return trim($parserlib->parse_data($content, $options));
+        return trim($parserlib->parse_data($content, $options), " \n\r\t\v\x00");
     }
 
     private function stripNp($content)
@@ -216,7 +216,7 @@ class Search_Action_EmailAction implements Search_Action_Action
         if (empty($email_or_username)) {
             return [];
         }
-        $email_or_username = trim($this->stripNp($email_or_username));
+        $email_or_username = trim($this->stripNp($email_or_username), " \n\r\t\v\x00");
 
         try {
             $resolvedAddresses = [];
@@ -265,7 +265,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             }
 
             if (! $inQuotes && ($character === ',' || $character === ';' || $character === "\n" || $character === "\r")) {
-                $candidate = trim($buffer);
+                $candidate = trim($buffer, " \n\r\t\v\x00");
                 if ($candidate !== '') {
                     $parsed[] = $candidate;
                 }
@@ -276,7 +276,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             $buffer .= $character;
         }
 
-        $candidate = trim($buffer);
+        $candidate = trim($buffer, " \n\r\t\v\x00");
         if ($candidate !== '') {
             $parsed[] = $candidate;
         }

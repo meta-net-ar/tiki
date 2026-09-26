@@ -97,12 +97,12 @@ function wikiplugin_footnote($data, $params, $offset, $context)
         setScheme($params['scheme']);
     }
 
-    $data = trim($data);
+    $data = trim($data, " \n\r\t\v\x00");
     if (! empty($data)) {
         $footnotes['count']++;                      // keep a record of how many times footones is called to generate unique id's
 
         // Create an array of classes to be applied
-        $classes = (! is_null($params['class'])) ? explode(' ', trim($params["class"])) : [];
+        $classes = (! is_null($params['class'])) ? explode(' ', trim($params["class"], " \n\r\t\v\x00")) : [];
         if ($footnotes['nest'] > 0) {   // if we are in a nested footnote, add a nested class
             $classes[] = 'footnest' . $footnotes['nest'];
         }

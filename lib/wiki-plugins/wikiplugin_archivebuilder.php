@@ -45,8 +45,8 @@ function wikiplugin_archivebuilder($data, $params)
         $archive = new ZipArchive();
         $archive->open($file = tempnam('temp/', 'archive') . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-        foreach (array_filter(explode("\n", trim($data))) as $line) {
-            $parts = explode(":", trim($line));
+        foreach (array_filter(explode("\n", trim($data, " \n\r\t\v\x00"))) as $line) {
+            $parts = explode(":", trim($line, " \n\r\t\v\x00"));
             $handler = array_shift($parts);
 
             if (isset($handlers[$handler])) {

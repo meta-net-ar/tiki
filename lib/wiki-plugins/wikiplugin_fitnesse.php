@@ -49,7 +49,7 @@ function wikiplugin_fitnesse($data, $params)
 
         $arguments = $table->getArguments();
         $arguments = $argParser->parse($arguments);
-        $body = trim($table->getBody());
+        $body = trim($table->getBody(), " \n\r\t\v\x00");
 
         if (isset($fixtures[$fixture])) {
             $replace = call_user_func($fixtures[$fixture], $body, new JitFilter($arguments));

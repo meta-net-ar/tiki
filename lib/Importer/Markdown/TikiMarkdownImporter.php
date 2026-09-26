@@ -363,8 +363,8 @@ class TikiMarkdownImporter
                 'type' => $f['type'] ?? 'page',
                 'size_bytes' => $f['size_bytes'] ?? strlen($raw),
                 'has_front_matter' => $f['has_front_matter'] ?? false,
-                'original_preview' => mb_substr(trim($raw), 0, 200),
-                'purified_preview' => mb_substr(trim($md), 0, 200),
+                'original_preview' => mb_substr(trim($raw, " \n\r\t\v\x00"), 0, 200),
+                'purified_preview' => mb_substr(trim($md, " \n\r\t\v\x00"), 0, 200),
                 'notes' => $res['notes'] ?? [],
             ];
         }
@@ -544,7 +544,7 @@ class TikiMarkdownImporter
         $tikilib = TikiLib::lib('tiki');
 
         $mode   = $opts[self::GC_OPT_MODE] ?? self::DEFAULT_GC_MODE; // off|mark|delete
-        $safeNS = trim((string)($opts[self::GC_OPT_SAFE_NS] ?? ''));
+        $safeNS = trim((string)($opts[self::GC_OPT_SAFE_NS] ?? ''), " \n\r\t\v\x00");
 
         if ($mode === self::GC_OFF) {
             return ['orphans' => 0, 'deleted' => 0, 'marked' => 0, 'errors' => []];

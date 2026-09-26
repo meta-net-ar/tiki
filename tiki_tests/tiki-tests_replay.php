@@ -169,7 +169,7 @@ function verif_url($url, $use_tidy = true)
         $result['replay_error_msg'] = tra('The Tidy extension is not present');
     }
     // If we have a XPath then we extract the new DOM and print it in HTML
-    if (trim($xpath) != '') {
+    if (trim($xpath, " \n\r\t\v\x00") != '') {
         $dom_ref = DOMDocument::loadHTML($data);
         $xp_ref = new DomXPath($dom_ref);
         $res_ref = $xp_ref->query($xpath);
@@ -202,7 +202,7 @@ function verif_url($url, $use_tidy = true)
     }
 
     $tmp = DiffUtils::diff2($data, $buffer, "htmldiff");
-    if (trim($xpath) != '') {
+    if (trim($xpath, " \n\r\t\v\x00") != '') {
         $result['html'] = preg_replace(
             ["/<html>/", "/<\/html>/"],
             ["<div style='overflow: auto; width:500px; text-align: center'> ", "</div>"],

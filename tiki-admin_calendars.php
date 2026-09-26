@@ -194,8 +194,8 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     }
 
     if (! empty($_REQUEST['newstatus'])) {
-        if (trim($_REQUEST["newstatus"])) {
-            $newstatus = trim($_REQUEST["newstatus"]);
+        if (trim($_REQUEST["newstatus"], " \n\r\t\v\x00")) {
+            $newstatus = trim($_REQUEST["newstatus"], " \n\r\t\v\x00");
             // the new custom status name must be different from default
             if (! in_array($newstatus, array_map('strtolower', $defaultstatus))) {
                 // if it is an update
@@ -225,7 +225,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     $options['nameoneachday'] = isset($_REQUEST['nameoneachday']) ? 'y' : 'n';
     $options['copybuttononeachevent'] = isset($_REQUEST['copybuttononeachevent']) ? 'y' : 'n';
     $valid_custom_flags = array_map(function ($customflag) {
-        $flag = strtolower(trim($customflag));
+        $flag = strtolower(trim($customflag, " \n\r\t\v\x00"));
         if (! in_array($flag, ['n', 'y', 'yes'])) {
             $flag = 'n';
         }

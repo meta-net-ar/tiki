@@ -260,7 +260,7 @@ class Tiki_Profile_Writer
 
         foreach ($this->data['objects'] as $object) {
             if ($object['type'] == $type && $object['_id'] == $id) {
-                $name = trim($object['ref']);
+                $name = trim($object['ref'], " \n\r\t\v\x00");
                 return "\$profileobject:{$name}\$";
             }
         }
@@ -296,9 +296,9 @@ class Tiki_Profile_Writer
 
     public function formatExternalReference($symbol, $profile, $repository = null)
     {
-        $symbol = trim($symbol);
-        $profile = trim($profile);
-        $repository = trim($repository);
+        $symbol = trim($symbol, " \n\r\t\v\x00");
+        $profile = trim($profile, " \n\r\t\v\x00");
+        $repository = trim($repository, " \n\r\t\v\x00");
         if ($repository) {
             $repository .= ':';
         }

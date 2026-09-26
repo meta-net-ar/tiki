@@ -776,7 +776,7 @@ class DirLib extends TikiLib
 
         $bindvars = ['y'];
         for ($i = 0, $icount_words = count($words); $i < $icount_words; $i++) {
-            $word = trim($words[$i]);
+            $word = trim($words[$i], " \n\r\t\v\x00");
             if (! empty($word)) {
                 // Check if the term is in the stats then add it or increment it
                 if ($this->getOne("select count(*) from `tiki_directory_search` where `term`=?", [$word])) {
@@ -827,7 +827,7 @@ class DirLib extends TikiLib
         $words = explode(' ', $words);
         $bindvars = ['y',(int)$parent];
         for ($i = 0, $icount_words = count($words); $i < $icount_words; $i++) {
-            $word = trim($words[$i]);
+            $word = trim($words[$i], " \n\r\t\v\x00");
             // Check if the term is in the stats then add it or increment it
             if ($this->getOne("select count(*) from `tiki_directory_search` where `term`=?", [$word])) {
                 $query = "update `tiki_directory_search` set `hits`=`hits`+1 where `term`=?";

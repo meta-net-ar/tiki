@@ -857,7 +857,7 @@ function wikiplugin_tracker($data, $params)
             $wiki = $wiki_matches[1];
         }
 
-        $wiki = trim($wiki);
+        $wiki = trim($wiki, " \n\r\t\v\x00");
     }
     if (empty($params['rulesparent'])) {
         $params['rulesparent'] = empty($tpl) && empty($wiki) ? '.tiki-form-group:first' : '.tracker-field-group:first';
@@ -1056,7 +1056,7 @@ function wikiplugin_tracker($data, $params)
             $fill_defaults = [];
             $fill_flds_defaults = [];   // May be different from fill_defaults if some fields are not editable
             $fieldsfillnames = [];
-            if (trim($fieldsfilldefaults) != '') {
+            if (trim($fieldsfilldefaults, " \n\r\t\v\x00") != '') {
                 $fill_defaults = preg_split('/ *: */', $fieldsfilldefaults);
             }
             foreach ($fill_fields as $k => $fieldId) {
@@ -1429,7 +1429,7 @@ function wikiplugin_tracker($data, $params)
                         // multiple recipients can be separated by a comma
                         $emailOptions[1] = explode(',', $emailOptions[1]);
                         foreach ($emailOptions[1] as $key => $recipient) {
-                            $parsed = wikiplugin_tracker_process_email_recipients(trim($recipient), $flds['data'], $item, $trackerId, $rid);
+                            $parsed = wikiplugin_tracker_process_email_recipients(trim($recipient, " \n\r\t\v\x00"), $flds['data'], $item, $trackerId, $rid);
                             $emailOptions[1][$key] = array_unique($parsed);
                         }
                     }
@@ -1496,7 +1496,7 @@ function wikiplugin_tracker($data, $params)
                         if (empty($mail_data)) {
                             $mail_data = tra('Tracker was modified at ') . $_SERVER['SERVER_NAME'];
                         } else {
-                            $mail_data = trim(str_replace('&nbsp;', ' ', strip_tags($mail_data)));  // tidy
+                            $mail_data = trim(str_replace('&nbsp;', ' ', strip_tags($mail_data)), " \n\r\t\v\x00");  // tidy
                         }
                         $mail->setSubject($mail_data);
                         $mailDir = ! str_starts_with($emailOptions[2][$templateCounter], 'wiki:') ? 'mail/' : '';    // wiki pages dont start with wiki:
@@ -1597,7 +1597,7 @@ function wikiplugin_tracker($data, $params)
                         }
                     }
 
-                    $msg = trim($data);
+                    $msg = trim($data, " \n\r\t\v\x00");
                     if (empty($msg)) {
                         $msg = tr('Form saved successfully.');
                     } else {
@@ -2453,7 +2453,7 @@ function wikiplugin_tracker_process_email_recipients($emailOrField, $fields, $it
     }
 
     foreach ($output as &$single) {
-        $single = trim($single);
+        $single = trim($single, " \n\r\t\v\x00");
         // string but not an email yet, therefore a username
         if (! empty($single) && ! str_contains($single, '@')) {
             $email = TikiLib::lib('user')->get_user_email($single);
@@ -2515,14 +2515,14 @@ function wikiplugin_tracker_save_item($trackerSavedState)
     if (! empty($fieldsfill) && ! empty($request['ins_fill'])) {    // We create multiple items
         $fill_lines = explode("\n", $request['ins_fill']);
         foreach ($fill_lines as $fill_line) {
-            if (trim($fill_line) == '') {   // Ignore blank lines
+            if (trim($fill_line, " \n\r\t\v\x00") == '') {   // Ignore blank lines
                 continue;
             }
             $fill_line_item = explode($fieldsfillseparator, $fill_line, $fill_line_count);   // Extra fields are merged with the last field. this avoids data loss and permits a last text field with commas or whichever separator is chosen
             $rid = $trklib->replace_item($trackerId, $itemId, $ins_fields, $status, $ins_categs);
             for ($i = 0; $i < $fill_line_count; $i++) {
                 if ($fill_line_item[$i] != '') {
-                    $fill_item = trim($fill_line_item[$i]);
+                    $fill_item = trim($fill_line_item[$i], " \n\r\t\v\x00");
                 } else {
                     $fill_item = $fill_flds_defaults[$i];
                 }

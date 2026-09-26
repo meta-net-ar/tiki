@@ -64,7 +64,7 @@ if (isset($_REQUEST['name']) && $selectedId && $objectperms->perspective_edit) {
 
 // Create perspective
 if (isset($_REQUEST['create'], $_REQUEST['name']) && $globalperms->create_perspective) {
-    $name = trim($_REQUEST['name']);
+    $name = trim($_REQUEST['name'], " \n\r\t\v\x00");
 
     if (! empty($name)) {
         $selectedId = $perspectivelib->replace_perspective(null, $name);

@@ -46,12 +46,12 @@ function wikiplugin_metatag($data, $params)
         $headerlib->add_meta($name, $content);
     } elseif (str_contains($data, '|')) {
         // split data by lines (trimed whitespace from start and end)
-        $lines = preg_split("/\n/", trim($data));
+        $lines = preg_split("/\n/", trim($data, " \n\r\t\v\x00"));
 
         foreach ($lines as $line) {
             $metaTagAttrib = explode('|', $line);
             //$result .= "<meta name=\"$metaTagAttrib[0]\" content=\"$metaTagAttrib[1]\">\n";
-            $headerlib->add_meta(trim($metaTagAttrib[0]), trim($metaTagAttrib[1]));
+            $headerlib->add_meta(trim($metaTagAttrib[0], " \n\r\t\v\x00"), trim($metaTagAttrib[1], " \n\r\t\v\x00"));
         }
     } else {
         // just insert the raw data from the plugin body

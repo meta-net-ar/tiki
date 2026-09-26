@@ -57,7 +57,7 @@ function wikiplugin_comment($data, $params)
     global $page;
     $smarty = TikiLib::lib('smarty');
 
-    $params['objectId'] = trim($params['objectId']) == '' ? $page : $params['objectId'];
+    $params['objectId'] = trim($params['objectId'], " \n\r\t\v\x00") == '' ? $page : $params['objectId'];
     $smarty->assign('wikiplugin_comment_objectId', $params['objectId']);
     $smarty->assign('wikiplugin_comment_objectType', $params['objectType']);
     $ret = $smarty->fetch('wiki-plugins/wikiplugin_comment.tpl');

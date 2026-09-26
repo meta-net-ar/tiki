@@ -50,7 +50,7 @@ class AggregationExpressionSanitizerTest extends TestCase
     /** @dataProvider safeExpressionProvider */
     public function testSafeExpressionsAreAcceptedUnchanged(string $expr)
     {
-        $this->assertSame(trim($expr), $this->sanitizer->sanitize($expr));
+        $this->assertSame(trim($expr, " \n\r\t\v\x00"), $this->sanitizer->sanitize($expr));
     }
 
     /**

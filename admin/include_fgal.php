@@ -77,7 +77,7 @@ if (! empty($_POST['move']) && $access->checkCsrf()) {
 if (! empty($_POST['mimes']) && $access->checkCsrf()) {
     $mimes = $_POST['mimes'];
     foreach ($mimes as $mime => $cmd) {
-        $mime = trim($mime);
+        $mime = trim($mime, " \n\r\t\v\x00");
         if (empty($cmd)) {
             $filegallib->delete_file_handler($mime);
         } elseif (! $filegallib->change_file_handler($mime, $cmd)) {

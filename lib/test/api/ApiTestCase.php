@@ -339,7 +339,7 @@ abstract class ApiTestCase extends \TikiTestCase
      */
     private function extractJsonFromResponse($rawResponse)
     {
-        $body = trim($rawResponse);
+        $body = trim($rawResponse, " \n\r\t\v\x00");
 
         // If response contains HTTP headers, extract just the body
         if (strpos($body, "\r\n\r\n") !== false) {
@@ -350,7 +350,7 @@ abstract class ApiTestCase extends \TikiTestCase
             $body = $parts[1] ?? $body;
         }
 
-        return trim($body);
+        return trim($body, " \n\r\t\v\x00");
     }
 
     /**
@@ -453,7 +453,7 @@ abstract class ApiTestCase extends \TikiTestCase
 
         $valid = false;
         foreach (explode('|', $typeOrNested) as $type) {
-            if ($this->valueMatchesType($value, trim($type))) {
+            if ($this->valueMatchesType($value, trim($type, " \n\r\t\v\x00"))) {
                 $valid = true;
                 break;
             }

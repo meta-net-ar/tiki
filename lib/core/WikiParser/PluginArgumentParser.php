@@ -15,7 +15,7 @@ class WikiParser_PluginArgumentParser
         while (is_string($data) && false !== $pos = strpos($data, '=')) {
             $name = substr($data, 0, $pos);
             $name = ltrim($name, ', ');
-            $name = trim($name);
+            $name = trim($name, " \n\r\t\v\x00");
             $value = '';
 
             if (strlen($data) == $pos + 1) {
@@ -29,7 +29,7 @@ class WikiParser_PluginArgumentParser
 
             // Cut off the name part
             $data = substr($data, $pos + 1);
-            $data = ltrim($data);
+            $data = ltrim($data, " \n\r\t\v\x00");
 
             if (! empty($data) && ($data[0] == '"' || $data[0] == "'")) {
                 $quote_style = $data[0];

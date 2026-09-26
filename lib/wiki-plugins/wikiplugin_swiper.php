@@ -496,13 +496,13 @@ function wikiplugin_swiper($data, $params)
         }
     }
     foreach ($slides as $slide) {
-        if (trim($slide)) {
+        if (trim($slide, " \n\r\t\v\x00")) {
             //processing slides
             $slideArr = array_filter(explode(";", str_replace(["\n", "\r"], '', $slide)));
             if (count($slideArr) > 0) {
                 foreach ($slideArr as $slideValue) {
                     $slideData = explode(":", $slideValue, 2);
-                    $slideArr[trim($slideData[0])] = trim($slideData[1]);
+                    $slideArr[trim($slideData[0], " \n\r\t\v\x00")] = trim($slideData[1], " \n\r\t\v\x00");
                 }
             } else {
                 $slideArr['text'] = $slideArr[0]; //single attribute slide

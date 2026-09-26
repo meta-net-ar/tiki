@@ -46,8 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($_FILES['video']['size'] > $max_upload_size) {
             $errors[] = tra('File exceeds maximum size of ') . $max_upload_size_comment;
         } else {
-            $name      = trim($_POST['name'] ?? '');
-            $desc      = trim($_POST['description'] ?? '');
+            $name      = trim($_POST['name'] ?? '', " \n\r\t\v\x00");
+            $desc      = trim($_POST['description'] ?? '', " \n\r\t\v\x00");
             $channelId = (int) ($_POST['channelId'] ?? 0);
             $privacy   = isset($_POST['privacy']) ? (int) $_POST['privacy'] : 1;
 

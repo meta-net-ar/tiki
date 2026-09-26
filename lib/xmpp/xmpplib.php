@@ -56,7 +56,7 @@ class XMPPLib extends TikiLib
     {
         global $prefs;
 
-        $login = trim((string) $login);
+        $login = trim((string) $login, " \n\r\t\v\x00");
         if ($login === '') {
             return '';
         }
@@ -89,7 +89,7 @@ class XMPPLib extends TikiLib
     {
         $empty = ['jid' => '', 'isLocal' => false, 'isExternal' => false, 'localJid' => null, 'externalJid' => null];
 
-        $username = trim($username);
+        $username = trim($username, " \n\r\t\v\x00");
         if ($username === '') {
             return $empty;
         }
@@ -100,11 +100,11 @@ class XMPPLib extends TikiLib
             // Avoid building JIDs from group names or unknown users
             return $empty;
         }
-        $login = trim($info['login']);
+        $login = trim($info['login'], " \n\r\t\v\x00");
 
         $localJid = $this->getLocalJidForLogin($login);
 
-        $ext = trim(TikiLib::lib('tiki')->get_user_preference($login, 'xmpp_jid', ''));
+        $ext = trim(TikiLib::lib('tiki')->get_user_preference($login, 'xmpp_jid', ''), " \n\r\t\v\x00");
         if ($ext !== '' && $this->isValidJid($ext) && strcasecmp($ext, $localJid) !== 0) {
             return [
                 'jid'         => $ext,
@@ -146,7 +146,7 @@ class XMPPLib extends TikiLib
      */
     public function getLastSyncedJidForUser(string $user): string
     {
-        return trim(TikiLib::lib('tiki')->get_user_preference($user, 'xmpp_last_synced_jid', ''));
+        return trim(TikiLib::lib('tiki')->get_user_preference($user, 'xmpp_last_synced_jid', ''), " \n\r\t\v\x00");
     }
 
     /**
@@ -154,7 +154,7 @@ class XMPPLib extends TikiLib
      */
     public function saveLastSyncedJidForUser(string $user, string $jid): void
     {
-        TikiLib::lib('tiki')->set_user_preference($user, 'xmpp_last_synced_jid', trim($jid));
+        TikiLib::lib('tiki')->set_user_preference($user, 'xmpp_last_synced_jid', trim($jid, " \n\r\t\v\x00"));
     }
 
     /**
@@ -261,7 +261,7 @@ class XMPPLib extends TikiLib
         }
 
         // Normalize human-readable room names into valid JID nodes.
-        $node = mb_strtolower(trim($roomName));
+        $node = mb_strtolower(trim($roomName, " \n\r\t\v\x00"));
         $node = preg_replace('/[^a-z0-9._-]+/u', '-', $node);
         $node = trim($node, '-');
 
@@ -446,7 +446,7 @@ class XMPPLib extends TikiLib
             $info['username'] = $jid_parts['node'];
             $info['domain']   = $jid_parts['domain'];
 
-            $endpoint = trim($u_endpoint ?: $u_httpBind ?: '');
+            $endpoint = trim($u_endpoint ?: $u_httpBind ?: '', " \n\r\t\v\x00");
             if ($endpoint) {
                 $transportOptions = $this->getEndpointTransportOptions($endpoint);
                 if ($transportOptions) {
@@ -604,7 +604,7 @@ class XMPPLib extends TikiLib
         $result = $tikilib->take_away_accent($text);
         $result = preg_replace('*[ $&`:<>\[\]{}"+#%@/;=?^|~\',]+*', '-', $result);
         $result = strtolower($result);
-        $result = trim($result);
+        $result = trim($result, " \n\r\t\v\x00");
         return $result;
     }
 
@@ -730,7 +730,7 @@ class XMPPLib extends TikiLib
     private function getExternalPasswordKey(): string
     {
         global $prefs;
-        $secret = trim($prefs['xmpp_shared_secret'] ?? '');
+        $secret = trim($prefs['xmpp_shared_secret'] ?? '', " \n\r\t\v\x00");
         if ($secret === '') {
             throw new Exception('xmpp_shared_secret is not configured.');
         }
@@ -828,7 +828,7 @@ class XMPPLib extends TikiLib
 
     public function hasExternalPassword(string $username): bool
     {
-        $stored = trim((string) TikiLib::lib('tiki')->get_user_preference($username, self::EXTERNAL_PASSWORD_PREF_KEY, ''));
+        $stored = trim((string) TikiLib::lib('tiki')->get_user_preference($username, self::EXTERNAL_PASSWORD_PREF_KEY, ''), " \n\r\t\v\x00");
         return $stored !== '';
     }
 
@@ -839,7 +839,7 @@ class XMPPLib extends TikiLib
             return null;
         }
 
-        $stored = trim((string) TikiLib::lib('tiki')->get_user_preference($username, self::EXTERNAL_PASSWORD_PREF_KEY, ''));
+        $stored = trim((string) TikiLib::lib('tiki')->get_user_preference($username, self::EXTERNAL_PASSWORD_PREF_KEY, ''), " \n\r\t\v\x00");
         if ($stored === '') {
             return null;
         }
@@ -912,7 +912,7 @@ class XMPPLib extends TikiLib
                 continue;
             }
 
-            $jid = trim($jid);
+            $jid = trim($jid, " \n\r\t\v\x00");
             if (
                 $jid === ''
                 || strlen($jid) > self::MAX_READ_CURSOR_JID_LENGTH

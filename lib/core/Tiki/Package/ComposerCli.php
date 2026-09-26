@@ -737,7 +737,7 @@ class ComposerCli
      */
     public function installComposer()
     {
-        $expectedSig = trim(file_get_contents('https://composer.github.io/installer.sig'));
+        $expectedSig = trim(file_get_contents('https://composer.github.io/installer.sig'), " \n\r\t\v\x00");
 
         if (! copy(self::COMPOSER_URL, self::COMPOSER_SETUP)) {
             return [false, tr('Unable to download composer installer from %0', self::COMPOSER_URL)];
@@ -796,7 +796,7 @@ class ComposerCli
         }
 
         $result = $process->isSuccessful();
-        $message = str_replace("\n", '<br>', trim($output));
+        $message = str_replace("\n", '<br>', trim($output, " \n\r\t\v\x00"));
 
         return [$result, $message];
     }

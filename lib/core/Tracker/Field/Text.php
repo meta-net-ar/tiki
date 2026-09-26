@@ -187,7 +187,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
             }
         }
 
-        return trim(strip_tags((string) $value));
+        return trim(strip_tags((string) $value), " \n\r\t\v\x00");
     }
 
     protected function processMultilingual($requestData, $id_string)

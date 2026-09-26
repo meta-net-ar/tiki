@@ -152,7 +152,7 @@ class CitationRenderer implements NodeRendererInterface
             $citation = strip_tags($output);
         }
 
-        $citation = trim($citation);
+        $citation = trim($citation, " \n\r\t\v\x00");
 
         // Remove outer parentheses if present.
         if (preg_match('/^\((.+)\)$/', $citation, $matches)) {

@@ -45,7 +45,7 @@ class TrackerConfigHistoryRenderer
             $to   = self::format($fmt, $change['to']);
 
             // Skip if the visual representation is exactly the same (e.g. both empty, or just whitespace differences)
-            if (trim(strip_tags($from)) === trim(strip_tags($to))) {
+            if (trim(strip_tags($from), " \n\r\t\v\x00") === trim(strip_tags($to), " \n\r\t\v\x00")) {
                 continue;
             }
 
@@ -113,7 +113,7 @@ class TrackerConfigHistoryRenderer
         if (is_array($value)) {
             $value = json_encode($value, JSON_UNESCAPED_UNICODE);
         }
-        if ($value === null || trim((string)$value) === '') {
+        if ($value === null || trim((string)$value, " \n\r\t\v\x00") === '') {
             return tra('(empty)');
         }
 
@@ -173,6 +173,6 @@ class TrackerConfigHistoryRenderer
         $spaced = preg_replace('/([A-Z])/', ' $1', $key);
         // snake_case → words
         $spaced = str_replace('_', ' ', $spaced);
-        return ucfirst(trim($spaced));
+        return ucfirst(trim($spaced, " \n\r\t\v\x00"));
     }
 }

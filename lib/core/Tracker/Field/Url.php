@@ -85,7 +85,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     {
         $smarty = TikiLib::lib('smarty');
         $rawValue = (string) $this->getConfiguration('value');
-        $parsedWikiLink = self::extractParsedWikiLinkData(trim($rawValue));
+        $parsedWikiLink = self::extractParsedWikiLinkData(trim($rawValue, " \n\r\t\v\x00"));
 
         $url = self::normalizeStoredValueToUrl($rawValue);
 
@@ -145,7 +145,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     {
         $fieldId = $this->getFieldId();
         $value = $ins_fields_data[$fieldId]['value'] ?? $this->getValue();
-        $trimmed = trim((string) $value);
+        $trimmed = trim((string) $value, " \n\r\t\v\x00");
 
         if ($trimmed === '') {
             return true;
@@ -227,7 +227,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     // consider refactoring URL to inherit Tracker_Field_Text.
     protected static function normalizeStoredValueToUrl(string $value): string
     {
-        $trimmed = trim($value);
+        $trimmed = trim($value, " \n\r\t\v\x00");
 
         if (! self::isWikiSyntaxLink($trimmed)) {
             return $value;
@@ -247,7 +247,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             return null;
         }
 
-        $label = trim(html_entity_decode(strip_tags($matches[3]), ENT_QUOTES, 'UTF-8'));
+        $label = trim(html_entity_decode(strip_tags($matches[3]), ENT_QUOTES, 'UTF-8'), " \n\r\t\v\x00");
 
         return [
             'href' => html_entity_decode($matches[2], ENT_QUOTES, 'UTF-8'),
@@ -284,23 +284,23 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     protected static function extractWikiLinkTarget(string $value): ?string
     {
         if (str_starts_with($value, '((') && str_ends_with($value, '))')) {
-            $inside = trim(substr($value, 2, -2));
+            $inside = trim(substr($value, 2, -2), " \n\r\t\v\x00");
             if ($inside === '') {
                 return null;
             }
 
             $parts = preg_split('/[|#]/', $inside, 2);
-            return trim($parts[0] ?? '');
+            return trim($parts[0] ?? '', " \n\r\t\v\x00");
         }
 
         if (str_starts_with($value, '[') && str_ends_with($value, ']')) {
-            $inside = trim(substr($value, 1, -1));
+            $inside = trim(substr($value, 1, -1), " \n\r\t\v\x00");
             if ($inside === '') {
                 return null;
             }
 
             $parts = explode('|', $inside, 2);
-            return trim($parts[0]);
+            return trim($parts[0], " \n\r\t\v\x00");
         }
 
         return null;

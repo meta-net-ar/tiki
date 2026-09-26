@@ -737,7 +737,7 @@ class SheetLib extends TikiLib
             for ($i = 0; $i < $count_longest($changes->orig, $changes->final); $i++) {
                 $class = ["", ""];
                 $char = ["", ""];
-                $vals = [trim($changes->orig[$i]), trim($changes->final[$i])];
+                $vals = [trim($changes->orig[$i], " \n\r\t\v\x00"), trim($changes->final[$i], " \n\r\t\v\x00")];
 
                 if ($vals[0] && $vals[1]) {
                     if ($vals[0] != $vals[1]) {

@@ -95,7 +95,7 @@ function wikiplugin_proposal_get_counts($data)
     $votes = [];
 
     foreach ($voteData as $entry) {
-        $entry = trim($entry);
+        $entry = trim($entry, " \n\r\t\v\x00");
         if (preg_match("/^(([\+\-]1)|0)(~(\d+(\.\d+)?))?\s+(\w+)/", $entry, $parts)) {
             list( , $vote, , , $weight, , $voter ) = $parts;
             if (strlen($weight) == 0) {
@@ -136,7 +136,7 @@ function wikiplugin_proposal_get_weight($user, array $params)
         $parts = explode(',', $params['weights']);
         foreach ($parts as $part) {
             if (preg_match('/^(.+)\((\d+(\.\d+)?)\)$/', $part, $segments)) {
-                $weights[trim($segments[1])] = (float) $segments[2];
+                $weights[trim($segments[1], " \n\r\t\v\x00")] = (float) $segments[2];
             }
         }
     }

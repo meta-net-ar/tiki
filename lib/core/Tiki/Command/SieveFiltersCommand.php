@@ -343,7 +343,7 @@ class SieveFiltersCommand extends Command
             $msg_content = $imap->get_message_content($msg['uid'], 0);
             $msg_content = str_replace("\r\n", "\n", $msg_content);
             $msg_content = str_replace("\n", "\r\n", $msg_content);
-            $msg_content = rtrim($msg_content) . "\r\n";
+            $msg_content = rtrim($msg_content, " \n\r\t\v\x00") . "\r\n";
 
             $field['value'] = [
                 'new' => [

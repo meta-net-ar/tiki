@@ -25,7 +25,7 @@ $results = [];
  */
 function detectUntranslatedInPHP($filePath, $line)
 {
-    $trimmed = trim($line);
+    $trimmed = trim($line, " \n\r\t\v\x00");
 
     // Ignore empty lines, comments, and variables
     if ($trimmed === '' || preg_match('/^\s*(\/\/|#|\/\*|\*|\?>)/', $trimmed)) {
@@ -71,7 +71,7 @@ function detectUntranslatedInPHP($filePath, $line)
     if (preg_match_all('/(["\'])([A-Za-zÀ-ÖØ-öø-ÿ][^"\']*)\1/', $line, $matches)) {
         $found = [];
         foreach ($matches[2] as $text) {
-            $clean = trim($text);
+            $clean = trim($text, " \n\r\t\v\x00");
 
             // Ignore paths, variables, HTML or code
             if (preg_match('/[\$%{}<>\/\\\]/', $clean)) {

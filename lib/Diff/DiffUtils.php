@@ -166,7 +166,7 @@ class DiffUtils
                 foreach ($matches[0] as $match) {
                     $allMatches[] = [
                         'state' => $state,
-                        'mention' => trim($match)
+                        'mention' => trim($match, " \n\r\t\v\x00")
                     ];
                 }
             }

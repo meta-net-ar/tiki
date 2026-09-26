@@ -71,7 +71,7 @@ function wikiplugin_exercise_parse_data($data)
     $key = -1;
 
     foreach (explode("\n", $data) as $line) {
-        $line = trim($line);
+        $line = trim($line, " \n\r\t\v\x00");
 
         if (empty($line)) {
             continue;

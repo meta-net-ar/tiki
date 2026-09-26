@@ -410,7 +410,7 @@ class Services_Edit_ListConverter
             foreach ($param as $name => $value) {
                 $result .= "$name=\"$value\" ";
             }
-            $result = rtrim($result) . "}\n";
+            $result = rtrim($result, " \n\r\t\v\x00") . "}\n";
         }
         return $result;
     }
@@ -483,7 +483,7 @@ class Services_Edit_ListConverter
             $display['format'] = 'trackerrender';
             $rawMode = true;
         }
-        $displays = rtrim($this->arrayToInlinePluginString('display', [$display]));
+        $displays = rtrim($this->arrayToInlinePluginString('display', [$display]), " \n\r\t\v\x00");
 
         if (! empty($url)) {
             if (preg_match('/itemId/i', $url)) {

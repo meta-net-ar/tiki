@@ -46,5 +46,5 @@ function getBaseCommitOrAbort(): string
     }
     return trim((string) shell_exec(
         'git merge-base ' . escapeshellarg($targetBranch) . ' HEAD 2>NUL'
-    ));
+    ), " \n\r\t\v\x00");
 }

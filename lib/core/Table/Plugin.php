@@ -625,7 +625,7 @@ class Table_Plugin
 
         //tstotals
         if (! empty($tstotals)) {
-            if (trim($tstotals) === 'y') {
+            if (trim($tstotals, " \n\r\t\v\x00") === 'y') {
                 $tstotals = 'type:col;formula:sum;label:' . tr('Page totals');
             }
             $tst = Table_Check::parseParam($tstotals);

@@ -167,8 +167,8 @@ class PeerTubeLib
                         $msg .= " (invalid '{$paramName}': " . $first['msg'] . ")";
                     }
                 }
-            } elseif (is_string($response) && trim($response) !== '') {
-                $msg .= ' — ' . trim($response);
+            } elseif (is_string($response) && trim($response, " \n\r\t\v\x00") !== '') {
+                $msg .= ' — ' . trim($response, " \n\r\t\v\x00");
             }
             throw new \Exception($msg);
         }
@@ -242,7 +242,7 @@ class PeerTubeLib
     {
         global $prefs;
 
-        $id = trim($id);
+        $id = trim($id, " \n\r\t\v\x00");
 
         if (empty($id)) {
             throw new \Exception("Video ID cannot be empty");

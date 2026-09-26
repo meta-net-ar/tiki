@@ -107,7 +107,7 @@ class TreeTable extends Base implements TikiSmartyExtensionInterface
         $_valueColumnIndex = $_valueColumnIndex ?? 0;
 
         if (is_string($_checkbox) && str_contains($_checkbox, ',')) {
-            $_checkbox = explode(',', trim($_checkbox));
+            $_checkbox = explode(',', trim($_checkbox, " \n\r\t\v\x00"));
         }
 
         if (! empty($_checkbox) && ! is_array($_checkbox)) {
@@ -117,7 +117,7 @@ class TreeTable extends Base implements TikiSmartyExtensionInterface
 
         if (! empty($_checkboxColumnIndex)) {
             if (is_string($_checkboxColumnIndex) && str_contains($_checkboxColumnIndex, ',')) {
-                $_checkboxColumnIndex = explode(',', trim($_checkboxColumnIndex));
+                $_checkboxColumnIndex = explode(',', trim($_checkboxColumnIndex, " \n\r\t\v\x00"));
             }
             if (count($_checkbox) != count($_checkboxColumnIndex)) {
                 return 'Number of items in _checkboxColumnIndex doesn not match items in _checkbox';
@@ -126,9 +126,9 @@ class TreeTable extends Base implements TikiSmartyExtensionInterface
         if (! empty($_checkboxTitles)) {
             if (is_string($_checkboxTitles)) {
                 if (str_contains($_checkboxTitles, ',')) {
-                    $_checkboxTitles = explode(',', trim($_checkboxTitles));
+                    $_checkboxTitles = explode(',', trim($_checkboxTitles, " \n\r\t\v\x00"));
                 } else {
-                    $_checkboxTitles = [trim($_checkboxTitles)];
+                    $_checkboxTitles = [trim($_checkboxTitles, " \n\r\t\v\x00")];
                 }
             }
             if (count($_checkbox) != count($_checkboxTitles)) {
@@ -176,7 +176,7 @@ class TreeTable extends Base implements TikiSmartyExtensionInterface
             $ar = preg_split('/,/', $_columns);
             $_columns = [];
             foreach ($ar as $str) {
-                $ar2 = preg_split('/=/', trim($str));
+                $ar2 = preg_split('/=/', trim($str, " \n\r\t\v\x00"));
                 $_columns[trim($ar2[0], ' "')] = trim($ar2[1], ' "');
             }
             unset($ar, $ar2);
@@ -313,7 +313,7 @@ $("#' . $id . '_showSelected").on("click", function () {
         foreach ($_data as &$row) {
             // set up tree hierarchy
             if ($_sortColumn) {
-                $treeType = htmlspecialchars(trim($row[$_sortColumn]));
+                $treeType = htmlspecialchars(trim($row[$_sortColumn], " \n\r\t\v\x00"));
                 $childRowClass = '';
 
                 if (! empty($_sortColumnDelimiter)) {   // nested

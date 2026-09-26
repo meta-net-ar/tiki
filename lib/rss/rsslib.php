@@ -816,10 +816,10 @@ class RSSLib extends TikiDb_Bridge
             $publication = $tikilib->now + $configuration['future_publish'] * 60;
         }
 
-        if (str_starts_with($data['content'], trim($data['description'])) && strlen($data['description']) < 1024) {
-            $data['content'] = substr($data['content'], strlen(trim($data['description'])));
+        if (str_starts_with($data['content'], trim($data['description'], " \n\r\t\v\x00")) && strlen($data['description']) < 1024) {
+            $data['content'] = substr($data['content'], strlen(trim($data['description'], " \n\r\t\v\x00")));
         }
-        $data['content'] = trim($data['content']) == '' ? $data['content'] : '~np~' . $data['content'] . '~/np~';
+        $data['content'] = trim($data['content'], " \n\r\t\v\x00") == '' ? $data['content'] : '~np~' . $data['content'] . '~/np~';
 
         if ($configuration['submission'] == true) {
             $subid = $this->table('tiki_submissions')->fetchOne('subId', [

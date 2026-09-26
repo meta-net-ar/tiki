@@ -54,7 +54,7 @@ class HeadingAutonumberingCollapsibleParser implements BlockStartParserInterface
         $cursor->advanceToNextNonSpaceOrTab();
         $cursor->advanceBy(\strlen($match[0]));
 
-        $level = \strlen(\trim($match[1]));
+        $level = \strlen(\trim($match[1], " \n\r\t\v\x00"));
         $str = $cursor->getRemainder();
 
         if ($match[2] === '$') {

@@ -116,7 +116,7 @@ class Multilingual_MachineTranslation_GoogleTranslateWrapper implements Multilin
         }
 
         $result = $this->remove_notranslateTags_and_reverse_to_original_markup($result);
-        return trim($result);
+        return trim($result, " \n\r\t\v\x00");
     }
 
 

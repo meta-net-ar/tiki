@@ -69,7 +69,7 @@ class IgnoreValidClassNameSniff implements Sniff
         if ($nameEnd === false) {
             $name = $tokens[$nameStart]['content'];
         } else {
-            $name = trim($phpcsFile->getTokensAsString($nameStart, ($nameEnd - $nameStart)));
+            $name = trim($phpcsFile->getTokensAsString($nameStart, ($nameEnd - $nameStart)), " \n\r\t\v\x00");
         }
 
         // Check for PascalCase format.

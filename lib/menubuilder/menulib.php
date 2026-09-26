@@ -105,7 +105,7 @@ class MenuLib extends TikiLib
 
             foreach ($matches[0] as $query) {
                 // remove extra whitespace and newlines
-                $query = preg_replace('/\s+/', ' ', trim($query));
+                $query = preg_replace('/\s+/', ' ', trim($query, " \n\r\t\v\x00"));
                 if (! empty($query)) {
                     $this->query($query);
                 }

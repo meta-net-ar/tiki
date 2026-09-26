@@ -581,7 +581,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
             $finalValue = '';
             $oldValue = (string)($row['value'] ?? '');
 
-            $pageName = trim($row['value']);
+            $pageName = trim($row['value'], " \n\r\t\v\x00");
 
             if (! $pageName) {
                 // tracker field value missing so try the pagename field (usually the title)
@@ -807,7 +807,7 @@ Page too big, so included below:
         if ($this->getOption('removeBadChars') === 'y' && $wikilib->contains_badchars($page_name)) {
             $bad_chars = $wikilib->get_badchars();
             $page_name = preg_replace('/[' . preg_quote($bad_chars, '/') . ']/', ' ', $page_name);
-            $page_name = trim(preg_replace('/\s+/', ' ', $page_name));
+            $page_name = trim(preg_replace('/\s+/', ' ', $page_name), " \n\r\t\v\x00");
         }
         if (strlen($page_name) > 160) {
             $page_name = substr($page_name, 0, 160);

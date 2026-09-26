@@ -193,7 +193,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
                     if (! str_contains($line, ':')) {
                         return null;
                     } else {
-                        return trim($line);
+                        return trim($line, " \n\r\t\v\x00");
                     }
                 }, explode("\n", $this->getValue())));
             }
@@ -368,7 +368,7 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
     {
         $value = $field['value'] ?? null;
         if ($value && ! is_array($value)) {
-            $target = explode("\n", trim($value));
+            $target = explode("\n", trim($value, " \n\r\t\v\x00"));
         } elseif ($value) {
             $target = $value;
         } else {

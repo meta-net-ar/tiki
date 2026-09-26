@@ -85,9 +85,9 @@ class Services_Kaltura_Controller
 
         // Handle POST upload
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['video'])) {
-            $name = trim($input->name->text());
-            $description = trim($input->description->text());
-            $tags = trim($input->tags->text());
+            $name = trim($input->name->text(), " \n\r\t\v\x00");
+            $description = trim($input->description->text(), " \n\r\t\v\x00");
+            $tags = trim($input->tags->text(), " \n\r\t\v\x00");
 
             // Repopulate form values on error
             $out['name'] = $name;

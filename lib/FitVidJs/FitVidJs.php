@@ -21,7 +21,7 @@ class FitVidJs
         $domains = explode("\n", $domains);
         $customSelectors = array_map(
             function ($domain) {
-                $domain = trim($domain);
+                $domain = trim($domain, " \n\r\t\v\x00");
                 return "iframe[src*='{$domain}']";
             },
             $domains

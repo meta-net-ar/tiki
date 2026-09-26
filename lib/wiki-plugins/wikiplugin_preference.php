@@ -56,7 +56,7 @@ function wikiplugin_preference($data, $params)
 
     $names = array_unique(explode(',', $name)); //prevent duplicated preferences
     $names = array_map(function ($prefName) {
-        return trim($prefName);
+        return trim($prefName, " \n\r\t\v\x00");
     }, $names);
 
     if (! empty($_POST[$name]) && ! empty($_POST['lm_preference'])) {

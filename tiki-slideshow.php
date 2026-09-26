@@ -123,7 +123,7 @@ if ($speakerNotesEnabled) {
     $rawData = preg_replace_callback(
         '/\{NOTES\(\)\}(.*?)\{NOTES\}/is',
         function ($matches) {
-            $noteContent = trim($matches[1]);
+            $noteContent = trim($matches[1], " \n\r\t\v\x00");
             // Wrap in ~np~ to preserve HTML through wiki parsing
             return '~np~<aside class="notes" data-label="'
                 . htmlspecialchars(tra("Speaker's Notes:"), ENT_QUOTES)
@@ -868,7 +868,7 @@ function headings_tags_separator_expression($headingLevelSlideSeparator)
         $levels .= $i;
     }
 
-    $expression = '/<h[' . trim($levels) . ']/';
+    $expression = '/<h[' . trim($levels, " \n\r\t\v\x00") . ']/';
 
     return $expression;
 }

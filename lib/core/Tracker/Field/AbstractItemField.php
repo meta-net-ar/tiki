@@ -451,7 +451,7 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
         $smarty = \TikiLib::lib('smarty');
         $smarty->assign('popupFields', $popupFields);
         $smarty->assign('popupItem', $this->itemData);
-        return trim($smarty->fetch('trackeroutput/popup.tpl'));
+        return trim($smarty->fetch('trackeroutput/popup.tpl'), " \n\r\t\v\x00");
     }
 
     /**
@@ -729,6 +729,6 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
             $out = implode(', ', $out);
         }
 
-        return trim(strip_tags((string) $out));
+        return trim(strip_tags((string) $out), " \n\r\t\v\x00");
     }
 }

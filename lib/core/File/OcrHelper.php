@@ -57,7 +57,7 @@ class OcrHelper
             $tempReadableFilePath = $pdfTempFile ?: $tempReadableFilePath;
             $process = new Process(['which', 'pdftotext']);
             $process->run();
-            $pdfToTextPath = preg_replace('/\s+/', ' ', trim($process->getOutput()));
+            $pdfToTextPath = preg_replace('/\s+/', ' ', trim($process->getOutput(), " \n\r\t\v\x00"));
 
             if (empty($pdfToTextPath) || TikiInit::isWindows()) {
                 throw new \Exception('Text cannot be extracted because pdftotext library is unavailable or is not supported.');

@@ -504,7 +504,7 @@ window.customsearch_$id = customsearch$id;
             }
             $html = $function($id, $fieldname, $fieldid, $arguments, $default, $script);
             if ($params['trimlinefeeds']) {
-                $html = trim($html);
+                $html = trim($html, " \n\r\t\v\x00");
             }
             $match->replaceWith($html);
             if (! empty($params['noajaxforbots'])) {

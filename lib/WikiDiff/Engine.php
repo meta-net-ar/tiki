@@ -64,11 +64,11 @@ class Engine
 
         // Ignore differences in line endings
         for ($i = 0; $i < $n_from; $i++) {
-            $from_lines[$i] = rtrim($from_lines[$i]);
+            $from_lines[$i] = rtrim($from_lines[$i], " \n\r\t\v\x00");
         }
 
         for ($i = 0; $i < $n_to; $i++) {
-            $to_lines[$i] = rtrim($to_lines[$i]);
+            $to_lines[$i] = rtrim($to_lines[$i], " \n\r\t\v\x00");
         }
 
         // Ignore trailing and leading matching lines.

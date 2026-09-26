@@ -79,7 +79,7 @@ class ContactLib extends TikiLib
         $ret = [];
 
         foreach ($contacts as $con) {
-            $con = trim($con);
+            $con = trim($con, " \n\r\t\v\x00");
 
             $query = "select count(*) from `tiki_webmail_contacts` where `email`=?";
             $count = $this->getOne($query, [$con]);
@@ -93,7 +93,7 @@ class ContactLib extends TikiLib
 
     public function exist_contact($contact, $user = '')
     {
-        $contact = trim($contact);
+        $contact = trim($contact, " \n\r\t\v\x00");
         $query = "select count(*) from `tiki_webmail_contacts` where `email`=? " . (($user != '') ? (' and `user` =? ') : (''));
         $params[] = $contact;
         if ($user != '') {
@@ -175,10 +175,10 @@ class ContactLib extends TikiLib
 
         global $tiki_p_admin, $tiki_p_admin_group_webmail;
 
-        $firstName = trim($firstName);
-        $lastName = trim($lastName);
-        $email = trim($email);
-        $nickname = trim($nickname);
+        $firstName = trim($firstName, " \n\r\t\v\x00");
+        $lastName = trim($lastName, " \n\r\t\v\x00");
+        $email = trim($email, " \n\r\t\v\x00");
+        $nickname = trim($nickname, " \n\r\t\v\x00");
         if ($contactId) {
             if ($this->is_a_user_contact($contactId, $user, true)) {
                 $query = "update `tiki_webmail_contacts` set `firstName`=?, `lastName`=?, `email`=?, `nickname`=? where `contactId`=?";

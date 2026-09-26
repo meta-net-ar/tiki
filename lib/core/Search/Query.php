@@ -140,7 +140,7 @@ class Search_Query implements Search_Query_Interface
         global $prefs;
         if ($prefs['unified_search_default_operator'] == 1 && is_string($query) && strpos($query, '*') !== false) {
             // Wildcard queries with spaces need to be OR otherwise "*foo bar*" won't match "foo bar" if set to AND.
-            $query = preg_replace('/\s+/', '* *', trim($query));
+            $query = preg_replace('/\s+/', '* *', trim($query, " \n\r\t\v\x00"));
             $query = str_replace(['*AND*', '*OR*', '**'], ['', 'OR', '*'], $query);
         }
         $this->addPart($query, 'plaintext', $field);

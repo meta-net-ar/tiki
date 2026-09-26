@@ -128,9 +128,9 @@ class OOoImg extends absOOo {
         //    echo("cm : ".$cm[1]);
 
         if (isset($this->_styleImg["width"])) $imageNode->setAttribute("svg:width", $this->_styleImg["width"]."cm");
-        else $imageNode->setAttribute("svg:width", trim(str_replace(",", ".", $cm[0]))."cm");
+        else $imageNode->setAttribute("svg:width", trim(str_replace(",", ".", $cm[0]), " \n\r\t\v\x00")."cm");
         if (isset($this->_styleImg["height"])) $imageNode->setAttribute("svg:height", $this->_styleImg["height"]."cm");
-        else $imageNode->setAttribute("svg:height", trim(str_replace(",", ".", $cm[1]))."cm");
+        else $imageNode->setAttribute("svg:height", trim(str_replace(",", ".", $cm[1]), " \n\r\t\v\x00")."cm");
         if (isset($this->_styleImg["z-index"])) $imageNode->setAttribute("draw:z-index", $this->_styleImg["z-index"]);
 
 

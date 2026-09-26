@@ -56,7 +56,7 @@ class Scheduler_Task_ConsoleCommandTask extends Scheduler_Task_CommandTask
     {
         preg_match_all('/(?<=^|\s)([\'"]?)(.+?)(?<!\\\\)\1(?=$|\s)/', (string)$params, $args);
 
-        $tokens = array_map(static fn ($arg) => trim((string)$arg), $args[2] ?? []);
+        $tokens = array_map(static fn ($arg) => trim((string)$arg, " \n\r\t\v\x00"), $args[2] ?? []);
         return array_values(array_filter($tokens, static fn ($arg) => $arg !== ''));
     }
 

@@ -105,7 +105,7 @@ class Tiki_Render_Editable
             $editable = '<div style="display: none">' . $editable . '</div>';
         } else {
             $editable = '';
-            if (trim(strip_tags($value)) == '') {
+            if (trim(strip_tags($value), " \n\r\t\v\x00") == '') {
                 // When the value is empty, make sure it becomes visible/clickable
                 $value .= '&nbsp;';
             }

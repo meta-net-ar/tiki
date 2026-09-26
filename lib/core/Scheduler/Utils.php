@@ -45,7 +45,7 @@ class Scheduler_Utils
         if (! empty($notificationUsers)) {
             $parts = explode(',', $notificationUsers);
             foreach ($parts as $target) {
-                $target = trim($target);
+                $target = trim($target, " \n\r\t\v\x00");
 
                 if (empty($target)) {
                     continue;

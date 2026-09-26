@@ -88,7 +88,7 @@ if ($mode == "view" && ! empty($app_id)) {
     $onReadyScripts = [];
     $trackerIdsList = $trackerlib->list_trackers();
     foreach ($iot_apps as $key => $iot_app) {
-        $app_id = trim(str_replace([' ','-'], '_', $iot_app['app_uuid']));
+        $app_id = trim(str_replace([' ','-'], '_', $iot_app['app_uuid']), " \n\r\t\v\x00");
         $editor = new DrawflowEditor($app_id, $iot_app['app_uuid'], $iot_app['app_name']);
         $editors[] = $editor;
         $trkfields = $trackerlib->list_tracker_fields($iot_app['trackerId']);

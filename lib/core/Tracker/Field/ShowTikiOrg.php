@@ -178,12 +178,12 @@ class Tracker_Field_ShowTikiOrg extends \Tracker\Field\AbstractItemField
         $versionpos = strpos($infooutput, 'VERSION: ');
         $version = substr($infooutput, $versionpos + 9);
         $version = substr($version, 0, strpos($version, PHP_EOL));
-        $version = trim($version);
+        $version = trim($version, " \n\r\t\v\x00");
         $ret['version'] = $version;
 
         $statuspos = strpos($infooutput, 'STATUS: ');
         $status = substr($infooutput, $statuspos + 8, 5);
-        $status = trim($status);
+        $status = trim($status, " \n\r\t\v\x00");
         if (! $status || $status == 'FAIL') {
             $ret['status'] = 'FAIL';
         } else {

@@ -25,7 +25,7 @@ class MetadataExtractor extends Manipulator
         } else {
             $name = $file->name;
         }
-        $file->setParam('name', trim(strip_tags($name)));
+        $file->setParam('name', trim(strip_tags($name), " \n\r\t\v\x00"));
         $file->setParam('description', strip_tags($file->description));
         $file->setParam('filename', $this->truncateFilename($file->filename));
 

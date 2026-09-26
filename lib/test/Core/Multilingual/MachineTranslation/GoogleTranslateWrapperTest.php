@@ -68,14 +68,14 @@ class GoogleTranslateWrapperTest extends TikiTestCase
     {
         $text = str_repeat("Nothing in the world is ever completely wrong; even a stopped clock is right twice a day. ", 19); //max url: 2065 chars; urlencoded string: 1980
         $translation = $this->translator->translateText($text);
-        $this->assertEquals(trim(str_repeat("Niente al mondo è mai completamente sbagliato; fermato anche un orologio è giusto due volte al giorno. ", 19)), $translation, "The translation was not correct for text of 1800 chars.");
+        $this->assertEquals(trim(str_repeat("Niente al mondo è mai completamente sbagliato; fermato anche un orologio è giusto due volte al giorno. ", 19), " \n\r\t\v\x00"), $translation, "The translation was not correct for text of 1800 chars.");
     }
 
     public function testTranslateTextWithMoreThan1800Chars()
     {
         $text = str_repeat("Nothing in the world is ever completely wrong; even a stopped clock is right twice a day. ", 24);
         $translation = $this->translator->translateText($text);
-        $this->assertEquals(trim(str_repeat("Niente al mondo è mai completamente sbagliato; fermato anche un orologio è giusto due volte al giorno. ", 24)), $translation, "The translation was not correct for text of 1800 chars.");
+        $this->assertEquals(trim(str_repeat("Niente al mondo è mai completamente sbagliato; fermato anche un orologio è giusto due volte al giorno. ", 24), " \n\r\t\v\x00"), $translation, "The translation was not correct for text of 1800 chars.");
     }
 
     public function testThisIsHowYouTranslateSomeText2()

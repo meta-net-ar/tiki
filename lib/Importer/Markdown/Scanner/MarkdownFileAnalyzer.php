@@ -55,7 +55,7 @@ class MarkdownFileAnalyzer
         $namingMode    = $options[ScannerInterface::OPT_NAMING_MODE] ?? self::DEF_NAMING_MODE;
         $dirLevels     = $options[ScannerInterface::OPT_DIR_LEVELS] ?? self::DEF_DIR_LEVELS;
         $separator     = $options[ScannerInterface::OPT_SEPARATOR] ?? self::DEF_SEPARATOR;
-        $namespace     = trim($options[ScannerInterface::OPT_NAMESPACE] ?? '');
+        $namespace     = trim($options[ScannerInterface::OPT_NAMESPACE] ?? '', " \n\r\t\v\x00");
 
         // Extract front-matter
         $hadFM = false;
@@ -95,7 +95,7 @@ class MarkdownFileAnalyzer
             self::RES_PAGE_NAME => $pageName,
             self::RES_TITLE => $resolvedTitle,
             self::RES_HAS_FM => $hadFM,
-            self::RES_PREVIEW => mb_substr(trim($this->previewText($bodyNoFm)), 0, 200),
+            self::RES_PREVIEW => mb_substr(trim($this->previewText($bodyNoFm), " \n\r\t\v\x00"), 0, 200),
         ];
     }
 
@@ -105,14 +105,14 @@ class MarkdownFileAnalyzer
         [$body, $hadFM, $fmBlock] = CommonMarkPurifier::removeFrontMatter($raw);
         $fmTitle = null;
         if ($hadFM && preg_match('/^\s*title\s*:\s*(.+)$/mi', (string)$fmBlock, $tm)) {
-            $fmTitle = trim($this->trimQuotes($tm[1]));
+            $fmTitle = trim($this->trimQuotes($tm[1]), " \n\r\t\v\x00");
         }
         return $body;
     }
 
     private function trimQuotes(string $s): string
     {
-        $s = trim($s);
+        $s = trim($s, " \n\r\t\v\x00");
         if ((str_starts_with($s, '"') && str_ends_with($s, '"')) || (str_starts_with($s, "'") && str_ends_with($s, "'"))) {
             return substr($s, 1, -1);
         }
@@ -123,10 +123,10 @@ class MarkdownFileAnalyzer
     private function extractH1(string $md): ?string
     {
         if (preg_match('/^\s*#\s+(.+?)\s*$/m', $md, $m)) {
-            return trim($m[1]);
+            return trim($m[1], " \n\r\t\v\x00");
         }
         if (preg_match('/^\s*##\s+(.+?)\s*$/m', $md, $m)) {
-            return trim($m[1]);
+            return trim($m[1], " \n\r\t\v\x00");
         }
         return null;
     }
@@ -145,7 +145,7 @@ class MarkdownFileAnalyzer
     private function humanizeFileBase(string $base): string
     {
         $s = preg_replace('/[_\-]+/', ' ', $base);
-        return trim(preg_replace('/\s+/', ' ', ucwords($s)));
+        return trim(preg_replace('/\s+/', ' ', ucwords($s)), " \n\r\t\v\x00");
     }
 
     /** Build Tiki page name from relative path and naming options. */
@@ -185,7 +185,7 @@ class MarkdownFileAnalyzer
         $s = preg_replace('~[\\/]+~', ' ', $s);
         $s = preg_replace('~[^\\p{L}\\p{N}\\- ]+~u', ' ', $s);
         $s = preg_replace('~\\s+~', ' ', $s);
-        return trim($s);
+        return trim($s, " \n\r\t\v\x00");
     }
 
     private function previewText(string $md): string
@@ -206,7 +206,7 @@ class MarkdownFileAnalyzer
      */
     public function tryParseJournalDate(string $title, ?string &$iso = null, string $lang = 'en'): bool
     {
-        $t = trim($title);
+        $t = trim($title, " \n\r\t\v\x00");
 
         if ($t === '') {
             return false;

@@ -16,9 +16,9 @@ class DefinitionListConverter implements ConverterInterface
         $value = $element->getValue();
 
         if ($elementType === 'dt') {
-            $value = trim($value);
+            $value = trim($value, " \n\r\t\v\x00");
         } elseif ($elementType === 'dd') {
-            $value = ': ' . trim($value);
+            $value = ': ' . trim($value, " \n\r\t\v\x00");
         }
 
         $value .= "\n";

@@ -153,13 +153,13 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         $prefs['wiki_heading_links'] = 'n';
         $inData = '!::Heading::';
         $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-center" id="Heading">Heading</h1>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $prefs['feature_use_three_colon_centertag'] = 'y';
         $inData = '!:::Heading:::';
         $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-center" id="Heading">Heading</h1>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
 
@@ -169,13 +169,13 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         $prefs['feature_use_three_colon_centertag'] = 'n';
         $inData = '!#::Heading::';
         $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-center" id="Heading">1. Heading</h1>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $prefs['feature_use_three_colon_centertag'] = 'y';
         $inData = '!#:::Heading:::';
         $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-center" id="Heading">1. Heading</h1>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
     }
 
@@ -188,42 +188,42 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         // Legacy expectations to keep backward compatibility intact.
         $inData = '!#Heading Level 1';
         $ex = '<h1 class="showhide_heading d-flex justify-content-start" id="Heading_Level_1">1. Heading Level&nbsp;1</h1>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData .= "\n"; // must keep lover level headings, otherwise we will get an error (undefined number)
         $inData .= '!!#Heading Level 2';
         $ex .= "\n";
         $ex .= '<h2 class="showhide_heading d-flex justify-content-start" id="Heading_Level_2">1.1. Heading Level&nbsp;2</h2>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData .= "\n";
         $inData .= '!!!#Heading Level 3';
         $ex .= "\n";
         $ex .= '<h3 class="showhide_heading d-flex justify-content-start" id="Heading_Level_3">1.1.1. Heading Level&nbsp;3</h3>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData .= "\n";
         $inData .= '!!!!#Heading Level 4';
         $ex .= "\n";
         $ex .= '<h4 class="showhide_heading d-flex justify-content-start" id="Heading_Level_4">1.1.1.1. Heading Level&nbsp;4</h4>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData .= "\n";
         $inData .= '!!!!!#Heading Level 5';
         $ex .= "\n";
         $ex .= '<h5 class="showhide_heading d-flex justify-content-start" id="Heading_Level_5">1.1.1.1.1. Heading Level&nbsp;5</h5>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData .= "\n";
         $inData .= '!!!!!!#Heading Level 6';
         $ex .= "\n";
         $ex .= '<h6 class="showhide_heading d-flex justify-content-start" id="Heading_Level_6">1.1.1.1.1.1. Heading Level&nbsp;6</h6>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         // Additional coverage validating extended numbering behavior.
@@ -247,7 +247,7 @@ TEST;
 <h1 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h1>
 <h2 class="showhide_heading d-flex justify-content-start" id="title_2.1">2.1. title&nbsp;2.1</h2>
 EX;
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         // Any highest level heading should have a number 1
@@ -265,7 +265,7 @@ TEST;
 <h3 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h3>
 <h3 class="showhide_heading d-flex justify-content-start" id="title_2.1">3. title&nbsp;2.1</h3>
 EX;
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         // Heading reset so it starts from 1
@@ -281,7 +281,7 @@ TEST;
 <h3 class="showhide_heading d-flex justify-content-start" id="title_1_2">1. title&nbsp;1</h3>
 <h3 class="showhide_heading d-flex justify-content-start" id="title_2_2">2. title&nbsp;2</h3>
 EX;
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         // More complex example combining numbered and unnumbered headings
@@ -309,7 +309,7 @@ TEST;
 <h3 class="showhide_heading d-flex justify-content-start" id="Title_2">1.2. Title&nbsp;2</h3>
 <h5 class="showhide_heading d-flex justify-content-start" id="Title_1.2.1.1.">1.2.1.1. Title&nbsp;1.2.1.1.</h5>
 EX;
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
     }
 
@@ -369,32 +369,32 @@ EX;
     {
         $inData = '!Heading Level 1';
         $ex = '<h1 class="showhide_heading d-flex justify-content-start" id="Heading_Level_1">Heading Level&nbsp;1</h1>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData = '!!Heading Level 2';
         $ex = '<h2 class="showhide_heading d-flex justify-content-start" id="Heading_Level_2">Heading Level&nbsp;2</h2>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData = '!!!Heading Level 3';
         $ex = '<h3 class="showhide_heading d-flex justify-content-start" id="Heading_Level_3">Heading Level&nbsp;3</h3>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData = '!!!!Heading Level 4';
         $ex = '<h4 class="showhide_heading d-flex justify-content-start" id="Heading_Level_4">Heading Level&nbsp;4</h4>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData = '!!!!!Heading Level 5';
         $ex = '<h5 class="showhide_heading d-flex justify-content-start" id="Heading_Level_5">Heading Level&nbsp;5</h5>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
         $inData = '!!!!!!Heading Level 6';
         $ex = '<h6 class="showhide_heading d-flex justify-content-start" id="Heading_Level_6">Heading Level&nbsp;6</h6>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
     }
 }

@@ -33,7 +33,7 @@ class ImageAbstract
         if (! empty($image) || $this->filename !== null) {
             if (is_readable($this->filename ?? '') && function_exists('exif_thumbnail') && in_array(image_type_to_mime_type(exif_imagetype($this->filename)), ['image/jpeg', 'image/tiff'])) {
                 $this->thumb = @exif_thumbnail($this->filename);
-                if (trim($this->thumb) == "") {
+                if (trim($this->thumb, " \n\r\t\v\x00") == "") {
                     $this->thumb = null;
                 }
             }

@@ -391,7 +391,7 @@ class CryptLib extends TikiLib
 
         // Trim whitespace from names
         foreach ($domains as &$dom) {
-            $dom = trim($dom);
+            $dom = trim($dom, " \n\r\t\v\x00");
         }
 
         // Add prefix
@@ -454,7 +454,7 @@ class CryptLib extends TikiLib
         } catch (\Exception $e) {
             return false;
         }
-        return rtrim($cleartext);
+        return rtrim($cleartext, " \n\r\t\v\x00");
     }
 
     //
@@ -606,7 +606,7 @@ class CryptLib extends TikiLib
         }
 
         // Clear trailing null-characters
-        $cleartext = rtrim($rawcleartext);
+        $cleartext = rtrim($rawcleartext, " \n\r\t\v\x00");
 
         return $cleartext;
     }
@@ -641,7 +641,7 @@ class CryptLib extends TikiLib
             );
 
             // Clear trailing null-characters
-            $cleartext = rtrim($cleartext);
+            $cleartext = rtrim($cleartext, " \n\r\t\v\x00");
         }
 
         return $cleartext;
@@ -662,7 +662,7 @@ class CryptLib extends TikiLib
             $rawcleartext = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $this->mcrypt_key, $crypttext, MCRYPT_MODE_CBC, $iv); // @phpstan-ignore function.notFound (part of mcrypt extension)
 
             // Clear trailing null-characters
-            $cleartext = rtrim($rawcleartext);
+            $cleartext = rtrim($rawcleartext, " \n\r\t\v\x00");
 
             restore_error_handler();
         } else {

@@ -184,7 +184,7 @@ class Tiki_Profile
                 return false;
             }
 
-            $content = trim(substr($content, $begin + 2));
+            $content = trim(substr($content, $begin + 2), " \n\r\t\v\x00");
 
             if (empty($content)) {
                 return false;
@@ -483,7 +483,7 @@ class Tiki_Profile
 
         foreach ($this->data['objects'] as $object) {
             if (isset($object['ref'])) {
-                $named[] = [ 'domain' => $this->domain, 'profile' => $this->profile, 'object' => trim($object['ref']) ];
+                $named[] = [ 'domain' => $this->domain, 'profile' => $this->profile, 'object' => trim($object['ref'], " \n\r\t\v\x00") ];
             }
         }
 

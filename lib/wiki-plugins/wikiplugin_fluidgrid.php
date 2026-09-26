@@ -303,9 +303,9 @@ function wikiplugin_fluidgrid($data, $params, $pos)
             // $tdtotalPercent   = total weighting in percent
             // $tdnosize  = count of columns without a specified size
             for ($i = 0; $i < $maxcols; $i++) {
-                if (isset($tdsize[$i]) && ( trim($tdsize[$i]) != '' )) {
+                if (isset($tdsize[$i]) && ( trim($tdsize[$i], " \n\r\t\v\x00") != '' )) {
                     $isPercentCol = ( strpos($tdsize[$i], '%') !== false );
-                    $w = abs((int) trim($tdsize[$i])); //The size must always be positive
+                    $w = abs((int) trim($tdsize[$i], " \n\r\t\v\x00")); //The size must always be positive
 
                     if ($isPercentCol) {
                         // Percentage mode. Save the width and increment the total percent size ($tdtotalPercent).
@@ -335,7 +335,7 @@ function wikiplugin_fluidgrid($data, $params, $pos)
                             $remaining   -= ceil($remaining / $tdnosize) ;
                             $tdnosize-- ;
                         } else {
-                            $w_array[$i] = round(( abs((int) trim($s_array[$i])) * 12) / 100);
+                            $w_array[$i] = round(( abs((int) trim($s_array[$i], " \n\r\t\v\x00")) * 12) / 100);
                         }
                     }
                 } else {
@@ -356,7 +356,7 @@ function wikiplugin_fluidgrid($data, $params, $pos)
                             $tdnosize-- ;
                         } elseif ($isValuePercent) {
                             // Size specified in percent mode
-                            $w_array[$i] = round(( abs((int) trim($s_array[$i])) * 12) / 100) ;
+                            $w_array[$i] = round(( abs((int) trim($s_array[$i], " \n\r\t\v\x00")) * 12) / 100) ;
                         } else {
                             // Size specified in normal mode
                             $w_array[$i] = $s_array[$i] ;
@@ -377,8 +377,8 @@ function wikiplugin_fluidgrid($data, $params, $pos)
             // $tdtotal   = total weighting
             // $tdnosize  = count of columns without a specified size
             for ($i = 0; $i < $maxcols; $i++) {
-                if (isset($tdsize[$i]) && ( trim($tdsize[$i]) != '' )) {
-                    $w = (int) trim($tdsize[$i]);
+                if (isset($tdsize[$i]) && ( trim($tdsize[$i], " \n\r\t\v\x00") != '' )) {
+                    $w = (int) trim($tdsize[$i], " \n\r\t\v\x00");
                     if ($w < 1) {
                     // treat 0 as unsized
                         $s_array[$i] = 0 ;
@@ -491,7 +491,7 @@ function wikiplugin_fluidgrid($data, $params, $pos)
             if ($joincols) {
             // Check for empty columns to the right
                 for ($k = $j + 1; $k < $maxcols; $k++) {
-                    if (isset($r[$k]) && ( trim($r[$k]) != '' )) {
+                    if (isset($r[$k]) && ( trim($r[$k], " \n\r\t\v\x00") != '' )) {
                         break ;
                     } else {
                       // Grab the space from the next column and skip it
@@ -508,7 +508,7 @@ function wikiplugin_fluidgrid($data, $params, $pos)
           // If you specify 'format' => 'wiki', then the returned text will
           //    be parsed as wiki text, but this is potentially dangerous,
           //    because it is a mixture of html and wiki syntax.
-            $c = trim($c);
+            $c = trim($c, " \n\r\t\v\x00");
             $c = wikiplugin_fluidgrid_rollback($c, $hashes);
             $c = TikiLib::lib('parser')->parse_data($c);
             $result .= "<div class='col-" . $devicesize . "-" . $w . "'>" . $c . "</div>" ;

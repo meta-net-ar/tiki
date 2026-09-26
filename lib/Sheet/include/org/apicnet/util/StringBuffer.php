@@ -132,7 +132,7 @@ class StringBuffer extends APICObject {
     }
 
     public function leftTrim(){
-        return new StringBuffer(ltrim($this->toString()));
+        return new StringBuffer(ltrim($this->toString(), " \n\r\t\v\x00"));
     }
 
     public function rightTrim(){
@@ -140,7 +140,7 @@ class StringBuffer extends APICObject {
     }
 
     public function trimAll(){
-        return new StringBuffer(trim($this->toString()));
+        return new StringBuffer(trim($this->toString(), " \n\r\t\v\x00"));
     }
 
     public function indexOf($str, $offset = 0){

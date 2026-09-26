@@ -226,6 +226,6 @@ class Perms_ResolverFactory_ObjectFactory implements Perms_ResolverFactory
     private function cleanObject($name)
     {
         $name = is_array($name) ? ($name[0] ?? null) : $name;
-        return $name !== null ? strtolower(trim($name)) : '';
+        return $name !== null ? strtolower(trim($name, " \n\r\t\v\x00")) : '';
     }
 }

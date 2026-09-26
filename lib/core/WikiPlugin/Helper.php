@@ -108,7 +108,7 @@ class WikiPlugin_Helper
 
         foreach ($info['params'] ?? [] as $key => $definition) {
             if (! empty($definition['required'])) {
-                $value = trim($params[$key] ?? '');
+                $value = trim($params[$key] ?? '', " \n\r\t\v\x00");
 
                 if ($value === '') {
                     $missing[] = $key;

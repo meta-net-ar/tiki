@@ -80,7 +80,7 @@ function wikiplugin_quote($data, $params)
     $smarty->assign('comment_info', $comment_info);
     $smarty->assign('replyto', $replyto);
     $smarty->assign('wpQuoteContent', TikiLib::lib('parser')->parse_data_plugin($data));
-    $smarty->assign('source_url', trim($source_url));
+    $smarty->assign('source_url', trim($source_url, " \n\r\t\v\x00"));
 
     return $smarty->fetch("wiki-plugins/wikiplugin_quote.tpl");
 }

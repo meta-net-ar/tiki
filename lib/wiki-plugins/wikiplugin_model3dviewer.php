@@ -230,7 +230,7 @@ function wikiplugin_model3dviewer($data, $params)
     $params['height'] = $params['height'] ?? '400px';
     $params['width'] = $params['width'] ?? '100%';
     $params['model3dviewer_mimetypes'] = '.gltf,.glb,.stl,.fbx,.obj,.dae,.ply,.3ds,.vrml,.x3d';
-    $bgColor = trim($params['backgroundColor'] ?? '') !== ''
+    $bgColor = trim($params['backgroundColor'] ?? '', " \n\r\t\v\x00") !== ''
         ? $params['backgroundColor']
         : ($prefs['theme_model3dviewer_default_background'] ?? '#ffffff');
 
@@ -316,7 +316,7 @@ function resolve_model3dviewer_src($params, $absolute_links = false, $filename =
         $separator = str_contains($src, '?') ? '&' : '?';
         $src .= $separator . 'filename=' . rawurlencode($filename);
     } elseif (! empty($params['src'])) {
-        $src = trim($params['src']);
+        $src = trim($params['src'], " \n\r\t\v\x00");
         $src = str_replace(' ', '', $src);
 
         if (stripos($src, 'javascript:') !== false) {

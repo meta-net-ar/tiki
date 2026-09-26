@@ -49,8 +49,8 @@ class DbgSQLTables extends DebuggerCommand
         //
         global $tikilib;
         // Is regex to match against var name given?
-        $p = explode(" ", trim($params));
-        $mask = count($p) > 0 ? str_replace('$', '', trim($p[0])) : '';
+        $p = explode(" ", trim($params, " \n\r\t\v\x00"));
+        $mask = count($p) > 0 ? str_replace('$', '', trim($p[0], " \n\r\t\v\x00")) : '';
         $len = strlen($mask);
         // Get list of all tables
         $qr = $tikilib->query("show tables;");

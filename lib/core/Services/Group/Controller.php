@@ -168,7 +168,7 @@ class Services_Group_Controller
         if ($util->notConfirmPost()) {
             $util->setVars($input, $this->filters);
             if (! empty($input['name'])) {
-                $newGroupName = trim($input->name->groupname());
+                $newGroupName = trim($input->name->groupname(), " \n\r\t\v\x00");
                 $userlib = TikiLib::lib('user');
                 if ($userlib->group_exists($newGroupName)) {
                     Services_Utilities::modalException(tra('Group already exists'));
@@ -302,7 +302,7 @@ class Services_Group_Controller
 
 
             if (! empty($input['name']) && isset($input['olgroup'])) {
-                $newGroupName = trim($input['name']);
+                $newGroupName = trim($input['name'], " \n\r\t\v\x00");
                 $userlib = TikiLib::lib('user');
                 $users = $userlib->get_group_users($input['name']);
                 if (! empty($users) && $input["isRole"] == "on") {

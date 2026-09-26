@@ -140,8 +140,8 @@ function wikiplugin_kaltura($data, $params)
         $params['player_id'] = $prefs['kaltura_kdpUIConf'];
     }
 
-    $rawWidth = isset($params['width']) ? trim($params['width']) : '';
-    $rawHeight = isset($params['height']) ? trim($params['height']) : '';
+    $rawWidth = isset($params['width']) ? trim($params['width'], " \n\r\t\v\x00") : '';
+    $rawHeight = isset($params['height']) ? trim($params['height'], " \n\r\t\v\x00") : '';
 
     /*
      * Determine aspect ratio:

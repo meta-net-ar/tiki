@@ -81,7 +81,7 @@ class PerspectiveLib
         $currentDomain = $_SERVER['HTTP_HOST'] ?? '';
         foreach ($this->get_domain_map($prefs) as $domain => $perspective) {
             if ($domain == $currentDomain) {
-                $_SESSION['current_perspective'] = trim($perspective);
+                $_SESSION['current_perspective'] = trim($perspective, " \n\r\t\v\x00");
                 $_SESSION['current_perspective_name'] = $this->get_perspective_name($_SESSION['current_perspective']);
                 return $perspective;
             }
@@ -108,7 +108,7 @@ class PerspectiveLib
                     // Ignore lines which don't have exactly one comma, such as empty lines.
                     // TODO: make sure there are no such lines in the first place
                     list($domain, $perspective) = explode(',', $config);
-                    $out[$domain] = trim($perspective);
+                    $out[$domain] = trim($perspective, " \n\r\t\v\x00");
                 }
             }
         }

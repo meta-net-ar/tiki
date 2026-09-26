@@ -164,14 +164,14 @@ if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
         if (str_contains($_REQUEST["email"], ',')) {
                     $emails = explode(',', $_REQUEST["email"]);
             foreach ($emails as $e) {
-                if ($userlib->user_exists(trim($e))) {
-                            $result = $nllib->newsletter_subscribe($nlId, trim($e), "y", $confirmEmail, $addEmail);
+                if ($userlib->user_exists(trim($e, " \n\r\t\v\x00"))) {
+                            $result = $nllib->newsletter_subscribe($nlId, trim($e, " \n\r\t\v\x00"), "y", $confirmEmail, $addEmail);
                 } else {
-                            $result = $nllib->newsletter_subscribe($nlId, trim($e), "n", $confirmEmail, "");
+                            $result = $nllib->newsletter_subscribe($nlId, trim($e, " \n\r\t\v\x00"), "n", $confirmEmail, "");
                 }
             }
         } else {
-                    $result = $nllib->newsletter_subscribe($nlId, trim($_REQUEST["email"]), "n", $confirmEmail, "");
+                    $result = $nllib->newsletter_subscribe($nlId, trim($_REQUEST["email"], " \n\r\t\v\x00"), "n", $confirmEmail, "");
         }
         if ($result) {
                     $successCount++;
@@ -253,7 +253,7 @@ if (
     }
 
     foreach ($emails as $email) {
-                $email = trim($email);
+                $email = trim($email, " \n\r\t\v\x00");
         if (empty($email)) {
                     continue;
         }

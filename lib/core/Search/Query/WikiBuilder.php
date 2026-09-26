@@ -465,7 +465,7 @@ class Search_Query_WikiBuilder
         if ($value == 'randommode') {
             if (! empty($arguments['modes'])) {
                 $modes = explode(',', $arguments['modes']);
-                $value = trim($modes[array_rand($modes)]);
+                $value = trim($modes[array_rand($modes)], " \n\r\t\v\x00");
                 // append a direction if not already supplied
                 $last = substr($value, strrpos($value, '_'));
                 $directions = ['_asc', '_desc', '_nasc', '_ndesc'];

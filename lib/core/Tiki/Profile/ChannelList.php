@@ -111,6 +111,6 @@ class Tiki_Profile_ChannelList
             $out .= implode(', ', $parts) . "\n";
         }
 
-        return trim($out);
+        return trim($out, " \n\r\t\v\x00");
     }
 }

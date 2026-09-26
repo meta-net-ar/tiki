@@ -336,6 +336,6 @@ class Xmp
                 $ret .= $exif->specs['EXIF'][$fieldname]['options']['0' . $singleval['rawval']] . ' ';
             }
         }
-        return trim($ret);
+        return trim($ret, " \n\r\t\v\x00");
     }
 }

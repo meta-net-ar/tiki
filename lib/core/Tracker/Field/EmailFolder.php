@@ -223,9 +223,9 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
      */
     private static function parseAddress(string $raw): array
     {
-        $raw = trim($raw);
+        $raw = trim($raw, " \n\r\t\v\x00");
         if ($raw !== '' && preg_match('/^"?([^"<>]*?)"?\s*<([^<>]+)>$/', $raw, $m)) {
-            return [trim($m[1]), trim($m[2])];
+            return [trim($m[1], " \n\r\t\v\x00"), trim($m[2], " \n\r\t\v\x00")];
         }
 
         return ['', $raw];

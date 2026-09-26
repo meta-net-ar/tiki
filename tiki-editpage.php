@@ -1090,7 +1090,7 @@ function parse_output(&$obj, &$parts)
         foreach ($items as $item) {
             $portions = explode('=', $item);
             if (isset($portions[0]) && isset($portions[1])) {
-                $aux[trim($portions[0])] = trim($portions[1]);
+                $aux[trim($portions[0], " \n\r\t\v\x00")] = trim($portions[1], " \n\r\t\v\x00");
             }
         }
         $parts[] = $aux;

@@ -24,6 +24,6 @@ class Trim implements TikiSmartyExtensionInterface
 
     public function handle($string, $chars = null)
     {
-        return empty($chars) ? trim($string) : trim($string, $chars);
+        return empty($chars) ? trim($string, " \n\r\t\v\x00") : trim($string, $chars);
     }
 }

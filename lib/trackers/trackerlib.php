@@ -782,7 +782,7 @@ class TrackerLib extends TikiLib
                 }
                 $value = trim($this->field_render_value(
                     ['field' => $myfield, 'process' => 'y', 'list_mode' => $list_mode, 'item' => $item]
-                ));
+                ), " \n\r\t\v\x00");
 
                 if ($format) {
                     $values[] = $value;
@@ -1365,7 +1365,7 @@ class TrackerLib extends TikiLib
                     $options = explode("\n", $rv);
                     foreach ($options as $option) {
                         $mid .= " AND (ttif$i.`value` LIKE ? OR ttif$i.`value` LIKE ?)";
-                        $option = trim($option);
+                        $option = trim($option, " \n\r\t\v\x00");
                         $bindvars[] = "%$option";
                         $bindvars[] = "%$option\n%";
                     }
@@ -2270,7 +2270,7 @@ class TrackerLib extends TikiLib
 
     public function _format_data($field, $data)
     {
-        $data = trim($data);
+        $data = trim($data, " \n\r\t\v\x00");
         if ($field['type'] == 'a') {
             if (isset($field["options_array"][3]) and $field["options_array"][3] > 0 and strlen($data) > $field["options_array"][3]) {
                 $data = substr($data, 0, $field["options_array"][3]) . " (...)";
@@ -2418,7 +2418,7 @@ class TrackerLib extends TikiLib
                 } elseif ($header[$i] == 'lastModif') {
                     $lastModif = $this->parse_imported_date($data[$i], $dateFormat);
                 } elseif ($header[$i] == 'categs') { // for old compatibility
-                    $cats = preg_split('/,/', trim($data[$i]));
+                    $cats = preg_split('/,/', trim($data[$i], " \n\r\t\v\x00"));
                 }
             }
             $t = $this->get_tracker_for_item($itemId);
@@ -2487,12 +2487,12 @@ class TrackerLib extends TikiLib
 
                         switch ($field['type']) {
                             case 'e':
-                                $cats = preg_split('/%%%/', trim($data[$i]));
+                                $cats = preg_split('/%%%/', trim($data[$i], " \n\r\t\v\x00"));
                                 $catIds = [];
                                 if (! empty($cats)) {
                                     foreach ($cats as $c) {
                                         $categlib = TikiLib::lib('categ');
-                                        if ($cId = $categlib->get_category_id(trim($c))) {
+                                        if ($cId = $categlib->get_category_id(trim($c, " \n\r\t\v\x00"))) {
                                             $catIds[] = $cId;
                                         }
                                     }
@@ -2928,7 +2928,7 @@ class TrackerLib extends TikiLib
                             break;
                         case 'a':
                             if (isset($f['options_array'][5]) && $f['options_array'][5] > 0) {
-                                if (count(preg_split('/\s+/', trim($f['value']))) > $f['options_array'][5]) {
+                                if (count(preg_split('/\s+/', trim($f['value'], " \n\r\t\v\x00"))) > $f['options_array'][5]) {
                                     $erroneous_values[] = $f;
                                 }
                             }
@@ -2957,7 +2957,7 @@ class TrackerLib extends TikiLib
 
                     // Only gate non-empty values: empty values fall through to the mandatory-field
                     // check above; optional encrypted fields legitimately submit empty.
-                    if (! empty($f['encryptionKeyId']) && ! empty(trim((string)($f['value'] ?? '')))) {
+                    if (! empty($f['encryptionKeyId']) && ! empty(trim((string)($f['value'] ?? ''), " \n\r\t\v\x00"))) {
                         try {
                             $key = new Tiki\Encryption\Key($f['encryptionKeyId']);
                             if (! $key->isKeyAccessible()) {
@@ -6828,7 +6828,7 @@ class TrackerLib extends TikiLib
     {
         return array_filter(
             array_map(function ($user) {
-                return trim($user ?? '');
+                return trim($user ?? '', " \n\r\t\v\x00");
             }, is_array($value) ? $value : str_getcsv($value ?? '', ',', '"', TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR)),
         );
     }

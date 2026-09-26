@@ -120,7 +120,7 @@ class Captcha
             foreach ($lines as $line) {
                 $line = explode(':', $line, 2);
                 if (count($line) === 2) {
-                    $questions[] = [trim($line[0]), trim($line[1])];
+                    $questions[] = [trim($line[0], " \n\r\t\v\x00"), trim($line[1], " \n\r\t\v\x00")];
                 }
             }
 

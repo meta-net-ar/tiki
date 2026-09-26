@@ -104,5 +104,5 @@ function wikiplugin_sort($data, $params)
         $data = implode("\n", $lines);
     }
 
-    return trim($data);
+    return trim($data, " \n\r\t\v\x00");
 }

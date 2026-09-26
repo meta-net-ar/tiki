@@ -242,8 +242,8 @@ class WikiLib extends TikiLib
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
         // if page already exists, stop here
-        $newName = trim($newName);
-        $oldName = trim($oldName);
+        $newName = trim($newName, " \n\r\t\v\x00");
+        $oldName = trim($oldName, " \n\r\t\v\x00");
 
         // Check if trying to rename to the same name
         if ($oldName === $newName) {
@@ -251,7 +251,7 @@ class WikiLib extends TikiLib
         }
         if ($this->get_page_info($newName, false, true)) {
             // if it is a case change of same page: allow it, else stop here
-            if (strcasecmp(trim($oldName), $newName) <> 0) {
+            if (strcasecmp(trim($oldName, " \n\r\t\v\x00"), $newName) <> 0) {
                 throw new Exception("Page already exists", 2);
             }
         }
@@ -819,7 +819,7 @@ class WikiLib extends TikiLib
         header("Last-Modified: $last_modified");
         header("Cache-Control:  must-revalidate, max-age:3600");
 
-        if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $etag !== trim($_SERVER['HTTP_IF_NONE_MATCH'])) {
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $etag !== trim($_SERVER['HTTP_IF_NONE_MATCH'], " \n\r\t\v\x00")) {
             return;
         } elseif (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) <= $info['lastModif']) {
             return;
@@ -1155,7 +1155,7 @@ class WikiLib extends TikiLib
 
         $prefixes = explode(',', $prefs["wiki_prefixalias_tokens"]);
         foreach ($prefixes as $p) {
-            $p = trim($p);
+            $p = trim($p, " \n\r\t\v\x00");
             if (strlen($p) > 0 && mb_strtolower(substr($alias, 0, strlen($p))) == mb_strtolower($p)) {
                 $toPage = $p;
                 $tokens = 'prefixalias';

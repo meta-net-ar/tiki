@@ -43,7 +43,7 @@ id,name
 1,"John Doe"
 TXT;
 
-        $this->assertEquals($expectedContent, trim($fileContents));
+        $this->assertEquals($expectedContent, trim($fileContents, " \n\r\t\v\x00"));
 
         // Append a new file
         $rows = [
@@ -57,6 +57,6 @@ TXT;
 \n2,"Mary Jane"
 TXT;
 
-        $this->assertEquals($expectedContent, trim($fileContents));
+        $this->assertEquals($expectedContent, trim($fileContents, " \n\r\t\v\x00"));
     }
 }

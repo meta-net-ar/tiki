@@ -418,9 +418,9 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 $dateNow->setTZbyID($displayTimezone);
                 $prefillAllDay = null;
                 if ($input->prefill_start->text()) {
-                    $prefillStart = trim($input->prefill_start->text());
-                    $prefillEnd = trim((string) $input->prefill_end->text());
-                    $prefillTimezoneRequested = trim((string) $input->prefill_tz->text());
+                    $prefillStart = trim($input->prefill_start->text(), " \n\r\t\v\x00");
+                    $prefillEnd = trim((string) $input->prefill_end->text(), " \n\r\t\v\x00");
+                    $prefillTimezoneRequested = trim((string) $input->prefill_tz->text(), " \n\r\t\v\x00");
                     $prefillTimezone = $this->resolvePrefillTimezone($prefillTimezoneRequested, $displayTimezone);
                     $prefillAllDay = $input->offsetExists('prefill_allday')
                         ? $input->prefill_allday->int() === 1

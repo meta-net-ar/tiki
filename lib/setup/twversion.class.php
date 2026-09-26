@@ -479,7 +479,7 @@ class TWVersion
         foreach ($lines as $line) {
             $relements = explode('.', $line);
             if (isset($relements[0]) && is_numeric($relements[0])) { // Avoid issues with empty lines
-                $line = rtrim($line);
+                $line = rtrim($line, " \n\r\t\v\x00");
                 $this->releases[] = $line;
                 if ($relements[0] == $velements[0]) {
                     $this->latestMinorRelease = $line;

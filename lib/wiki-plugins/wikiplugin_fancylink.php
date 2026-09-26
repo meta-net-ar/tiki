@@ -95,7 +95,7 @@ function wikiplugin_fancylink($data, $params)
 
     // If preview disabled, render a simple link
     if (! $shouldPreview) {
-        $linkText = trim((string) $data) !== '' ? $data : $url;
+        $linkText = trim((string) $data, " \n\r\t\v\x00") !== '' ? $data : $url;
         return '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($linkText) . '</a>';
     }
 
@@ -108,7 +108,7 @@ function wikiplugin_fancylink($data, $params)
     }
 
     // If body content exists, render as link with popover
-    $bodyContent = trim((string) $data);
+    $bodyContent = trim((string) $data, " \n\r\t\v\x00");
     if (! empty($bodyContent)) {
         return generateLinkWithPopover($url, $bodyContent, $metadata, $showImg, $showDesc);
     }
@@ -289,7 +289,7 @@ function normalizeInternalUrl($url)
         $base_url = rtrim($base_url, '/');
     }
 
-    $url = trim($url);
+    $url = trim($url, " \n\r\t\v\x00");
     $originalUrl = $url;
 
     if (filter_var($url, FILTER_VALIDATE_URL)) {
@@ -348,7 +348,7 @@ function extractUrlMetadata($url, $cacheTime = 86400)
     $url = normalizeInternalUrl($url);
 
     // Clean URL
-    $url = trim($url);
+    $url = trim($url, " \n\r\t\v\x00");
     $url = preg_replace('/^[^a-z0-9]+/i', '', $url);
     $url = filter_var($url, FILTER_SANITIZE_URL);
 
@@ -625,7 +625,7 @@ function parseUrlMetadata($content, $url)
     // Get title
     $titles = $dom->getElementsByTagName('title');
     if ($titles->length > 0) {
-        $metadata['title'] = trim($titles->item(0)->textContent);
+        $metadata['title'] = trim($titles->item(0)->textContent, " \n\r\t\v\x00");
     }
 
     // Get meta tags

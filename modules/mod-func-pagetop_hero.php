@@ -87,11 +87,11 @@ function module_pagetop_hero($mod_reference, $module_params)
         if (! empty($module_params["breadcrumbs"])) {
             $items = explode(",", $module_params["breadcrumbs"]);
             foreach ($items as $item) {
-                $item = trim($item);
+                $item = trim($item, " \n\r\t\v\x00");
                 if (strpos($item, '|') !== false) {
                     // Item has pipe: Text|URL
                     list($text, $url) = explode('|', $item, 2);
-                    $breadcrumbs[] = ['text' => trim($text), 'url' => trim($url)];
+                    $breadcrumbs[] = ['text' => trim($text, " \n\r\t\v\x00"), 'url' => trim($url, " \n\r\t\v\x00")];
                 } else {
                     // Item without pipe
                     if ($auto_link) {

@@ -253,7 +253,7 @@ function wikiplugin_datachannel($data, $params)
 
             $trimAndMapArraysAsYaml = function ($element) {
                 if (! is_array($element)) {
-                    return trim($element);
+                    return trim($element, " \n\r\t\v\x00");
                 }
                 $element = array_map('trim', $element);
                 return implode(',', $element);

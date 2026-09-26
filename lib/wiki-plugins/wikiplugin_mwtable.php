@@ -112,9 +112,9 @@ function wikiplugin_mwtable($data, $params)
             list($attribs, $text) = explode("|", $element, 2);
             $attributes = _get_attributes($attribs);
             $wret .= _output_tag_with_attributes("caption", $attributes, true);
-            $wret .= trim($text);
+            $wret .= trim($text, " \n\r\t\v\x00");
         } else {
-            $wret .= "<caption>" . trim($element);
+            $wret .= "<caption>" . trim($element, " \n\r\t\v\x00");
         }
         $wret .= "</caption>\n";
         // move soe - skip terminating suffix
@@ -175,10 +175,10 @@ function wikiplugin_mwtable($data, $params)
                 $attributes = _get_attributes($attribs);
                 _check_class_attribute($attributes, $default_class_headings);
                 $wret .= _output_tag_with_attributes("th", $attributes);
-                $wret .= trim($text);
+                $wret .= trim($text, " \n\r\t\v\x00");
             } else {
                 // only one part so use as heading
-                $wret .= "<th>" . trim($column);
+                $wret .= "<th>" . trim($column, " \n\r\t\v\x00");
             }
             $wret .= "</th>\n";
         }
@@ -234,7 +234,7 @@ function wikiplugin_mwtable($data, $params)
             }
             _check_class_attribute($attributes, $default_class_td);
             $wret .= _output_tag_with_attributes("td", $attributes);
-            $wret .= trim($text);
+            $wret .= trim($text, " \n\r\t\v\x00");
 
             // end of cell
             $wret .= "</td>\n";

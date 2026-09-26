@@ -286,7 +286,7 @@ function wikiplugin_accordion($body, $params)
                     $icons[$key] = $m[1];
                 }
                 $header = preg_split($pattern, $header, -1, PREG_SPLIT_NO_EMPTY);
-                $headers[$key] = trim($header[0]);
+                $headers[$key] = trim($header[0], " \n\r\t\v\x00");
             } else {
                 $headers[$key] = $header;
             }

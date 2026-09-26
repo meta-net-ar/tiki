@@ -81,9 +81,9 @@ class MoneyFormat implements TikiSmartyExtensionInterface
                 'nosimbol' => preg_match('/\!/', $fmatch[1]) > 0,
                 'isleft' => preg_match('/\-/', $fmatch[1]) > 0,
             ];
-            $width = trim($fmatch[2]) ? (int) $fmatch[2] : 0;
-            $left = trim($fmatch[3]) ? (int) $fmatch[3] : 0;
-            $right = trim($fmatch[4]) ? (int) $fmatch[4] : $locale['int_frac_digits'];
+            $width = trim($fmatch[2], " \n\r\t\v\x00") ? (int) $fmatch[2] : 0;
+            $left = trim($fmatch[3], " \n\r\t\v\x00") ? (int) $fmatch[3] : 0;
+            $right = trim($fmatch[4], " \n\r\t\v\x00") ? (int) $fmatch[4] : $locale['int_frac_digits'];
             $conversion = $fmatch[5];
 
             $positive = true;

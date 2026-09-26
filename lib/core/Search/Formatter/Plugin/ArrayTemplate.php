@@ -66,7 +66,7 @@ class Search_Formatter_Plugin_ArrayTemplate extends Search_Formatter_Plugin_Abst
             $entry[str_replace('tracker_field_', '', $field)] = str_replace(
                 ['~np~', '~/np~'],
                 '',
-                trim($valueFormatter->$format($searchField, $arguments))
+                trim($valueFormatter->$format($searchField, $arguments), " \n\r\t\v\x00")
             );
         }
         return $entry;

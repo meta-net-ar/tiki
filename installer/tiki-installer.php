@@ -760,7 +760,7 @@ if ($install_step == '2') {
     }
 
     // copy of most of $tikilib->return_bytes() not available at this stage
-    $memory_limit = trim(ini_get('memory_limit'));
+    $memory_limit = trim(ini_get('memory_limit'), " \n\r\t\v\x00");
     $last = strtolower($memory_limit[strlen($memory_limit) - 1]);
     $memory_limit = (int)$memory_limit;
     switch ($last) {

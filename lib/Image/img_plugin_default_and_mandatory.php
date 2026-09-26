@@ -21,25 +21,25 @@ if (! function_exists('apply_default_and_mandatory')) {
     {
         $smarty = TikiLib::lib('smarty');
         $section = Sections::getCurrentSection();
-        $imgdata[$default] = trim($imgdata[$default]) . ';'; // trim whitespace and ensure at least one semicolon
+        $imgdata[$default] = trim($imgdata[$default], " \n\r\t\v\x00") . ';'; // trim whitespace and ensure at least one semicolon
         $img_conditions_array = explode(';', $imgdata[$default]); // conditions separated by semicolons
         if (! empty($img_conditions_array)) {
             foreach ($img_conditions_array as $key => $var) { // for each condition
                 if (! empty($var)) {
                     $img_condition = explode('?', $var); // condition separated from parameters by question mark
                     if (! empty($img_condition)) {
-                        $img_condition_name = trim($img_condition[0]);
+                        $img_condition_name = trim($img_condition[0], " \n\r\t\v\x00");
                         if (! empty($img_condition[1])) { // if there is at least one parameter
-                            $img_condition[1] = trim($img_condition[1]) . ',';  // at least one comma
+                            $img_condition[1] = trim($img_condition[1], " \n\r\t\v\x00") . ',';  // at least one comma
                             $img_parameters_array = explode(',', $img_condition[1]); // separate multiple parameters
                             if (! empty($img_parameters_array)) {  // if a parameter has been extracted
                                 foreach ($img_parameters_array as $param_key => $param_var) {   // for each parameter
                                     if (! empty($param_var)) {  // if a parameter exists
-                                        $img_parameter_array = explode('=', trim($param_var)); // separate parameters and values
+                                        $img_parameter_array = explode('=', trim($param_var, " \n\r\t\v\x00")); // separate parameters and values
                                         if (! empty($img_parameter_array[0])) {  // if a parameter with a value has been extracted
                                             $img_condition_status = false;  // initialise condition as not being true
 
-                                            $img_condition_name = strtolower(trim($img_condition_name));
+                                            $img_condition_name = strtolower(trim($img_condition_name, " \n\r\t\v\x00"));
                                             switch ($img_condition_name) {
                                                 case 'default':
                                                     $img_condition_status = true; // default is always true
@@ -68,7 +68,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                                             if (! empty($smarty)) {
                                                                 $image_article_type = $smarty->getTemplateVars('type');
                                                                 if (! empty($image_article_type)) {
-                                                                    if (strtolower(trim($image_article_type)) == 'article') {
+                                                                    if (strtolower(trim($image_article_type, " \n\r\t\v\x00")) == 'article') {
                                                                         $img_condition_status = true;
                                                                     }
                                                                 } // if (!empty($image_article_type))
@@ -82,7 +82,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                                             if (! empty($smarty)) {
                                                                 $image_article_type = $smarty->getTemplateVars('type');
                                                                 if (! empty($image_article_type)) {
-                                                                    if (strtolower(trim($image_article_type)) == 'review') {
+                                                                    if (strtolower(trim($image_article_type, " \n\r\t\v\x00")) == 'review') {
                                                                         $img_condition_status = true;
                                                                     }
                                                                 } // if (!empty($image_article_type))
@@ -96,7 +96,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                                             if (! empty($smarty)) {
                                                                 $image_article_type = $smarty->getTemplateVars('type');
                                                                 if (! empty($image_article_type)) {
-                                                                    if (strtolower(trim($image_article_type)) == 'event') {
+                                                                    if (strtolower(trim($image_article_type, " \n\r\t\v\x00")) == 'event') {
                                                                         $img_condition_status = true;
                                                                     }
                                                                 } // if (!empty($image_article_type))
@@ -110,7 +110,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                                             if (! empty($smarty)) {
                                                                 $image_article_type = $smarty->getTemplateVars('type');
                                                                 if (! empty($image_article_type)) {
-                                                                    if (strtolower(trim($image_article_type)) == 'classified') {
+                                                                    if (strtolower(trim($image_article_type, " \n\r\t\v\x00")) == 'classified') {
                                                                         $img_condition_status = true;
                                                                     }
                                                                 } // if (!empty($image_article_type))
@@ -127,7 +127,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                                         if (strlen($img_condition_name) > 8) {
                                                             $img_condition_part = substr($img_condition, 8); // get part after "section_"
                                                             $img_condition_part = strtolower($img_condition_part);
-                                                            $img_condition_part = trim(strtr($img_condition_part, '_', ' ')); // replace underscore with spaces
+                                                            $img_condition_part = trim(strtr($img_condition_part, '_', ' '), " \n\r\t\v\x00"); // replace underscore with spaces
                                                             if ($section == $img_condition_part) {
                                                                 $img_condition_status = true;
                                                             }
@@ -138,84 +138,84 @@ if (! function_exists('apply_default_and_mandatory')) {
 
                                             if ($img_condition_status == true) {
                                                 // set the parameters to their values
-                                                switch (strtolower(trim($img_parameter_array[0]))) {
+                                                switch (strtolower(trim($img_parameter_array[0], " \n\r\t\v\x00"))) {
                                                     case 'src':
-                                                        $imgdata['src'] = trim($img_parameter_array[1]);
+                                                        $imgdata['src'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'id':
-                                                        $imgdata['id'] = trim($img_parameter_array[1]);
+                                                        $imgdata['id'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'fileId':
-                                                        $imgdata['fileId'] = trim($img_parameter_array[1]);
+                                                        $imgdata['fileId'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'randomGalleryId':
-                                                        $imgdata['randomGalleryId'] = trim($img_parameter_array[1]);
+                                                        $imgdata['randomGalleryId'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'fgalId':
-                                                        $imgdata['fgalId'] = trim($img_parameter_array[1]);
+                                                        $imgdata['fgalId'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'sort_mode':
-                                                        $imgdata['sort_mode'] = trim($img_parameter_array[1]);
+                                                        $imgdata['sort_mode'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'attId':
-                                                        $imgdata['attId'] = trim($img_parameter_array[1]);
+                                                        $imgdata['attId'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'thumb':
-                                                        $imgdata['thumb'] = trim($img_parameter_array[1]);
+                                                        $imgdata['thumb'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'button':
-                                                        $imgdata['button'] = trim($img_parameter_array[1]);
+                                                        $imgdata['button'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'link':
-                                                        $imgdata['link'] = trim($img_parameter_array[1]);
+                                                        $imgdata['link'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'rel':
-                                                        $imgdata['rel'] = trim($img_parameter_array[1]);
+                                                        $imgdata['rel'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'usemap':
-                                                        $imgdata['usemap'] = trim($img_parameter_array[1]);
+                                                        $imgdata['usemap'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'height':
-                                                        $imgdata['height'] = trim($img_parameter_array[1]);
+                                                        $imgdata['height'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'width':
-                                                        $imgdata['width'] = trim($img_parameter_array[1]);
+                                                        $imgdata['width'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'max':
-                                                        $imgdata['max'] = trim($img_parameter_array[1]);
+                                                        $imgdata['max'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'imalign':
-                                                        $imgdata['imalign'] = trim($img_parameter_array[1]);
+                                                        $imgdata['imalign'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'styleimage':
-                                                        $imgdata['styleimage'] = trim($img_parameter_array[1]);
+                                                        $imgdata['styleimage'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'align':
-                                                        $imgdata['align'] = trim($img_parameter_array[1]);
+                                                        $imgdata['align'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'stylebox':
-                                                        $imgdata['stylebox'] = trim($img_parameter_array[1]);
+                                                        $imgdata['stylebox'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'styledesc':
-                                                        $imgdata['styledesc'] = trim($img_parameter_array[1]);
+                                                        $imgdata['styledesc'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'block':
-                                                        $imgdata['block'] = trim($img_parameter_array[1]);
+                                                        $imgdata['block'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'class':
-                                                        $imgdata['class'] = trim($img_parameter_array[1]);
+                                                        $imgdata['class'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'desc':
-                                                        $imgdata['desc'] = trim($img_parameter_array[1]);
+                                                        $imgdata['desc'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'title':
-                                                        $imgdata['title'] = trim($img_parameter_array[1]);
+                                                        $imgdata['title'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'metadata':
-                                                        $imgdata['metadata'] = trim($img_parameter_array[1]);
+                                                        $imgdata['metadata'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                     case 'alt':
-                                                        $imgdata['alt'] = trim($img_parameter_array[1]);
+                                                        $imgdata['alt'] = trim($img_parameter_array[1], " \n\r\t\v\x00");
                                                         break;
                                                 } // switch ($img_parameter_array[0])
                                             } // if ( $img_condition_status == true )

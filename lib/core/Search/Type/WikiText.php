@@ -45,7 +45,7 @@ class Search_Type_WikiText implements Search_Type_Interface
 
         $plaintext = strip_tags($htmlSpaceBeforeTags);
         $plaintextNoDoubleSpace = str_replace('  ', ' ', $plaintext);
-        return trim($plaintextNoDoubleSpace);
+        return trim($plaintextNoDoubleSpace, " \n\r\t\v\x00");
     }
 
     public function getValue()

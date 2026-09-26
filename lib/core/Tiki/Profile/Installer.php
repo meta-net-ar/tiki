@@ -598,7 +598,7 @@ class Tiki_Profile_Installer
                         $pos = strpos($change['description'], $handlersName);
                         if ($pos !== false) {
                             $handlersName = substr_replace($change['description'], '', $pos, strlen($description[0]));
-                            $handlersName = str_replace('"', "", trim($handlersName));
+                            $handlersName = str_replace('"', "", trim($handlersName, " \n\r\t\v\x00"));
                         }
                         $handle = $this->handlers[$description[0]];
                         $installerType = $description[0];
@@ -838,7 +838,7 @@ class Tiki_Profile_Installer
 
         foreach ($objects as $data) {
             foreach ($data['permissions'] as $perm => $v) {
-                $data['id'] = trim($data['id']);
+                $data['id'] = trim($data['id'], " \n\r\t\v\x00");
                 $data['type'] = self::convertType($data['type']);
                 $data['id'] = Tiki_Profile_Installer::convertObject($data['type'], $data['id'], ['groupMap' => $groupMap]);
 

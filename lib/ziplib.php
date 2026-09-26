@@ -614,7 +614,7 @@ function MimeifyPageRevision($page)
 
     foreach ($lines as $line) {
         // This is a dirty hack to allow saving binary text files. See above.
-        $line = rtrim($line);
+        $line = rtrim($line, " \n\r\t\v\x00");
 
         $out .= "$line\r\n";
     }

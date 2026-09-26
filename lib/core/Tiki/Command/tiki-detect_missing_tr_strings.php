@@ -95,7 +95,7 @@ $results = [];
 function isTranslatable($filePath, $line)
 {
     $ext = pathinfo($filePath, PATHINFO_EXTENSION);
-    $trimmed = trim($line);
+    $trimmed = trim($line, " \n\r\t\v\x00");
 
     // Ignore empty lines
     if ($trimmed === '') {
@@ -124,7 +124,7 @@ function isTranslatable($filePath, $line)
         // Detect visible text between HTML tags like: "<p>Hello World</p>" → "Hello World"
         if (preg_match_all('/>([^<]{2,}?)</', $line, $matches)) {
             foreach ($matches[1] as $text) {
-                $clean = trim($text);
+                $clean = trim($text, " \n\r\t\v\x00");
                 // Skip if it's a Smarty variable like: "{$var}"
                 if (preg_match('/^\{\$[^}]+\}$/', $clean)) {
                     continue;
@@ -138,7 +138,7 @@ function isTranslatable($filePath, $line)
         // Detect untranslated text inside HTML attributes
         if (preg_match_all('/\b(?:title|alt|placeholder|aria-label|data-tooltip)\s*=\s*["\']([^"\']+)["\']/', $line, $matches)) {
             foreach ($matches[1] as $text) {
-                $clean = trim($text);
+                $clean = trim($text, " \n\r\t\v\x00");
                 // Skip Smarty variables and already translated content
                 if (preg_match('/^\{\$[^}]+\}$/', $clean) || preg_match('/\{tr\}.*\{\/tr\}/', $clean)) {
                     continue;

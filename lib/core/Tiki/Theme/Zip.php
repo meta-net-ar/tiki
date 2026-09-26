@@ -286,7 +286,7 @@ class Zip
      */
     public function setCurrentFolder($folder)
     {
-        $this->currentFolder = rtrim(trim($folder), '\/');
+        $this->currentFolder = rtrim(trim($folder, " \n\r\t\v\x00"), '\/');
     }
 
     /**
@@ -298,7 +298,7 @@ class Zip
     protected function composePath($path = '')
     {
         $parts = func_get_args();
-        $parts[0] = rtrim(trim($parts[0]), '\/');
+        $parts[0] = rtrim(trim($parts[0], " \n\r\t\v\x00"), '\/');
 
         return implode(DIRECTORY_SEPARATOR, $parts);
     }

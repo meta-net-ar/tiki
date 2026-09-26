@@ -153,7 +153,7 @@ function wikiplugin_contributionsdashboard($data, $params)
                 $data = json_decode($data);
 
                 $hits[] = $count;
-                $userLabel = trim($data->user);
+                $userLabel = trim($data->user, " \n\r\t\v\x00");
                 if (empty($userLabel)) {
                     $userLabel = 'Anonymous';
                 }

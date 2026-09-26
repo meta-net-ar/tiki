@@ -24,7 +24,7 @@ function getMinVersion()
  */
 function check_bin_version()
 {
-    return version_compare(trim(shell_exec("git --version  2> /dev/null | awk '{print \$3}'")), GIT_MIN_VERSION, '>');
+    return version_compare(trim(shell_exec("git --version  2> /dev/null | awk '{print \$3}'"), " \n\r\t\v\x00"), GIT_MIN_VERSION, '>');
 }
 
 /**
@@ -36,7 +36,7 @@ function check_bin_version()
 function has_uncommited_changes($localPath)
 {
     $localPath = escapeshellarg($localPath);
-    $count = trim(shell_exec("git status -s $localPath | wc -l"));
+    $count = trim(shell_exec("git status -s $localPath | wc -l"), " \n\r\t\v\x00");
     return $count > 0;
 }
 
@@ -49,9 +49,9 @@ function has_uncommited_changes($localPath)
 function getUncommittedChangesParentFolder($localPath)
 {
     $localPath = escapeshellarg($localPath);
-    $output = trim(shell_exec("git status -s $localPath | awk '{print \$2}' | xargs -I{} dirname {} | sort | uniq"));
+    $output = trim(shell_exec("git status -s $localPath | awk '{print \$2}' | xargs -I{} dirname {} | sort | uniq"), " \n\r\t\v\x00");
 
-    $parentFolders = array_filter(explode("\n", trim($output)));
+    $parentFolders = array_filter(explode("\n", trim($output, " \n\r\t\v\x00")));
     $processedFolders = array_map(function ($folder) {
         $parts = explode('/', $folder);
         // Iterate backwards and find the first non-empty directory
@@ -95,7 +95,7 @@ function delete_file($file, $message = null)
 function files_differ($localPath)
 {
     $localPath = escapeshellarg($localPath);
-    $ret = trim(shell_exec("git -C $localPath status -s | awk '{print \$2}'"));
+    $ret = trim(shell_exec("git -C $localPath status -s | awk '{print \$2}'"), " \n\r\t\v\x00");
     return explode(PHP_EOL, $ret);
 }
 
@@ -119,7 +119,7 @@ function get_revision($path)
     if (str_starts_with($path, "http")) {
         shell_exec("git fetch");
     }
-    return trim(shell_exec("git rev-parse HEAD"));
+    return trim(shell_exec("git rev-parse HEAD"), " \n\r\t\v\x00");
 }
 
 /**
@@ -128,7 +128,7 @@ function get_revision($path)
  */
 function getCurrentBranch()
 {
-    return trim(shell_exec("git rev-parse --abbrev-ref HEAD"));
+    return trim(shell_exec("git rev-parse --abbrev-ref HEAD"), " \n\r\t\v\x00");
 }
 
 /**
@@ -143,7 +143,7 @@ function get_tag_revision($releaseNumber)
 
     // --stop-on-copy makes it only return the tag commit, not the whole history since time began
     $log = shell_exec("git describe --tags tags/$releaseNumber");
-    $log = ! empty($log) ? trim($log) : '';
+    $log = ! empty($log) ? trim($log, " \n\r\t\v\x00") : '';
 
     if (preg_match('/^r(\d+)/ms', $log, $matches)) {
         $revision = (int)$matches[1];
@@ -302,7 +302,7 @@ function tag_exists($tag, $remote = false)
 {
     shell_exec("git fetch --all --tags --prune");
     $searchedTag = shell_exec("git tag --list '$tag'");
-    $searchedTag = ! empty($searchedTag) ? trim($searchedTag) : '';
+    $searchedTag = ! empty($searchedTag) ? trim($searchedTag, " \n\r\t\v\x00") : '';
 
     return ! empty($searchedTag);
 }

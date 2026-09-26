@@ -1075,7 +1075,7 @@ class FileGalLib extends TikiLib
 
         $handlers = $this->table('tiki_file_handlers');
 
-        $mime_type = trim($mime_type);
+        $mime_type = trim($mime_type, " \n\r\t\v\x00");
 
         $handlers->delete(['mime_type' => $mime_type]);
         $handlers->insert(['mime_type' => $mime_type, 'cmd' => $cmd]);
@@ -1308,7 +1308,7 @@ class FileGalLib extends TikiLib
      */
     private function isSafeHandlerCommand($command)
     {
-        $command = trim($command);
+        $command = trim($command, " \n\r\t\v\x00");
         if ($command === '') {
             return false;
         }
@@ -1324,7 +1324,7 @@ class FileGalLib extends TikiLib
 
     private function getHandlerCommandBinary($command)
     {
-        $parts = preg_split('/\s+/', trim($command), 2);
+        $parts = preg_split('/\s+/', trim($command, " \n\r\t\v\x00"), 2);
         $binary = $parts[0] ?? '';
 
         return basename(str_replace('\\', '/', $binary));

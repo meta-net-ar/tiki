@@ -61,14 +61,14 @@ class BaseImageResolver
         }
 
         return [
-            'type' => strtolower(trim($ini['source.type'])),
+            'type' => strtolower(trim($ini['source.type'], " \n\r\t\v\x00")),
             'file' => $ini['source.file'] ?? '',
         ];
     }
 
     private function resolveLocalSource(string $file): string
     {
-        $file = trim($file);
+        $file = trim($file, " \n\r\t\v\x00");
 
         if ($file === '') {
             $file = 'custom_tiki.sql';

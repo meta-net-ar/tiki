@@ -381,13 +381,13 @@ class Hm_Output_filter_groupmail_data extends Hm_Output_Module
                 $icon = 'env_open';
                 $parent_value = sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']);
                 $id = sprintf("imap_%s_%s_%s", $msg['server_id'], $msg['uid'], $msg['folder']);
-                if (! trim($msg['subject'])) {
+                if (! trim($msg['subject'], " \n\r\t\v\x00")) {
                     $msg['subject'] = '[No Subject]';
                 }
                 $subject = $msg['subject'];
                 $from = format_imap_from_fld($msg['from']);
                 $nofrom = '';
-                if (! trim($from)) {
+                if (! trim($from, " \n\r\t\v\x00")) {
                     $from = '[No From]';
                     $nofrom = ' nofrom';
                 }
@@ -401,7 +401,7 @@ class Hm_Output_filter_groupmail_data extends Hm_Output_Module
                         $icon = 'env_closed';
                     }
                 }
-                if (trim($msg['x_auto_bcc']) === 'cypht') {
+                if (trim($msg['x_auto_bcc'], " \n\r\t\v\x00") === 'cypht') {
                     $from = preg_replace("/(\<.+\>)/U", '', $msg['to']);
                     $icon = 'sent';
                 }
@@ -438,7 +438,7 @@ class Hm_Output_filter_groupmail_data extends Hm_Output_Module
                 // check if sender is in contacts
                 $from_email = '';
                 foreach (process_address_fld($msg['from']) as $vals) {
-                    if (trim($vals['email'])) {
+                    if (trim($vals['email'], " \n\r\t\v\x00")) {
                         $from_email = $vals['email'];
                     }
                 }

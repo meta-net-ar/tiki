@@ -198,7 +198,7 @@ class PageParser
 
     public function cdataHandler($parser, $data)
     {
-        $data = trim($data);
+        $data = trim($data, " \n\r\t\v\x00");
 
         if ($data === '' || $this->currentTag === null) {
             return true;

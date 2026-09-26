@@ -636,7 +636,7 @@ abstract class TikiDb
 
                 // Detect the end of the function/procedure block (usually 'END;' or 'END$$')
                 if (preg_match('/^\s*END\s*;/i', $line)) {
-                    $statements[] = trim($buffer);
+                    $statements[] = trim($buffer, " \n\r\t\v\x00");
                     $buffer = '';
                     $insideFunction = false;
                 }
@@ -644,15 +644,15 @@ abstract class TikiDb
                 // If not inside a function, split by semicolon
                 $buffer .= $line . "\n";
                 if (preg_match('/;\s*$/', $line)) {
-                    $statements[] = trim($buffer);
+                    $statements[] = trim($buffer, " \n\r\t\v\x00");
                     $buffer = '';
                 }
             }
         }
 
         // Add any remaining buffer content as a statement
-        if (! empty(trim($buffer))) {
-            $statements[] = trim($buffer);
+        if (! empty(trim($buffer, " \n\r\t\v\x00"))) {
+            $statements[] = trim($buffer, " \n\r\t\v\x00");
         }
 
         return $statements;

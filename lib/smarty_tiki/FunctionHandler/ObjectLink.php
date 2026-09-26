@@ -283,7 +283,7 @@ class ObjectLink extends Base implements TikiSmartyExtensionInterface
                     // Nothing at all resolved for this format (ex: item has no data yet).
                     // Same idea as the freetag case above: quietly show what we have (the
                     // status icon, if any) rather than a "No title specified" placeholder.
-                    return rtrim($pre);
+                    return rtrim($pre, " \n\r\t\v\x00");
                 }
             }
             return $pre . $this->smartyFunctionObjectLinkDefault($template, $object, $title, $type, $url, $params);

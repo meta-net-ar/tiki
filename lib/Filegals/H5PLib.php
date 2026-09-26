@@ -659,7 +659,7 @@ class H5PLib
 
         // Trim title and check length
         $content['title'] = $input->title->text();
-        $trimmed_title = empty($content['title']) ? '' : trim($content['title']);
+        $trimmed_title = empty($content['title']) ? '' : trim($content['title'], " \n\r\t\v\x00");
         if ($trimmed_title === '') {
             $core->h5pF->setErrorMessage(tr('Missing title.'));
             return false;

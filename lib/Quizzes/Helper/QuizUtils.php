@@ -74,7 +74,7 @@ class QuizUtils
         }
 
         for ($i = 0, $icount_text = count($text); $i < $icount_text; $i++) {
-            $text[$i] = trim($text[$i]);
+            $text[$i] = trim($text[$i], " \n\r\t\v\x00");
         }
 
         $questions = [];

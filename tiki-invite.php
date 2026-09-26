@@ -44,7 +44,7 @@ function parsemails_csv($bloc)
     $ignored = [];
     $lines = preg_split('/[\n\r]+/', $bloc);
     foreach ($lines as $line) {
-        $line = trim($line);
+        $line = trim($line, " \n\r\t\v\x00");
         if ($line === '') {
             continue;
         }
@@ -57,9 +57,9 @@ function parsemails_csv($bloc)
         }
 
         $r = [];
-        $r['lastname'] = trim($l[0]);
-        $r['firstname'] = trim($l[1]);
-        $r['email'] = trim($l[2]);
+        $r['lastname'] = trim($l[0], " \n\r\t\v\x00");
+        $r['firstname'] = trim($l[1], " \n\r\t\v\x00");
+        $r['email'] = trim($l[2], " \n\r\t\v\x00");
         if (str_contains($r['email'], '@')) {
             $results[] = $r;
         }
@@ -80,7 +80,7 @@ function parsemails_all($bloc)
     $mails = preg_split('/[^a-zA-Z0-9@._-]/', $bloc);
     $results = [];
     foreach ($mails as $m) {
-        $m = trim($m);
+        $m = trim($m, " \n\r\t\v\x00");
         if (! str_contains($m, '@')) {
             continue;
         }

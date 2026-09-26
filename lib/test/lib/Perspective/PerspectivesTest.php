@@ -90,7 +90,7 @@ class PerspectivesTest extends PerspectivesNavigationBaseTestCase
 
         $pages = [];
         $crawler->filter('#listpages1 > tbody > tr')->each(function (Crawler $node) use (&$pages) {
-            $pages[] = trim($node->filter('td:nth-child(1)')->text());
+            $pages[] = trim($node->filter('td:nth-child(1)')->text(), " \n\r\t\v\x00");
         });
 
         $expected = ['A', 'A1 A2 A3', 'A2 and B2', 'A3 and B3', 'A1 and B1'];

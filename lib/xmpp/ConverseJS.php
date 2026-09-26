@@ -119,7 +119,7 @@ class ConverseJS
         $authMethod = TikiLib::lib('tiki')->get_preference('xmpp_auth_method');
         $this->set_option('on_xmpp_page', $params['on_xmpp_page'] ?? 'n');
 
-        $currentRoom = trim($params['room'] ?? '');
+        $currentRoom = trim($params['room'] ?? '', " \n\r\t\v\x00");
         if ($currentRoom !== '') {
             $currentRoom = TikiLib::lib('xmpp')->buildRoomJid($currentRoom);
         }
@@ -134,12 +134,12 @@ class ConverseJS
             $dmTarget = '';
 
             if ($onXmppPage) {
-                $anonRoom = trim($prefs['xmpp_anonymous_room'] ?? '');
+                $anonRoom = trim($prefs['xmpp_anonymous_room'] ?? '', " \n\r\t\v\x00");
             } elseif ($anonymousMode === 'support') {
-                $dmTarget = trim($params['dm_target'] ?? ($prefs['xmpp_admin_jid'] ?? ''));
-                $anonRoom = trim($prefs['xmpp_anonymous_room'] ?? '');
+                $dmTarget = trim($params['dm_target'] ?? ($prefs['xmpp_admin_jid'] ?? ''), " \n\r\t\v\x00");
+                $anonRoom = trim($prefs['xmpp_anonymous_room'] ?? '', " \n\r\t\v\x00");
             } else {
-                $anonRoom = trim($prefs['xmpp_anonymous_room'] ?? '');
+                $anonRoom = trim($prefs['xmpp_anonymous_room'] ?? '', " \n\r\t\v\x00");
             }
 
             $this->set_options([
@@ -469,9 +469,9 @@ JS;
         $options['play_sounds'] = true;
         $options['notify_all_room_messages'] = true;
         $options['omemo_default'] = false;
-        $siteName = trim((string) ($prefs['sitetitle'] ?? ''))
-            ?: trim((string) ($prefs['browsertitle'] ?? ''))
-            ?: trim((string) ($prefs['sitelogo_title'] ?? ''))
+        $siteName = trim((string) ($prefs['sitetitle'] ?? ''), " \n\r\t\v\x00")
+            ?: trim((string) ($prefs['browsertitle'] ?? ''), " \n\r\t\v\x00")
+            ?: trim((string) ($prefs['sitelogo_title'] ?? ''), " \n\r\t\v\x00")
             ?: 'Tiki';
 
         // Tiki-only presentation strings from the settings contract (see
@@ -485,7 +485,7 @@ JS;
             // An empty value is intentional: the browser plugin then
             // discovers the logo currently rendered by Tiki instead of
             // assuming a particular file.
-            'tiki_site_logo' => trim((string) ($prefs['sitelogo_src'] ?? '')),
+            'tiki_site_logo' => trim((string) ($prefs['sitelogo_src'] ?? ''), " \n\r\t\v\x00"),
             'tiki_support_label' => tra('Support team'),
             'tiki_destination_close_label' => tra('Close'),
             'tiki_destination_title' => tra('How would you like to chat?'),

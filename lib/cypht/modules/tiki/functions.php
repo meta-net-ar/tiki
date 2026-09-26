@@ -278,7 +278,7 @@ if (! hm_exists('tiki_flag_message')) {
             $flags .= ' \\' . ucfirst($flag);
             $state = $flag;
         }
-        $flags = preg_replace("/\s{2,}/", ' ', trim($flags));
+        $flags = preg_replace("/\s{2,}/", ' ', trim($flags, " \n\r\t\v\x00"));
         $raw = preg_replace("/Flags:.*?\r\n/", "Flags: $flags\r\n", $file->getContents(), -1, $cnt);
         if ($cnt == 0) {
             $raw = "Flags: $flags\r\n" . $raw;
@@ -429,7 +429,7 @@ if (! hm_exists('get_message_data')) {
         $msg = $mailbox->get_message_content($folder, $msg_id, 0);
         $msg = str_replace("\r\n", "\n", $msg);
         $msg = str_replace("\n", "\r\n", $msg);
-        $msg = rtrim($msg) . "\r\n";
+        $msg = rtrim($msg, " \n\r\t\v\x00") . "\r\n";
 
         $headers = $mailbox->get_message_headers($folder, $msg_id);
         if (! empty($headers['Flags'])) {
@@ -558,7 +558,7 @@ function tiki_fetch_tracker_messages($folder, $limit, $since, $keyword = '')
         . " AND tti.`status` = ?";
     $result = $trk->query($query, array_merge($fieldIds, ['o']));
 
-    $needle = mb_strtolower(trim((string) $keyword));
+    $needle = mb_strtolower(trim((string) $keyword, " \n\r\t\v\x00"));
     $sinceTs = strtotime($since);
     $itemInfoCache = [];
     while ($row = $result->fetchRow()) {
@@ -674,7 +674,7 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
         $id = sprintf("tracker_%s_%s_%s_%s", $msg['fileId'], $msg['itemId'], $msg['fieldId'], $msg['trackerId']);
 
         // Set default subject
-        if (! trim($msg['subject'] ?? '')) {
+        if (! trim($msg['subject'] ?? '', " \n\r\t\v\x00")) {
             $msg['subject'] = '[No Subject]';
         }
         $subject = $msg['subject'];
@@ -694,7 +694,7 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
         $from = is_array($from) ? implode(', ', $from) : $from;
         $from = format_imap_from_fld($from);
         $nofrom = '';
-        if (! trim($from)) {
+        if (! trim($from, " \n\r\t\v\x00")) {
             $from = '[No From]';
             $nofrom = ' nofrom';
         }
@@ -765,10 +765,10 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
         $inReplyTo = $msg['in_reply_to'] ?? '';
 
         if ($msgId) {
-            $msgId = str_replace(['<', '>'], '', trim($msgId));
+            $msgId = str_replace(['<', '>'], '', trim($msgId, " \n\r\t\v\x00"));
         }
         if ($inReplyTo) {
-            $inReplyTo = str_replace(['<', '>'], '', trim($inReplyTo));
+            $inReplyTo = str_replace(['<', '>'], '', trim($inReplyTo, " \n\r\t\v\x00"));
         }
 
         // Build message row based on style

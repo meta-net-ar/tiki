@@ -47,7 +47,7 @@ class XmppRegistrationSubscriber implements EventSubscriberInterface
         }
 
         // Group mapping
-        $mapJson  = trim($prefs['xmpp_group_room_map'] ?? '');
+        $mapJson  = trim($prefs['xmpp_group_room_map'] ?? '', " \n\r\t\v\x00");
         $groupMap = $mapJson ? json_decode($mapJson, true) : [];
         if (! is_array($groupMap)) {
             $groupMap = [];

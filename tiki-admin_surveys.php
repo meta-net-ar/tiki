@@ -48,7 +48,7 @@ $tikilib->get_perm_object($_REQUEST['surveyId'], 'survey');
 $access->check_permission('tiki_p_admin_surveys');
 if (isset($_REQUEST["save"])) {
     $access->checkCsrf();
-    if (empty($_REQUEST["name"]) || trim($_REQUEST["name"]) === '') {
+    if (empty($_REQUEST["name"]) || trim($_REQUEST["name"], " \n\r\t\v\x00") === '') {
         Feedback::error(tr('Survey name is required, Please provide a name'));
     } else {
         if (isset($_REQUEST["restriction"]) && $_REQUEST["restriction"] == 'on') {
@@ -59,7 +59,7 @@ if (isset($_REQUEST["save"])) {
 
         $isUpdating = ! empty($_REQUEST["surveyId"]);
 
-        $redirect_after = isset($_REQUEST["redirect_after"]) ? trim($_REQUEST["redirect_after"]) : '';
+        $redirect_after = isset($_REQUEST["redirect_after"]) ? trim($_REQUEST["redirect_after"], " \n\r\t\v\x00") : '';
         // Validate redirect_after: only allow wiki page names (alphanumeric, spaces, dashes, underscores) or valid URLs
         $redirect_after_valid = true;
         if (! empty($redirect_after) && ! preg_match('#^https?://#', $redirect_after) && ! preg_match('/^[\w\s\-]+$/u', $redirect_after)) {

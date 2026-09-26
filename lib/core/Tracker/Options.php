@@ -27,7 +27,7 @@ class Tracker_Options
         $options = new Tracker_Options();
         $options->info = $info;
 
-        $parts = preg_split('/\s*,\s*/', trim($string));
+        $parts = preg_split('/\s*,\s*/', trim($string, " \n\r\t\v\x00"));
 
         foreach ($parts as $key => $value) {
             if (empty($value)) {
@@ -90,7 +90,7 @@ class Tracker_Options
                         $commaItem = '';
                         foreach ($commaItems as $item) {
                             // one word quoted. ex: "bananas" or option1="bananas"
-                            if (preg_match('/^(").*\1$|^.*=(").*\2$/', trim($item))) {
+                            if (preg_match('/^(").*\1$|^.*=(").*\2$/', trim($item, " \n\r\t\v\x00"))) {
                                 $optionItems[] = $item;
                             } elseif (str_contains($item, '"')) {
                                 if ($commaItem == '') {

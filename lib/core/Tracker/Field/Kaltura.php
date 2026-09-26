@@ -51,7 +51,7 @@ class Tracker_Field_Kaltura extends \Tracker\Field\AbstractItemField implements 
             $flattened = [];
             array_walk_recursive($values, function ($v) use (&$flattened) {
                 if (is_string($v) || is_numeric($v)) {
-                    $flattened[] = trim((string)$v);
+                    $flattened[] = trim((string)$v, " \n\r\t\v\x00");
                 }
             });
 

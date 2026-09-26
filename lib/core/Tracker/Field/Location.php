@@ -217,7 +217,7 @@ class Tracker_Field_Location extends \Tracker\Field\AbstractItemField implements
             }
         });
 
-        if (trim($address)) {
+        if (trim($address, " \n\r\t\v\x00")) {
             $geo = TikiLib::lib('geo')->geocode($address);
             if ($geo) {
                 $out = $geo['lon'] . ',' . $geo['lat'] . ',' . $prefs['gmap_defaultz'];

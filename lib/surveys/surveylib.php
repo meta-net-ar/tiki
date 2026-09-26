@@ -685,7 +685,7 @@ class SurveyLib extends TikiLib
             $options = str_replace('\,', $comma, $options);
             $options = explode(',', $options);
             foreach ($options as & $option) {
-                $option = trim(str_replace($comma, ',', $option));
+                $option = trim(str_replace($comma, ',', $option), " \n\r\t\v\x00");
             }
         } else {
             $options = [];
