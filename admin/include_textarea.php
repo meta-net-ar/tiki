@@ -170,6 +170,61 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
+        // Handle LIST plugin caching settings
+        if ($_POST['implementation'] === 'list') {
+            if (! empty($_POST['alias_cache_enabled'])) {
+                $info['params']['cache'] = $_POST['alias_cache_mode'] ?? 'y';
+
+                $cacheExpiry = $_POST['alias_cache_expiry'] ?? '180';
+                if (! empty($_POST['alias_cache_expiry_override'])) {
+                    $info['params']['cacheexpiry'] = [
+                        'pattern' => '%cacheexpiry%',
+                        'params' => [
+                            'cacheexpiry' => [
+                                'input' => 'cacheexpiry',
+                                'encoding' => 'none',
+                                'default' => $cacheExpiry,
+                            ],
+                        ],
+                    ];
+                    $info['description']['params']['cacheexpiry'] = [
+                        'required' => false,
+                        'safe' => true,
+                        'name' => tra('Cache Expiry Time'),
+                        'description' => tra('Override default cache expiry time in minutes. Default: ') . $cacheExpiry,
+                        'filter' => 'digits',
+                    ];
+                } else {
+                    $info['params']['cacheexpiry'] = $cacheExpiry;
+                }
+
+                $cachePurgeRules = $_POST['alias_cache_purgerules'] ?? '';
+                if (! empty($_POST['alias_cache_purgerules_override'])) {
+                    $info['params']['cachepurgerules'] = [
+                        'pattern' => '%cachepurgerules%',
+                        'params' => [
+                            'cachepurgerules' => [
+                                'input' => 'cachepurgerules',
+                                'encoding' => 'none',
+                                'default' => $cachePurgeRules,
+                            ],
+                        ],
+                    ];
+                    $info['description']['params']['cachepurgerules'] = [
+                        'required' => false,
+                        'safe' => true,
+                        'name' => tra('Cache Purge Rules'),
+                        'description' => tra('Comma-separated purge rules to invalidate cache. Examples: trackeritem:trackerId:3, wiki:HomePage, file:galleryId:5'),
+                        'filter' => 'text',
+                    ];
+                } elseif (! empty($cachePurgeRules)) {
+                    $info['params']['cachepurgerules'] = $cachePurgeRules;
+                }
+            } else {
+                $info['params']['cache'] = 'n';
+            }
+        }
+
         WikiPlugin_Negotiator_Wiki_Alias::store($_POST['plugin_alias'], $info);
 
         if (! in_array($_POST['plugin_alias'], $pluginsAlias)) {
@@ -240,6 +295,39 @@ if (
         }
     }
 
+    // Extract LIST plugin cache settings for editing
+    $cacheSettings = [
+        'enabled' => false,
+        'mode' => 'y',
+        'expiry' => '180',
+        'expiry_override' => false,
+        'purgerules' => '',
+        'purgerules_override' => false,
+    ];
+    if (isset($pluginInfo['implementation']) && $pluginInfo['implementation'] === 'list') {
+        if (isset($pluginInfo['params']['cache'])) {
+            $cacheSettings['enabled'] = true;
+            $cacheSettings['mode'] = is_array($pluginInfo['params']['cache']) ? 'y' : $pluginInfo['params']['cache'];
+        }
+        if (isset($pluginInfo['params']['cacheexpiry'])) {
+            if (is_array($pluginInfo['params']['cacheexpiry'])) {
+                $cacheSettings['expiry_override'] = true;
+                $cacheSettings['expiry'] = $pluginInfo['params']['cacheexpiry']['params']['cacheexpiry']['default'] ?? '180';
+            } else {
+                $cacheSettings['expiry'] = $pluginInfo['params']['cacheexpiry'];
+            }
+        }
+        if (isset($pluginInfo['params']['cachepurgerules'])) {
+            if (is_array($pluginInfo['params']['cachepurgerules'])) {
+                $cacheSettings['purgerules_override'] = true;
+                $cacheSettings['purgerules'] = $pluginInfo['params']['cachepurgerules']['params']['cachepurgerules']['default'] ?? '';
+            } else {
+                $cacheSettings['purgerules'] = $pluginInfo['params']['cachepurgerules'];
+            }
+        }
+    }
+    $smarty->assign('alias_cache_settings', $cacheSettings);
+
     $smarty->assign('plugin_admin', $pluginInfo);
     $cookietab = 3;
 } else {
@@ -269,6 +357,16 @@ if (
     ];
 
     $smarty->assign('plugin_admin', $emptyPluginInfo);
+
+    // Set default cache settings for new aliases
+    $smarty->assign('alias_cache_settings', [
+        'enabled' => false,
+        'mode' => 'y',
+        'expiry' => '180',
+        'expiry_override' => false,
+        'purgerules' => '',
+        'purgerules_override' => false,
+    ]);
 }
 $smarty->assign('plugins_alias', $pluginsAlias);
 // allow plugin aliases of other aliases

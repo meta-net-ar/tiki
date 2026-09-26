@@ -434,6 +434,71 @@
                         </div><br>
                     </fieldset><br>
 
+                    <fieldset id="pluginalias_caching" class="d-none">
+                        <legend class="h3">
+                            {tr}Caching Settings{/tr} {help url="PluginList#Caching"}
+                        </legend>
+                        <div class="alert alert-info">
+                            {tr}Enable output caching to improve performance. Only available for LIST-based plugin aliases.{/tr}
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="col-sm-4" for="alias_cache_enabled">{tr}Enable Caching{/tr}</label>
+                            <div class="col-sm-8">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="alias_cache_enabled" name="alias_cache_enabled" value="1" {if !empty($alias_cache_settings.enabled)}checked="checked"{/if}>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="alias_cache_options" class="{if empty($alias_cache_settings.enabled)}d-none{/if}">
+                            <div class="mb-3 row">
+                                <label class="col-form-label col-sm-4" for="alias_cache_mode">{tr}Cache Mode{/tr}</label>
+                                <div class="col-sm-8">
+                                    <select class="form-select" name="alias_cache_mode" id="alias_cache_mode">
+                                        <option value="y" {if empty($alias_cache_settings.mode) or $alias_cache_settings.mode eq 'y'}selected="selected"{/if}>{tr}Cache for non-admins (y){/tr}</option>
+                                        <option value="a" {if !empty($alias_cache_settings.mode) and $alias_cache_settings.mode eq 'a'}selected="selected"{/if}>{tr}Cache for all users including admins (a){/tr}</option>
+                                    </select>
+                                    <div class="form-text">{tr}Choose whether admins see cached content or always fresh data{/tr}</div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-form-label col-sm-4" for="alias_cache_expiry">{tr}Cache Expiry (minutes){/tr}</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" type="number" min="1" name="alias_cache_expiry" id="alias_cache_expiry" value="{$alias_cache_settings.expiry|default:'180'|escape}">
+                                    <div class="form-text">{tr}How long cached output remains valid. Default: 180 minutes (3 hours){/tr}</div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-sm-4">{tr}Allow User Override (Expiry){/tr}</label>
+                                <div class="col-sm-8">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="alias_cache_expiry_override" name="alias_cache_expiry_override" value="1" {if !empty($alias_cache_settings.expiry_override)}checked="checked"{/if}>
+                                        <label class="form-check-label" for="alias_cache_expiry_override">{tr}Allow plugin users to override cache expiry via parameter{/tr}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-form-label col-sm-4" for="alias_cache_purgerules">{tr}Cache Purge Rules{/tr}</label>
+                                <div class="col-sm-8">
+                                    <input class="form-control" type="text" name="alias_cache_purgerules" id="alias_cache_purgerules" value="{$alias_cache_settings.purgerules|default:''|escape}">
+                                    <div class="form-text">{tr}Auto-invalidate cache when objects change. Format: type:field:value (comma-separated). Examples:{/tr}<br>
+                                        <code>trackeritem:trackerId:5</code> - {tr}Purge when tracker 5 items change{/tr}<br>
+                                        <code>wiki:HomePage</code> - {tr}Purge when HomePage changes{/tr}<br>
+                                        <code>file:galleryId:3</code> - {tr}Purge when files in gallery 3 change{/tr}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <label class="col-sm-4">{tr}Allow User Override (Purge Rules){/tr}</label>
+                                <div class="col-sm-8">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="alias_cache_purgerules_override" name="alias_cache_purgerules_override" value="1" {if !empty($alias_cache_settings.purgerules_override)}checked="checked"{/if}>
+                                        <label class="form-check-label" for="alias_cache_purgerules_override">{tr}Allow plugin users to override purge rules via parameter{/tr}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset><br>
+
                     <fieldset id="pluginalias_simple_args">
                         <legend class="h3">
                             {tr}Simple plugin arguments{/tr} {icon name="add" class='add-param text-success tips' title='|{tr}Add parameter{/tr}'}
@@ -705,3 +770,39 @@
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}
 </form>
+
+{jq}
+// Plugin Alias Caching Settings UI Logic
+$(function() {
+    var $implementation = $('#implementation');
+    var $cachingFieldset = $('#pluginalias_caching');
+    var $cacheEnabled = $('#alias_cache_enabled');
+    var $cacheOptions = $('#alias_cache_options');
+
+    // Show/hide caching fieldset based on base plugin selection
+    function updateCachingVisibility() {
+        if ($implementation.val() === 'list') {
+            $cachingFieldset.removeClass('d-none');
+        } else {
+            $cachingFieldset.addClass('d-none');
+        }
+    }
+
+    // Show/hide cache options based on enabled checkbox
+    function updateCacheOptionsVisibility() {
+        if ($cacheEnabled.is(':checked')) {
+            $cacheOptions.removeClass('d-none');
+        } else {
+            $cacheOptions.addClass('d-none');
+        }
+    }
+
+    // Bind events
+    $implementation.on('change', updateCachingVisibility);
+    $cacheEnabled.on('change', updateCacheOptionsVisibility);
+
+    // Initial state
+    updateCachingVisibility();
+    updateCacheOptionsVisibility();
+});
+{/jq}
