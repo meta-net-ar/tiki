@@ -4198,6 +4198,22 @@ class Comments extends TikiLib
                     $comments_objectId,
                     $params['contributions'] ?? ''
                 );
+                // Deal with mail notifications.
+                include_once('lib/notifications/notificationemaillib.php');
+                sendForumEmailNotification(
+                    empty($params['comments_reply_threadId']) ? 'forum_post_topic_changed' : 'forum_post_thread_changed',
+                    $params['forumId'],
+                    $forum_info,
+                    $params['comments_title'],
+                    $params['comments_data'],
+                    $user,
+                    $params['comments_title'],
+                    $message_id,
+                    $in_reply_to,
+                    $threadId,
+                    $params['comments_parentId'] ?? 0,
+                    $params['contributions'] ?? ''
+                );
             }
         }
         if (! empty($threadId) || ! empty($qId)) {

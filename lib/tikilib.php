@@ -1245,17 +1245,28 @@ class TikiLib extends TikiDb_Bridge
             $bindvars[] = $object;
             $bindvars[] = $info['lang'];
         } elseif ($event == 'forum_post_topic') {
-            $mid = "(`event`=? or `event`=?) and `object`=?";
+            $mid = "(`event`=? or `event`=?) and (`object`=? or `object`='*')";
             $bindvars[] = $event;
             $bindvars[] = 'forum_post_topic_and_thread';
             $bindvars[] = $object;
         } elseif ($event == 'forum_post_thread') {
-            $mid = "(`event`=? and `object`=?) or ( `event`=? and `object`=?)";
+            $mid = "(`event`=? and (`object`=? or `object`='*')) or (`event`=? and (`object`=? or `object`='*'))";
             $bindvars[] = $event;
             $bindvars[] = $object;
             $bindvars[] = 'forum_post_topic_and_thread';
             $forumId = $info['forumId'];
             $bindvars[] = $forumId;
+        } elseif ($event == 'forum_post_topic_changed') {
+            $mid = "(`event`=? or `event`=?) and (`object`=? or `object`='*')";
+            $bindvars[] = $event;
+            $bindvars[] = 'forum_post_topic_and_thread_changed';
+            $bindvars[] = $object;
+        } elseif ($event == 'forum_post_thread_changed') {
+            $mid = "(`event`=? and (`object`=? or `object`='*')) or (`event`=? and (`object`=? or `object`='*'))";
+            $bindvars[] = $event;
+            $bindvars[] = $object;
+            $bindvars[] = 'forum_post_topic_and_thread_changed';
+            $bindvars[] = $object;
         } else {
             $extraEvents = "";
             if (substr_count($event, 'article_')) {
@@ -1320,10 +1331,12 @@ class TikiLib extends TikiDb_Bridge
                         $res['perm'] = ($this->user_has_perm_on_object($res['user'], $object, 'blog', 'tiki_p_read_blog') ||
                                 $this->user_has_perm_on_object($res['user'], $object, 'comments', 'tiki_p_read_comments'));
                         break;
+                    case 'forum_post_topic_changed':
                     case 'forum_post_topic':
                         $res['perm'] = ($this->user_has_perm_on_object($res['user'], $object, 'forum', 'tiki_p_forum_read') ||
                                 $this->user_has_perm_on_object($res['user'], $object, 'forum', 'tiki_p_admin_forum'));
                         break;
+                    case 'forum_post_thread_changed':
                     case 'forum_post_thread':
                         $res['perm'] = ($this->user_has_perm_on_object($res['user'], $object, 'thread', 'tiki_p_forum_read') ||
                                 $this->user_has_perm_on_object($res['user'], $object, 'forum', 'tiki_p_admin_forum'));

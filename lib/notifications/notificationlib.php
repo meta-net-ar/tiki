@@ -188,6 +188,34 @@ class NotificationLib extends TikiLib
             'available' => $prefs['feature_user_watches_translations'] == 'y',
         ];
 
+        $watches['forum_post_topic'] = [
+            'label' => tr('A new topic is posted in the forum') ,
+            'type' => 'forum',
+            'url' => 'tiki-forums.php',
+            'available' => $prefs['feature_forums'] == 'y'
+        ];
+
+        $watches['forum_post_topic_and_thread'] = [
+            'label' => tr('A new topic or a reply is posted in the forum') ,
+            'type' => 'forum',
+            'url' => 'tiki-forums.php',
+            'available' => $prefs['feature_forums'] == 'y'
+        ];
+
+        $watches['forum_post_topic_changed'] = [
+            'label' => tr('A topic in the forum is modified'),
+            'type' => 'forum',
+            'url' => 'tiki-forums.php',
+            'available' => $prefs['feature_forums'] == 'y',
+        ];
+
+        $watches['forum_post_topic_and_thread_changed'] = [
+            'label' => tr('A topic or a reply in the forum is modified'),
+            'type' => 'forum',
+            'url' => 'tiki-forums.php',
+            'available' => $prefs['feature_forums'] == 'y',
+        ];
+
         foreach ($watches as $key => $watch) {
             if (array_key_exists('available', $watch) && ! $watch['available']) {
                 unset($watches[$key]);
