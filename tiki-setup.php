@@ -441,15 +441,82 @@ if ($prefs['pwa_feature'] == 'y') { //pwa test propose, pages to cache
 
 Sections::onSectionChange(function ($section) use ($prefs, $headerlib, $smarty) {
     $customRobots = null;
-    if ($prefs['metatag_robotscustom'] == 'y') {
-        $object = current_object();
-        if ($object && $object['type'] == 'wiki page') {
-            $wikilib = TikiLib::lib('wiki');
-            $customRobots = $wikilib->getPageMetatagRobotscustom($object['object']);
-            if (! empty($customRobots)) {
-                $smarty->assign('metatag_robotscustom', $customRobots);
-                $headerlib->setXRobotsTag($customRobots);
+    $smarty->assign('metatag_object_description', '');
+    $smarty->assign('metatag_object_keywords', '');
+    $smarty->assign('metatag_robotscustom', '');
+
+    $object = current_object();
+    if ($object) {
+        $attributelib = TikiLib::lib('attribute');
+        $getLocalizedAttribute = function (array $attributes, string $attribute) use ($prefs): string {
+            $language = $prefs['language'] ?? '';
+            if (! empty($language) && ($prefs['site_language'] ?? '') !== $language) {
+                $localizedAttribute = $attribute . '.' . $language;
+                if (! empty($attributes[$localizedAttribute])) {
+                    return $attributes[$localizedAttribute];
+                }
             }
+
+            return $attributes[$attribute] ?? '';
+        };
+        $attributes = $attributelib->get_attributes($object['type'], $object['object']);
+
+        $objectDescription = $getLocalizedAttribute($attributes, 'tiki.object.metatag.description');
+        $objectKeywords = $getLocalizedAttribute($attributes, 'tiki.object.metatag.keywords');
+        $objectRobots = $getLocalizedAttribute($attributes, 'tiki.object.metatag.robots');
+
+        if (empty($objectRobots) && $prefs['metatag_robotscustom'] == 'y' && $object['type'] == 'wiki page') {
+            $wikilib = TikiLib::lib('wiki');
+            $objectRobots = $wikilib->getPageMetatagRobotscustom($object['object']);
+        }
+
+        if (! empty($objectDescription)) {
+            $smarty->assign('metatag_object_description', $objectDescription);
+        }
+        if (! empty($objectKeywords)) {
+            $smarty->assign('metatag_object_keywords', $objectKeywords);
+        }
+
+        if ($prefs['feature_categories'] === 'y' && (empty($objectDescription) || empty($objectKeywords) || empty($objectRobots))) {
+            $categoryIds = [];
+            if ($object['type'] === 'category') {
+                $categoryIds[] = (int) $object['object'];
+            } else {
+                $categoryIds = TikiLib::lib('categ')->get_object_categories($object['type'], $object['object']);
+            }
+
+            foreach ($categoryIds as $categoryId) {
+                $categoryAttributes = $attributelib->get_attributes('category', $categoryId);
+                if (empty($objectDescription)) {
+                    $categoryDescription = $getLocalizedAttribute($categoryAttributes, 'tiki.category.metatag.description');
+                    if (! empty($categoryDescription)) {
+                        $objectDescription = $categoryDescription;
+                        $smarty->assign('metatag_object_description', $objectDescription);
+                    }
+                }
+                if (empty($objectKeywords)) {
+                    $categoryKeywords = $getLocalizedAttribute($categoryAttributes, 'tiki.category.metatag.keywords');
+                    if (! empty($categoryKeywords)) {
+                        $objectKeywords = $categoryKeywords;
+                        $smarty->assign('metatag_object_keywords', $objectKeywords);
+                    }
+                }
+                if (empty($objectRobots)) {
+                    $categoryRobots = $getLocalizedAttribute($categoryAttributes, 'tiki.category.metatag.robots');
+                    if (! empty($categoryRobots)) {
+                        $objectRobots = $categoryRobots;
+                    }
+                }
+                if (! empty($objectDescription) && ! empty($objectKeywords) && ! empty($objectRobots)) {
+                    break;
+                }
+            }
+        }
+
+        if (! empty($objectRobots)) {
+            $customRobots = $objectRobots;
+            $smarty->assign('metatag_robotscustom', $customRobots);
+            $headerlib->setXRobotsTag($customRobots);
         }
     }
 

@@ -22,6 +22,9 @@ $inputConfiguration = [
             'sort_mode'         => 'alnumdash',      //get
             'name'         => 'striptags',           //post
             'description'  => 'xss',                 //post
+            'metatag_description' => 'striptags',    //post
+            'metatag_keywords'    => 'striptags',    //post
+            'metatag_robots'      => 'striptags',    //post
             'pollId'            => 'int',            //post
             'faqId'             => 'int',            //post
             'trackerId'         => 'int',            //post
@@ -276,6 +279,7 @@ if (
 }
 if (isset($_REQUEST["save"]) && isset($_REQUEST["name"]) && strlen($_REQUEST["name"]) > 0 && $access->checkCsrf()) {
     // Save
+    $categorySaved = false;
     if (isset($_REQUEST["name"], $_REQUEST["description"])) {
         $validateNameFieldLength = Feedback::validateFieldLength("Name", $_REQUEST["name"], CategLib::MAX_CATEGORY_NAME_LENGTH);
         $validateDescriptionFieldLength = Feedback::validateFieldLength("Description", $_REQUEST["description"], CategLib::MAX_CATEGORY_DESCRIPTION_LENGTH);
@@ -305,6 +309,7 @@ if (isset($_REQUEST["save"]) && isset($_REQUEST["name"]) && strlen($_REQUEST["na
                     $userlib->remove_object_permission('', $_REQUEST['categId'], 'category', '');
                     $userlib->copy_object_permissions($_REQUEST['parentId'], $_REQUEST['categId'], 'category');
                 }
+                $categorySaved = true;
                 Feedback::success(tr('Category %0 updated', htmlspecialchars($_REQUEST["name"])));
             } catch (Exception $e) {
                 $errors['mes'] = $e->getMessage();
@@ -324,10 +329,18 @@ if (isset($_REQUEST["save"]) && isset($_REQUEST["name"]) && strlen($_REQUEST["na
                 $userlib->copy_object_permissions($_REQUEST['parentId'], $newcategId, 'category');
                 Perms::getInstance()->clear();
             }
+            $categorySaved = true;
             Feedback::success(tr('Category %0 created', htmlspecialchars($_REQUEST["name"])));
         } catch (Exception $e) {
             $errors['mes'] = $e->getMessage();
         }
+    }
+
+    if ($categorySaved && ! empty($_REQUEST["categId"])) {
+        $attributelib = TikiLib::lib('attribute');
+        $attributelib->set_attribute('category', $_REQUEST["categId"], 'tiki.category.metatag.description', $_REQUEST['metatag_description'] ?? '');
+        $attributelib->set_attribute('category', $_REQUEST["categId"], 'tiki.category.metatag.keywords', $_REQUEST['metatag_keywords'] ?? '');
+        $attributelib->set_attribute('category', $_REQUEST["categId"], 'tiki.category.metatag.robots', $_REQUEST['metatag_robots'] ?? '');
     }
 
     $cRolesInput = $_REQUEST["categoryRole"] ?? [];
@@ -429,6 +442,13 @@ if (isset($_REQUEST['import']) && ! empty($_FILES['csvlist']['tmp_name']) && $ac
 $smarty->assign('categId', $_REQUEST["categId"]);
 $smarty->assign('categoryName', $info["name"]);
 $smarty->assign('description', $info["description"]);
+$categoryAttributes = [];
+if (! empty($_REQUEST["categId"])) {
+    $categoryAttributes = TikiLib::lib('attribute')->get_attributes('category', $_REQUEST["categId"]);
+}
+$smarty->assign('category_metatag_description', $categoryAttributes['tiki.category.metatag.description'] ?? '');
+$smarty->assign('category_metatag_keywords', $categoryAttributes['tiki.category.metatag.keywords'] ?? '');
+$smarty->assign('category_metatag_robots', $categoryAttributes['tiki.category.metatag.robots'] ?? '');
 $smarty->assign('MAX_CATEGORY_NAME_LENGTH', CategLib::MAX_CATEGORY_NAME_LENGTH);
 $smarty->assign('MAX_CATEGORY_DESCRIPTION_LENGTH', CategLib::MAX_CATEGORY_DESCRIPTION_LENGTH);
 if (isset($info["tplGroupContainerId"])) {
