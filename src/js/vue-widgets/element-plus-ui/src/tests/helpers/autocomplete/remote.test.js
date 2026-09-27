@@ -66,7 +66,10 @@ describe("Autocomplete remote helper functions", () => {
 
         test.each([
             ["the request fails", () => vi.spyOn(window, "fetch").mockRejectedValueOnce(new Error("network"))],
-            ["the server answers with an error status", () => vi.spyOn(window, "fetch").mockResolvedValueOnce({ ok: false, status: 500, json: vi.fn() })],
+            [
+                "the server answers with an error status",
+                () => vi.spyOn(window, "fetch").mockResolvedValueOnce({ ok: false, status: 500, json: vi.fn() }),
+            ],
         ])("calls the callback with an empty list when %s", async (_, mockFetch) => {
             const callback = vi.fn();
             vi.spyOn(console, "error").mockImplementation(() => {});
