@@ -32,10 +32,11 @@
     },
     "scripts" : {
         "checkEnvironment:engine" : "node src/js/build_utils/engineCheck.js",
-        "checkEnvironment:validNodeModules" : "npm ls",
+        "checkEnvironment:validNodeModules" : "npm ls --workspaces --include-workspace-root",
         "checkEnvironmentComment" : "The idea is to emulate running all processes sequentially with && (fail if any return a non zero exit code), but be compatible with the different shells on windows",
         "checkEnvironment" : "run-s --print-label \"checkEnvironment:*\"",
         "prebuild" : "run-s --print-label \"checkEnvironment\"",
+        "prebuild:js" : "npm run checkEnvironment",
         "build:generateIconList" : "node lib/iconGeneratorNodeWrapper.js",
         "build:js" : "vite --config=src/js/vite.config.mjs build --mode=production",
         "build:scss" : "npm run build -w src/scss",
