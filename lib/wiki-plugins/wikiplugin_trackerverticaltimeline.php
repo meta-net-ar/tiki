@@ -20,7 +20,7 @@ function wikiplugin_trackerverticaltimeline_info()
             'title' => [
                 'required' => true,
                 'name' => tra('Title Field'),
-                'description' => tr('Tracker Field ID, or Field Permanent Name, if %0, containing the item title.', '<code>usePermNames="y"</code>'),
+                'description' => tr('Tracker Field ID, or Field Permanent Name, containing the item title.'),
                 'since' => '29.0',
                 'filter' => 'text',
                 'default' => '',
@@ -44,7 +44,7 @@ function wikiplugin_trackerverticaltimeline_info()
             'url' => [
                 'required' => false,
                 'name' => tra('Url Field'),
-                'description' => tr('Tracker Field ID, or Field Permanent Name, if %0, containing the url, link to go where when we click on the title of the item.', '<code>usePermNames="y"</code>'),
+                'description' => tr('Tracker Field ID, or Field Permanent Name, containing the url, link to go where when we click on the title of the item.'),
                 'since' => '29.0',
                 'filter' => 'text',
                 'default' => '',
@@ -65,8 +65,8 @@ function wikiplugin_trackerverticaltimeline_info()
             'date' => [
                 'required' => true,
                 'name' => tra('Date of event'),
-                'description' => tr('Tracker Field ID, or Field Permanent Name, if %0, containing the element start date. The field must be a
-                    datetime/jscalendar field.', '<code>usePermNames="y"</code>'),
+                'description' => tr('Tracker Field ID, or Field Permanent Name, containing the element start date. The field must be a
+                    datetime/jscalendar field.'),
                 'since' => '29.0',
                 'filter' => 'text',
                 'profile_reference' => 'tracker_field',
@@ -118,7 +118,7 @@ function wikiplugin_trackerverticaltimeline_info()
             'image_field' => [
                 'required' => false,
                 'name' => tra('Image Field'),
-                'description' => tr('Tracker Field ID, or Field Permanent Name, if %0, containing the image file.', '<code>usePermNames="y"</code>'),
+                'description' => tr('Tracker Field ID, or Field Permanent Name, containing the image file.'),
                 'since' => '29.0',
                 'filter' => 'text',
                 'default' => '',

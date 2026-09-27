@@ -79,7 +79,7 @@ class WikiPlugin_Helper
             'tracker' => [
                 'required' => false,
                 'name' => tr('Tracker'),
-                'description' => tr('Tracker ID, or Tracker Permanent Name, if %0.', '<code>usePermNames="y"</code>'),
+                'description' => tr('Tracker ID, or Tracker Permanent Name'),
                 'since' => '30.2',
                 'filter' => 'text',
                 'profile_reference' => 'tracker',
