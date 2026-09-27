@@ -146,6 +146,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-iot-dashboard-all": resolve(import.meta.dirname, "tiki-iot/dashboard-all.js"),
         "tiki-mermaid": resolve(import.meta.dirname, "tiki-mermaid/mermaid.js"),
         "tiki-lottie": resolve(import.meta.dirname, "tiki-lottie/lottie.js"),
+        "tiki-plugin-zones": resolve(import.meta.dirname, "tiki-plugin-zones/index.js"),
         "tiki-vue-sfc-loader": resolve(import.meta.dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(import.meta.dirname, "tiki-toast-ui/toast-index.js"),
         "@tiki/modules/search": resolve(import.meta.dirname, "@tiki/modules/search.js"),

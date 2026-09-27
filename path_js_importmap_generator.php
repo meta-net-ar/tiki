@@ -163,6 +163,9 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 /* src/js/tiki-mermaid */
                 "@mermaidPack" => $tikiUrl . JS_ASSETS_PATH . "/tiki-mermaid.js",
 
+                /* src/js/tiki-plugin-zones */
+                "@tiki-plugin-zones" => $tikiUrl . JS_ASSETS_PATH . "/tiki-plugin-zones.js",
+
                 /* src/js/tiki-sentry-browser */
                 "@tiki-modules/sentryBrowser" => $tikiUrl . JS_ASSETS_PATH . "/tiki-sentry-browser.js",
 

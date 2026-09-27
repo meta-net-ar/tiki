@@ -165,7 +165,8 @@
                                 <a class="dropdown-item" {ajax_href template="tiki-editpage.tpl"}tiki-editpage.php?page={$page|escape:"url"}{if !empty($page_ref_id) and (empty($needsStaging) or $needsStaging neq 'y')}&amp;page_ref_id={$page_ref_id}{/if}{/ajax_href}>
                                         {icon name="edit"} {tr}Edit{/tr}
                                         {$hasPageAction="1"}</a>
-                                {if $prefs.wiki_edit_icons_toggle eq 'y' and ($prefs.wiki_edit_plugin eq 'y' or $prefs.wiki_edit_section eq 'y')}
+                                {* nothing left to toggle when the only icons are plugin ones and those are replaced by the highlight *}
+                                {if $prefs.wiki_edit_icons_toggle eq 'y' and ($prefs.wiki_edit_section eq 'y' or ($prefs.wiki_edit_plugin eq 'y' and $prefs.wiki_edit_plugin_mode neq 'zone'))}
                                     {jq}
                                         $("#wiki_plugin_edit_view").on("click", function () {
                                         var $icon = $("#wiki_plugin_edit_view");

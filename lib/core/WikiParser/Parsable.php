@@ -286,43 +286,93 @@ class WikiParser_Parsable extends ParserLib
             if ($this->plugin_is_editable($plugin_name, $arguments) && (empty($this->option['preview_mode']) || ! $this->option['preview_mode']) && empty($this->option['indexing']) && (empty($this->option['print']) || ! $this->option['print']) && ! $this->option['suppress_icons']) {
                 $headerlib = TikiLib::lib('header');
 
-                $id = 'plugin-edit-' . $plugin_name . $current_index;
+                // Kept to [\w-] so it is safe inside the markers below, inside an HTML
+                // attribute and inside the jQuery selector of the handler added underneath.
+                $id = preg_replace('/[^\w-]/', '', 'plugin-edit-' . $plugin_name . $current_index);
                 if (strlen($plugin_data) > 2000) {
                     $plugin_data = '~same~';
                 }
 
-                $headerlib->add_js(
-                    "\$(function() {
-if ( \$('#$id') ) {
-\$('#$id').on('click', function(event) {
-    popupPluginForm("
-                    . json_encode('editwiki')
-                    . ', '
-                    . json_encode($plugin_name)
-                    . ', '
-                    . json_encode($current_index ?? '')
-                    . ', '
-                    . json_encode($this->option['page'])
-                    . ', '
-                    . json_encode($arguments)
-                    . ', '
-                    . json_encode($this->option['is_markdown'])
-                    . ', '
-                    . json_encode($this->unprotectSpecialChars($plugin_data, true)) //we restore it back to html here so that it can be edited, we want no modification, ie, it is brought back to html
-                    . ", event.target);
-} );
-}
-} );
-"
-                );
+                // icon: the behaviour before Tiki 31, only the icon after the plugin.
+                // zone: the content is highlighted on mouse over and carries the edit button, so
+                //       neither the icon nor its click handler are emitted at all.
+                // both: the highlight, and the icon after the plugin as before.
+                $pluginMode = $prefs['wiki_edit_plugin_mode'] ?? 'zone';
 
-                $displayIcon = $prefs['wiki_edit_icons_toggle'] != 'y' || (isset($_COOKIE['wiki_plugin_edit_view']) && $_COOKIE['wiki_plugin_edit_view']);
+                if ($pluginMode === 'zone') {
+                    // The module opens the form itself, from the parameters registered here
+                    // under the same id as the markers around the output.
+                    $headerlib->add_js(
+                        'window.tikiPluginZoneData = window.tikiPluginZoneData || {};'
+                        . 'window.tikiPluginZoneData[' . json_encode($id) . '] = ' . json_encode([
+                            'type' => $plugin_name,
+                            'index' => $current_index ?? '',
+                            'page' => $this->option['page'],
+                            'args' => $arguments,
+                            'isMarkdown' => $this->option['is_markdown'],
+                            'body' => $this->unprotectSpecialChars($plugin_data, true),
+                        ]) . ';'
+                    );
+                } else {
+                    $headerlib->add_js(
+                        "\$(function() {
+                            if ( \$('#$id') ) {
+                                \$('#$id').on('click', function(event) {
+                                    popupPluginForm("
+                                        . json_encode('editwiki')
+                                        . ', '
+                                        . json_encode($plugin_name)
+                                        . ', '
+                                        . json_encode($current_index ?? '')
+                                        . ', '
+                                        . json_encode($this->option['page'])
+                                        . ', '
+                                        . json_encode($arguments)
+                                        . ', '
+                                        . json_encode($this->option['is_markdown'])
+                                        . ', '
+                                        . json_encode($this->unprotectSpecialChars($plugin_data, true)) //we restore it back to html here so that it can be edited, we want no modification, ie, it is brought back to html
+                                        . ", event.target);
+                                    } );
+                                }
+                            } );
+                        "
+                    );
+                }
 
-                $ret .= '~np~' .
-                        '<a id="' . $id . '" href="javascript:void(1)" class="editplugin"' . ' aria-label="Edit plugin" ' . ($displayIcon ? '' : ' style="display:none;"') . '>' .
+                $displayIcon = ($prefs['wiki_edit_icons_toggle'] ?? 'n') != 'y'
+                    || (isset($_COOKIE['wiki_plugin_edit_view']) && $_COOKIE['wiki_plugin_edit_view']);
+
+                if ($pluginMode !== 'icon') {
+                    $headerlib->add_js_module(
+                        'import initPluginZones from "@tiki-plugin-zones"; initPluginZones('
+                        . json_encode(['mode' => $pluginMode]) . ');'
+                    );
+                }
+
+                $startMarker = '<!--tiki-plugin:start ' . $id . '-->';
+                $endMarker = '<!--tiki-plugin:end ' . $id . '-->';
+                $pluginStart = $match->getStart();
+                $atLineStart = $pluginStart === 0 || substr($matches->getText(), $pluginStart - 1, 1) === "\n";
+
+                if ($pluginMode === 'icon') {
+                    $startMarker = $endMarker = ''; // nothing to mark, the icon is on its own
+                } elseif ($atLineStart && preg_match('/^[^<~\p{L}\p{N}]/u', $ret)) {
+                    $ret = $startMarker . "\n" . $ret;
+                } else {
+                    $ret = '~np~' . $startMarker . '~/np~' . $ret;
+                }
+
+                $icon = '';
+                if ($pluginMode !== 'zone') {
+                    $icon = '<a id="' . $id . '" href="javascript:void(1)" class="editplugin"' .
+                        ' data-plugin="' . htmlspecialchars($plugin_name, ENT_QUOTES) . '" data-index="' . (int) $current_index . '"' .
+                        ' aria-label="Edit plugin" ' . ($displayIcon ? '' : ' style="display:none;"') . '>' .
                         \SmartyTiki\FunctionHandler\Icon::render(['name' => 'plugin', 'iclass' => 'tips', 'ititle' => tra('Edit plugin') . ':' . ucfirst($plugin_name)], $smarty->getEmptyInternalTemplate()) .
-                        '</a>' .
-                        '~/np~';
+                        '</a>';
+                }
+
+                $ret .= '~np~' . $endMarker . $icon . '~/np~';
             }
 
             // End plugin handling

@@ -64,6 +64,9 @@
                     {preference name=feature_wiki_undo}
                     {preference name=wiki_edit_minor}
                     {preference name=wiki_edit_plugin}
+                    <div class="adminoptionboxchild" id="wiki_edit_plugin_childcontainer">
+                        {preference name=wiki_edit_plugin_mode}
+                    </div>
                     {preference name=wiki_edit_section}
                     <div class="adminoptionboxchild" id="wiki_edit_section_childcontainer">
                         {preference name=wiki_edit_icons_toggle}
