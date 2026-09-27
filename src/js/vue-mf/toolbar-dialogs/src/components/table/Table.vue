@@ -83,9 +83,15 @@ function _shown() {
 function _insert() {
     let output = "";
     if (toolbarObject.value.editor.isMarkdown) {
-        cells.value.forEach(function (row) {
-            output += "| " + row.join(" | ") + " |\n"
-        })
+        const markdownRows = cells.value.map((row, index) => {
+            if (index !== 1) {
+                return row;
+            }
+            return row.map((cell) => cell || "---");
+        });
+        markdownRows.forEach(function (row) {
+            output += "| " + row.join(" | ") + " |\n";
+        });
         output = output.replace("  |", " |").replace("|  ", "| ")
         output = output.substring(0, output.length - 1)
     } else {
