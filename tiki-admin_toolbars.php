@@ -133,7 +133,7 @@ if (! empty($_REQUEST['save_tool']) && ! empty($_REQUEST['tool_name'])) {   // i
         $_REQUEST['tool_name'],
         $_REQUEST['tool_label'],
         $_REQUEST['tool_icon'],
-        $_REQUEST['tool_token'],
+        $_REQUEST['tool_token'] ?? '',
         $_REQUEST['tool_syntax'],
         $_REQUEST['tool_type'],
         $_REQUEST['tool_plugin']

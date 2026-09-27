@@ -115,11 +115,11 @@
                         <fieldset class="p-0 border-0 mt-4">
                             <div class="mb-3">
                                 <label for="tool_name">{tr}Name:{/tr}</label>
-                                <input type="text" name="tool_name" id="tool_name" class="form-control p-2 mb-3" minlength="2" maxlength="16">
+                                <input type="text" name="tool_name" id="tool_name" class="form-control p-2 mb-3" minlength="2" maxlength="16" required>
                             </div>
                             <div class="mb-3">
                                 <label for="tool_label">{tr}Label:{/tr}</label>
-                                <input type="text" name="tool_label" id="tool_label" class="form-control p-2 mb-3" minlength="1" maxlength="80">
+                                <input type="text" name="tool_label" id="tool_label" class="form-control p-2 mb-3" minlength="1" maxlength="80" required>
                             </div>
                             <div class="mb-3">
                                 <label for="tool_icon">{tr}Icon:{/tr}</label>
@@ -128,24 +128,24 @@
                             <div class="mb-3">
                                 <label for="tool_type" class="d-block">{tr}Type:{/tr}</label>
                                 <select name="tool_type" id="tool_type" class="form-control d-block">
-                                    <option value="Inline">Inline</option>
-                                    <option value="Block">Block</option>
-                                    <option value="LineBased">LineBased</option>
-                                    <option value="Picker">Picker</option>
-                                    <option value="Separator">Separator</option>
+                                    <option value="Inline" selected>{tr}Inline{/tr}</option>
+                                    <option value="Block">{tr}Block{/tr}</option>
+                                    <option value="LineBased">{tr}LineBased{/tr}</option>
+                                    <option value="Picker">{tr}Picker{/tr}</option>
+                                    <option value="Separator">{tr}Separator{/tr}</option>
                                     {if $prefs.feature_wysiwyg eq 'y'}
-                                        <option value="FckOnly">FckOnly</option>
+                                        <option value="FckOnly">{tr}FckOnly{/tr}</option>
                                     {/if}
-                                    <option value="Fullscreen">Fullscreen</option>
-                                    <option value="TextareaResize">TextareaResize</option>
-                                    <option value="Helptool">Helptool</option>
-                                    <option value="FileGallery">FileGallery</option>
-                                    <option value="Wikiplugin">Wikiplugin</option>
+                                    <option value="Fullscreen">{tr}Fullscreen{/tr}</option>
+                                    <option value="TextareaResize">{tr}TextareaResize{/tr}</option>
+                                    <option value="Helptool">{tr}Helptool{/tr}</option>
+                                    <option value="FileGallery">{tr}FileGallery{/tr}</option>
+                                    <option value="Wikiplugin">{tr}Wikiplugin{/tr}</option>
                                 </select>
                             </div>
                             <div class="mb-3">
                                 <label for="tool_syntax" class="d-block">{tr}Syntax:{/tr}</label>
-                                <input type="text" name="tool_syntax" id="tool_syntax" class="form-control d-block p-2 mb-3">
+                                <input type="text" name="tool_syntax" id="tool_syntax" class="form-control d-block p-2 mb-3" required>
                             </div>
                             <div class="mb-3">
                                 <label for="tool_plugin">{tr}Plugin name:{/tr}</label>
@@ -169,9 +169,9 @@
                         </fieldset>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-danger delete">Delete</button>
-                        <button type="submit" class="btn btn-primary save">Save</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{tr}Close{/tr}</button>
+                        <button type="submit" class="btn btn-danger delete">{tr}Delete{/tr}</button>
+                        <button type="submit" class="btn btn-primary save">{tr}Save{/tr}</button>
                     </div>
                 </form>
             </div>
