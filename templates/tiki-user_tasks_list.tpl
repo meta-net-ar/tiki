@@ -3,62 +3,92 @@
 {* start ************ Task list ***************}
 <form action="tiki-user_tasks.php" method="post">
     {ticket}
-    <table class="table table-hover formcolor">
+    <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
+    <input type="hidden" name="offset" value="{$offset|escape}">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 bg-light p-3 border rounded mb-3">
+        <div class="d-flex align-items-center gap-2">
+            <input type="text" name="find" class="form-control form-control-sm w-auto" placeholder="{tr}Search tasks...{/tr}" value="{$find|escape}">
+            <button type="submit" class="btn btn-primary btn-sm" name="search" title="{tr}Search{/tr}">{icon name="search"}</button>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="taskFiltersDropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    {icon name="filter"} {tr}Filters{/tr}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end p-3 shadow" aria-labelledby="taskFiltersDropdown" style="min-width: 220px;">
+                    <li>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="show_private" id="show_private" {if $show_private}checked="checked"{/if}>
+                            <label class="form-check-label" for="show_private">{tr}Private{/tr}</label>
+                        </div>
+                    </li>
+                    {if $tiki_p_tasks_receive eq 'y'}
+                    <li>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="show_received" id="show_received" {if $show_received}checked="checked"{/if}>
+                            <label class="form-check-label" for="show_received">{tr}Received{/tr}</label>
+                        </div>
+                    </li>
+                    {/if}
+                    {if $tiki_p_tasks_send eq 'y'}
+                    <li>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="show_submitted" id="show_submitted" {if $show_submitted}checked="checked"{/if}>
+                            <label class="form-check-label" for="show_submitted">{tr}Submitted{/tr}</label>
+                        </div>
+                    </li>
+                    {/if}
+                    {if $tiki_p_tasks_receive eq 'y' or $tiki_p_tasks_send eq 'y'}
+                    <li>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="show_shared" id="show_shared" {if $show_shared}checked="checked"{/if}>
+                            <label class="form-check-label" for="show_shared">{tr}Shared{/tr}</label>
+                        </div>
+                    </li>
+                    {/if}
+                    <li>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="show_trash" id="show_trash" {if $show_trash}checked="checked"{/if}>
+                            <label class="form-check-label" for="show_trash">{tr}Trash{/tr}</label>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="show_completed" id="show_completed" {if $show_completed}checked="checked"{/if}>
+                            <label class="form-check-label" for="show_completed">{tr}Completed{/tr}</label>
+                        </div>
+                    </li>
+                    {if $task_admin or $admin_mode}
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="show_admin" id="show_admin" {if $show_admin}checked="checked"{/if}>
+                            <label class="form-check-label text-primary fw-bold" for="show_admin">{tr}All Shared Tasks{/tr}</label>
+                        </div>
+                    </li>
+                    {/if}
+                </ul>
+            </div>
+            
+            <button type="submit" class="btn btn-outline-primary btn-sm" name="reload" title="{tr}Apply filters{/tr}">
+                {icon name="refresh"} {tr}Apply{/tr}
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+    <table class="table table-hover formcolor mb-0">
     <thead>
         <tr>
-            <td colspan="6">
-                <div class="row align-items-center">
-                    <div class="col-md-3">
-                        <label>{tr}Tasks per page{/tr}</label>
-                        <select name="tasks_maxRecords" class="form-select form-select-sm d-inline-block w-auto">
-                        <option value="-1" {if $prefs.tasks_maxRecords eq -1}selected="selected"{/if}>{tr}All{/tr}</option>
-                        {foreach from=array(2, 5, 10, 20, 30, 40, 50) item=val}
-                        <option value="{$val}" {if $prefs.tasks_maxRecords eq $val}selected="selected"{/if}>{$val}</option>
-                        {/foreach}
-                        </select>
-                    </div>
-
-                    <div class="col-md-9 text-center">
-                        <div class="mb-2">
-                            <strong>{tr}Show:{/tr}</strong>
-                            <label class="mx-1"><input name="show_private" {if $show_private}checked="checked"{/if} type="checkbox"> {tr}Private{/tr}</label>
-                            
-                            {if $tiki_p_tasks_receive eq 'y'}
-                                <label class="mx-1"><input name="show_received" {if $show_received}checked="checked"{/if} type="checkbox"> {tr}Received{/tr}</label>
-                            {/if}
-                            
-                            {if $tiki_p_tasks_send eq 'y'}
-                                <label class="mx-1"><input name="show_submitted" {if $show_submitted}checked="checked"{/if} type="checkbox"> {tr}Submitted{/tr}</label>
-                            {/if}
-                            
-                            {if $tiki_p_tasks_receive eq 'y' or $tiki_p_tasks_send eq 'y'}
-                                <label class="mx-1"><input name="show_shared" {if $show_shared}checked="checked"{/if} type="checkbox"> {tr}Shared{/tr}</label>
-                            {/if}
-                            
-                            <label class="mx-1"><input name="show_trash" {if $show_trash}checked="checked"{/if} type="checkbox"> {tr}Trash{/tr}</label>
-                            <label class="mx-1"><input name="show_completed" {if $show_completed}checked="checked"{/if} type="checkbox"> {tr}Completed{/tr}</label>
-                            
-                            {if ($admin_mode)}
-                                <label class="mx-1 highlight text-primary">
-                                    <input name="show_admin" {if $show_admin}checked="checked"{/if} type="checkbox"> {tr}All Shared Tasks{/tr}
-                                </label>
-                            {/if}
-                        </div>
-                        <div>
-                            <input type="submit" class="btn btn-info btn-sm" name="reload" value="{tr}Reload{/tr}">
-                        </div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-
-        <tr>
-            <th style="width: 40px;">&nbsp;</th>
+            <th style="width: 40px;">
+                <input type="checkbox" class="form-check-input" id="selectAllTasks">
+            </th>
             <th><a href="tiki-user_tasks.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'title_desc'}title_asc{else}title_desc{/if}">{tr}Title{/tr}</a></th>
             <th><a href="tiki-user_tasks.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'start_desc'}start_asc{else}start_desc{/if}">{tr}Start{/tr}</a></th>
             <th><a href="tiki-user_tasks.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'end_desc'}end_asc{else}end_desc{/if}">{tr}End{/tr}</a></th>
             <th class="text-end"><a href="tiki-user_tasks.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'priority_desc'}priority_asc{else}priority_desc{/if}">{tr}Priority{/tr}</a></th>
-            <th class="text-end"><a href="tiki-user_tasks.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'percentage_desc'}percentage_asc{else}percentage_desc{/if}">{tr}Completed{/tr}</a></th>
+            <th class="text-end"><a href="tiki-user_tasks.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'percentage_desc'}percentage_asc{else}percentage_desc{/if}">{tr}Status{/tr}</a></th>
         </tr>
     </thead>
 
@@ -67,7 +97,7 @@
             {assign var=task value=$tasklist[task_i]}
             <tr>
                 <td class="prio{$task.priority} align-middle">
-                    <input {if $task.disabled}disabled="disabled"{/if} type="checkbox" name="task[{$task.taskId}]">
+                    <input {if $task.disabled}disabled="disabled"{/if} type="checkbox" name="task[{$task.taskId}]" class="form-check-input task-checkbox">
                     
                     {if $task.deleted}
                         {if $task.creator ne $user}
@@ -128,7 +158,19 @@
                 </td>
 
                 <td class="prio{$task.priority} text-end align-middle {if $task.status eq 'c'}text-decoration-line-through text-muted{/if}">
-                    {$task.priority}
+                    {if $task.priority eq 1}
+                        <span class="badge bg-secondary">{tr}Very Low{/tr}</span>
+                    {elseif $task.priority eq 2}
+                        <span class="badge bg-info">{tr}Low{/tr}</span>
+                    {elseif $task.priority eq 3}
+                        <span class="badge bg-success">{tr}Medium{/tr}</span>
+                    {elseif $task.priority eq 4}
+                        <span class="badge bg-warning text-dark">{tr}High{/tr}</span>
+                    {elseif $task.priority eq 5}
+                        <span class="badge bg-danger">{tr}Very High{/tr}</span>
+                    {else}
+                        {$task.priority}
+                    {/if}
                 </td>
 
                 <td class="prio{$task.priority} text-end align-middle">
@@ -150,28 +192,45 @@
     </tbody>
 
     <tfoot>
-        <tr>
-            <td colspan="3" class="align-bottom">
+        <tr class="table-light">
+            <td colspan="3" class="align-middle">
                 <div class="input-group input-group-sm w-auto">
-                    <span class="input-group-text">{icon name='ok'}</span>
                     <select name="action" class="form-select">
-                        <option value="">{tr}Select One{/tr}</option>
+                        <option value="">{tr}Bulk actions...{/tr}</option>
                         <option value="waiting_marked">{tr}Waiting{/tr}</option>
                         <option value="open_marked">{tr}Open{/tr}</option>
                         <option value="complete_marked">{tr}Completed{/tr}</option>
                         <option value="move_marked_to_trash">{tr}Trash{/tr}</option>
                         <option value="remove_marked_from_trash">{tr}Undo Trash{/tr}</option>
                     </select>
-                    <button type="submit" class="btn btn-primary" name="update_tasks">{tr}Go{/tr}</button>
+                    <button type="submit" class="btn btn-primary" name="update_tasks">{tr}Apply{/tr}</button>
                 </div>
             </td>
-            <td colspan="3" class="text-end align-bottom">
-                <button type="submit" class="btn btn-primary btn-sm" name="update_percentage">{tr}Apply{/tr}</button>
+            <td colspan="3" class="text-end align-middle">
+                <div class="d-flex align-items-center justify-content-end gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small text-muted text-nowrap m-0">{tr}Per page{/tr}</label>
+                        <select name="tasks_maxRecords" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                            <option value="-1" {if $prefs.tasks_maxRecords eq -1}selected="selected"{/if}>{tr}All{/tr}</option>
+                            {foreach from=array(2, 5, 10, 20, 30, 40, 50) item=val}
+                            <option value="{$val}" {if $prefs.tasks_maxRecords eq $val}selected="selected"{/if}>{$val}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary btn-sm" name="update_percentage">{tr}Save status changes{/tr}</button>
+                </div>
             </td>
         </tr>
     </tfoot>
 </table>
+</div>
 </form>
+
+{jq}
+$('#selectAllTasks').on('change', function() {
+    $('.task-checkbox').prop('checked', $(this).prop('checked'));
+});
+{/jq}
 
 {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 {* end ************ Task list ***************}
