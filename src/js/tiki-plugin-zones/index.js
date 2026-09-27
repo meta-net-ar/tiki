@@ -14,6 +14,7 @@ const END = new RegExp("^tiki-plugin:end (" + ID + ")$", "i");
 const HIDE_DELAY = 250; // ms, time to move the pointer from the content to the button
 const OFFSET = 3; // px, matches the outline-offset of .tiki-plugin-zone-outline
 const MIN_SIZE = 80; // px, under this the corners are too close together to be worth choosing
+const HYSTERESIS = 0.3; // how far past the middle the pointer goes before the corner changes
 
 const translate = (text) => (typeof window.tr === "function" ? window.tr(text) : text);
 
@@ -159,10 +160,10 @@ export default function initPluginZones(options = {}) {
 
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "tiki-plugin-zone-edit";
+    button.className = "btn btn-xs btn-primary tiki-plugin-zone-edit";
 
+    outline.appendChild(button);
     document.body.appendChild(outline);
-    document.body.appendChild(button);
 
     function show(zone, withButton, pointer) {
         clearTimeout(hideTimer);
@@ -197,22 +198,56 @@ export default function initPluginZones(options = {}) {
         button.setAttribute("aria-label", translate("Edit plugin") + " " + zone.name.toUpperCase());
         button.classList.add("shown");
 
-        const width = button.offsetWidth;
-        const height = button.offsetHeight;
         if (!corner) {
-            corner = {
-                right: pointer && box.width > MIN_SIZE ? pointer.x > box.left + box.width / 2 : rtl,
-                bottom: pointer && box.height > MIN_SIZE ? pointer.y > box.top + box.height / 2 : false,
-            };
+            corner = { right: rtl, bottom: false };
+        }
+        if (pointer && box.width > MIN_SIZE) {
+            const margin = Math.min((box.width / 2) * HYSTERESIS, 120);
+            const centre = box.left + box.width / 2;
+            if (pointer.x > centre + margin) {
+                corner.right = true;
+            } else if (pointer.x < centre - margin) {
+                corner.right = false;
+            }
+        }
+        if (pointer && box.height > MIN_SIZE) {
+            const margin = Math.min((box.height / 2) * HYSTERESIS, 120);
+            const centre = box.top + box.height / 2;
+            if (pointer.y > centre + margin) {
+                corner.bottom = true;
+            } else if (pointer.y < centre - margin) {
+                corner.bottom = false;
+            }
         }
 
-        const x = corner.right ? box.left + box.width + OFFSET - width : box.left - OFFSET;
-        let y = corner.bottom ? box.top + box.height + OFFSET : box.top - OFFSET - height;
-        if (y + scrollY < 0) {
-            y = box.top;
+        button.classList.toggle("is-right", corner.right);
+        button.classList.toggle("is-bottom", corner.bottom);
+        keepVisible();
+    }
+
+    /**
+     * A plugin can be taller than the window, and a page can load in the middle of one, which
+     * would leave the button out of sight. Keep it against the visible part of the zone.
+     */
+    function keepVisible() {
+        if (!current || !button.classList.contains("shown")) {
+            return;
         }
-        button.style.left = x + scrollX + "px";
-        button.style.top = y + scrollY + "px";
+
+        button.style.top = "";
+        button.style.bottom = "";
+
+        const zone = outline.getBoundingClientRect();
+        const rect = button.getBoundingClientRect();
+        const room = rect.height + OFFSET;
+
+        if (rect.top < 0 && zone.bottom > room) {
+            button.style.top = Math.max(0, -zone.top) + "px";
+            button.style.bottom = "auto";
+        } else if (rect.bottom > window.innerHeight && zone.top < window.innerHeight - room) {
+            button.style.top = Math.max(0, window.innerHeight - zone.top - rect.height) + "px";
+            button.style.bottom = "auto";
+        }
     }
 
     function hide(delay) {
@@ -286,6 +321,19 @@ export default function initPluginZones(options = {}) {
     });
 
     root.addEventListener("pointerleave", () => hide(HIDE_DELAY));
+
+    let pending = 0;
+    const follow = () => {
+        if (pending) {
+            return;
+        }
+        pending = requestAnimationFrame(() => {
+            pending = 0;
+            keepVisible();
+        });
+    };
+    window.addEventListener("scroll", follow, { passive: true });
+    window.addEventListener("resize", follow, { passive: true });
     button.addEventListener("pointerenter", () => clearTimeout(hideTimer));
     button.addEventListener("pointerleave", () => hide(HIDE_DELAY));
     button.addEventListener("click", () => openEditor(current, button));
