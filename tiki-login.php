@@ -98,7 +98,7 @@ if ($prefs['session_silent'] == 'y') {
 
 if ($prefs['auth_webauthn_enabled'] === 'y' && ! empty($_SESSION['webauthn_user'])) {
     $_REQUEST['user'] = $_SESSION['webauthn_user'];
-    $_REQUEST['pass'] = ! empty($_REQUEST['pass']) ? trim($_REQUEST['pass']) : $userlib->genPass();
+    $_REQUEST['pass'] = ! empty($_REQUEST['pass']) ? trim($_REQUEST['pass'], " \n\r\t\v\x00") : $userlib->genPass();
 }
 
 $twoFaPrevalidated = false;
@@ -184,8 +184,8 @@ if (isset($_REQUEST['su']) && $access->checkCsrf(true)) {
     }
     $access->redirect($_SESSION['loginfrom']);
 }
-$requestedUser = trim($_REQUEST['user'] ?? '') ?: false;
-$pass = trim($_REQUEST['pass'] ?? '') ?: false;
+$requestedUser = trim($_REQUEST['user'] ?? '', " \n\r\t\v\x00") ?: false;
+$pass = trim($_REQUEST['pass'] ?? '', " \n\r\t\v\x00") ?: false;
 $isvalid = false;
 $isdue = false;
 
@@ -306,8 +306,8 @@ if (
                     if ($prefs['feature_intertiki_imported_groups']) {
                         $groups = preg_split('/\s*,\s*/', $prefs['feature_intertiki_imported_groups']);
                         foreach ($groups as $group) {
-                            if (in_array(trim($group), $user_details['groups']) && $userlib->group_exists(trim($group))) {
-                                $userlib->assign_user_to_group($user, trim($group));
+                            if (in_array(trim($group, " \n\r\t\v\x00"), $user_details['groups']) && $userlib->group_exists(trim($group, " \n\r\t\v\x00"))) {
+                                $userlib->assign_user_to_group($user, trim($group, " \n\r\t\v\x00"));
                             }
                         }
                     } else {
@@ -325,7 +325,7 @@ if (
                         Feedback::errorAndDie(tra('No groups set on Intertiki client.'), \Laminas\Http\Response::STATUS_CODE_409);
                     }
                     foreach ($groups as $group) {
-                        $userlib->assign_user_to_group($user, trim($group));
+                        $userlib->assign_user_to_group($user, trim($group, " \n\r\t\v\x00"));
                     }
                 }
             } else {
@@ -485,7 +485,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
             $groups = $tikilib->getOne("SELECT `groups` FROM `tiki_invite` WHERE `id` = ?", [(int)$id_invite]);
             $groups = explode(',', $groups);
             foreach ($groups as $group) {
-                $userlib->assign_user_to_group($user, trim($group));
+                $userlib->assign_user_to_group($user, trim($group, " \n\r\t\v\x00"));
             }
             $tikilib->query("UPDATE `tiki_invited` SET `used`=? WHERE id_invite=?", ["logged", (int)$id_invited]);
 

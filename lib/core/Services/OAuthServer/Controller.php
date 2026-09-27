@@ -248,7 +248,7 @@ class Services_OAuthServer_Controller
         $repo = $oauthserverlib->getClientRepository();
         $client = $repo->get($client_id);
 
-        if (! $client || $client->getClientSecret() !== trim($client_secret)) {
+        if (! $client || $client->getClientSecret() !== trim($client_secret, " \n\r\t\v\x00")) {
             $response = new JsonResponse(403, [], 'Invalid client');
             return $this->utilities->processPsr7Response($response);
         }

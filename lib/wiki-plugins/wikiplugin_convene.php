@@ -215,14 +215,14 @@ function wikiplugin_convene($data, $params): string
         //start flat static text to prepared array
         $dataArray = [];
 
-        $lines = explode("\n", trim($data));
+        $lines = explode("\n", trim($data, " \n\r\t\v\x00"));
         sort($lines);
         foreach ($lines as $line) {
-            $line = trim($line);
+            $line = trim($line, " \n\r\t\v\x00");
 
             if (! empty($line) && str_contains($line, ':')) {
                 $parts = explode(':', $line);
-                $dataArray[trim($parts[0])] = trim($parts[1]);
+                $dataArray[trim($parts[0], " \n\r\t\v\x00")] = trim($parts[1], " \n\r\t\v\x00");
             }
         }
 
@@ -241,7 +241,7 @@ function wikiplugin_convene($data, $params): string
 
         // Validate and add default users
         foreach ($default_users as $username) {
-            $username = trim($username);
+            $username = trim($username, " \n\r\t\v\x00");
             if (! empty($username)) {
                 if ($userlib->user_exists($username)) {
                     $users[] = $username;
@@ -253,7 +253,7 @@ function wikiplugin_convene($data, $params): string
 
         // Validate and add users from default groups
         foreach ($default_groups as $groupname) {
-            $groupname = trim($groupname);
+            $groupname = trim($groupname, " \n\r\t\v\x00");
             if (! empty($groupname)) {
                 $group_users = $userlib->get_group_users($groupname);
                 $users = array_merge($users, $group_users);
@@ -263,7 +263,7 @@ function wikiplugin_convene($data, $params): string
 
         // Process default dates
         foreach ($default_dates as $date_str) {
-            $date_str = trim($date_str);
+            $date_str = trim($date_str, " \n\r\t\v\x00");
             if (! empty($date_str)) {
                 try {
                     $tz = TikiLib::lib('tiki')->get_display_timezone();

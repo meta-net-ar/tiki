@@ -1239,7 +1239,7 @@ class TikiAccessLib extends TikiLib
             $url = $prefs['tikiIndex'];
         }
 
-        if (trim($msg)) {
+        if (trim($msg, " \n\r\t\v\x00")) {
             $session = session_id();
             if (empty($session) && empty($_SESSION['loginfrom'])) {
                 // Can happen if session_silent is enabled. But does any instance enable session_silent?

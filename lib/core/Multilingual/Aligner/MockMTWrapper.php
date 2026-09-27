@@ -36,11 +36,11 @@ class Multilingual_Aligner_MockMTWrapper extends Multilingual_Aligner_SentenceAl
         $target_array = explode("<br/>", $target_file);
 
         for ($i = 0, $ct_a = count($target_array); $i < $ct_a; $i++) {
-            $target_array[$i] = trim($target_array[$i]);
+            $target_array[$i] = trim($target_array[$i], " \n\r\t\v\x00");
             //  $target_array[$i]=utf8_decode($target_array[$i]);
         }
         for ($i = 0, $cs_a = count($source_array); $i < $cs_a; $i++) {
-            $source_array[$i] = trim($source_array[$i]);
+            $source_array[$i] = trim($source_array[$i], " \n\r\t\v\x00");
         }
         for ($i = 0, $cs_a = count($source_array); $i < $cs_a; $i++) {
             $this->addSentencePair($source_array[$i], $source_lng, $target_array[$i], $target_lng);

@@ -97,11 +97,11 @@ class EditLib
      */
     public function assignCustomTipToSmarty(string $customTip, string $customTipTitle = ''): void
     {
-        if (trim($customTip) !== '') {
+        if (trim($customTip, " \n\r\t\v\x00") !== '') {
             $smarty = TikiLib::lib('smarty');
             $smarty->assign('customTip', $customTip);
 
-            if (trim($customTipTitle) !== '') {
+            if (trim($customTipTitle, " \n\r\t\v\x00") !== '') {
                 $smarty->assign('customTipTitle', $customTipTitle);
             } else {
                 $smarty->assign('customTipTitle', tr('Tip'));
@@ -449,7 +449,7 @@ class EditLib
             $p['wiki_lbr']++; // force wiki line break mode
 
             // does the link text match the target?
-            if ($target == trim($text)) {
+            if ($target == trim($text, " \n\r\t\v\x00")) {
                 $text = '';  // make sure walk_and_parse() does not append any text.
             } else {
                 $link .= '|'; // the text will be appended by walk_and_parse()
@@ -605,7 +605,7 @@ class EditLib
 
         for ($i = 0, $count_matches = count($matches[0]); $i < $count_matches; $i++) {
             $key = $matches[1][$i];
-            $value = trim($matches[2][$i]);
+            $value = trim($matches[2][$i], " \n\r\t\v\x00");
 
             /*
              * shortand list 'background:'
@@ -630,7 +630,7 @@ class EditLib
                 } // foreach shorthand
 
                 // keep unprocessed list entries
-                $value = trim($unprocessed);
+                $value = trim($unprocessed, " \n\r\t\v\x00");
             } // background:
 
             // save the result
@@ -977,12 +977,12 @@ class EditLib
                     // Open tag type
                     $style = $node['pars']['style']['value'] ?? '';
                     $styleAttrs = array_filter(explode(';', $style), function ($attr) {
-                        return ! empty(trim($attr));
+                        return ! empty(trim($attr, " \n\r\t\v\x00"));
                     });
                     // When Tiki syntax can't handle the current style attributes
                     if (count($styleAttrs)) {
                         $cssAttrs = array_map(function ($attr) {
-                            return trim(explode(':', $attr)[0]);
+                            return trim(explode(':', $attr)[0], " \n\r\t\v\x00");
                         }, $styleAttrs);
                         $tikiStyleAttrs = [
                             'text-align', 'font-weight', 'font-style', 'text-decoration',
@@ -1606,7 +1606,7 @@ class EditLib
                 if ($level < 1 || $level > 6) {
                     return $matches[0];
                 }
-                return "{tikiheading level=$level options=$matches[2]}" . trim($matches[3]) . "{/tikiheading}";
+                return "{tikiheading level=$level options=$matches[2]}" . trim($matches[3], " \n\r\t\v\x00") . "{/tikiheading}";
             }, $data);
             $data = preg_replace('/~~(.+?):(.+?)~~/', '{HTML()}<span style="color:$1">$2</span>{HTML}', $data);
             $data = preg_replace('/-\+(.+?)\+-/', '`$1`', $data);
@@ -2119,7 +2119,7 @@ class EditLib
                 // Handle any remaining quoted strings that might be malformed
                 $fontFamily = preg_replace('/([a-zA-Z0-9-]+)\s*,\s*([a-zA-Z0-9-]+)\s*,\s*([a-zA-Z0-9-]+)/', '$1, $2, $3', $fontFamily);
 
-                return 'font-family: ' . trim($fontFamily);
+                return 'font-family: ' . trim($fontFamily, " \n\r\t\v\x00");
             },
             $style
         );
@@ -2138,14 +2138,14 @@ class EditLib
                     // Replace inner double quotes with single quotes for other properties
                     $value = preg_replace('/"([^"]*)"/', "'$1'", $value);
                 }
-                return $property . ': ' . trim($value);
+                return $property . ': ' . trim($value, " \n\r\t\v\x00");
             },
             $style
         );
 
         // Clean up any malformed CSS and ensure proper semicolon termination
         $style = preg_replace('/\s*;\s*;+/', ';', $style); // Remove duplicate semicolons
-        $style = trim($style);
+        $style = trim($style, " \n\r\t\v\x00");
         if (! empty($style) && substr($style, -1) !== ';') {
             $style .= ';';
         }

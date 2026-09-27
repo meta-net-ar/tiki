@@ -286,8 +286,8 @@ if (! timezone) {
 
     $username_pattern = " / ^ ['\-_a-zA-Z0-9\.]*$/";
     if (is_string($prefs['username_pattern'])) {
-        if (trim($prefs['username_pattern']) && trim($prefs['username_pattern']) !== '') {
-            $jqueryTiki['usernamePattern'] = trim($prefs['username_pattern']);
+        if (trim($prefs['username_pattern'], " \n\r\t\v\x00") && trim($prefs['username_pattern'], " \n\r\t\v\x00") !== '') {
+            $jqueryTiki['usernamePattern'] = trim($prefs['username_pattern'], " \n\r\t\v\x00");
         } else {
             $jqueryTiki['usernamePattern'] = $username_pattern;
         }

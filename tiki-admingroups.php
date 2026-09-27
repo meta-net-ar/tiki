@@ -399,7 +399,7 @@ if (! empty($_REQUEST['group']) && isset($_REQUEST['import']) && ! empty($_FILES
             if (function_exists("mb_detect_encoding") && mb_detect_encoding($data[0], "ASCII, UTF-8, ISO-8859-1") == "ISO-8859-1") {
                 $data[0] = mb_convert_encoding($data[0], 'UTF-8', 'ISO-8859-1');
             }
-            $data[0] = trim($data[0]);
+            $data[0] = trim($data[0], " \n\r\t\v\x00");
             if (! $userlib->user_exists($data[0])) {
                 $errors[] = $data[0];
             } else {

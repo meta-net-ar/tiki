@@ -32,7 +32,7 @@ function wikiplugin_mono($data, $params)
 {
     extract($params, EXTR_SKIP);
 
-    $code = /* htmlentities( htmlspecialchars(*/ trim($data) /* ) )*/;
+    $code = /* htmlentities( htmlspecialchars(*/ trim($data, " \n\r\t\v\x00") /* ) )*/;
     $code = preg_replace("/\n/", "<br />", $code);
 
     $font .= ", monospace";

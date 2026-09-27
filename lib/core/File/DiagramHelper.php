@@ -146,7 +146,7 @@ class DiagramHelper
         $type = $file->getParam('filetype');
 
         if (in_array($type, ['text/plain', 'text/xml'])) {
-            $data = trim($file->getContents());
+            $data = trim($file->getContents(), " \n\r\t\v\x00");
             if (str_starts_with($data, '<mx')) {
                 return true;
             }

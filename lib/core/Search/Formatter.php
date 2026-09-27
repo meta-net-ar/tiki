@@ -194,7 +194,7 @@ class Search_Formatter
             $fields = explode(',', $custom_filter['field']);
             $filter = null;
             foreach ($fields as $key => $field) {
-                $fieldName = str_replace('tracker_field_', '', trim($field));
+                $fieldName = str_replace('tracker_field_', '', trim($field, " \n\r\t\v\x00"));
                 $mode = $custom_filter['mode'];
                 $filter = Tracker\Filter\Collection::getFilter($fieldName, $mode, strstr($field, 'tracker_field_'));
                 if ($key == 0) {

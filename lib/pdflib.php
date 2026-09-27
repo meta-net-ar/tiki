@@ -704,18 +704,18 @@ HTML;
                 $resetPage = 1;
             }
 
-            if (trim(strtolower($pdfPage['footer'])) != "off") {
+            if (trim(strtolower($pdfPage['footer']), " \n\r\t\v\x00") != "off") {
                 $mpdf->DefHTMLFooterByName(
                     'footer-without-pagination',
                     $this->processHeaderFooter($pdfPage['footer'], $params['page'] ?? '', 'bottom', false)
                 );
             }
 
-            if (strip_tags(trim($pdfPage['pageContent']), "img,pdfinclude") != '') { //including external pdf
+            if (strip_tags(trim($pdfPage['pageContent'], " \n\r\t\v\x00"), "img,pdfinclude") != '') { //including external pdf
                 if (str_contains($pdfPage['pageContent'], "<pdfinclude")) {
                     //getting src
                     $breakPageContent = str_replace(["<pdfpage>.","</pdfpage>","<pdfinclude src=","/>","\""], "", $pdfPage['pageContent']);
-                    $breakPageContent = trim($breakPageContent);
+                    $breakPageContent = trim($breakPageContent, " \n\r\t\v\x00");
 
                     if ($prefs['auth_token_access'] === 'y') {
                         global $tikiroot;
@@ -789,12 +789,12 @@ HTML;
                     unlink($tmpExtPDF);
                 } else {
                     //checking header and footer
-                    if (trim(strtolower($pdfPage['header'])) == "off") {
+                    if (trim(strtolower($pdfPage['header']), " \n\r\t\v\x00") == "off") {
                         $header = "";
                     } else {
                         $pdfPage['header'] == '' ? $header = $pdfSettings['header'] : $header = $pdfPage['header'];
                     }
-                    if (trim(strtolower($pdfPage['footer'])) == "off" || $pdfPage['footer'] == "") {
+                    if (trim(strtolower($pdfPage['footer']), " \n\r\t\v\x00") == "off" || $pdfPage['footer'] == "") {
                         $footer = "";
                     } elseif ($pdfPage['footer']) {
                         $footer = $pdfPage['footer'];
@@ -898,9 +898,9 @@ HTML;
             $mpdf->SetWatermarkImage($pdfPage['background_image'], 1);
             $mpdf->watermarkImgBehind = true;
         }
-        trim(strtolower($pdfSettings['header'])) == "off" ? $mpdf->SetHTMLHeader() : $mpdf->SetHTMLHeader($this->processHeaderFooter($pdfSettings['header'], $params['page'] ?? ''));
+        trim(strtolower($pdfSettings['header']), " \n\r\t\v\x00") == "off" ? $mpdf->SetHTMLHeader() : $mpdf->SetHTMLHeader($this->processHeaderFooter($pdfSettings['header'], $params['page'] ?? ''));
         if (is_array($pdfPages) && ! empty($pdfPages) && $pdfPages[count($pdfPages) - 1]['footer'] == $pdfSettings['footer']) {
-            isset($pdfSettings['footer']) && trim(strtolower($pdfSettings['footer'])) == "off" ? $mpdf->SetHTMLFooter() : $mpdf->SetHTMLFooter($this->processHeaderFooter($pdfSettings['footer'] ?? '', $params['page'] ?? '', 'top'));
+            isset($pdfSettings['footer']) && trim(strtolower($pdfSettings['footer']), " \n\r\t\v\x00") == "off" ? $mpdf->SetHTMLFooter() : $mpdf->SetHTMLFooter($this->processHeaderFooter($pdfSettings['footer'] ?? '', $params['page'] ?? '', 'top'));
         }
 
         $this->clearTempImg($tempImgArr);
@@ -1092,7 +1092,7 @@ HTML;
         global $base_url;
 
         // Normalize and strip base URL so we can parse both legacy and SEFURL
-        $relative = html_entity_decode(trim($url), ENT_QUOTES);
+        $relative = html_entity_decode(trim($url, " \n\r\t\v\x00"), ENT_QUOTES);
 
         if (! empty($base_url) && str_starts_with($relative, $base_url)) {
             $relative = substr($relative, strlen($base_url));
@@ -1251,7 +1251,7 @@ HTML;
             }
             $pages['pageContent'] = $doc->saveXML($page);
             $pageData[] = $pages;
-            if (trim(strip_tags($lpages[1])) != "") {
+            if (trim(strip_tags($lpages[1]), " \n\r\t\v\x00") != "") {
                 $mainContent = $lpages[1];
             }
         }
@@ -1260,7 +1260,7 @@ HTML;
             $defaultPage = $pdfSettings;
             $defaultPage['pageContent'] = $html;
             $pageData[] = $defaultPage;
-        } elseif (trim(strip_tags($lpages[1])) != '') { //adding and resetting options for last page if any
+        } elseif (trim(strip_tags($lpages[1]), " \n\r\t\v\x00") != '') { //adding and resetting options for last page if any
             $lastPage = $pdfSettings;
             $lastPage['pageContent'] = $lpages[1];
             $pageData[] = $lastPage;
@@ -1892,7 +1892,7 @@ TEXT;
             // - "Undefined array key" PHP warning
             // - "Deprecated: trim(null)" in PHP 8.1+
             // The graceful fallback preserves the original var() in CSS output
-            $value = isset($variables[$var_name]) ? trim($variables[$var_name]) : '';
+            $value = isset($variables[$var_name]) ? trim($variables[$var_name], " \n\r\t\v\x00") : '';
             if ($value) {
                 // If the variable contains another `var()`, recursively resolve it
                 if (preg_match('/var\(--([a-zA-Z0-9-]+)\)/U', $value)) {
@@ -1907,7 +1907,7 @@ TEXT;
                 if (preg_match('/var\(--([a-zA-Z0-9-]+)\)/', $fallback)) {
                     return $this->runReplaceVars($fallback, $variables);
                 }
-                return trim($fallback);  // Return fallback value
+                return trim($fallback, " \n\r\t\v\x00");  // Return fallback value
             }
 
             return $matches[0];  // Return original `var()` if no variable or fallback found

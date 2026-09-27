@@ -91,7 +91,7 @@ function prefs_memcache_serialize_servers($data)
         }
     }
 
-    return trim($out);
+    return trim($out, " \n\r\t\v\x00");
 }
 
 function prefs_memcache_unserialize_servers(string $string)

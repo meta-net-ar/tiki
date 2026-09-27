@@ -92,7 +92,7 @@ function wikiplugin_versions($data, $params)
             if ($nav == 'n' and $title == 'y') {
                 $data = "<b class='versiontitle'>" . $default . '</b>' . $data;
             }
-            $data = "\n" . ltrim(substr($data, strpos("\n", $data)));
+            $data = "\n" . ltrim(substr($data, strpos("\n", $data)), " \n\r\t\v\x00");
         } elseif (isset($v[1][$p - 1]) and strpos($data, '---(' . $v[1][$p - 1])) {
             if ($nav == 'n' and $title == 'y') {
                 $data = substr($data, strpos($data, '---(' . $v[1][$p - 1]));

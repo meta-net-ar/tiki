@@ -160,7 +160,7 @@ class TikiLib extends TikiDb_Bridge
             || (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] === 'https');
 
-        $samesite = trim((string)($session_params['samesite'] ?? '')) ?: 'Lax';
+        $samesite = trim((string)($session_params['samesite'] ?? ''), " \n\r\t\v\x00") ?: 'Lax';
         if (strcasecmp($samesite, 'None') === 0) {
             $samesite = 'None';
             $secure = true;
@@ -680,7 +680,7 @@ class TikiLib extends TikiDb_Bridge
 
                 if (! empty($header_to_check) && array_key_exists($header_to_check, $_SERVER)) {
                     foreach (explode(',', $_SERVER[$header_to_check]) as $ip) {
-                        $ip = trim($ip);
+                        $ip = trim($ip, " \n\r\t\v\x00");
                         if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
                             return $ip;
                         }
@@ -1722,7 +1722,7 @@ class TikiLib extends TikiDb_Bridge
 
         if ($prefs['user_use_gravatar'] == 'y' && $res['email']) {
             $https_mode = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on';
-            $hash = md5(strtolower(trim($res['email'])));
+            $hash = md5(strtolower(trim($res['email'], " \n\r\t\v\x00")));
 
             if ($https_mode) {
                 $url = "https://secure.gravatar.com/avatar/$hash?s=45";
@@ -1815,7 +1815,7 @@ class TikiLib extends TikiDb_Bridge
         }
 
         if ($prefs['user_use_gravatar'] == 'y' && $res['email']) {
-            $hash = md5(strtolower(trim($res['email'])));
+            $hash = md5(strtolower(trim($res['email'], " \n\r\t\v\x00")));
             $url = "https://secure.gravatar.com/avatar/$hash.jpg?s=45";
             $data = file_get_contents($url);
             $mime = 'image/jpeg';
@@ -5005,7 +5005,7 @@ class TikiLib extends TikiDb_Bridge
         if (! $is_html) {
             $data = str_replace('<x>', '', $data);
         }
-        $name = trim($name); // to avoid pb with trailing space http://dev.mysql.com/doc/refman/5.1/en/char.html
+        $name = trim($name, " \n\r\t\v\x00"); // to avoid pb with trailing space http://dev.mysql.com/doc/refman/5.1/en/char.html
 
         if (! $user) {
             $user = 'anonymous';
@@ -6010,7 +6010,7 @@ class TikiLib extends TikiDb_Bridge
         static $long_datetime_format = false;
 
         if (! $long_datetime_format) {
-            $t = trim($this->get_long_time_format());
+            $t = trim($this->get_long_time_format(), " \n\r\t\v\x00");
             if (! empty($t)) {
                 $t = ' ' . $t;
             }
@@ -6028,7 +6028,7 @@ class TikiLib extends TikiDb_Bridge
         static $short_datetime_format = false;
 
         if (! $short_datetime_format) {
-            $t = trim($this->get_short_time_format());
+            $t = trim($this->get_short_time_format(), " \n\r\t\v\x00");
             if (! empty($t)) {
                 $t = ' ' . $t;
             }
@@ -6241,7 +6241,7 @@ class TikiLib extends TikiDb_Bridge
                     }
                 }
                 if (isset($var) and (preg_match("/^([-_\/ a-zA-Z0-9]+)[ \t]+[:=][ \t]+(.*)/", $line, $s))) {
-                    $back[$var][trim($s[1])] = trim($s[2]);
+                    $back[$var][trim($s[1], " \n\r\t\v\x00")] = trim($s[2], " \n\r\t\v\x00");
                 }
             }
         }
@@ -6561,7 +6561,7 @@ class TikiLib extends TikiDb_Bridge
      */
     public function return_bytes($val)
     {
-        $val = trim($val);
+        $val = trim($val, " \n\r\t\v\x00");
         $bytes = (int) $val;
         $lastCharacter = strtolower($val[strlen($val) - 1]);
         $units = ['k' => 1, 'm' => 2, 'g' => 3];
@@ -7079,7 +7079,7 @@ class TikiLib extends TikiDb_Bridge
             }
             return $vals;
         } else {
-            return trim($filter->filter($vals));
+            return trim($filter->filter($vals), " \n\r\t\v\x00");
         }
     }
 
@@ -7341,7 +7341,7 @@ class TikiLib extends TikiDb_Bridge
             $txt = $this->take_away_accent($txt);
         }
 
-        $txt = preg_replace('/[\s]+/mu', '-', trim($txt));
+        $txt = preg_replace('/[\s]+/mu', '-', trim($txt, " \n\r\t\v\x00"));
         $arr = mb_str_split($txt);
         $frag = "";
 
@@ -7374,7 +7374,7 @@ class TikiLib extends TikiDb_Bridge
 
     public function attValue(string $txt): string
     {
-        $txt = preg_replace('/[\s]+/mu', '-', trim($txt)); // Replace any space(s) at the start, middle or end of the text with a dash
+        $txt = preg_replace('/[\s]+/mu', '-', trim($txt, " \n\r\t\v\x00")); // Replace any space(s) at the start, middle or end of the text with a dash
         $txt = preg_replace("/&/", "&amp;", $txt);
         $txt = preg_replace("/</", "&lt;", $txt);
         $txt = preg_replace("/\"/", "&quot;", $txt);
@@ -7393,7 +7393,7 @@ class TikiLib extends TikiDb_Bridge
         rewind($fh);
         $csv = stream_get_contents($fh);
         fclose($fh);
-        return trim($csv);
+        return trim($csv, " \n\r\t\v\x00");
     }
 
     /**

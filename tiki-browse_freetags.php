@@ -96,7 +96,7 @@ foreach ($tagArray as $t_ar) {
         $tagString .= $t_ar . ' ';
     }
 }
-$smarty->assign('tagString', trim($tagString));
+$smarty->assign('tagString', trim($tagString, " \n\r\t\v\x00"));
 $smarty->assign('tag', (isset($tagArray[0])) ? $tagArray[0] : '');
 if (empty($_REQUEST['maxPopular'])) {
     $maxPopular = $prefs['freetags_browse_amount_tags_in_cloud'];

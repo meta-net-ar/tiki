@@ -74,7 +74,7 @@ class Tabset extends Base implements TikiSmartyExtensionInterface
         } else {
             $tabsetCookietab = isset($params['cookietab']) && $cookietab !== 'n' ? $cookietabTabset : $cookietab;
             $cookietabTabset = null;
-            $content = trim($content);
+            $content = trim($content, " \n\r\t\v\x00");
             if (empty($content)) {
                 return '';
             }

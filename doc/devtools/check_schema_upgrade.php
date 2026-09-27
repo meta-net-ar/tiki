@@ -476,7 +476,7 @@ class CheckSchemaUpgrade
 
         $status = true;
         foreach ($statements as $statement) {
-            if (trim($statement)) {
+            if (trim($statement, " \n\r\t\v\x00")) {
                 if (preg_match('/^\s*(?!-- )/m', $statement)) {// If statement is not commented
                     if ($this->useInnoDB) {
                         // Convert all MyISAM statments to InnoDB
@@ -680,7 +680,7 @@ class CheckSchemaUpgrade
         } catch (ProcessFailedException $e) {
             $this->printMessageError("==Process failed:==\n");
             $this->printMessageError($e->getMessage());
-            $err = trim($process->getErrorOutput());
+            $err = trim($process->getErrorOutput(), " \n\r\t\v\x00");
             if ($err !== '') {
                 $this->printMessageError("==Errors ==\n$err");
             }
@@ -688,8 +688,8 @@ class CheckSchemaUpgrade
         }
 
         if ($this->verbose) {
-            $out = trim($process->getOutput());
-            $err = trim($process->getErrorOutput());
+            $out = trim($process->getOutput(), " \n\r\t\v\x00");
+            $err = trim($process->getErrorOutput(), " \n\r\t\v\x00");
 
             if ($out !== '') {
                 $this->printMessage("==Output ==\n$out");
@@ -700,7 +700,7 @@ class CheckSchemaUpgrade
             }
         }
 
-        $originalResult = trim(file_get_contents($outputFile));
+        $originalResult = trim(file_get_contents($outputFile), " \n\r\t\v\x00");
         unlink($outputFile);
 
         if ($this->ignorePreferenceChanges) {

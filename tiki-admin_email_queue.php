@@ -178,7 +178,7 @@ foreach ($mailQueues['data'] as $key => $message) {
         $subject = $mail->getSubject() ?? '';
 
         $textBody = $mail->getTextBody() ?? '';
-        $htmlBody = ! empty($mail->getHtmlBody()) ? trim(strip_tags($mail->getHtmlBody())) : '';
+        $htmlBody = ! empty($mail->getHtmlBody()) ? trim(strip_tags($mail->getHtmlBody()), " \n\r\t\v\x00") : '';
 
         $message['date'] = $date;
         $message['destination'] = implode(', ', $destinations);

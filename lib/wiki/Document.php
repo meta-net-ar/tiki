@@ -196,12 +196,12 @@ class Document
                     if ($state == 0) {
                         // Searching for start marker, dropping lines until found
                         unset($explText[$i]);   // Drop the line
-                        if (0 == strcmp($this->startmarker, trim($line))) {
+                        if (0 == strcmp($this->startmarker, trim($line, " \n\r\t\v\x00"))) {
                             $state = 1; // Start retaining lines and searching for stop marker
                         }
                     } else {
                         // Searching for stop marker, retaining lines until found
-                        if (0 == strcmp($this->endmarker, trim($line))) {
+                        if (0 == strcmp($this->endmarker, trim($line, " \n\r\t\v\x00"))) {
                             unset($explText[$i]);   // Stop marker, drop the line
                             $state = 0;         // Go back to looking for start marker
                         }
@@ -211,7 +211,7 @@ class Document
                 // Only start marker is set. Search for it, dropping all lines until it is found.
                 foreach ($explText as $i => $line) {
                     unset($explText[$i]); // Drop the line
-                    if (0 == strcmp($this->startmarker, trim($line))) {
+                    if (0 == strcmp($this->startmarker, trim($line, " \n\r\t\v\x00"))) {
                         break;
                     }
                 }
@@ -224,7 +224,7 @@ class Document
                         unset($explText[$i]);
                     } else {
                         // Searching for stop marker, retaining lines until found
-                        if (0 == strcmp($this->endmarker, trim($line))) {
+                        if (0 == strcmp($this->endmarker, trim($line, " \n\r\t\v\x00"))) {
                             unset($explText[$i]);   // Stop marker, drop the line
                             $state = 0;         // Start dropping lines
                         }
@@ -387,7 +387,7 @@ class Document
             if ($this->nohtml) {
                 $w = strip_tags($w);
             }
-            if (trim($w) == '') {
+            if (trim($w, " \n\r\t\v\x00") == '') {
                 $this->statistics[$author][$prefix . 'whitespaces']++;
                 $this->total[$prefix . 'whitespaces']++;
             } else {
@@ -615,8 +615,8 @@ class Document
         $pstr = substr($pluginstr, $start + 1, $end - $start - 1);
         $plist = explode(',', $pstr);
         foreach ($plist as $paramstr) {
-            $p = explode('=', trim($paramstr));
-            $params[strtolower(trim($p[0]))] = preg_replace('/^"|^\&quot;|"$|\&quot;$/', '', trim($p[1]));
+            $p = explode('=', trim($paramstr, " \n\r\t\v\x00"));
+            $params[strtolower(trim($p[0], " \n\r\t\v\x00"))] = preg_replace('/^"|^\&quot;|"$|\&quot;$/', '', trim($p[1], " \n\r\t\v\x00"));
         }
         return $params;
     }
@@ -680,7 +680,7 @@ class Document
                 $w1 = strip_tags($w1);
                 $w2 = strip_tags($w2);
             }
-            if (trim($w1) == '' and trim($w2) == '') {
+            if (trim($w1, " \n\r\t\v\x00") == '' and trim($w2, " \n\r\t\v\x00") == '') {
                 array_pop($newdoc); // kill one of the whitespaces
             }
         }
@@ -691,7 +691,7 @@ class Document
                 $w1 = strip_tags($w1);
                 $w2 = strip_tags($w2);
             }
-            if (trim($w1) == '' and trim($w2) == '') {
+            if (trim($w1, " \n\r\t\v\x00") == '' and trim($w2, " \n\r\t\v\x00") == '') {
                 $index++; // jump over one of the whitespaces
             }
         }

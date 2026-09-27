@@ -875,8 +875,8 @@ class CalendarLib extends TikiLib
             if (! $data["locationId"] and ! $data["newloc"]) {
                 $data['locationId'] = 0;
             }
-            if (trim($data["newloc"])) {
-                $bindvars = [(int)$data["calendarId"],trim($data["newloc"])];
+            if (trim($data["newloc"], " \n\r\t\v\x00")) {
+                $bindvars = [(int)$data["calendarId"],trim($data["newloc"], " \n\r\t\v\x00")];
                 $data["locationId"] = $this->getOne("select `callocId` from `tiki_calendar_locations` where `calendarId`=? and `name`=?", $bindvars);
                 if (empty($data["locationId"])) {
                     $query = "insert into `tiki_calendar_locations` (`calendarId`,`name`) values (?,?)";
@@ -892,10 +892,10 @@ class CalendarLib extends TikiLib
             if (! $data["categoryId"] and ! $data["newcat"]) {
                 $data['categoryId'] = 0;
             }
-            if (trim($data["newcat"])) {
+            if (trim($data["newcat"], " \n\r\t\v\x00")) {
                 $calendarId = (int)$data["calendarId"];
-                $newcatname = trim($data["newcat"]);
-                $newcatbgcolor = trim($data["newcatbgcolor"]);
+                $newcatname = trim($data["newcat"], " \n\r\t\v\x00");
+                $newcatbgcolor = trim($data["newcatbgcolor"], " \n\r\t\v\x00");
 
                 $data["categoryId"] = $this->getOne("select `calcatId` from `tiki_calendar_categories` where `calendarId`=? and `name`=?", [$calendarId, $newcatname]);
                 if (empty($data["categoryId"])) {
@@ -915,9 +915,9 @@ class CalendarLib extends TikiLib
                     $data['organizers'] = preg_split('/\s*,\s*/', $data['organizers']);
                 }
                 foreach ($data['organizers'] as $o) {
-                    if (trim($o)) {
+                    if (trim($o, " \n\r\t\v\x00")) {
                         $roles[] = [
-                            'username' => trim($o),
+                            'username' => trim($o, " \n\r\t\v\x00"),
                             'role' => ROLE_ORGANIZER
                         ];
                     }
@@ -925,7 +925,7 @@ class CalendarLib extends TikiLib
             }
             if ($data["participants"]) {
                 foreach ($data['participants'] as $pa) {
-                    if (trim($pa['username'])) {
+                    if (trim($pa['username'], " \n\r\t\v\x00")) {
                         $roles[] = $pa;
                     }
                 }

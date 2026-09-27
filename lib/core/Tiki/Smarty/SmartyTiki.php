@@ -340,15 +340,15 @@ class SmartyTiki extends Smarty
                 }
                 if ($script_name != 'tiki-admin.php' && str_starts_with($script_name, 'tiki-admin')) {
                     $str = substr($script_name, 10, strpos($script_name, '.php') - 10);
-                    $str = ucwords(trim(str_replace('_', ' ', $str)));
+                    $str = ucwords(trim(str_replace('_', ' ', $str), " \n\r\t\v\x00"));
                     $this->assign('headtitle', 'Admin ' . $str);
                 } elseif (str_starts_with($script_name, 'tiki-list')) {
                     $str = substr($script_name, 9, strpos($script_name, '.php') - 9);
-                    $str = ucwords(trim(str_replace('_', ' ', $str)));
+                    $str = ucwords(trim(str_replace('_', ' ', $str), " \n\r\t\v\x00"));
                     $this->assign('headtitle', 'List ' . $str);
                 } elseif (str_starts_with($script_name, 'tiki-view')) {
                     $str = substr($script_name, 9, strpos($script_name, '.php') - 9);
-                    $str = ucwords(trim(str_replace('_', ' ', $str)));
+                    $str = ucwords(trim(str_replace('_', ' ', $str), " \n\r\t\v\x00"));
                     $this->assign('headtitle', 'View ' . $str);
                 } elseif ($prefs['urlIndex'] && str_starts_with($script_name, $prefs['urlIndex'])) {
                     $this->assign('headtitle', tra($prefs['urlIndexBrowserTitle']));    // Viewing Custom Homepage

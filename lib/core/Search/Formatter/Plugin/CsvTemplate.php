@@ -24,7 +24,7 @@ class Search_Formatter_Plugin_CsvTemplate extends Search_Formatter_Plugin_Abstra
             unset($arguments['format']);
             unset($arguments['name']);
             unset($arguments['field']);
-            $entry[str_replace('tracker_field_', '', $field)] = trim($valueFormatter->$format($field, $arguments));
+            $entry[str_replace('tracker_field_', '', $field)] = trim($valueFormatter->$format($field, $arguments), " \n\r\t\v\x00");
         }
         return $entry;
     }

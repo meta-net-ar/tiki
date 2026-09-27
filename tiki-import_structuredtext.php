@@ -34,7 +34,7 @@ function parse_st($dump)
     $res = [];
     array_shift($pages);
     foreach ($pages as $p) {
-        $ret['pagename'] = trim(substr($p, 0, strpos($p, ">")));
+        $ret['pagename'] = trim(substr($p, 0, strpos($p, ">")), " \n\r\t\v\x00");
         $ret['pagename'] = str_replace(' ', '', ucwords(str_replace('_', ' ', $ret['pagename'])));
         $ret['body'] = substr($p, strpos($p, $titlesep) + strlen($titlesep));
         $res[] = $ret;

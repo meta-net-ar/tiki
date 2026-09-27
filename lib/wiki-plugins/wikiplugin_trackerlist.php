@@ -2029,7 +2029,7 @@ function wikiplugin_trackerlist($data, $params)
                                     // construct the new dropdown filterfield entry from the trackerfield definition
                                     $newTsfilterField = 'type:dropdown';
                                     foreach ($options as $option) {
-                                        $newTsfilterField .= ";option:" . trim($option);
+                                        $newTsfilterField .= ";option:" . trim($option, " \n\r\t\v\x00");
                                     }
                                     // update field - note that we used a ref
                                     $tsfilterField = $newTsfilterField;

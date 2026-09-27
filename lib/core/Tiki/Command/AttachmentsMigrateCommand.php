@@ -77,7 +77,7 @@ class AttachmentsMigrateCommand extends Command
             $line = fgets($handle);
         }
 
-        if (trim(strtolower($line)) != 'y' && trim(strtolower($line)) != 'yes') {
+        if (trim(strtolower($line), " \n\r\t\v\x00") != 'y' && trim(strtolower($line), " \n\r\t\v\x00") != 'yes') {
             $output->writeln('<comment>' . tr('Migration cancelled.') . '</comment>');
             return Command::SUCCESS;
         }

@@ -653,9 +653,9 @@ function duplicate(array $info, array $params, array $trackerData, string $level
     if (! empty($info) && $access->checkCsrf()) {
         $error = false;
         $trackerId = ! empty($info['ganttId']) ? $info['trackerId'] : 0;
-        $sourceGanttId = ! empty($info['sourceGanttId']) ? trim($info['sourceGanttId']) : '';
-        $ganttId = ! empty($info['ganttId']) ? trim($info['ganttId']) : '';
-        $ganttIdField = ! empty($info['ganttIdField']) ? trim($info['ganttIdField']) : '';
+        $sourceGanttId = ! empty($info['sourceGanttId']) ? trim($info['sourceGanttId'], " \n\r\t\v\x00") : '';
+        $ganttId = ! empty($info['ganttId']) ? trim($info['ganttId'], " \n\r\t\v\x00") : '';
+        $ganttIdField = ! empty($info['ganttIdField']) ? trim($info['ganttIdField'], " \n\r\t\v\x00") : '';
 
         if ($trackerId != $params['trackerId']) {
             Feedback::error(tr('You are trying to update a tracker that is not used by this gantt chart'));

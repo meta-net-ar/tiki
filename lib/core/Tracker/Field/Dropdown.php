@@ -348,7 +348,7 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
             $value = substr($value, 1, strlen($value) - 2);
         }
 
-        return trim($value);
+        return trim($value, " \n\r\t\v\x00");
     }
 
     private function getLabelPortion($value)
@@ -361,7 +361,7 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
             $value = substr($value, 1, strlen($value) - 2);
         }
 
-        return trim($value);
+        return trim($value, " \n\r\t\v\x00");
     }
 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)

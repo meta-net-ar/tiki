@@ -78,7 +78,7 @@ class Terms extends AbstractAggregation
             $this->orderBy = $orderBy;
             return $this;
         }
-        $orderBy = trim((string) $orderBy);
+        $orderBy = trim((string) $orderBy, " \n\r\t\v\x00");
         if ($orderBy === '') {
             $this->orderBy = [];
             return $this;

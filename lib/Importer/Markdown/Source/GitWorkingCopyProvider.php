@@ -35,8 +35,8 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 
     public function fetchToTempDir(): string
     {
-        $repoUrl   = trim((string)($this->cfg[self::CFG_REPO_URL] ?? ''));
-        $branch    = trim((string)($this->cfg[self::CFG_REPO_BRANCH] ?? self::DEF_BRANCH));
+        $repoUrl   = trim((string)($this->cfg[self::CFG_REPO_URL] ?? ''), " \n\r\t\v\x00");
+        $branch    = trim((string)($this->cfg[self::CFG_REPO_BRANCH] ?? self::DEF_BRANCH), " \n\r\t\v\x00");
         $gitPull   = ! empty($this->cfg[self::CFG_GIT_PULL]);
         $token     = (string)($this->cfg[self::CFG_REPO_TOKEN] ?? '');
         $timeout   = (int)($this->ctx[self::CTX_TIMEOUT] ?? self::DEF_TIMEOUT);
@@ -143,7 +143,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     {
         $env = $this->gitEnv($token, null);
         $res = $this->execGit($git, '-C ' . escapeshellarg($wcPath) . ' rev-parse --abbrev-ref HEAD', self::DEF_METADATA_TIMEOUT, $env, null);
-        return $res['code'] === 0 ? trim($res['output']) : null;
+        return $res['code'] === 0 ? trim($res['output'], " \n\r\t\v\x00") : null;
     }
 
     /**
@@ -332,7 +332,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         proc_close($proc); // release the resource; exit code was already captured above
 
         $code = $timedOut ? 124 : ($exitCode ?? 1);
-        $out = trim($out);
+        $out = trim($out, " \n\r\t\v\x00");
 
         return ['code' => $code, 'output' => $maskSecrets ? $this->maskSecrets($out) : $out];
     }
@@ -365,7 +365,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $originUrl = is_readable($configPath) ? file_get_contents($configPath) : false;
         $origin = null;
         if ($originUrl && preg_match('~url\s*=\s*(.+)~i', $originUrl, $m)) {
-            $origin = trim($m[1]);
+            $origin = trim($m[1], " \n\r\t\v\x00");
         }
 
         $env = $this->gitEnv($token, $origin);
@@ -407,10 +407,10 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         }
 
         return [
-            'head' => $head['code'] === 0 ? trim($head['output']) : null,
+            'head' => $head['code'] === 0 ? trim($head['output'], " \n\r\t\v\x00") : null,
             'checked_out_branch' => $headBranch,
             'remote_head' => $remoteHead !== '' ? substr($remoteHead, 0, 12) : null,
-            'is_up_to_date' => ($remoteHead !== '' && $head['code'] === 0) ? str_starts_with($remoteHead, trim($head['output'])) : null,
+            'is_up_to_date' => ($remoteHead !== '' && $head['code'] === 0) ? str_starts_with($remoteHead, trim($head['output'], " \n\r\t\v\x00")) : null,
         ];
     }
 
@@ -466,7 +466,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
 
     private function computeRepoPath(string $rootDir, string $repoUrl): string
     {
-        $url = trim($repoUrl);
+        $url = trim($repoUrl, " \n\r\t\v\x00");
         $host = null;
         $path = null;
 
@@ -509,7 +509,7 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     private function resolveBaseDir(): string
     {
         global $prefs;
-        $base = trim((string)($prefs['md_import_git_root'] ?? ''));
+        $base = trim((string)($prefs['md_import_git_root'] ?? ''), " \n\r\t\v\x00");
         if ($base === '') {
             $base = TIKI_PATH . '/storage/markdown-importer';
         }

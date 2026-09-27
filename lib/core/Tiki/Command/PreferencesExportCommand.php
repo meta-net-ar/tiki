@@ -241,7 +241,7 @@ class PreferencesExportCommand extends Command
         $groups = [];
 
         foreach ($data as $values) {
-            $location = trim(explode(',', $values['locations'])[0]);
+            $location = trim(explode(',', $values['locations'])[0], " \n\r\t\v\x00");
             $group = $location !== '' ? ucfirst(explode('/', $location)[0]) : $ungrouped;
             $groups[$group][] = $values;
         }

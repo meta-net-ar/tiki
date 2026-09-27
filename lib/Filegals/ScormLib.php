@@ -130,7 +130,7 @@ class ScormLib
     {
         $data = [];
         foreach ($node->getElementsByTagName('langstring') as $text) {
-            $data[$text->getAttribute('xml:lang')] = trim($text->textContent);
+            $data[$text->getAttribute('xml:lang')] = trim($text->textContent, " \n\r\t\v\x00");
         }
 
         return $data;

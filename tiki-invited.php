@@ -65,8 +65,8 @@ function tiki_invited()
         );
         $groups = explode(',', $groups);
         foreach ($groups as $group) {
-            if (! empty(trim($group))) {
-                $userlib->assign_user_to_group($user, trim($group));
+            if (! empty(trim($group, " \n\r\t\v\x00"))) {
+                $userlib->assign_user_to_group($user, trim($group, " \n\r\t\v\x00"));
             }
         }
 

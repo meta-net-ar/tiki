@@ -156,7 +156,7 @@ class ExternalLinksChecker
             if (preg_match('/@tiki-external-link-ok:\s*(.+)/', $lines[$i], $matches)) {
                 return [
                     'suppressed' => true,
-                    'reason' => trim($matches[1]),
+                    'reason' => trim($matches[1], " \n\r\t\v\x00"),
                 ];
             }
         }
@@ -187,7 +187,7 @@ class ExternalLinksChecker
 
         for ($i = 0; $i <= $lineNumber && $i < count($lines); $i++) {
             $line = $lines[$i];
-            $trimmed = trim($line);
+            $trimmed = trim($line, " \n\r\t\v\x00");
 
             // Check for comment start
             if (preg_match('/\/\*/', $line)) {
@@ -238,7 +238,7 @@ class ExternalLinksChecker
         // This handles cases where comments contain HTML examples
         $isComment = false;
         if ($extension === 'php' || $extension === 'js') {
-            $trimmed = trim($line);
+            $trimmed = trim($line, " \n\r\t\v\x00");
             if (str_starts_with($trimmed, '//') || str_starts_with($trimmed, '/*') || str_starts_with($trimmed, '*')) {
                 $isComment = true;
             }
@@ -418,7 +418,7 @@ class ExternalLinksChecker
                     'line' => $lineNumber,
                     'url' => $categorized['url'],
                     'context' => $categorized['context'],
-                    'code' => trim($line),
+                    'code' => trim($line, " \n\r\t\v\x00"),
                     ];
                 }
             }

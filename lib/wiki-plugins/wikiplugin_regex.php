@@ -44,6 +44,6 @@ function wikiplugin_regex($data, $params)
     }
 
     $data = preg_replace($pattern, $replace, $data);
-    $data = trim($data);
+    $data = trim($data, " \n\r\t\v\x00");
     return $data;
 }

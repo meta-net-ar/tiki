@@ -59,7 +59,7 @@ class Parser
         foreach ($lines as $line) {
             // Check if line is blank BEFORE stripping comments
             // Only truly blank lines (not comment-only lines) should end groups
-            $isBlankLine = (trim($line) === '');
+            $isBlankLine = (trim($line, " \n\r\t\v\x00") === '');
 
             // Strip inline comments
             $hashPos = strpos($line, '#');
@@ -67,7 +67,7 @@ class Parser
                 $line = substr($line, 0, $hashPos);
             }
 
-            $line = trim($line);
+            $line = trim($line, " \n\r\t\v\x00");
             if ($line === '') {
                 // Per Google's spec, blank lines separate groups. However, many real-world
                 // robots.txt files use blank lines for readability within groups.
@@ -84,8 +84,8 @@ class Parser
                 continue;
             }
 
-            $field = strtolower(trim($parts[0]));
-            $value = trim($parts[1]);
+            $field = strtolower(trim($parts[0], " \n\r\t\v\x00"));
+            $value = trim($parts[1], " \n\r\t\v\x00");
 
             if ($field === 'user-agent') {
                 // Start a new group if:

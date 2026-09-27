@@ -174,7 +174,7 @@ class MultiLike extends Base implements TikiSmartyExtensionInterface
     private function getMultivaluesFromPref()
     {
         global $prefs;
-        $data = explode("\n\n", trim($prefs['user_multilike_config'] ?? ''));
+        $data = explode("\n\n", trim($prefs['user_multilike_config'] ?? '', " \n\r\t\v\x00"));
         $configurations = [];
         foreach ($data as $config) {
             preg_match_all("/(\S*)\s*=\s*(.*)/", $config, $temp_arr);

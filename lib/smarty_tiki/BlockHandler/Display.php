@@ -53,7 +53,7 @@ class Display extends Base implements TikiSmartyExtensionInterface
         $anon = false; // see the workaround to exclude Registered below
 
         foreach ($groups as $gr) {
-            $gr = trim($gr);
+            $gr = trim($gr, " \n\r\t\v\x00");
             if ($gr == 'Anonymous') {
                 $anon = true;
             }

@@ -295,7 +295,7 @@ function wikiplugin_rss_clean_description($description)
 {
     $description = html_entity_decode((string) $description, ENT_QUOTES | ENT_HTML5);
     $description = preg_replace('/<img\b[^>]*>/i', ' ', $description);
-    return trim(preg_replace('/\s+/u', ' ', strip_tags($description)));
+    return trim(preg_replace('/\s+/u', ' ', strip_tags($description)), " \n\r\t\v\x00");
 }
 
 function wikiplugin_rss_apply_images(array &$items): void
@@ -451,7 +451,7 @@ function wikiplugin_rss_extract_image_from_html(string $html, string $pageUrl): 
 
 function wikiplugin_rss_resolve_url(string $url, string $baseUrl): string
 {
-    $url = trim(html_entity_decode($url, ENT_QUOTES | ENT_HTML5));
+    $url = trim(html_entity_decode($url, ENT_QUOTES | ENT_HTML5), " \n\r\t\v\x00");
     if ($url === '' || str_starts_with($url, 'data:')) {
         return '';
     }

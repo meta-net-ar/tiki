@@ -98,7 +98,7 @@ class Executor
                         if ($modifier == 'object_ids') {
                             $val = array_map(function ($id) {
                                 list($type, $id) = explode(':', $id);
-                                return trim($id);
+                                return trim($id, " \n\r\t\v\x00");
                             }, explode("\n", $val));
                             $values = array_merge($values, $val);
                             return $val;

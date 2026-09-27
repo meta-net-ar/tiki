@@ -187,9 +187,9 @@ function wikiplugin_tikimanagerclone($data, $params)
         return WikiParser_PluginOutput::error(tra('Error'), $e->getMessage());
     }
 
-    $params['source'] = trim($params['source']);
+    $params['source'] = trim($params['source'], " \n\r\t\v\x00");
     $params['target'] = array_map(function ($i) {
-        return trim($i);
+        return trim($i, " \n\r\t\v\x00");
     }, explode(',', $params['target']));
 
     extract($params, EXTR_SKIP);

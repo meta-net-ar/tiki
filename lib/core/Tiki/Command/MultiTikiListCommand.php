@@ -49,7 +49,7 @@ class MultiTikiListCommand extends Command
                 $output->writeln("<info>Multitikis in $path</info>");
             }
             foreach ($list as $multi) {
-                $output->writeln(trim($multi));
+                $output->writeln(trim($multi, " \n\r\t\v\x00"));
             }
         } else {
             if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {

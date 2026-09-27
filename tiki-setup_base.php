@@ -500,7 +500,7 @@ if (function_exists('apache_request_headers')) {
     $headers = apache_request_headers();
     foreach ($headers as $header => $value) {
         if (ucwords($header) === 'Authorization' && ! empty($value)) {
-            $_SERVER['HTTP_AUTHORIZATION'] = trim($value);
+            $_SERVER['HTTP_AUTHORIZATION'] = trim($value, " \n\r\t\v\x00");
         }
     }
 }

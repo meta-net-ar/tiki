@@ -40,7 +40,7 @@ class Tiki_MemoryLimit
 
     private static function toBytes($limitString)
     {
-        $limitString = trim($limitString);
+        $limitString = trim($limitString, " \n\r\t\v\x00");
         $bytes = (int) $limitString;
         $lastCharacter = strtolower($limitString[strlen($limitString) - 1]);
         $units = ['k' => 1, 'm' => 2, 'g' => 3];

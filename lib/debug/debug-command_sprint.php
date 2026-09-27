@@ -50,7 +50,7 @@ class DbgSPrint extends DebuggerCommand
         $vars = explode(' ', $params);
 
         foreach ($vars as $v) {
-            $v = trim(str_replace('$', '', $v));
+            $v = trim(str_replace('$', '', $v), " \n\r\t\v\x00");
 
             if (strlen($v) != 0) {
                 $tmp = $smarty->getTemplateVars();

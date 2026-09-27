@@ -116,7 +116,7 @@ class PluginMatcherMatch
         $rawarguments = trim($this->matcher->getChunkFrom($this->nameEnd, $pos - $this->nameEnd), '() ');
         // arguments can be html encoded. So, decode first
         $arguments = html_entity_decode($rawarguments);
-        $this->arguments = trim($arguments);
+        $this->arguments = trim($arguments, " \n\r\t\v\x00");
 
         if ($this->matchType == self::LEGACY) {
             ++$pos;

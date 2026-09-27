@@ -60,7 +60,7 @@ class Tiki_Profile_InstallHandler_Webmail extends Tiki_Profile_InstallHandler
         $data['cc']      = trim(str_replace(["\n","\r"], "", html_entity_decode(strip_tags($data['cc']))), ' ,');
         $data['bcc']     = trim(str_replace(["\n","\r"], "", html_entity_decode(strip_tags($data['bcc']))), ' ,');
         $data['from']    = trim(str_replace(["\n","\r"], "", html_entity_decode(strip_tags($data['from']))), ' ,');
-        $data['subject'] = trim(str_replace(["\n","\r"], "", html_entity_decode(strip_tags($data['subject']))));
+        $data['subject'] = trim(str_replace(["\n","\r"], "", html_entity_decode(strip_tags($data['subject']))), " \n\r\t\v\x00");
 
         $smtp_id = '';
         if ($data['from']) {

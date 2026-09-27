@@ -63,7 +63,7 @@ class EditLib_ParseToWysiwyg_CharacterTest extends TikiTestCase
     {
         $inData = '__bold__';
         $exp = '<strong>bold</strong>'; // like CKE
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertStringContainsString($exp, $out);
     }
 
@@ -72,7 +72,7 @@ class EditLib_ParseToWysiwyg_CharacterTest extends TikiTestCase
     {
         $inData = '\'\'italic\'\'';
         $exp = '<em>italic</em>'; // like CKE
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertStringContainsString($exp, $out);
     }
 
@@ -81,7 +81,7 @@ class EditLib_ParseToWysiwyg_CharacterTest extends TikiTestCase
     {
         $inData = '===underlined===';
         $exp = '<u>underlined</u>'; // like CKE
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertStringContainsString($exp, $out);
     }
 
@@ -90,7 +90,7 @@ class EditLib_ParseToWysiwyg_CharacterTest extends TikiTestCase
     {
         $inData = '--strike through--';
         $exp = '<strike>strike through</strike>'; // like CKE
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertStringContainsString($exp, $out);
     }
 
@@ -158,17 +158,17 @@ class EditLib_ParseToWysiwyg_CharacterTest extends TikiTestCase
     {
         $inData = '~~#112233:text~~';
         $exp = '<span style="color:#112233">text</span>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertStringContainsString($exp, $out);
 
         $inData = '~~ ,#112233:text~~';
         $exp = '<span style="background-color:#112233">text</span>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertStringContainsString($exp, $out);
 
         $inData = '~~#AABBCC,#112233:text~~';
         $exp = '<span style="color:#AABBCC; background-color:#112233">text</span>';
-        $out = trim($this->el->parseToWysiwyg($inData));
+        $out = trim($this->el->parseToWysiwyg($inData), " \n\r\t\v\x00");
         $this->assertStringContainsString($exp, $out);
     }
 }

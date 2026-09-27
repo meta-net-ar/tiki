@@ -143,7 +143,7 @@ class EditLib_ParseToWiki_LinkTest extends TikiTestCase
          */
         $inData = '<a class="wiki" href="#A_Heading" rel="">#A_Heading</a>';
         $ex = '[#A_Heading]';
-        $out = trim($this->el->parseToWiki($inData));
+        $out = trim($this->el->parseToWiki($inData), " \n\r\t\v\x00");
         $this->assertEquals($ex, $out);
 
 

@@ -306,7 +306,7 @@ class WikiMediawiki extends Wiki
      */
     public function sanitizeAttachmentFileName($fileName)
     {
-        $fileName = trim((string) $fileName);
+        $fileName = trim((string) $fileName, " \n\r\t\v\x00");
 
         if ($fileName === '' || str_contains($fileName, "\0")) {
             return null;

@@ -700,7 +700,7 @@ class WikiPlugin_Negotiator_Wiki
         $smarty->assign('plugin_body', $this->body);
         $smarty->assign('plugin_args', $this->args);
 
-        return trim($smarty->fetch('tiki-plugin_blocked.tpl'));
+        return trim($smarty->fetch('tiki-plugin_blocked.tpl'), " \n\r\t\v\x00");
     }
 
     public function executeAwaiting(&$input)

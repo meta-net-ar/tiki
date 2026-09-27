@@ -104,8 +104,8 @@ class WikiPluginBackLinks extends PluginsLib
         if (! is_null($info)) {
             $info_temp = [];
             foreach ($info as $sInfo) {
-                if (in_array(trim($sInfo), $aInfoPreset)) {
-                    $info_temp[] = trim($sInfo);
+                if (in_array(trim($sInfo, " \n\r\t\v\x00"), $aInfoPreset)) {
+                    $info_temp[] = trim($sInfo, " \n\r\t\v\x00");
                 }
                 $info = $info_temp ? $info_temp :
                     false;

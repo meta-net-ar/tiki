@@ -19,7 +19,7 @@ class SearchStatsLib extends TikiLib
 
     public function register_term_hit($term)
     {
-        $term = trim($term);
+        $term = trim($term, " \n\r\t\v\x00");
 
         if (function_exists('mb_strlen') && function_exists('mb_substr')) {
             if (mb_strlen($term, 'UTF-8') > self::MAX_SEARCH_TERM_LENGTH) {

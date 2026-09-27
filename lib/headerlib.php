@@ -328,7 +328,7 @@ class HeaderLib
                 header('Access-Control-Allow-Credentials: true');
             }
             if ($access_control_allow_methods === 'y') {
-                $header_value = trim($prefs['http_header_access_control_allow_methods_value']);
+                $header_value = trim($prefs['http_header_access_control_allow_methods_value'], " \n\r\t\v\x00");
                 if ($access_control_allow_credentials === 'y' && $header_value === '*') {
                     Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Methods when http_header_access_control_allow_credential is enabled"));
                     header_remove('Access-Control-Allow-Methods');
@@ -337,7 +337,7 @@ class HeaderLib
                 }
             }
             if ($access_control_allow_headers === 'y') {
-                $headers_value = trim($prefs['http_header_access_control_allow_headers_value']);
+                $headers_value = trim($prefs['http_header_access_control_allow_headers_value'], " \n\r\t\v\x00");
                 if ($access_control_allow_credentials === 'y' && $headers_value === '*') {
                     Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Headers when Access-Control-Allow-Credentials is enabled."));
                     header_remove('Access-Control-Allow-Headers');
@@ -346,7 +346,7 @@ class HeaderLib
                 }
             }
             if ($cross_origin_embedder_policy === 'y') {
-                switch (trim($prefs['http_header_cross_origin_embedder_policy_value'])) {
+                switch (trim($prefs['http_header_cross_origin_embedder_policy_value'], " \n\r\t\v\x00")) {
                     case 'require-corp':
                         header('Cross-Origin-Embedder-Policy: require-corp');
                         break;
@@ -361,7 +361,7 @@ class HeaderLib
                 }
             }
             if ($cross_origin_resource_policy === 'y') {
-                switch (trim($prefs['http_header_cross_origin_resource_policy_value'])) {
+                switch (trim($prefs['http_header_cross_origin_resource_policy_value'], " \n\r\t\v\x00")) {
                     case 'same-origin':
                         header('Cross-Origin-Resource-Policy: same-origin');
                         break;
@@ -376,7 +376,7 @@ class HeaderLib
                 }
             }
             if ($cross_origin_opener_policy === 'y') {
-                switch (trim($prefs['http_header_cross_origin_opener_policy_value'])) {
+                switch (trim($prefs['http_header_cross_origin_opener_policy_value'], " \n\r\t\v\x00")) {
                     case 'same-origin':
                         header('Cross-Origin-Opener-Policy: same-origin');
                         break;
@@ -394,35 +394,35 @@ class HeaderLib
                 }
             }
             if ($content_security_policy == 'y') {
-                $header_value = trim($prefs['http_header_content_security_policy_value']);
+                $header_value = trim($prefs['http_header_content_security_policy_value'], " \n\r\t\v\x00");
                 if ($header_value !== '') {
                     header('Content-Security-Policy: ' . $header_value);
                 }
             }
 
             if ($strict_transport_security == 'y') {
-                $header_value = trim($prefs['http_header_strict_transport_security_value']);
+                $header_value = trim($prefs['http_header_strict_transport_security_value'], " \n\r\t\v\x00");
                 if ($header_value !== '') {
                     header('Strict-Transport-Security: ' . $header_value);
                 }
             }
 
             if ($public_key_pins == 'y') {
-                $header_value = trim($prefs['http_header_public_key_pins_value']);
+                $header_value = trim($prefs['http_header_public_key_pins_value'], " \n\r\t\v\x00");
                 if ($header_value !== '') {
                     header('Public-Key-Pins: ' . $header_value);
                 }
             }
 
             if ($referrer_policy === 'y') {
-                $header_value = trim($prefs['http_header_referrer_policy_value']);
+                $header_value = trim($prefs['http_header_referrer_policy_value'], " \n\r\t\v\x00");
                 if ($header_value !== '') {
                     header('Referrer-Policy: ' . $header_value);
                 }
             }
 
             if ($permitted_cross_domain_policies === 'y') {
-                $header_value = trim($prefs['http_header_permitted_cross_domain_policies_value']);
+                $header_value = trim($prefs['http_header_permitted_cross_domain_policies_value'], " \n\r\t\v\x00");
                 if ($header_value !== '') {
                     header('X-Permitted-Cross-Domain-Policies: ' . $header_value);
                 }

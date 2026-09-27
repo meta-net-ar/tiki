@@ -205,7 +205,7 @@ class StructLib extends TikiLib
                             $orders[$node->depth]++;
                         }
                         $node->parent_id = $node->parent_id == 'root' || empty($node->parent_id) ? $parent_ref_id : $node->parent_id;
-                        $pageName = trim($node->page_name ?? '');
+                        $pageName = trim($node->page_name ?? '', " \n\r\t\v\x00");
                         $fields = [
                             'parent_id' => $node->parent_id,
                             'pos' => $orders[$node->depth],

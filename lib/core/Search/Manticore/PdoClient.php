@@ -161,9 +161,9 @@ class PdoClient
     {
         if (str_contains($name, ':')) {
             $parts = explode(':', $name);
-            $host = trim($parts[0]);
+            $host = trim($parts[0], " \n\r\t\v\x00");
             if (count($parts) > 2) {
-                $ports = trim($parts[1]);
+                $ports = trim($parts[1], " \n\r\t\v\x00");
                 $ports = explode('|', $ports);
             } else {
                 $ports = [];

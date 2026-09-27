@@ -83,7 +83,7 @@ class Metric extends AbstractAggregation
 
     public static function normalizeKind(string $kind): string
     {
-        $kind = strtolower(trim($kind));
+        $kind = strtolower(trim($kind, " \n\r\t\v\x00"));
         return self::KIND_ALIASES[$kind] ?? $kind;
     }
 

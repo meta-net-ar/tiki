@@ -112,7 +112,7 @@ function wikiplugin_annotation($data, $params)
 
     $annotations = [];
     foreach (explode("\n", $data) as $line) {
-        $line = trim($line);
+        $line = trim($line, " \n\r\t\v\x00");
         if (empty($line)) {
             continue;
         }

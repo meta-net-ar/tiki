@@ -94,7 +94,7 @@ class ExpressionSanitizer
      */
     public function sanitize(string $expression): string
     {
-        $expression = trim($expression);
+        $expression = trim($expression, " \n\r\t\v\x00");
         if ($expression === '') {
             throw new InvalidArgumentException('expression is empty');
         }

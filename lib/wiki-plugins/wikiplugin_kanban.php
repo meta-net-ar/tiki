@@ -146,7 +146,7 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
         $appendAllPossibleFieldValues = true;
     } elseif (count($fieldValuesParam) === 1) {
         $fieldParamsArray = explode(',', $fieldValuesParam[0]);
-        $fieldValue = trim($fieldParamsArray[0]);
+        $fieldValue = trim($fieldParamsArray[0], " \n\r\t\v\x00");
         if ($fieldValue === '') {
             $appendAllPossibleFieldValues = true;
         }
@@ -162,7 +162,7 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
         foreach ($fieldValuesParam as $fieldParams) {
             $fieldParamsArray = explode(',', $fieldParams);
 
-            $fieldValue = trim($fieldParamsArray[0]);
+            $fieldValue = trim($fieldParamsArray[0], " \n\r\t\v\x00");
             if ($fieldValue !== '' && ! $fieldValuesMap[$fieldValue]) {
                 throw new TypeError(tra('Column value "%0" specified in parameter "%1=%2" is not found in tracker field "%3".  Possible values are %4', '', false, [
                     $fieldValue,
@@ -181,7 +181,7 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
             $fieldInfo[$fieldValue] = array_merge($fieldDefaultConfig, $fieldData);
             //Override column label
             if (isset($fieldParamsArray[1]) && $fieldParamsArray[1] !== 'null') {
-                $fieldInfo[$fieldValue]['title'] = trim($fieldParamsArray[1]);
+                $fieldInfo[$fieldValue]['title'] = trim($fieldParamsArray[1], " \n\r\t\v\x00");
             }
             //wip limit
             if (isset($fieldParamsArray[2]) && $fieldParamsArray[2] !== 'null') {

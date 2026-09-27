@@ -124,7 +124,7 @@ $smarty->assign('page', $page);
 $smarty->assign('isFromPage', isset($page));
 $smarty->assign('fileId', $fileId);
 
-$cryptpadBaseUrl = trim($prefs['cryptpad_base_url'] ?? '');
+$cryptpadBaseUrl = trim($prefs['cryptpad_base_url'] ?? '', " \n\r\t\v\x00");
 $cryptpadAvailable = ! empty($cryptpadBaseUrl);
 $smarty->assign('cryptpadAvailable', $cryptpadAvailable);
 $smarty->assign('cryptpadBaseUrl', $cryptpadBaseUrl);

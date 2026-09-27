@@ -180,7 +180,7 @@ class WikiBuilder
         if (is_bool($value)) {
             return $value;
         }
-        $v = strtolower(trim((string) $value));
+        $v = strtolower(trim((string) $value, " \n\r\t\v\x00"));
         return $v === 'y' || $v === 'yes' || $v === '1' || $v === 'true' || $v === 'on';
     }
 

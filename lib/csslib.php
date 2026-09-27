@@ -56,7 +56,7 @@ class cssLib extends TikiLib
         $type = '';
 
         foreach ($data as $line) {
-            $line = trim($line);
+            $line = trim($line, " \n\r\t\v\x00");
 
             if ($line) {
                 if (($type != 'comment') and ($line == '/*')) {
@@ -76,7 +76,7 @@ class cssLib extends TikiLib
                     $li = explode(',', $line);
 
                     foreach ($li as $l) {
-                        $l = trim($l);
+                        $l = trim($l, " \n\r\t\v\x00");
 
                         if ($l) {
                             $back["$index"]['items'][] = $l;
@@ -93,15 +93,15 @@ class cssLib extends TikiLib
                     $parts = explode(':', str_replace(';', '', $line));
 
                     if (isset($parts[0]) && isset($parts[1])) {
-                        $obj = trim($parts[0]);
+                        $obj = trim($parts[0], " \n\r\t\v\x00");
 
-                        $back["$index"]['attributes']["$obj"] = trim($parts[1]);
+                        $back["$index"]['attributes']["$obj"] = trim($parts[1], " \n\r\t\v\x00");
                     }
                 } else {
                     $li = explode(',', $line);
 
                     foreach ($li as $l) {
-                        $l = trim($l);
+                        $l = trim($l, " \n\r\t\v\x00");
 
                         if ($l) {
                             $back["$index"]['items'][] = $l;

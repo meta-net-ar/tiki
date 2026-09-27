@@ -498,7 +498,7 @@ function is_function_declaration_file(&$file) // {{{
                 return;
             }
         } else {
-            if (! $isInFunctionDeclaration && ! in_array(trim($token), $allowedChars) && trim($token) !== '') {
+            if (! $isInFunctionDeclaration && ! in_array(trim($token, " \n\r\t\v\x00"), $allowedChars) && trim($token, " \n\r\t\v\x00") !== '') {
                 return; // fail
             }
         }

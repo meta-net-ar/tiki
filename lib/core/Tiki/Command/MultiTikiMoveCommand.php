@@ -186,7 +186,7 @@ class MultiTikiMoveCommand extends Command
         if (is_file($virtuals)) {
             $list = file($virtuals);
             foreach ($list as & $line) {
-                $line = trim($line);
+                $line = trim($line, " \n\r\t\v\x00");
             }
         }
         return $list;

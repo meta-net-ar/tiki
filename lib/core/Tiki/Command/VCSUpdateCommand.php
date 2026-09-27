@@ -172,7 +172,7 @@ class VCSUpdateCommand extends Command
     {
         $raw = $this->execCommand('git rev-parse --abbrev-ref @{upstream} 2>/dev/null || git describe --tags --exact-match');
 
-        $upstreamBranch = trim($raw);
+        $upstreamBranch = trim($raw, " \n\r\t\v\x00");
 
         return $upstreamBranch;
     }
@@ -202,7 +202,7 @@ class VCSUpdateCommand extends Command
 
         $hash = $this->execCommand($command);
 
-        return ! empty($hash) ? trim($hash) : null;
+        return ! empty($hash) ? trim($hash, " \n\r\t\v\x00") : null;
     }
 
     /**
@@ -530,7 +530,7 @@ class VCSUpdateCommand extends Command
     {
         $this->logger->debug('Command: ' . $command);
         $output = shell_exec($command);
-        $output = trim($output || '');
+        $output = trim($output || '', " \n\r\t\v\x00");
         $this->logger->debug('Output: ' . $output);
 
         return $output;

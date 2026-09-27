@@ -50,8 +50,8 @@ class DbgPermissions extends DebuggerCommand
 
         $this->set_result_tpl('debug/tiki-debug_permissions.tpl');
         // Is regex to match against var name given?
-        $p = explode(' ', trim($params));
-        $mask = count($p) > 0 ? str_replace('$', '', trim($p[0])) : '';
+        $p = explode(' ', trim($params, " \n\r\t\v\x00"));
+        $mask = count($p) > 0 ? str_replace('$', '', trim($p[0], " \n\r\t\v\x00")) : '';
         // Get list of all vars
         $tpl_vars = $smarty->getTemplateVars();
         // Get descriptions for all permissions

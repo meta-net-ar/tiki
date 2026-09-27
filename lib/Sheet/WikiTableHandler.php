@@ -41,7 +41,7 @@ class WikiTableHandler extends DataHandler
                 $table = explode("\n", $table);
 
                 foreach ($table as $line) {
-                    $line = explode('|', trim($line));
+                    $line = explode('|', trim($line, " \n\r\t\v\x00"));
 
                     foreach ($line as $col => $cellValue) {
                         $value = $cellValue['value'];

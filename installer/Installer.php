@@ -306,7 +306,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $error = '';
         $result = $this->queryError($query, $error, $values);
 
-        if (stripos(trim($query), 'SHOW WARNINGS') === 0) {
+        if (stripos(trim($query, " \n\r\t\v\x00"), 'SHOW WARNINGS') === 0) {
             return $result;
         }
 

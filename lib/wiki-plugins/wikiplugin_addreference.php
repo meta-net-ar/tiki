@@ -43,7 +43,7 @@ function wikiplugin_addreference($data, $params)
             $GLOBALS['referencesData'] = [];
         }
 
-        $data = trim($data);
+        $data = trim($data, " \n\r\t\v\x00");
 
         if (str_contains($_SERVER['SCRIPT_NAME'], 'tiki-print.php')) {
             $page = urldecode($_REQUEST['page']);
@@ -75,7 +75,7 @@ function wikiplugin_addreference($data, $params)
         $temp = array_unique($matchedReferences);
         $i = 0;
         foreach ($temp as $v) {
-            if (strlen(trim($v)) > 0) {
+            if (strlen(trim($v, " \n\r\t\v\x00")) > 0) {
                 $curr_matches[$i] = $v;
                 $i++;
             }
@@ -86,7 +86,7 @@ function wikiplugin_addreference($data, $params)
         foreach ($params['biblio_code'] as $code) {
             $index = 0;
             foreach ($curr_matches as $key => $val) {
-                if (strlen(trim($val)) > 0) {
+                if (strlen(trim($val, " \n\r\t\v\x00")) > 0) {
                     if ($val == $code) {
                         $index = $key + 1;
                         break;

@@ -149,7 +149,7 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     foreach ($commentslib->getForumDefaultsInfo() as $key => $default) {
         $value = $_REQUEST[$key] ?? $default;
         if ($key == 'outbound_address') {
-            $value = trim($value);
+            $value = trim($value, " \n\r\t\v\x00");
         }
         $input[$key] = $value ;
     }

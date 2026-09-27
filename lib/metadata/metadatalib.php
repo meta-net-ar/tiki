@@ -96,7 +96,7 @@ class FileMetadata
             $type_charset = explode(';', $type_charset);
             //external file types may already be set at this point
             $this->basicraw['type'] = empty($this->type) ? $type_charset[0] : $this->type;
-            $this->basicraw['charset'] = trim($type_charset[1]);
+            $this->basicraw['charset'] = trim($type_charset[1], " \n\r\t\v\x00");
             $finfo = new finfo(FILEINFO_DEVICES);
             $this->basicraw['devices'] = $finfo->file($temppath);
         }

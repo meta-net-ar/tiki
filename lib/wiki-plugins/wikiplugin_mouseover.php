@@ -233,7 +233,7 @@ function wikiplugin_mouseover($data, $params)
         $url = htmlentities($url, ENT_QUOTES, 'UTF-8');
     }
 
-    $text = trim($text);
+    $text = trim($text, " \n\r\t\v\x00");
 
     if (empty($text)) {
         if ($params['parselabel'] == 'y') {

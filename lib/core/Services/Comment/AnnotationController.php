@@ -200,8 +200,8 @@ class Services_Comment_AnnotationController
         foreach ($list['comments'] as $comment) {
             if (str_starts_with($comment['data'], ';note:')) {         // only the "inline" ones starting ;note: so far
                 $data = explode("\n", $comment['data'], 2);
-                $quote = trim(substr($data[0], 6));
-                $text = trim($data[1]);
+                $quote = trim(substr($data[0], 6), " \n\r\t\v\x00");
+                $text = trim($data[1], " \n\r\t\v\x00");
 
                 $ranges = json_decode(
                     TikiLib::lib('attribute')->get_attribute(

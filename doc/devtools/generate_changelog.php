@@ -125,7 +125,7 @@ function parse_args(): array
 
 function run($cmd): string
 {
-    return trim(shell_exec($cmd));
+    return trim(shell_exec($cmd), " \n\r\t\v\x00");
 }
 
 function last_tag(): string
@@ -170,7 +170,7 @@ function get_first_commit_after_branch_point(string $branch, string $parent = 'm
 {
     run("git fetch origin $branch");
 
-    $base = trim(run("git merge-base origin/$branch $parent"));
+    $base = trim(run("git merge-base origin/$branch $parent"), " \n\r\t\v\x00");
     $commits = explode("\n", run("git rev-list --reverse $base^..HEAD"));
 
     return $commits[0] ?? $base;
@@ -203,7 +203,7 @@ function extract_mr($body): ?string
 
     // Walk from bottom to top
     for ($i = count($lines) - 1; $i >= 0; $i--) {
-        $line = trim($lines[$i]);
+        $line = trim($lines[$i], " \n\r\t\v\x00");
         if ($line === '') {
             continue;
         }
@@ -220,7 +220,7 @@ function extract_mr($body): ?string
 function clean_message($msg): string
 {
     $msg = strtok($msg, "\n");
-    return trim(explode('---', $msg)[0]);
+    return trim(explode('---', $msg)[0], " \n\r\t\v\x00");
 }
 
 function build_groups(array $commits): array
@@ -266,7 +266,7 @@ function build_groups(array $commits): array
 
         $msg = clean_message($subject);
         $mr = extract_mr($subject . "\n" . $body);
-        $hash = trim($hash);
+        $hash = trim($hash, " \n\r\t\v\x00");
         $url = $mr
             ? REPO_URL . "/-/merge_requests/$mr"
             : REPO_URL . "/-/commit/$hash";

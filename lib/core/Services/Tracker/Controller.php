@@ -1760,7 +1760,7 @@ class Services_Tracker_Controller
                     $field['selected_categories'] = $fieldsProcessed[$permName]['selected_categories'];
                 }
                 if (isset($field['freetags'])) {
-                    $freetags = trim($fieldsProcessed[$permName]['value']);
+                    $freetags = trim($fieldsProcessed[$permName]['value'], " \n\r\t\v\x00");
                     $freetags = explode(' ', $freetags);
                     $field['freetags'] = $freetags;
                 }
@@ -1837,7 +1837,7 @@ class Services_Tracker_Controller
         }
 
         $linkedItemIds = [];
-        $linkValue = trim($input->linkValue->text());
+        $linkValue = trim($input->linkValue->text(), " \n\r\t\v\x00");
 
         foreach ($input->items as $itemId) {
             $itemObject = Tracker_Item::fromId($itemId);

@@ -49,7 +49,7 @@ if (isset($_REQUEST['ext_remove'])) {
 }
 if (isset($_REQUEST['ext_add'])) {
     $cookietab = 2;
-    $rawField = trim($_REQUEST['ext_add']);
+    $rawField = trim($_REQUEST['ext_add'], " \n\r\t\v\x00");
     if ($rawField === '') {
         Feedback::error(tra('Field name cannot be empty.'));
     } elseif (mb_strlen($rawField) > 100) {

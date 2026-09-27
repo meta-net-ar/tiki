@@ -22,7 +22,7 @@ class Services_User_SocialController
 
     private function resolveUsername($rawUsername)
     {
-        $rawUsername = trim($rawUsername);
+        $rawUsername = trim($rawUsername, " \n\r\t\v\x00");
 
         if (! $rawUsername) {
             return '';

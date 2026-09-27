@@ -74,7 +74,7 @@ class Math_Formula_Function_Subtotal extends Math_Formula_Function
         // group values by field
         if (is_array($list)) {
             foreach ($list as $values) {
-                $group_value = trim($this->evaluateChild($group, $values));
+                $group_value = trim($this->evaluateChild($group, $values), " \n\r\t\v\x00");
                 if (! isset($out[$group_value])) {
                     $out[$group_value] = ['group' => $group_value];
                     foreach ($aggregate as $position => $field) {

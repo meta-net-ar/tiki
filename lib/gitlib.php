@@ -36,7 +36,7 @@ class GitLib extends TikiLib
             ob_start();
             $process = new Process(['which','git']);
             $process->run();
-            $git = trim($process->getOutput());
+            $git = trim($process->getOutput(), " \n\r\t\v\x00");
             ob_end_clean();
             if (! $process->getErrorOutput() && $git) {
                 $this->bin = $git;
@@ -78,7 +78,7 @@ class GitLib extends TikiLib
         }
 
         $ref = file_get_contents($filename);
-        $ref = trim($ref);
+        $ref = trim($ref, " \n\r\t\v\x00");
         $ref = explode(' ', $ref);
         return $ref[ 1 ];
     }
@@ -98,7 +98,7 @@ class GitLib extends TikiLib
         $filename = $this->dir . DIRECTORY_SEPARATOR . $branch;
         if (file_exists($filename) && is_readable($filename)) {
             $hash = file_get_contents($filename);
-            $hash = trim($hash);
+            $hash = trim($hash, " \n\r\t\v\x00");
             return $hash;
         }
 
@@ -137,8 +137,8 @@ class GitLib extends TikiLib
             return zlib_decode($object);
         } elseif ($this->getBin()) {
             $object = $this->run_git(['cat-file', '-t', $commit]);
-            $object = rtrim($object) . " " . $this->run_git(['cat-file', '-s', $commit]);
-            $object = rtrim($object) . "\0" . $this->run_git(['cat-file', '-p', $commit]);
+            $object = rtrim($object, " \n\r\t\v\x00") . " " . $this->run_git(['cat-file', '-s', $commit]);
+            $object = rtrim($object, " \n\r\t\v\x00") . "\0" . $this->run_git(['cat-file', '-p', $commit]);
             return $object;
         }
 

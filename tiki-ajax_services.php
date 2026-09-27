@@ -94,7 +94,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
     } elseif ($listonly == 'users') {
         $names_array = explode(',', str_replace(';', ',', $query));
         $filterNames = array_filter($names_array);
-        $last_name = trim(end($filterNames));
+        $last_name = trim(end($filterNames), " \n\r\t\v\x00");
         $groups = $jitRequest->groups->text();
         $groups = $groups ? explode(',', $groups) : [];
 
@@ -103,7 +103,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $access->output_serialized($listusers);
     } elseif ($listonly == 'usersandcontacts') {
         $email_array = explode(',', str_replace(';', ',', $query));
-        $last_email = trim(end($email_array));
+        $last_email = trim(end($email_array), " \n\r\t\v\x00");
 
         $contactlib = TikiLib::lib('contact');
         $listcontact = $contactlib->list_contacts($user);
@@ -131,7 +131,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $access->output_serialized($contacts);
     } elseif ($listonly == 'userrealnames') {
         $names_array = explode(',', str_replace(';', ',', $query));
-        $last_name = trim(end($names_array));
+        $last_name = trim(end($names_array), " \n\r\t\v\x00");
         $groups = $jitRequest->groups->text();
         $groups = $groups ? explode(',', $groups) : [];
         $listusers = $userlib->get_users_light(0, -1, 'login_asc', $last_name, $groups);
@@ -159,7 +159,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $access->output_serialized($finalusers);
     } elseif ($listonly == 'usersautocomplete') {
         $names_array = explode(',', str_replace(';', ',', $query));
-        $last_name = trim(end($names_array));
+        $last_name = trim(end($names_array), " \n\r\t\v\x00");
         $groups = $jitRequest->groups->text();
         $groups = $groups ? explode(',', $groups) : [];
         $listusers = $userlib->get_users_light(0, -1, 'login_asc', $last_name, $groups);

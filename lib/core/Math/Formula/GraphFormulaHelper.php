@@ -65,7 +65,7 @@ class GraphFormulaHelper
 
     public static function sanitize(string $formula): string
     {
-        return trim(str_replace(self::STRIP_CHARS, array_fill(0, count(self::STRIP_CHARS), ''), $formula));
+        return trim(str_replace(self::STRIP_CHARS, array_fill(0, count(self::STRIP_CHARS), ''), $formula), " \n\r\t\v\x00");
     }
 
     /**
@@ -73,7 +73,7 @@ class GraphFormulaHelper
      */
     public static function looksLegacy(string $formula): bool
     {
-        $formula = trim($formula);
+        $formula = trim($formula, " \n\r\t\v\x00");
         if ($formula === '' || $formula[0] === '(') {
             return false;
         }

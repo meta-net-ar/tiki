@@ -107,11 +107,11 @@ function wikiplugin_signature($data, $params)
 
     $params = array_merge($defaults, $params);
 
-    if (! preg_match('/px$|%$/', trim($params['height']))) {
+    if (! preg_match('/px$|%$/', trim($params['height'], " \n\r\t\v\x00"))) {
         $params['height'] = $params['height'] . 'px';
     }
 
-    if (! preg_match('/px$|%$/', trim($params['width']))) {
+    if (! preg_match('/px$|%$/', trim($params['width'], " \n\r\t\v\x00"))) {
         $params['width'] = $params['width'] . 'px';
     }
 

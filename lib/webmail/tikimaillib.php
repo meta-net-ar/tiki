@@ -134,7 +134,7 @@ class TikiMail
     {
         $headers = $this->mail->getHeaders();
         if (is_string($value)) {
-            $value = explode(',', trim($value));
+            $value = explode(',', trim($value, " \n\r\t\v\x00"));
         }
         switch ($name) {
             case 'Message-Id':
@@ -156,14 +156,14 @@ class TikiMail
     {
         // handle type lib/core/Tiki/SabreDav/Utilities.php: 'text/calendar; method=PUBLISH; name=event.ics'
         $parts = explode(';', $type);
-        $contentType = trim(array_shift($parts));
+        $contentType = trim(array_shift($parts), " \n\r\t\v\x00");
 
         $params = [];
         foreach ($parts as $param) {
-            $param = trim($param);
+            $param = trim($param, " \n\r\t\v\x00");
             if (str_contains($param, '=')) {
                 list($key, $value) = explode('=', $param, 2);
-                $params[strtolower(trim($key))] = trim($value, '" ');
+                $params[strtolower(trim($key, " \n\r\t\v\x00"))] = trim($value, '" ');
             }
         }
 
@@ -202,7 +202,7 @@ class TikiMail
         global $tikilib, $prefs;
         $logslib = TikiLib::lib('logs');
         $logEmailRes = [];
-        $logEmailRes['subject'] = trim($this->mail->getSubject());
+        $logEmailRes['subject'] = trim($this->mail->getSubject(), " \n\r\t\v\x00");
         foreach ($this->mail->getFrom() as $address) {
             $logEmailRes['from_email'] = $address->getAddress();
             $logEmailRes['from_name'] = $address->getName();
@@ -214,7 +214,7 @@ class TikiMail
         foreach ((array) $recipients as $to) {
             try {
                 $this->mail->addTo($to);
-                $addedRecipients[] = trim($to);
+                $addedRecipients[] = trim($to, " \n\r\t\v\x00");
             } catch (RfcComplianceException $e) {
                 $error = $e->getMessage();
                 $this->errors[] = $error;

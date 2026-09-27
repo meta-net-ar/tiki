@@ -526,10 +526,10 @@ if (! empty($_REQUEST['filtervalue_other'])) {
 }
 if (is_array($filtervalue)) {
     $filtervalue = array_map(static function ($value) {
-        return is_string($value) ? trim($value) : $value;
+        return is_string($value) ? trim($value, " \n\r\t\v\x00") : $value;
     }, $filtervalue);
 } elseif (is_string($filtervalue)) {
-    $filtervalue = trim($filtervalue);
+    $filtervalue = trim($filtervalue, " \n\r\t\v\x00");
 }
 
 if (! empty($filterfield)) {

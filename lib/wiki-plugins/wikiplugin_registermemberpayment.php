@@ -63,7 +63,7 @@ function wikiplugin_registermemberpayment($data, $params, $offset)
             $fixedperiod = explode(':', $fixedperiod);
             $name = $fixedperiod[0];
             $value = (! empty($fixedperiod[1]) ? $fixedperiod[1] : $fixedperiod[0]);
-            $fixedperiodsDDL .= '<option value="' . trim($value) . '">' . trim($name) . '</option>';
+            $fixedperiodsDDL .= '<option value="' . trim($value, " \n\r\t\v\x00") . '">' . trim($name, " \n\r\t\v\x00") . '</option>';
         }
     }
 

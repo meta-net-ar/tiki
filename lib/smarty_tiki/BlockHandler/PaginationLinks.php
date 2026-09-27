@@ -176,7 +176,7 @@ class PaginationLinks extends Base implements TikiSmartyExtensionInterface
         }
 
         // remove old arguments that will be replaced and add new ones
-        $url = preg_replace('/(?<=&amp;|&|\?)(move|reloff|' . $params['offset_arg'] . ')=[^&]*/', '', trim($url));
+        $url = preg_replace('/(?<=&amp;|&|\?)(move|reloff|' . $params['offset_arg'] . ')=[^&]*/', '', trim($url, " \n\r\t\v\x00"));
 
         // remove &amp; that are redundant or at the end of url
         $url = preg_replace('/(?:(\?|&amp;)(&amp;)+|(\?|&amp;))$/', '\\1', $url);

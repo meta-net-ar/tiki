@@ -419,8 +419,8 @@ class CommentsTest extends TikiTestCase
 
         // Configure mock behaviors
         $userlib->method('user_exists')->willReturnMap([
-            [trim($GLOBALS['user']), true],
-            [trim('Anonymous User'), false]
+            [trim($GLOBALS['user'], " \n\r\t\v\x00"), true],
+            [trim('Anonymous User', " \n\r\t\v\x00"), false]
         ]);
         $tikilib->method('add_user_watch')->willReturn(true);
 
@@ -428,7 +428,7 @@ class CommentsTest extends TikiTestCase
         $normalPost = [
             'object' => 'forum',
             'parentId' => 0,
-            'user' => trim($GLOBALS['user']),
+            'user' => trim($GLOBALS['user'], " \n\r\t\v\x00"),
             'title' => 'Test Title',
             'data' => 'Test Data',
             'forumId' => $this->forumId,
@@ -473,7 +473,7 @@ class CommentsTest extends TikiTestCase
 
         // Test Case 2: Anonymous post
         $anonymousPost = array_merge($normalPost, [
-            'user' => trim('Anonymous User'),
+            'user' => trim('Anonymous User', " \n\r\t\v\x00"),
             'email' => 'anon@example.com'
         ]);
         $qId2 = $this->queueTable->insert($anonymousPost);
@@ -884,7 +884,7 @@ class CommentsTest extends TikiTestCase
         $commentResult = $this->commentsLib->post_new_comment(
             "forum:$this->forumId",
             $parentId,
-            trim($GLOBALS['user']), // Ensure username is trimmed
+            trim($GLOBALS['user'], " \n\r\t\v\x00"), // Ensure username is trimmed
             "Test Comment",
             "Comment content",
             $message_id
@@ -911,7 +911,7 @@ class CommentsTest extends TikiTestCase
             1,
             $queueData['object'],
             $threadId, // Use threadId as parentId
-            trim($GLOBALS['user']), // Ensure username is trimmed
+            trim($GLOBALS['user'], " \n\r\t\v\x00"), // Ensure username is trimmed
             $queueData['title'],
             $queueData['data'],
             $queueData['type'],
@@ -1644,12 +1644,12 @@ class CommentsTest extends TikiTestCase
             "",   // summary
             "",   // smiley
             "",   // contributions
-            trim($anonymousName)  // Ensure the anonymous name is trimmed
+            trim($anonymousName, " \n\r\t\v\x00")  // Ensure the anonymous name is trimmed
         );
 
         $this->assertGreaterThan(0, $threadId2, "Anonymous comment should be created");
         $comment2 = $this->commentsLib->get_comment($threadId2);
-        $this->assertEquals(trim($anonymousName), trim($comment2['userName']), "Anonymous username should match after trimming");
+        $this->assertEquals(trim($anonymousName, " \n\r\t\v\x00"), trim($comment2['userName'], " \n\r\t\v\x00"), "Anonymous username should match after trimming");
 
         // Test Case 3: Comment with special characters
         $messageId3 = uniqid();

@@ -47,7 +47,7 @@ class DisallowSymfonyProcessSniff implements Sniff
 
         $end = $phpcsFile->findNext($find, ($stackPtr + 1));
         $name = $phpcsFile->getTokensAsString(($stackPtr + 1), ($end - $stackPtr - 1));
-        $name = trim($name);
+        $name = trim($name, " \n\r\t\v\x00");
 
         $regex = '/Symfony\\\\Component\\\\Process\\\\Process( .+)$/';
         if (preg_match($regex, $name)) {

@@ -2111,7 +2111,7 @@ class UsersLib extends TikiLib
             $this->set_user_password($res['userId'], $pass);
             return [USER_VALID, $user];
         }
-        if (! empty($pass) && $res['hash'] === md5($user . $pass . trim($res['email']))) { // very ancient method md5(user.pass.email), for compatibility
+        if (! empty($pass) && $res['hash'] === md5($user . $pass . trim($res['email'], " \n\r\t\v\x00"))) { // very ancient method md5(user.pass.email), for compatibility
             $this->set_user_password($res['userId'], $pass);
             return [USER_VALID, $user];
         }
@@ -7197,7 +7197,7 @@ class UsersLib extends TikiLib
             $autogenerate_uname = true;
         }
 
-        $user = trim($user);
+        $user = trim($user, " \n\r\t\v\x00");
         if (
             $this->user_exists($user)
                 || empty($user)
@@ -7865,7 +7865,7 @@ class UsersLib extends TikiLib
     ) {
 
         $tikilib = TikiLib::lib('tiki');
-        $group = trim($group);
+        $group = trim($group, " \n\r\t\v\x00");
 
         if ($this->group_exists($group)) {
             return false;
@@ -8959,7 +8959,7 @@ class UsersLib extends TikiLib
             if (empty($u)) {
                 continue;
             }
-            $u = trim($u);
+            $u = trim($u, " \n\r\t\v\x00");
             if (! $u) {
                 continue;
             }
@@ -8990,7 +8990,7 @@ class UsersLib extends TikiLib
         $tikilib = TikiLib::lib('tiki');
         if ($prefs['user_show_realnames'] == 'y' || $force_check_realnames) {
             // need to trim to prevent mustMatch failure
-            $realname = trim($tikilib->get_user_preference($u, 'realName', ''));
+            $realname = trim($tikilib->get_user_preference($u, 'realName', ''), " \n\r\t\v\x00");
         }
         if (! empty($realname)) {
             $u = $realname;

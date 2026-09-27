@@ -57,7 +57,7 @@ class DbgSQLQuery extends DebuggerCommand
         $debugger->msg('SQL query: "' . $params . '"');
 
         //
-        if (strlen(trim($params)) != 0) {
+        if (strlen(trim($params, " \n\r\t\v\x00")) != 0) {
             try {
                 $query = TikiDb::get()->query($params, null, -1, -1, 'exception');
                 // Check if result value an array or smth else

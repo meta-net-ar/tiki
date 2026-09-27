@@ -149,7 +149,7 @@ class Tracker_Field_Checkbox extends \Tracker\Field\AbstractItemField implements
                 return ('y' === $value) ? 'X' : '';
             })
             ->setParseIntoTransform(function (&$info, $value) use ($permName) {
-                $value = trim($value);
+                $value = trim($value, " \n\r\t\v\x00");
                 $info['fields'][$permName] = empty($value) ? 'n' : 'y';
             })
             ;

@@ -104,8 +104,8 @@ class ServicesPeerTubeController
 
         // Handle POST upload
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['video'])) {
-            $name = trim($input->name->text());
-            $desc = trim($input->description->text());
+            $name = trim($input->name->text(), " \n\r\t\v\x00");
+            $desc = trim($input->description->text(), " \n\r\t\v\x00");
             $channelId = $input->channelId->int();
             $privacy = $input->privacy->int();
 

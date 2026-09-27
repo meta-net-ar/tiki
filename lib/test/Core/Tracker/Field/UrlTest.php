@@ -14,7 +14,7 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsWikiSyntaxLinkSupportedInputs(string $value): void
     {
-        $this->assertTrue($this->invokeIsWikiSyntaxLink(trim($value)));
+        $this->assertTrue($this->invokeIsWikiSyntaxLink(trim($value, " \n\r\t\v\x00")));
     }
 
     /**
@@ -22,7 +22,7 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
      */
     public function testIsWikiSyntaxLinkUnsupportedInputs(string $value): void
     {
-        $this->assertFalse($this->invokeIsWikiSyntaxLink(trim($value)));
+        $this->assertFalse($this->invokeIsWikiSyntaxLink(trim($value, " \n\r\t\v\x00")));
     }
 
     public static function supportedWikiSyntaxProvider(): array

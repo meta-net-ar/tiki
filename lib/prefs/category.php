@@ -202,7 +202,7 @@ function prefs_category_serialize_defaults($data)
         }
     }
 
-    return trim($out);
+    return trim($out, " \n\r\t\v\x00");
 }
 
 function prefs_category_unserialize_defaults($string)

@@ -111,7 +111,7 @@ if (isset($_REQUEST["remove"]) && $access->checkCsrf(true)) {
     }
 }
 if ((isset($_REQUEST["save"]) || isset($_REQUEST["add"])) && $access->checkCsrf()) {
-    if (empty($_REQUEST["title"]) || trim($_REQUEST["title"]) === '') {
+    if (empty($_REQUEST["title"]) || trim($_REQUEST["title"], " \n\r\t\v\x00") === '') {
         Feedback::error(tr('Poll title is required. Please provide a title.'));
     } else {
         if ($prefs['feature_jscalendar'] == 'y' && ! empty($_REQUEST['pollPublishDate'])) {

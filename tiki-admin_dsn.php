@@ -56,7 +56,7 @@ if (isset($_REQUEST["remove"]) && $access->checkCsrf(true)) {
     }
 }
 if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
-    if (empty(trim($_REQUEST["name"])) || empty(trim($_REQUEST["dsn"]))) {
+    if (empty(trim($_REQUEST["name"], " \n\r\t\v\x00")) || empty(trim($_REQUEST["dsn"], " \n\r\t\v\x00"))) {
         Feedback::error(tr('Both DSN and name fields are required.'));
     } else {
         $result = $adminlib->replace_dsn($_REQUEST["dsnId"], $_REQUEST["dsn"], $_REQUEST['name']);

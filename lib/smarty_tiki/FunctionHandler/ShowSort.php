@@ -42,7 +42,7 @@ class ShowSort extends Base implements TikiSmartyExtensionInterface
                 $prop = substr($value, 0, strrpos($value, '_'));
                 $order = substr($value, strrpos($value, '_') + 1);
 
-                if (strtolower($prop) == strtolower(trim($params['var']))) {
+                if (strtolower($prop) == strtolower(trim($params['var'], " \n\r\t\v\x00"))) {
                     switch ($order) {
                         case 'asc':
                         case 'nasc':

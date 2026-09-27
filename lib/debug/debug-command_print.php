@@ -42,11 +42,11 @@ class DbgPrint extends DebuggerCommand
         $result = '';
         $vars = explode(" ", $params);
         foreach ($vars as $v) {
-            if (strlen(str_replace('$', '', trim($v))) == 0) {
+            if (strlen(str_replace('$', '', trim($v, " \n\r\t\v\x00"))) == 0) {
                 continue;
             }
             $result .= $v . ' = ';
-            $result .= trim($debugger->str_var_dump($v)) . "\n";
+            $result .= trim($debugger->str_var_dump($v), " \n\r\t\v\x00") . "\n";
         }
         return $result;
     }

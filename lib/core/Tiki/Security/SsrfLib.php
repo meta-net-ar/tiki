@@ -102,7 +102,7 @@ class SsrfLib
      */
     public function isUrlAllowed(string $url): bool
     {
-        $url = trim($url);
+        $url = trim($url, " \n\r\t\v\x00");
 
         if ($url === '' || ! filter_var($url, FILTER_VALIDATE_URL)) {
             return false;

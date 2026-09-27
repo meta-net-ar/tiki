@@ -38,19 +38,19 @@ class Multilingual_Aligner_UpdatePages
         $target_modified_sentences[count($target_modified_sentences)] = 'dummy';
         $i = -1;
         for ($a = 0, $aCountSourceOutofdateSentences = count($source_outofdate_sentences); $a < $aCountSourceOutofdateSentences; $a++) {
-            $source_outofdate_sentences[$a] = trim($source_outofdate_sentences[$a]);
+            $source_outofdate_sentences[$a] = trim($source_outofdate_sentences[$a], " \n\r\t\v\x00");
         }
 
         for ($a = 0, $aCountSourceModifiedSentences = count($source_modified_sentences); $a < $aCountSourceModifiedSentences; $a++) {
-            $source_modified_sentences[$a] = trim($source_modified_sentences[$a]);
+            $source_modified_sentences[$a] = trim($source_modified_sentences[$a], " \n\r\t\v\x00");
         }
 
         for ($a = 0, $aCountTargetOutofdateSentences = count($target_outofdate_sentences); $a < $aCountTargetOutofdateSentences; $a++) {
-            $target_outofdate_sentences[$a] = trim($target_outofdate_sentences[$a]);
+            $target_outofdate_sentences[$a] = trim($target_outofdate_sentences[$a], " \n\r\t\v\x00");
         }
 
         for ($a = 0, $aCountTargetModifiedSentences = count($target_modified_sentences); $a < $aCountTargetModifiedSentences; $a++) {
-            $target_modified_sentences[$a] = trim($target_modified_sentences[$a]);
+            $target_modified_sentences[$a] = trim($target_modified_sentences[$a], " \n\r\t\v\x00");
         }
 
         $update = new Multilingual_Aligner_UpdateSentences();
@@ -58,11 +58,11 @@ class Multilingual_Aligner_UpdatePages
         $target_diff = $update->DifferencebetweenOriginalFileandModifiedFile($target_outofdate_sentences, $target_modified_sentences, $this->alignments, $this->translator, 'en', 'fr', 0);
 
         for ($a = 0, $aCountSourceDiff = count($source_diff); $a < $aCountSourceDiff; $a++) {
-            $source_diff[$a] = trim($source_diff[$a]);
+            $source_diff[$a] = trim($source_diff[$a], " \n\r\t\v\x00");
         }
 
         for ($a = 0, $aCountTargetDiff = count($target_diff); $a < $aCountTargetDiff; $a++) {
-            $target_diff[$a] = trim($target_diff[$a]);
+            $target_diff[$a] = trim($target_diff[$a], " \n\r\t\v\x00");
             if ($target_diff[$a] == '+dummy') {
                 unset($target_diff[$a]);
             }

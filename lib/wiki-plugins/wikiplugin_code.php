@@ -146,7 +146,7 @@ function wikiplugin_code($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    $code = trim($data);
+    $code = trim($data, " \n\r\t\v\x00");
     if ($mediawiki == '1') {
         return "<code>$code</code>";
     }

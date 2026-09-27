@@ -23,6 +23,6 @@ function wikiplugin_center_info()
 
 function wikiplugin_center($data, $params)
 {
-    $data = '<div style="text-align:center">' . trim($data) . '</div>';
+    $data = '<div style="text-align:center">' . trim($data, " \n\r\t\v\x00") . '</div>';
     return $data;
 }

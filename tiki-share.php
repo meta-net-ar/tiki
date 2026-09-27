@@ -511,7 +511,7 @@ function normalizeShareEmailAddresses($raw): array
     $seen = [];
     $out = [];
     foreach ($parts as $p) {
-        $p = trim((string) $p);
+        $p = trim((string) $p, " \n\r\t\v\x00");
         if ($p === '') {
             continue;
         }

@@ -71,7 +71,7 @@ class Tiki_Profile_Object
     public function getRef()
     {
         if (isset($this->data['ref'])) {
-            return trim($this->data['ref']);
+            return trim($this->data['ref'], " \n\r\t\v\x00");
         }
     }
 

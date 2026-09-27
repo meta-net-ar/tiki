@@ -265,12 +265,12 @@ function wikiplugin_include($dataIn, $params)
                     if ($state == 0) {
                         // Searching for start marker, dropping lines until found
                         unset($lines[$i]);  // Drop the line
-                        if (0 == strcmp($start, trim($line))) {
+                        if (0 == strcmp($start, trim($line, " \n\r\t\v\x00"))) {
                             $state = 1; // Start retaining lines and searching for stop marker
                         }
                     } else {
                         // Searching for stop marker, retaining lines until found
-                        if (0 == strcmp($stop, trim($line))) {
+                        if (0 == strcmp($stop, trim($line, " \n\r\t\v\x00"))) {
                             unset($lines[$i]);  // Stop marker, drop the line
                             $state = 0;         // Go back to looking for start marker
                         }
@@ -281,7 +281,7 @@ function wikiplugin_include($dataIn, $params)
                 // it is found.
                 foreach ($lines as $i => $line) {
                     unset($lines[$i]); // Drop the line
-                    if (0 == strcmp($start, trim($line))) {
+                    if (0 == strcmp($start, trim($line, " \n\r\t\v\x00"))) {
                         break;
                     }
                 }
@@ -295,7 +295,7 @@ function wikiplugin_include($dataIn, $params)
                         unset($lines[$i]);
                     } else {
                         // Searching for stop marker, retaining lines until found
-                        if (0 == strcmp($stop, trim($line))) {
+                        if (0 == strcmp($stop, trim($line, " \n\r\t\v\x00"))) {
                             unset($lines[$i]);  // Stop marker, drop the line
                             $state = 0;         // Start dropping lines
                         }

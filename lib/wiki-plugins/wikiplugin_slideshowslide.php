@@ -202,5 +202,5 @@ function wikiplugin_slideshowslide($data, $params)
         $slideEnd = "</td></tr></table>";
     }
 
-    return "<sslide id= data-plugin-slide " . $slideSettings . " " . $textColorStyle . ">" . html_entity_decode(TikiLib::lib('parser')->parse_data(trim($data), ['is_html' => true, 'parse_wiki' => true])) . $slideEnd . '</sslide>';
+    return "<sslide id= data-plugin-slide " . $slideSettings . " " . $textColorStyle . ">" . html_entity_decode(TikiLib::lib('parser')->parse_data(trim($data, " \n\r\t\v\x00"), ['is_html' => true, 'parse_wiki' => true])) . $slideEnd . '</sslide>';
 }

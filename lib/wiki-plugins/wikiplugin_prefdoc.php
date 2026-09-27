@@ -246,7 +246,7 @@ class PrefsDoc extends TWVersion
         }
         // end first processing the below should be applied to the above.... not a continuation (eg. empty array)
         $this->prefDefault = $this->prefDefault ?? '';
-        $this->prefDefault = trim($this->prefDefault);
+        $this->prefDefault = trim($this->prefDefault, " \n\r\t\v\x00");
 
         if ($this->prefDefault == '') {
             $this->prefDefault = '<span style="color:gray">None</span>';
@@ -361,7 +361,7 @@ class PrefsDoc extends TWVersion
                 $escapedString = ' ~np~';
             }
             $escapedString .= str_replace("\n", ' ', $string);
-            $escapedString = trim($escapedString);
+            $escapedString = trim($escapedString, " \n\r\t\v\x00");
             if ($escape) {
                 $escapedString .= '~/np~';
             }

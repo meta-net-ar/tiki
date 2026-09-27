@@ -156,7 +156,7 @@ class ImagickNew extends ImageAbstract
     public function isSupported($format)
     {
         $image = new Imagick();
-        $format = strtoupper(trim($format));
+        $format = strtoupper(trim($format, " \n\r\t\v\x00"));
 
         // Theses formats have pb if multipage document
         switch ($format) {

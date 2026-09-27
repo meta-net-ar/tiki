@@ -44,7 +44,7 @@ class Tiki_Editable_Value
         $objectStore = htmlspecialchars($this->objectStoreUrl);
 
         $value = $this->inner;
-        if (trim(strip_tags($value)) == '') {
+        if (trim(strip_tags($value), " \n\r\t\v\x00") == '') {
             // When the value is empty, make sure it becomes visible/clickable
             $value .= '&nbsp;';
         }

@@ -669,7 +669,7 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
                     ];
                 }
 
-                $value = trim($value);
+                $value = trim($value, " \n\r\t\v\x00");
                 if ($value == 'X' || $value == 'x') {
                     $info['fields'][$permName]['incremental']['+'][] = $categId;
                 } else {

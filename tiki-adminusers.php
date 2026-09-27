@@ -304,11 +304,11 @@ if (isset($_REQUEST['batch']) && is_uploaded_file($_FILES['csvlist']['tmp_name']
         $AddUser = false;
     }
 
-    $newPass = $_POST['pass'] ? trim($_POST['pass']) : trim($_POST['genepass']);
+    $newPass = $_POST['pass'] ? trim($_POST['pass'], " \n\r\t\v\x00") : trim($_POST['genepass'], " \n\r\t\v\x00");
 
     // Check if the user already exists
 
-    $_REQUEST['login'] = trim($_REQUEST['login']);
+    $_REQUEST['login'] = trim($_REQUEST['login'], " \n\r\t\v\x00");
 
     if ($userlib->user_exists($_REQUEST['login'])) {
         $errors[] = sprintf(tra('User %s already exists'), $_REQUEST['login']);
@@ -460,7 +460,7 @@ if (isset($_REQUEST['user']) and $_REQUEST['user']) {
 
     // If login is e-mail, email field needs to be the same as name (and is generally not send)
     if ($prefs['login_is_email'] == 'y' && isset($_POST['login'])) {
-        $_POST['email'] = trim($_POST['login']);
+        $_POST['email'] = trim($_POST['login'], " \n\r\t\v\x00");
     }
 
     if (
@@ -468,7 +468,7 @@ if (isset($_REQUEST['user']) and $_REQUEST['user']) {
         && $access->checkCsrf(true)
     ) {
         if (! empty($_POST['login'])) {
-            $_POST['login'] = trim($_POST['login']);
+            $_POST['login'] = trim($_POST['login'], " \n\r\t\v\x00");
             if ($prefs['login_is_email'] == 'y' && strlen($_REQUEST['login']) > 200 && ($userinfo['login'] != $_POST['login'] || $userinfo['email'] != $_POST['email'])) {
                 $errors[] = sprintf(tra('Username %s must be less than 200 characters.'), $_REQUEST['login']);
             } elseif ($prefs['login_is_email'] == 'n' && (strlen($_REQUEST['login']) > $prefs['max_username_length'] || strlen($_REQUEST['login']) < $prefs['min_username_length']) && $userinfo['login'] != $_POST['login']) {
@@ -514,7 +514,7 @@ if (isset($_REQUEST['user']) and $_REQUEST['user']) {
             }
 
             if ($tiki_p_admin == 'y' || $tiki_p_admin_users == 'y' || $userinfo['login'] == $user) {
-                $newPass = $_POST['pass'] ? trim($_POST['pass']) : ($_POST['genepass'] ? trim($_POST['genepass']) : null);
+                $newPass = $_POST['pass'] ? trim($_POST['pass'], " \n\r\t\v\x00") : ($_POST['genepass'] ? trim($_POST['genepass'], " \n\r\t\v\x00") : null);
                 if (! empty($newPass)) {
                     $polerr = $userlib->check_password_policy($newPass);
                     if (strlen($polerr) > 0) {
@@ -613,11 +613,11 @@ if (isset($_REQUEST['user']) and $_REQUEST['user']) {
 } else {
     //For to get informations entered and placed in the fields
     if (isset($_REQUEST['login'])) {
-        $userinfo['login'] = strip_tags((trim($_REQUEST['login'])));
+        $userinfo['login'] = strip_tags((trim($_REQUEST['login'], " \n\r\t\v\x00")));
     }
 
     if (isset($_REQUEST['email'])) {
-        $userinfo['email'] = strip_tags((trim($_REQUEST['email'])));
+        $userinfo['email'] = strip_tags((trim($_REQUEST['email'], " \n\r\t\v\x00")));
     }
 
     /**

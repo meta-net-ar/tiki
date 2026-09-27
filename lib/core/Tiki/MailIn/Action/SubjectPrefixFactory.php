@@ -25,7 +25,7 @@ class SubjectPrefixFactory implements FactoryInterface
 
         foreach ($this->config as $prefix => $factory) {
             if (empty($prefix) || strpos($subject, $prefix) === 0) {
-                $subject = trim(substr($subject, strlen($prefix)));
+                $subject = trim(substr($subject, strlen($prefix)), " \n\r\t\v\x00");
                 $message->setSubject($subject);
 
                 return $factory->createAction($account, $message);

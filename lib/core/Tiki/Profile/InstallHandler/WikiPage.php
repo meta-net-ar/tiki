@@ -231,7 +231,7 @@ class Tiki_Profile_InstallHandler_WikiPage extends Tiki_Profile_InstallHandler
             }
 
             if ($this->mode == 'append') {
-                $this->content = rtrim($info['data']) . "\n" . trim($this->content) . "\n";
+                $this->content = rtrim($info['data'], " \n\r\t\v\x00") . "\n" . trim($this->content, " \n\r\t\v\x00") . "\n";
             }
 
             if (! $this->message) {

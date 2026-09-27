@@ -308,7 +308,7 @@ See above details about each error or failure.
         $answer = null;
         while ($answer == null) {
             echo $prompt;
-            $tentative_answer = rtrim(fgets(STDIN));
+            $tentative_answer = rtrim(fgets(STDIN), " \n\r\t\v\x00");
             if (in_array($tentative_answer, $eligible_answers)) {
                 $answer = $tentative_answer;
             } else {

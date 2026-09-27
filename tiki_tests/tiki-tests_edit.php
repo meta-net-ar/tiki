@@ -113,7 +113,7 @@ function save_test($urls, $file, $options)
             $u->appendChild($post);
         }
 
-        if (trim($url['xpath']) != '') {
+        if (trim($url['xpath'], " \n\r\t\v\x00") != '') {
             $xpath = $dom->createElement('xpath', $url['xpath']);
             $u->appendChild($xpath);
         }
@@ -174,8 +174,8 @@ $count = 0;
 foreach ($urls as $url) {
     if (! (isset($_REQUEST['delete'][$count]) and $_REQUEST['delete'][$count] == 'delete')) {
         $result[$count] = get_url($url, $options['use_tidy'] == 'y');
-        if ($edit and is_string($_REQUEST['xpath'][$count]) and trim($_REQUEST['xpath'][$count]) != '') {
-            $result[$count]['xpath'] = trim($_REQUEST['xpath'][$count]);
+        if ($edit and is_string($_REQUEST['xpath'][$count]) and trim($_REQUEST['xpath'][$count], " \n\r\t\v\x00") != '') {
+            $result[$count]['xpath'] = trim($_REQUEST['xpath'][$count], " \n\r\t\v\x00");
         } elseif ($edit) {
             unset($result[$count]['xpath']);
         }

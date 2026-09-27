@@ -863,7 +863,7 @@ class ArtLib extends TikiLib
             return false;
         }
         for ($i = 0, $icount_fds = count($fds); $i < $icount_fds; $i++) {
-            $fields[trim($fds[$i])] = $i;
+            $fields[trim($fds[$i], " \n\r\t\v\x00")] = $i;
         }
         if (! isset($fields['title'])) {
             $fields['title']                = $i++;
@@ -1556,7 +1556,7 @@ class ArtLib extends TikiLib
         $relationlib = TikiLib::lib('relation');
         $attributelib = TikiLib::lib('attribute');
 
-        $fullAttributeName = TikiFilter::get('attribute_type')->filter(trim('tiki.article.' . $attributeName));
+        $fullAttributeName = TikiFilter::get('attribute_type')->filter(trim('tiki.article.' . $attributeName, " \n\r\t\v\x00"));
         $relationId = $relationlib->add_relation('tiki.article.attribute', 'articletype', $artType, 'attribute', $fullAttributeName);
         if (! $relationId) {
             return 0;

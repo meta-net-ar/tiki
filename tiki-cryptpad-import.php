@@ -21,7 +21,7 @@ function tiki_cp_origin_from_base(string $base): string
     return $origin;
 }
 
-$cryptpadBase = trim($prefs['cryptpad_base_url'] ?? '');
+$cryptpadBase = trim($prefs['cryptpad_base_url'] ?? '', " \n\r\t\v\x00");
 $allowOrigin = tiki_cp_origin_from_base($cryptpadBase);
 if (! empty($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     if ($allowOrigin) {

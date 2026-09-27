@@ -67,10 +67,10 @@ class UnoserverStrategy implements ConverterInterface
             $errorMessage .= "Exit code: " . $process->getExitCode() . "\n";
 
             if ($errorOutput) {
-                $errorMessage .= "Error output: " . trim($errorOutput) . "\n";
+                $errorMessage .= "Error output: " . trim($errorOutput, " \n\r\t\v\x00") . "\n";
             }
             if ($standardOutput) {
-                $errorMessage .= "Standard output: " . trim($standardOutput);
+                $errorMessage .= "Standard output: " . trim($standardOutput, " \n\r\t\v\x00");
             }
 
             throw new \Exception(tr($errorMessage));

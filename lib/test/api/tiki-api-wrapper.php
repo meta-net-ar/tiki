@@ -38,11 +38,11 @@ if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'PATCH', 'DELETE'
             $_POST = array_merge($_POST, $postData);
         } elseif (strpos($contentType, 'multipart/form-data') !== false) {
             if (preg_match('/boundary=(.*)$/', $contentType, $matches)) {
-                $boundary = trim($matches[1]);
+                $boundary = trim($matches[1], " \n\r\t\v\x00");
                 $parts = explode('--' . $boundary, $input);
 
                 foreach ($parts as $part) {
-                    if (empty(trim($part)) || $part === '--') {
+                    if (empty(trim($part, " \n\r\t\v\x00")) || $part === '--') {
                         continue;
                     }
 
@@ -67,7 +67,7 @@ if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'PATCH', 'DELETE'
                             ];
                         } else {
                             // For regular form fields, trim the value
-                            $_POST[$name] = trim($value);
+                            $_POST[$name] = trim($value, " \n\r\t\v\x00");
                         }
                     }
                 }

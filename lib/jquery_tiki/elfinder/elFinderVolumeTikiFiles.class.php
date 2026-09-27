@@ -772,7 +772,7 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
         } else {
             $isgal = true;
         }
-        $name = trim(strip_tags($name));
+        $name = trim(strip_tags($name), " \n\r\t\v\x00");
         if (! $isgal) {
             $srcId = $this->pathToId($source);
         } else {
@@ -810,7 +810,7 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
         } else {
             $isgal = true;
         }
-        $name = trim(strip_tags($name));
+        $name = trim(strip_tags($name), " \n\r\t\v\x00");
         if (! $isgal) {
             $srcDirId = $this->options['accessControlData']['parentIds']['files'][$this->pathToId($source)];
         } else {

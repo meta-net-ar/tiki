@@ -146,7 +146,7 @@ function checkTranslationFile($file)
         $i = 0;
         while (($line = fgets($fileHandler)) !== false) {
             $i++;
-            $lineTrim = trim($line);
+            $lineTrim = trim($line, " \n\r\t\v\x00");
 
             // Skip empty lines and comment lines
             if ($lineTrim === '' || str_starts_with($lineTrim, '//') || str_starts_with($lineTrim, '#')) {

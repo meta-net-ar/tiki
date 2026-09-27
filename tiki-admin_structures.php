@@ -154,11 +154,11 @@ if ($tiki_p_edit_structures == 'y') {
         foreach ($tree_lines as $full_line) {
             $names = explode("->", $full_line);
             $line = $names[0];
-            $line = rtrim($line);
+            $line = rtrim($line, " \n\r\t\v\x00");
             // count the depth level (leading spaces indicate it)
-            $tabs = strlen($line) - strlen(ltrim($line));
+            $tabs = strlen($line) - strlen(ltrim($line, " \n\r\t\v\x00"));
             // Is there smth else 'cept spaces?
-            if (strlen($line = trim($line))) {
+            if (strlen($line = trim($line, " \n\r\t\v\x00"))) {
                 $parent_id = $parents[$tabs];
                 if (isset($last_pages[$tabs])) {
                     $last_page = $last_pages[$tabs];
@@ -169,17 +169,17 @@ if ($tiki_p_edit_structures == 'y') {
                 if (! empty($names[1])) {
                     $alias = $names[1];
                 }
-                if ($tikilib->page_exists(trim($line))) {
-                    $strucs = $structlib->get_page_structures(trim($line));
+                if ($tikilib->page_exists(trim($line, " \n\r\t\v\x00"))) {
+                    $strucs = $structlib->get_page_structures(trim($line, " \n\r\t\v\x00"));
                     if (count($strucs) > 0) {
-                        $alert_in_st[] = trim($line);
+                        $alert_in_st[] = trim($line, " \n\r\t\v\x00");
                     }
                 }
-                $new_page_ref_id = $structlib->s_create_page($parent_id, $last_page, trim($line), trim($alias), $structure_id);
+                $new_page_ref_id = $structlib->s_create_page($parent_id, $last_page, trim($line, " \n\r\t\v\x00"), trim($alias, " \n\r\t\v\x00"), $structure_id);
                 if (isset($new_page_ref_id)) {
                     $parents[$tabs + 1] = $new_page_ref_id;
                     $last_pages[$tabs] = $new_page_ref_id;
-                    $cat_name = trim($line);
+                    $cat_name = trim($line, " \n\r\t\v\x00");
                     $cat_objid = $cat_name;
                     $cat_href = "tiki-index.php?page=" . urlencode($cat_name);
                     $catObjectId = $categlib->is_categorized($cat_type, $cat_objid);

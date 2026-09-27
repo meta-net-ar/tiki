@@ -358,7 +358,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             if (isset($requestData[$string_id])) {
                 $parts = is_array($data['value']) ? array_values($data['value']) : preg_split('/[\s,]+/', $data['value'], -1, PREG_SPLIT_NO_EMPTY);
                 if (array_filter($parts, fn($v) => str_starts_with($v, 'trackeritem:'))) {
-                    $parts = array_values(array_filter(array_map(fn($v) => preg_replace('/^trackeritem:/', '', trim($v)), $parts)));
+                    $parts = array_values(array_filter(array_map(fn($v) => preg_replace('/^trackeritem:/', '', trim($v, " \n\r\t\v\x00")), $parts)));
                 }
                 $data['value'] = $parts;
             } elseif (! is_array($data['value'])) {
@@ -1652,11 +1652,11 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 AND ttif.`fieldId` = ?", [$trackerId, $fieldId]);
         foreach ($data as $row) {
             $itemId = $row['itemId'];
-            $remoteIds = array_filter(explode(',', trim($row['value'])));
+            $remoteIds = array_filter(explode(',', trim($row['value'], " \n\r\t\v\x00")));
             $value = implode(
                 "\n",
                 array_map(function ($v) {
-                    return "trackeritem:" . trim($v);
+                    return "trackeritem:" . trim($v, " \n\r\t\v\x00");
                 }, $remoteIds)
             );
             $trklib->table('tiki_tracker_item_fields')->update(

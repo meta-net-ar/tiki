@@ -101,7 +101,7 @@ class ocrLib extends TikiLib
             $return = 0;
             exec($cmd, $output, $return);
             if ($return === 0) {
-                $result = trim(array_shift($output));
+                $result = trim(array_shift($output), " \n\r\t\v\x00");
                 if (! empty($result)) {
                     return $result;
                 }

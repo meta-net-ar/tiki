@@ -161,7 +161,7 @@ EXPECT;
         $matches = WikiParser_PluginMatcher::match($content);
 
         foreach ($matches as $plugin) {
-            $this->assertEquals(trim($expect), trim($plugin->getBody()));
+            $this->assertEquals(trim($expect, " \n\r\t\v\x00"), trim($plugin->getBody(), " \n\r\t\v\x00"));
         }
     }
 }

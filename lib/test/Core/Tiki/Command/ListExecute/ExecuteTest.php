@@ -84,7 +84,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
         );
 
         $pageName = self::PAGE_NAME;
-        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()), " \n\r\t\v\x00");
         $expected = "[ERROR] Action action failed on page {$pageName}. ListExecute plugin is pending for approval.";
         $this->assertStringContainsString($expected, $actual);
         $this->assertEquals(1, $this->commandTester->getStatusCode());
@@ -107,7 +107,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
         );
 
         $pageName = self::PAGE_NAME;
-        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()), " \n\r\t\v\x00");
         $expected = "[ERROR] Action action failed on page {$pageName}. ListExecute plugin was rejected.";
         $this->assertStringContainsString($expected, $actual);
         $this->assertEquals(1, $this->commandTester->getStatusCode());
@@ -129,7 +129,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
             ]
         );
 
-        $actual = trim($this->commandTester->getDisplay());
+        $actual = trim($this->commandTester->getDisplay(), " \n\r\t\v\x00");
         $pageName = self::PAGE_NAME;
 
         $expected = "[OK] Action action executed on page {$pageName}.";
@@ -157,7 +157,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
         );
 
         $pageName = self::PAGE_NAME;
-        $actualString = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $actualString = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()), " \n\r\t\v\x00");
         $expectedString = "[WARNING] Some commands may need to determine the URL of the website and will not be able to do so reliably because fallbackBaseUrl is not set in the admin. [OK] Action action executed on page {$pageName}.";
 
         $this->assertStringContainsString($expectedString, $actualString);
@@ -183,7 +183,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
         );
 
         $pageName = self::PAGE_NAME;
-        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()), " \n\r\t\v\x00");
         $expected = "[OK] Action action executed on page {$pageName} for trackeritem:1, trackeritem:2.";
         $this->assertStringContainsString($expected, $actual);
         $this->assertEquals(0, $this->commandTester->getStatusCode());
@@ -206,7 +206,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
             ]
         );
 
-        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()), " \n\r\t\v\x00");
         $expected = '[ERROR] Invalid object identifier(s): trackeritem, :3. Expected format is object_type:object_id.';
         $this->assertStringContainsString($expected, $actual);
         $this->assertStringNotContainsString('executed on page', $actual);
@@ -231,7 +231,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
         );
 
         $pageName = self::PAGE_NAME;
-        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()), " \n\r\t\v\x00");
         $expected = "[OK] Action action executed on page {$pageName} for results page 2.";
         $this->assertStringContainsString($expected, $actual);
         $this->assertEquals(0, $this->commandTester->getStatusCode());
@@ -254,7 +254,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
             ]
         );
 
-        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()), " \n\r\t\v\x00");
         $this->assertStringContainsString('[ERROR] Invalid results page: 0.', $actual);
         $this->assertStringNotContainsString('executed on page', $actual);
         $this->assertEquals(1, $this->commandTester->getStatusCode());
@@ -278,7 +278,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
             ]
         );
 
-        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()), " \n\r\t\v\x00");
         $this->assertStringContainsString('[ERROR] The objects and results-page options cannot be combined', $actual);
         $this->assertStringNotContainsString('executed on page', $actual);
         $this->assertEquals(1, $this->commandTester->getStatusCode());
@@ -295,7 +295,7 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
                 'added_by'        => 'user',
                 'last_objectType' => 'wiki page',
                 'last_objectId'   => TikiLib::lib('tiki')->get_page_id_from_name(self::PAGE_NAME),
-                'body' => trim(preg_replace('/{LISTEXECUTE\(?\)?}/', '', self::CONTENT_FOR_FINGERPRINT)),
+                'body' => trim(preg_replace('/{LISTEXECUTE\(?\)?}/', '', self::CONTENT_FOR_FINGERPRINT), " \n\r\t\v\x00"),
                 'arguments' => 'a:0:{}',
             ]
         );

@@ -244,7 +244,7 @@ class ThemeInstaller
     protected function composePath($path = '')
     {
         $parts = func_get_args();
-        $parts[0] = rtrim(trim($parts[0]), '\/');
+        $parts[0] = rtrim(trim($parts[0], " \n\r\t\v\x00"), '\/');
 
         return implode(DIRECTORY_SEPARATOR, $parts);
     }

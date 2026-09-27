@@ -66,7 +66,7 @@ class DirectiveInclude
         if ($str instanceof TaggedValue) {
             $str = $str->getValue();
         } else {
-            $str = trim(substr($str, strlen('!include')));
+            $str = trim(substr($str, strlen('!include')), " \n\r\t\v\x00");
         }
         $parts = explode(" ", $str);
         return $parts;

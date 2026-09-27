@@ -63,8 +63,8 @@ class HistLib extends TikiLib
 
         global $prefs;
         // add both an optional, manual comment, and an automatic comment to existing one (after truncating if needed)
-        if (trim($comment) <> '') {
-            $comment = ". " . trim($comment);
+        if (trim($comment, " \n\r\t\v\x00") <> '') {
+            $comment = ". " . trim($comment, " \n\r\t\v\x00");
         }
         $ver_comment = " [" . tr('Rollback by %0 to version %1', $GLOBALS['user'], $version) . $comment . "]";
         $too_long = 200 - strlen($res["comment"] . $ver_comment);

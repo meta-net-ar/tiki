@@ -132,7 +132,7 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
         rewind($fh);
         $csv = stream_get_contents($fh);
         fclose($fh);
-        echo trim($csv);
+        echo trim($csv, " \n\r\t\v\x00");
     } else {
         // create ical with sabre/dav
 

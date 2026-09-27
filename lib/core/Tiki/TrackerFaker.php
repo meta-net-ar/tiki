@@ -103,7 +103,7 @@ class TrackerFaker
             return $overrides[$field['permName']];
         }
         if (preg_match('/~tc~faker:(.*)~\/tc~/', $field['description'] ?? '', $matches)) {
-            $parts = explode(',', trim($matches[1]));
+            $parts = explode(',', trim($matches[1], " \n\r\t\v\x00"));
             $formatter = array_shift($parts);
             return ! empty($parts) ? [$formatter, $parts] : $formatter;
         }

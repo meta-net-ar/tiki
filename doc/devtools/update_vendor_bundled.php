@@ -14,7 +14,7 @@ if (! is_dir($vendorBundledPath)) {
 }
 
 if (! file_exists($composerBin)) {
-    $composerBin = trim(exec('which composer'));
+    $composerBin = trim(exec('which composer'), " \n\r\t\v\x00");
 }
 
 if (empty($composerBin)) {

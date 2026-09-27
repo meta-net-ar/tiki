@@ -114,7 +114,7 @@ class Matcher
         }
 
         // Empty or whitespace-only user agent defaults to '*'
-        $ua = trim($userAgent);
+        $ua = trim($userAgent, " \n\r\t\v\x00");
         if (empty($ua)) {
             $ua = '*';
         }
@@ -219,7 +219,7 @@ class Matcher
     private function matchUserAgentKey(string $userAgent, array $availableKeys): ?string
     {
         // Normalize user agent - tree keys are already lowercase from Parser::buildTree()
-        $ua = strtolower(trim($userAgent));
+        $ua = strtolower(trim($userAgent, " \n\r\t\v\x00"));
         if (empty($ua)) {
             $ua = '*';
         }

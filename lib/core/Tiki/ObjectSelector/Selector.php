@@ -17,7 +17,7 @@ class Selector
 
     public function read($input, $format = null)
     {
-        $parts = explode(':', trim($input ?? ''), 2);
+        $parts = explode(':', trim($input ?? '', " \n\r\t\v\x00"), 2);
 
         if (count($parts) === 2) {
             list($type, $object) = $parts;

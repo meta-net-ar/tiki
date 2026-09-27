@@ -24,7 +24,7 @@ class Ini
         $raw = file_get_contents($file);
         $raw = preg_replace('#^\xEF\xBB\xBF#', '', $raw);
         $raw = preg_replace('#^<\?php.*?\?>#s', '', $raw);
-        $raw = ltrim($raw);
+        $raw = ltrim($raw, " \n\r\t\v\x00");
 
         $parsed = parse_ini_string($raw, true, INI_SCANNER_RAW);
         if ($parsed === false) {
@@ -77,9 +77,9 @@ class Ini
         $result = [];
         foreach ($data as $key => $value) {
             $tokens = explode(self::SECTION_SEPARATOR, (string) $key);
-            $section = trim($tokens[0]);
+            $section = trim($tokens[0], " \n\r\t\v\x00");
             if (count($tokens) === 2 && is_array($value)) {
-                $value[self::SECTION_EXTENDS_KEY] = trim($tokens[1]);
+                $value[self::SECTION_EXTENDS_KEY] = trim($tokens[1], " \n\r\t\v\x00");
             }
             $result[$section] = $value;
         }

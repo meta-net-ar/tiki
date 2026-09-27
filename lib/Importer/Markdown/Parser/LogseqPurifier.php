@@ -151,7 +151,7 @@ class LogseqPurifier implements MarkdownPurifierInterface
 
         $result = preg_replace_callback('~\[\[([^\]]+)\]\]~u', function ($m) use ($journalNs, $journalLang, &$count, &$journalLinks) {
             $count++;
-            $label = trim($m[1]);
+            $label = trim($m[1], " \n\r\t\v\x00");
 
             if ($this->parseJournalDate($label, $iso, $journalLang)) {
                 $journalLinks++;
@@ -174,7 +174,7 @@ class LogseqPurifier implements MarkdownPurifierInterface
      */
     private function parseJournalDate(string $title, ?string &$iso = null, string $lang = self::DEF_JOURNAL_LANG): bool
     {
-        $t = trim($title);
+        $t = trim($title, " \n\r\t\v\x00");
 
         // Already ISO-ish (YYYY[-_./]MM[-_./]DD)
         if (preg_match('~^(\d{4})[\/_\-.](\d{1,2})[\/_\-.](\d{1,2})$~', $t, $m)) {
@@ -248,7 +248,7 @@ class LogseqPurifier implements MarkdownPurifierInterface
         for ($i = 0; $i < $last; $i++) {
             $line = $lines[$i];
 
-            if (trim($line) === '') {
+            if (trim($line, " \n\r\t\v\x00") === '') {
                 continue;
             }
             // Already indented, or already a list item: nothing to fix.
@@ -271,8 +271,8 @@ class LogseqPurifier implements MarkdownPurifierInterface
         $count = 0;
         $out = preg_replace_callback('/^(?:\s*)([^\s:#][^:\n#]*?)::\s*(.+)$/m', function ($m) use (&$count) {
             $count++;
-            $k = trim($m[1]);
-            $v = rtrim($m[2]);
+            $k = trim($m[1], " \n\r\t\v\x00");
+            $v = rtrim($m[2], " \n\r\t\v\x00");
             return '**' . $k . ':** ' . $v;
         }, $md);
         return $out ?? $md;

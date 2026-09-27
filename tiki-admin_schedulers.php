@@ -59,7 +59,7 @@ function saveScheduler()
     $name = $_POST['scheduler_name'];
     $description = $_POST['scheduler_description'];
     $task = $_POST['scheduler_task'];
-    $runTime = trim($_POST['scheduler_time']);
+    $runTime = trim($_POST['scheduler_time'], " \n\r\t\v\x00");
     $status = $_POST['scheduler_status'];
     $reRun = $_POST['scheduler_rerun'] ?? 0;
     $reRun = $reRun == 'on' ? 1 : 0;

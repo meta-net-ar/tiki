@@ -485,7 +485,7 @@ class FreetagLib extends ObjectLib
             return;
         }
 
-        $hasAddRequest = $tiki_p_freetags_tag === 'y' && trim($_POST['addtags'] ?? '') !== '';
+        $hasAddRequest = $tiki_p_freetags_tag === 'y' && trim($_POST['addtags'] ?? '', " \n\r\t\v\x00") !== '';
         $hasDeleteRequest = ($tiki_p_admin === 'y' || $tiki_p_unassign_freetags === 'y') && isset($_REQUEST['delTag']);
         if (! $hasAddRequest && ! $hasDeleteRequest) {
             return;
@@ -988,7 +988,7 @@ class FreetagLib extends ObjectLib
      */
     public function parse_tag($tag_string)
     {
-        $query = trim($tag_string);
+        $query = trim($tag_string, " \n\r\t\v\x00");
 
         $words = preg_split('/(")/', $query, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         $delim = 0;
@@ -1032,7 +1032,7 @@ class FreetagLib extends ObjectLib
         }
 
         foreach ($tagArray as $tag) {
-            $tag = trim($tag);
+            $tag = trim($tag, " \n\r\t\v\x00");
             if ($tag != '') {
                 $tag = addslashes($tag);
                 $this->safe_tag($user, $itemId, $type, $tag, $lang);

@@ -38,7 +38,7 @@ class PandocLibraryFile
 
     public static function fromPreference(string $preference): self
     {
-        $preference = trim($preference);
+        $preference = trim($preference, " \n\r\t\v\x00");
 
         if ($preference === '') {
             throw new RuntimeException('No Zotero CSL JSON library file selected.');
@@ -142,7 +142,7 @@ class PandocLibraryFile
 
     private static function resolveFilePath(string $path, array $prefixCandidates = []): ?string
     {
-        $trimmed = trim($path);
+        $trimmed = trim($path, " \n\r\t\v\x00");
         if ($trimmed === '') {
             return null;
         }

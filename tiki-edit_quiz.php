@@ -99,9 +99,9 @@ function validateQuizForm($data)
 {
     $errors = [];
     // Validate quiz name (required)
-    if (empty(trim($data['name']))) {
+    if (empty(trim($data['name'], " \n\r\t\v\x00"))) {
         $errors[] = tra("Quiz name is required and cannot be empty.");
-    } elseif (strlen(trim($data['name'])) < 2) {
+    } elseif (strlen(trim($data['name'], " \n\r\t\v\x00")) < 2) {
         $errors[] = tra("Quiz name must be at least 2 characters long.");
     }
     // Validate passing percentage
@@ -171,7 +171,7 @@ if (isset($_REQUEST["save"])) {
             // Save quiz
             $qid = $quizlib->replace_quiz(
                 $_REQUEST["quizId"],
-                trim($_REQUEST["name"]),
+                trim($_REQUEST["name"], " \n\r\t\v\x00"),
                 $_REQUEST["description"],
                 $_REQUEST["canRepeat"],
                 $_REQUEST["storeResults"],
@@ -194,8 +194,8 @@ if (isset($_REQUEST["save"])) {
             include_once("categorize.php");
             $isEdit = $_REQUEST["quizId"] > 0;
             $successMessage = $isEdit ?
-                tra("Quiz") . " '" . trim($_REQUEST["name"]) . "' " . tra("has been successfully updated.") :
-                tra("Quiz") . " '" . trim($_REQUEST["name"]) . "' " . tra("has been successfully created.");
+                tra("Quiz") . " '" . trim($_REQUEST["name"], " \n\r\t\v\x00") . "' " . tra("has been successfully updated.") :
+                tra("Quiz") . " '" . trim($_REQUEST["name"], " \n\r\t\v\x00") . "' " . tra("has been successfully created.");
             Feedback::success($successMessage);
             if (! $isEdit) {
                 $_REQUEST["quizId"] = 0;

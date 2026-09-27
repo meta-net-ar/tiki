@@ -273,7 +273,7 @@ class WikiTools
         string $description = '',
         string $lang = ''
     ): array {
-        if (trim($page) === '') {
+        if (trim($page, " \n\r\t\v\x00") === '') {
             throw new ToolCallException("Page name cannot be empty.");
         }
 

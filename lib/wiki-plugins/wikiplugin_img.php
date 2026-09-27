@@ -753,7 +753,7 @@ function wikiplugin_img($data, $params)
         }
         $params[$id] = '';
         foreach ($id_list as $value) {
-            $params[$id] = trim($value);
+            $params[$id] = trim($value, " \n\r\t\v\x00");
             $params['fgalId'] = '';
             $params['type'] = $id;
             $pluginResult = TikiLib::lib('parser')->invokePlugin('img', $data, $params);
@@ -1206,7 +1206,7 @@ function wikiplugin_img($data, $params)
         if ($imgdata['responsive'] == 'y') {
             $imgdata['class'] .= ' table-responsive';
         }
-        $imgdata['class'] = trim($imgdata['class']);
+        $imgdata['class'] = trim($imgdata['class'], " \n\r\t\v\x00");
     } else {
         $tagName = 'img';
         $replimg = '<img src="' . $src . '" ';
@@ -1224,7 +1224,7 @@ function wikiplugin_img($data, $params)
         if ($imgdata['featured'] == 'y') {
             $imgdata['class'] .= ' featured';
         }
-        $imgdata['class'] = trim($imgdata['class']);
+        $imgdata['class'] = trim($imgdata['class'], " \n\r\t\v\x00");
     }
 
     if ($lozardImg) {

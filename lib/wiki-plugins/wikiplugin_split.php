@@ -165,7 +165,7 @@ function wikiplugin_split($data, $params, $pos)
             if (! isset($tdsize[$i])) {
                 $tdsize[$i] = 0;
             } else {
-                $tdsize[$i] = trim($tdsize[$i]);
+                $tdsize[$i] = trim($tdsize[$i], " \n\r\t\v\x00");
                 if (str_contains($tdsize[$i], '%')) {
                     $percent = true;
                 }

@@ -147,11 +147,11 @@ if ($action === ACTION_SAVE && $access->checkCsrf()) {
 
     $src = $_SESSION[SESS_MD_IMPORT][SESS_SOURCE];
     $src[CFG_TYPE] = $type;
-    $src[CFG_SOURCE_ID] = trim($_POST['source_id'] ?? '');
+    $src[CFG_SOURCE_ID] = trim($_POST['source_id'] ?? '', " \n\r\t\v\x00");
 
     if ($type === SRC_TYPE_GIT) {
-        $src[CFG_REPO_URL] = trim($_POST['repo_url'] ?? '');
-        $src[CFG_REPO_BRANCH] = trim($_POST['repo_branch'] ?? '');
+        $src[CFG_REPO_URL] = trim($_POST['repo_url'] ?? '', " \n\r\t\v\x00");
+        $src[CFG_REPO_BRANCH] = trim($_POST['repo_branch'] ?? '', " \n\r\t\v\x00");
         $src[CFG_GIT_PULL] = isset($_POST['git_pull']);
         $src[CFG_REPO_TOKEN] = mdimp_merge_repo_token($src[CFG_REPO_TOKEN] ?? '', $_POST);
         $src[CFG_GIT_TIMEOUT] = max(5, (int)($_POST['git_timeout'] ?? 30));
@@ -160,25 +160,25 @@ if ($action === ACTION_SAVE && $access->checkCsrf()) {
 
 
     $_SESSION[SESS_MD_IMPORT][SESS_WIKI] = [
-        WIKI_ROOTS => trim($_POST['roots'] ?? '.'),
+        WIKI_ROOTS => trim($_POST['roots'] ?? '.', " \n\r\t\v\x00"),
         WIKI_RECURSIVE => isset($_POST['recursive']),
         WIKI_MAX_DEPTH => max(0, (int)($_POST['max_depth'] ?? 0)),
-        WIKI_EXCLUDE_GLOBS => trim($_POST['exclude_globs'] ?? ''),
+        WIKI_EXCLUDE_GLOBS => trim($_POST['exclude_globs'] ?? '', " \n\r\t\v\x00"),
         WIKI_TITLE_STRATEGY => $_POST['title_strategy'] ?? 'fm_h1_filename',
         WIKI_NAMING_MODE => $_POST['naming_mode'] ?? 'basename',
         WIKI_DIR_LEVELS => max(0, (int)($_POST['dir_levels'] ?? 2)),
         WIKI_SEPARATOR => (string)($_POST['separator'] ?? ' '),
-        WIKI_NAMESPACE => trim($_POST['namespace'] ?? ''),
+        WIKI_NAMESPACE => trim($_POST['namespace'] ?? '', " \n\r\t\v\x00"),
         WIKI_DETECT_JOURNAL => isset($_POST['detect_journal']),
         WIKI_JOURNAL_LANG => in_array(($_POST['journal_lang'] ?? 'en'), ['en', 'fr'], true) ? $_POST['journal_lang'] : 'en',
         WIKI_MARKDOWN_SOURCE => $_POST['markdown_source'] ?? 'commonmark',
-        WIKI_JOURNAL_NS => trim($_POST['journal_ns'] ?? 'Journal'),
+        WIKI_JOURNAL_NS => trim($_POST['journal_ns'] ?? 'Journal', " \n\r\t\v\x00"),
     ];
 
 
     $_SESSION[SESS_MD_IMPORT][SESS_GC] = [
         GC_MODE => in_array(($_POST['gc_mode'] ?? 'off'), ['off', 'mark', 'delete'], true) ? $_POST['gc_mode'] : 'off',
-        GC_SAFE_NAMESPACE => trim($_POST['gc_safe_namespace'] ?? ''),
+        GC_SAFE_NAMESPACE => trim($_POST['gc_safe_namespace'] ?? '', " \n\r\t\v\x00"),
     ];
     Feedback::success(tra('Import options saved successfully.'));
 }
@@ -305,7 +305,7 @@ if ($action === ACTION_IMPORT && $access->checkCsrf()) {
  */
 function mdimp_merge_repo_token(string $existingToken, array $post): string
 {
-    $posted = trim((string)($post['repo_token'] ?? ''));
+    $posted = trim((string)($post['repo_token'] ?? ''), " \n\r\t\v\x00");
     if ($posted !== '') {
         return $posted;
     }
@@ -346,14 +346,14 @@ function mdimp_build_runtime_cfg(array $sessionCfg): array
     }
 
     if (array_key_exists('source_id', $_POST)) {
-        $source[CFG_SOURCE_ID] = trim((string)$_POST['source_id']);
+        $source[CFG_SOURCE_ID] = trim((string)$_POST['source_id'], " \n\r\t\v\x00");
     }
 
     if (array_key_exists('repo_url', $_POST)) {
-        $source[CFG_REPO_URL] = trim((string)$_POST['repo_url']);
+        $source[CFG_REPO_URL] = trim((string)$_POST['repo_url'], " \n\r\t\v\x00");
     }
     if (array_key_exists('repo_branch', $_POST)) {
-        $source[CFG_REPO_BRANCH] = trim((string)$_POST['repo_branch']);
+        $source[CFG_REPO_BRANCH] = trim((string)$_POST['repo_branch'], " \n\r\t\v\x00");
     }
     if (array_key_exists('git_pull', $_POST)) {
         $source[CFG_GIT_PULL] = true;
@@ -374,7 +374,7 @@ function mdimp_build_runtime_cfg(array $sessionCfg): array
     }
 
     if (array_key_exists('roots', $_POST)) {
-        $wiki[WIKI_ROOTS] = trim((string)$_POST['roots']);
+        $wiki[WIKI_ROOTS] = trim((string)$_POST['roots'], " \n\r\t\v\x00");
     }
     if (array_key_exists('recursive', $_POST)) {
         $wiki[WIKI_RECURSIVE] = true;
@@ -385,7 +385,7 @@ function mdimp_build_runtime_cfg(array $sessionCfg): array
         $wiki[WIKI_MAX_DEPTH] = max(0, (int)$_POST['max_depth']);
     }
     if (array_key_exists('exclude_globs', $_POST)) {
-        $wiki[WIKI_EXCLUDE_GLOBS] = trim((string)$_POST['exclude_globs']);
+        $wiki[WIKI_EXCLUDE_GLOBS] = trim((string)$_POST['exclude_globs'], " \n\r\t\v\x00");
     }
     if (array_key_exists('title_strategy', $_POST)) {
         $wiki[WIKI_TITLE_STRATEGY] = (string)$_POST['title_strategy'];
@@ -400,7 +400,7 @@ function mdimp_build_runtime_cfg(array $sessionCfg): array
         $wiki[WIKI_SEPARATOR] = (string)$_POST['separator'];
     }
     if (array_key_exists('namespace', $_POST)) {
-        $wiki[WIKI_NAMESPACE] = trim((string)$_POST['namespace']);
+        $wiki[WIKI_NAMESPACE] = trim((string)$_POST['namespace'], " \n\r\t\v\x00");
     }
     if (array_key_exists('detect_journal', $_POST)) {
         $wiki[WIKI_DETECT_JOURNAL] = true;
@@ -411,14 +411,14 @@ function mdimp_build_runtime_cfg(array $sessionCfg): array
         $wiki[WIKI_JOURNAL_LANG] = in_array($_POST['journal_lang'], ['en', 'fr'], true) ? $_POST['journal_lang'] : 'en';
     }
     if (array_key_exists('journal_ns', $_POST)) {
-        $wiki[WIKI_JOURNAL_NS] = trim((string)$_POST['journal_ns']);
+        $wiki[WIKI_JOURNAL_NS] = trim((string)$_POST['journal_ns'], " \n\r\t\v\x00");
     }
 
     if (array_key_exists('gc_mode', $_POST)) {
         $gc[GC_MODE] = in_array($_POST['gc_mode'], ['off', 'mark', 'delete'], true) ? $_POST['gc_mode'] : 'off';
     }
     if (array_key_exists('gc_safe_namespace', $_POST)) {
-        $gc[GC_SAFE_NAMESPACE] = trim((string)$_POST['gc_safe_namespace']);
+        $gc[GC_SAFE_NAMESPACE] = trim((string)$_POST['gc_safe_namespace'], " \n\r\t\v\x00");
     }
 
     return [
@@ -537,8 +537,8 @@ $gcOpts = array_values(array_filter($gcOpts));
 
 //Build commands
 $base = 'markdown:importer';
-$cmdPreview = trim($base . ' --mode=preview ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' ' . implode(' ', $gcOpts) . ' --json');
-$cmdImport  = trim($base . ' --mode=import ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' ' . implode(' ', $gcOpts) . ' --json');
+$cmdPreview = trim($base . ' --mode=preview ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' ' . implode(' ', $gcOpts) . ' --json', " \n\r\t\v\x00");
+$cmdImport  = trim($base . ' --mode=import ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' ' . implode(' ', $gcOpts) . ' --json', " \n\r\t\v\x00");
 
 $smarty->assign('md_cli_preview', $cmdPreview);
 $smarty->assign('md_cli_import', $cmdImport);

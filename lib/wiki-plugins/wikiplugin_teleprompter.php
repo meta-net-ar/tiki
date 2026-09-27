@@ -193,7 +193,7 @@ function wikiplugin_teleprompter($data, $params)
     }
     $params = array_merge($defaults, $params);
 
-    if (trim((string) $params['fileIds']) === '' && trim((string) $params['fgalId']) === '' && trim((string) $data) === '') {
+    if (trim((string) $params['fileIds'], " \n\r\t\v\x00") === '' && trim((string) $params['fgalId'], " \n\r\t\v\x00") === '' && trim((string) $data, " \n\r\t\v\x00") === '') {
         Feedback::error(tr('Parameters missing: Please either select file gallery, give file ids or enter teleprompter content in the body.'));
         return;
     }
@@ -231,7 +231,7 @@ function wikiplugin_teleprompter($data, $params)
     }
 
     $parserlib = TikiLib::lib('parser');
-    if (trim((string) $data) !== '') {
+    if (trim((string) $data, " \n\r\t\v\x00") !== '') {
         $teleprompterBlocks[] = '<div class="teleprompter-block">' . $parserlib->parse_data($data, ['is_html' => true, 'parse_wiki' => true]) . '</div>';
     }
     if (empty($teleprompterBlocks)) {

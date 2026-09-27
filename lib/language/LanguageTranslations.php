@@ -232,10 +232,10 @@ class LanguageTranslations extends TikiDb_Bridge
             $newTrans = [];
             // Ensure the previous line has a comma if it doesn't already
             if ($lastStr > 0) {
-                $prevLine = trim($langFile[$lastStr - 1]);
+                $prevLine = trim($langFile[$lastStr - 1], " \n\r\t\v\x00");
                 // Check if previous line is a translation entry without a trailing comma
                 if (preg_match('/^".*"\s*=>\s*".*"$/', $prevLine)) {
-                    $langFile[$lastStr - 1] = rtrim($langFile[$lastStr - 1]) . ",\n";
+                    $langFile[$lastStr - 1] = rtrim($langFile[$lastStr - 1], " \n\r\t\v\x00") . ",\n";
                 }
             }
 

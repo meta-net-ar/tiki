@@ -42,15 +42,15 @@ class mime
         $body = substr($input, $pos + (2 * strlen($crlf)));
 
         $headparsed = preg_replace('/' . $crlf . "(\t| )/", ' ', $header);
-        $heads = explode($crlf, trim($headparsed));
+        $heads = explode($crlf, trim($headparsed, " \n\r\t\v\x00"));
 
         if (str_starts_with($heads[0], 'From ')) {
             $heads[0] = str_replace('From ', 'x-From: ', $heads[0]);
         }
 
         foreach ($heads as $line) {
-            $hdr_name = trim(substr($line, 0, strpos($line, ':')));
-            $hdr_value = trim(substr($line, strpos($line, ':') + 1));
+            $hdr_name = trim(substr($line, 0, strpos($line, ':')), " \n\r\t\v\x00");
+            $hdr_value = trim(substr($line, strpos($line, ':') + 1), " \n\r\t\v\x00");
 
             if (str_starts_with($hdr_value, ' ')) {
                 $hdr_value = substr($hdr_value, 1);
@@ -104,8 +104,8 @@ class mime
             $input = $headers[$key];
             $it = [];
             if (($pos = strpos($input, ';')) !== false) {
-                $it['value'] = trim(substr($input, 0, $pos));
-                $input = trim(substr($input, $pos + 1));
+                $it['value'] = trim(substr($input, 0, $pos), " \n\r\t\v\x00");
+                $input = trim(substr($input, $pos + 1), " \n\r\t\v\x00");
                 if (strlen($input) > 0) {
                     preg_match_all('/(([[:alnum:]]+)="?([^"]*)"?\s?;?)+/i', $input, $matches);
                     for ($i = 0, $icount_matches = count($matches[2]); $i < $icount_matches; $i++) {
@@ -113,7 +113,7 @@ class mime
                     }
                 }
             } else {
-                $it['value'] = trim($input);
+                $it['value'] = trim($input, " \n\r\t\v\x00");
             }
 
             switch ($key) {

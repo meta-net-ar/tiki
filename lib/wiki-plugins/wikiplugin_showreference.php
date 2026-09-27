@@ -93,13 +93,13 @@ function wikiplugin_showreference($data, $params)
 
     $referenceStyle = (! empty($prefs['feature_references_style']) && $prefs['feature_references_style'] === 'mla') ? 'mla' : 'ama';
 
-    $params['title'] = trim($params['title']);
-    $params['hlevel'] = trim($params['hlevel']);
-    $params['removelines'] = trim($params['removelines']);
-    $params['pageid'] = trim($params['pageid']);
+    $params['title'] = trim($params['title'], " \n\r\t\v\x00");
+    $params['hlevel'] = trim($params['hlevel'], " \n\r\t\v\x00");
+    $params['removelines'] = trim($params['removelines'], " \n\r\t\v\x00");
+    $params['pageid'] = trim($params['pageid'], " \n\r\t\v\x00");
 
     $title = empty($params['title']) ? tr('Bibliography') : $params['title'];
-    $showtitle = empty($params['showtitle']) || trim($params['showtitle']) !== 'no';
+    $showtitle = empty($params['showtitle']) || trim($params['showtitle'], " \n\r\t\v\x00") !== 'no';
 
     if ($params['hlevel'] != '') {
         if ($params['hlevel'] != '0') {

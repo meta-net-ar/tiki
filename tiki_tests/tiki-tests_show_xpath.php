@@ -49,7 +49,7 @@ function enlight_xpath($url, $xpath)
 
     $result = [];
     $data = $url->getElementsByTagName('data')->item(0)->textContent;
-    if (trim($data) == '') {
+    if (trim($data, " \n\r\t\v\x00") == '') {
         return tra('The page is empty');
     }
 

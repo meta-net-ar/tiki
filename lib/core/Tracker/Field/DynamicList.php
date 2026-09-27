@@ -235,7 +235,7 @@ class Tracker_Field_DynamicList extends \Tracker\Field\AbstractItemField impleme
         // It fixes also the issue that, if more than one dynamic item list fields are set and use the same
         // $filterFieldIdHere, then the initial value was wrong due to multiple fires of the handler.
 
-        $filterFieldIdHere = trim($this->trackerField->getOption('filterFieldIdHere'));
+        $filterFieldIdHere = trim($this->trackerField->getOption('filterFieldIdHere'), " \n\r\t\v\x00");
         $trackerIdThere = $this->trackerField->getOption('trackerId');
         $listFieldIdThere = $this->trackerField->getOption('listFieldIdThere');
         $filterFieldIdThere = $this->trackerField->getOption('filterFieldIdThere');

@@ -86,7 +86,7 @@ class TierSelector
         if ($tier === null) {
             return self::TIER_AUTO;
         }
-        $tier = strtolower(trim($tier));
+        $tier = strtolower(trim($tier, " \n\r\t\v\x00"));
         if ($tier === '') {
             return self::TIER_AUTO;
         }

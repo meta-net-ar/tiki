@@ -131,33 +131,33 @@ class Table_Check
         if (! empty($paramstr)) {
             $ret = explode('|', $paramstr);
             foreach ($ret as $key => $pipe) {
-                $key = trim($key);
-                $pipe = trim($pipe);
+                $key = trim($key, " \n\r\t\v\x00");
+                $pipe = trim($pipe, " \n\r\t\v\x00");
                 $ret[$key] = str_contains($pipe, ';') ? explode(';', $pipe) : $pipe;
                 if (! is_array($ret[$key])) {
                     if (str_contains($ret[$key], ':')) {
                         $colon = explode(':', $ret[$key]);
                         unset($ret[$key]);
-                        if (trim($colon[1]) == 'nofilter') {
+                        if (trim($colon[1], " \n\r\t\v\x00") == 'nofilter') {
                             $ret[$key][$colon[0]] = false;
                         } else {
-                            $ret[$key][$colon[0]] = trim($colon[1]);
+                            $ret[$key][$colon[0]] = trim($colon[1], " \n\r\t\v\x00");
                         }
                     }
                 } elseif (is_array($ret[$key])) {
                     foreach ($ret[$key] as $key2 => $subparam) {
-                        $key2 = trim($key);
-                        $subparam = trim($subparam);
+                        $key2 = trim($key, " \n\r\t\v\x00");
+                        $subparam = trim($subparam, " \n\r\t\v\x00");
                         if (str_contains($subparam, ':')) {
                             $colon = explode(':', $subparam);
                             unset($ret[$key][$key2]);
                             if (in_array($colon[0], ['expand', 'option'])) {
-                                if (trim($colon[0]) == 'option') {
+                                if (trim($colon[0], " \n\r\t\v\x00") == 'option') {
                                     $colon[0] = 'options';
                                 }
-                                $ret[$key][$colon[0]][] = trim($colon[1]);
+                                $ret[$key][$colon[0]][] = trim($colon[1], " \n\r\t\v\x00");
                             } else {
-                                $ret[$key][$colon[0]] = trim($colon[1]);
+                                $ret[$key][$colon[0]] = trim($colon[1], " \n\r\t\v\x00");
                             }
                         }
                     }

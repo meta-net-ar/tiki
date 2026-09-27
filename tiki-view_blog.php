@@ -49,7 +49,7 @@ if ($prefs['feature_categories'] == 'y') {
 $access->check_feature('feature_blogs');
 
 if (isset($_REQUEST["blogTitle"])) {
-    $blog_data = $bloglib->get_blog_by_title(trim(trim($_REQUEST["blogTitle"]), "\x22\x27"));
+    $blog_data = $bloglib->get_blog_by_title(trim(trim($_REQUEST["blogTitle"], " \n\r\t\v\x00"), "\x22\x27"));
     if ((! empty($blog_data)) && (! empty($blog_data["blogId"]))) {
         $_REQUEST["blogId"] = $blog_data["blogId"];
     }

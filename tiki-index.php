@@ -311,7 +311,7 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
     $isprefixed = false;
     $prefixes = explode(',', $prefs['wiki_prefixalias_tokens']);
     foreach ($prefixes as $p) {
-        $p = trim($p);
+        $p = trim($p, " \n\r\t\v\x00");
         if (strlen($p) > 0 && mb_strtolower(substr($page, 0, strlen($p))) == mb_strtolower($p)) {
             $isprefixed = true;
         }
@@ -361,9 +361,9 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
         // Process prefix alias with itemId append for pretty tracker pages
         $prefixes = explode(',', $prefs['wiki_prefixalias_tokens']);
         foreach ($prefixes as $p) {
-            $p = trim($p);
+            $p = trim($p, " \n\r\t\v\x00");
             if (strlen($p) > 0 && mb_strtolower(substr($page, 0, strlen($p))) == mb_strtolower($p)) {
-                $suffix = trim(substr($page, strlen($p)));
+                $suffix = trim(substr($page, strlen($p)), " \n\r\t\v\x00");
                 if (! ctype_digit($suffix) && $suffix) {
                     // allow escaped numerics as text
                     $suffix = stripslashes($suffix);
@@ -394,7 +394,7 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
                     $_GET['page'] = $newPage;
                     $jitGet = new JitFilter($_GET);
                     $jitRequest = new JitFilter($_REQUEST);
-                    $smarty->assign('canonical_ending', urlencode(trim(substr($page, strlen($newPage)))));
+                    $smarty->assign('canonical_ending', urlencode(trim(substr($page, strlen($newPage)), " \n\r\t\v\x00")));
                     $page = $newPage;
                     $info = $tikilib->get_page_info($_REQUEST['page']);
                     $statslib->stats_hit($suffix, 'trackeritem');

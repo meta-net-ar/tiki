@@ -82,7 +82,7 @@ class Debugger extends ResultType
     public function execute($rawcmd)
     {
         $this->reset();
-        $rawcmd = trim($rawcmd);
+        $rawcmd = trim($rawcmd, " \n\r\t\v\x00");
         $result = '';
       // Is smth else in command line 'cept spaces?
         if (strlen($rawcmd)) {
@@ -105,7 +105,7 @@ class Debugger extends ResultType
                 }
             } else {
               // Handle help command. Is help for some command needed?
-                $rawcmd = trim(str_replace($cmd, "", $rawcmd));
+                $rawcmd = trim(str_replace($cmd, "", $rawcmd), " \n\r\t\v\x00");
                 $result = [];
                 $result["action"] = 'none';
                 if (strlen($rawcmd) == 0) {
@@ -114,7 +114,7 @@ class Debugger extends ResultType
                     $result[0][] = ['cmd' => 'help',
                     'description' => 'Display list of commands or help for specified command (<code>help print</code> for example)'];
                     foreach ($this->commands as $cmdobj) {
-                        if (strlen(trim($cmdobj->name())) > 0) {
+                        if (strlen(trim($cmdobj->name(), " \n\r\t\v\x00")) > 0) {
                             $result[0][] = ['cmd' => $cmdobj->name(), 'description' => $cmdobj->description()];
                         }
                     }
@@ -161,7 +161,7 @@ class Debugger extends ResultType
     public function str_var_dump($v)
     {
         $result = '';
-        $v = preg_replace('/^\$/', '', trim($v));
+        $v = preg_replace('/^\$/', '', trim($v, " \n\r\t\v\x00"));
         if (strlen($v) > 0) {
             $var = (($pos = strpos($v, '[')) == false) ? $v : substr($v, 0, $pos);
             if (isset($GLOBALS[$var])) {

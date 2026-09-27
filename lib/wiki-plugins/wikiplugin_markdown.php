@@ -42,7 +42,7 @@ function wikiplugin_markdown($data, $params)
 {
     extract($params, EXTR_SKIP);
 
-    $md = trim($data);
+    $md = trim($data, " \n\r\t\v\x00");
     $md = str_replace('&lt;x&gt;', '', $md);
     $md = str_replace('<x>', '', $md);
 

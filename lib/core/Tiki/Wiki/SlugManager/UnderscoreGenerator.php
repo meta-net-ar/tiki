@@ -20,7 +20,7 @@ class UnderscoreGenerator implements Generator
 
     public function generate($pageName, $suffix = null)
     {
-        $slug = preg_replace('/[\s]+/u', '_', trim($pageName));
+        $slug = preg_replace('/[\s]+/u', '_', trim($pageName, " \n\r\t\v\x00"));
 
         if ($suffix) {
             $slug .= '_' . $suffix;
@@ -31,6 +31,6 @@ class UnderscoreGenerator implements Generator
 
     public function degenerate($slug)
     {
-        return preg_replace('/_+/', ' ', trim($slug));
+        return preg_replace('/_+/', ' ', trim($slug, " \n\r\t\v\x00"));
     }
 }

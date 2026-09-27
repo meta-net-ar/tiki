@@ -37,6 +37,6 @@ class Search_MySql_HighlightHelper implements Laminas\Filter\FilterInterface
         $content = $this->snippetHelper->filter($content);
         $content = str_ireplace($this->words, $this->replacements, $content);
 
-        return trim(strip_tags($content, '<b><i><em><strong><pre><code><span>'));
+        return trim(strip_tags($content, '<b><i><em><strong><pre><code><span>'), " \n\r\t\v\x00");
     }
 }

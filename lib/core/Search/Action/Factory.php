@@ -59,7 +59,7 @@ class Search_Action_Factory
             return new Search_Action_UnknownStep();
         }
 
-        $action = trim($definition['action']);
+        $action = trim($definition['action'], " \n\r\t\v\x00");
 
         if (! isset($this->actions[$action])) {
             return new Search_Action_UnknownStep($action);

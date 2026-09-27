@@ -18,8 +18,8 @@ $userslib = TikiLib::lib('user');
 $xmpplib  = TikiLib::lib('xmpp');
 
 // --- Shared secret (file or preference) and HTTP auth handling ---
-$file_secret = @file_exists('/etc/prosody/xmpp_http_secret') ? trim(@file_get_contents('/etc/prosody/xmpp_http_secret') ?: '') : '';
-$pref_secret = trim((string) ($prefslib->getPreference('xmpp_shared_secret')['value'] ?? ''));
+$file_secret = @file_exists('/etc/prosody/xmpp_http_secret') ? trim(@file_get_contents('/etc/prosody/xmpp_http_secret') ?: '', " \n\r\t\v\x00") : '';
+$pref_secret = trim((string) ($prefslib->getPreference('xmpp_shared_secret')['value'] ?? ''), " \n\r\t\v\x00");
 $trusted_secret = $file_secret !== '' ? $file_secret : $pref_secret;
 
 $auth = $_SERVER['HTTP_AUTHORIZATION']

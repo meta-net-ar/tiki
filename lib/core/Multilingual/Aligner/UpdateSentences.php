@@ -39,7 +39,7 @@ class Multilingual_Aligner_UpdateSentences
             $ii = 0;
             foreach ($changed_diff_unchanged as $val) {
                 if (strcmp($changed_diff_unchanged[$ii], "*deleted*") != 0) {
-                    $changed_final[] = trim($changed_diff_unchanged[$ii]);
+                    $changed_final[] = trim($changed_diff_unchanged[$ii], " \n\r\t\v\x00");
                 }
                 $ii = $ii + 1;
             }
@@ -90,15 +90,15 @@ class Multilingual_Aligner_UpdateSentences
             foreach ($new_val as $nn) {
                 if ($val != "" && $val[0] == "-") {
                     if ($num == 0) {
-                        $sentences_new[] = trim($nn);
+                        $sentences_new[] = trim($nn, " \n\r\t\v\x00");
                     } else {
-                        $sentences_new[] = "-" . trim($nn);
+                        $sentences_new[] = "-" . trim($nn, " \n\r\t\v\x00");
                     }
                 } elseif ($val != "" && $val[0] == "+") {
                     if ($num == 0) {
-                        $sentences_new[] = trim($nn);
+                        $sentences_new[] = trim($nn, " \n\r\t\v\x00");
                     } else {
-                        $sentences_new[] = "+" . trim($nn);
+                        $sentences_new[] = "+" . trim($nn, " \n\r\t\v\x00");
                     }
                 } else {
                     $sentences_new[] = $nn;
@@ -174,7 +174,7 @@ class Multilingual_Aligner_UpdateSentences
             $key_value = $target_lng_array[0];
             $target_lng_sentence = $target_lng_array[1];
             if (strcmp($target_lng_sentence, "NULL") != 0) {
-                $source_sent = $segmentor->segment(trim($key_value));
+                $source_sent = $segmentor->segment(trim($key_value, " \n\r\t\v\x00"));
                 $index = $this->array_search_function($value, $changed_diff_unchanged);
                 $jj = 0;
                 for ($ii = $index, $count_ss = count($source_sent); $ii < $count_ss + $index + $jj; $ii++) {
@@ -184,9 +184,9 @@ class Multilingual_Aligner_UpdateSentences
                         $jj++;
                     }
                 }
-                $sentences = $segmentor->segment(trim($target_lng_sentence));
+                $sentences = $segmentor->segment(trim($target_lng_sentence, " \n\r\t\v\x00"));
                 foreach ($sentences as $item) {
-                    $changedSource_translated[] = trim($item);
+                    $changedSource_translated[] = trim($item, " \n\r\t\v\x00");
                 }
             } else {
                 //Machine Translation is required
@@ -195,14 +195,14 @@ class Multilingual_Aligner_UpdateSentences
                         $temp = substr($value, 1);
                         $translation = $translator->getTranslationInOtherLanguage($temp, $source_lng);
                         if ($translation != "NULL") {
-                            $changedSource_translated[] = "+" . trim($translation);
+                            $changedSource_translated[] = "+" . trim($translation, " \n\r\t\v\x00");
                         } else {
                             $changedSource_translated[] = "+" . "$temp";
                         }
                     } else {
                             $translation = $translator->getTranslationInOtherLanguage($value, $source_lng);
                         if ($translation != "NULL") {
-                            $changedSource_translated[] = "+" . trim($translation);
+                            $changedSource_translated[] = "+" . trim($translation, " \n\r\t\v\x00");
                         } else {
                             $changedSource_translated[] = "+" . "$value";
                         }

@@ -188,7 +188,7 @@ function get_remotetikiurl($autologin_remotetiki, $redirect_page)
     global $user, $base_url;
     TikiLib::lib('access')->check_user($user);
     $email = TikiLib::lib('user')->get_user_email($user);
-    $realName = trim(TikiLib::lib('tiki')->get_user_preference($user, 'realName', ''));
+    $realName = trim(TikiLib::lib('tiki')->get_user_preference($user, 'realName', ''), " \n\r\t\v\x00");
     $remotetikiurl = $autologin_remotetiki . '/tiki-autologin.php';
     $client = TikiLib::lib('tiki')->get_http_client($remotetikiurl);
     $groups = TikiLib::lib('user')->get_user_groups($user);

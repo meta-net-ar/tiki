@@ -498,7 +498,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
                     $aggBuilder = new AggregationBuilder($this);
                     $built = $aggBuilder->build($facetAggs);
                     if (! empty($built['clauses'])) {
-                        $facets = trim(((string) $facets) . ' ' . $built['clauses']);
+                        $facets = trim(((string) $facets) . ' ' . $built['clauses'], " \n\r\t\v\x00");
                         $aggregationSpecs = $built['specs'];
                     }
                 }

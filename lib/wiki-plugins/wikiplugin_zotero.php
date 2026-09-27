@@ -90,7 +90,7 @@ function wikiplugin_zotero($data, $params)
         // Strip remaining HTML tags and decode entities
         $textContent = strip_tags($content);
         $textContent = html_entity_decode($textContent, ENT_QUOTES, 'UTF-8');
-        $textContent = trim($textContent);
+        $textContent = trim($textContent, " \n\r\t\v\x00");
 
         // Use first non-empty line as title
         $lines = array_filter(array_map('trim', explode("\n", $textContent)));

@@ -115,7 +115,7 @@ function wikiplugin_chartjs($data, $params)
         $params['data_highlights'] = $params['data_colors'];
     }
 
-    if (empty(trim($data))) {
+    if (empty(trim($data, " \n\r\t\v\x00"))) {
         $values = array_filter(explode(':', $params['values']));
         $data_labels = array_filter(explode(':', $params['data_labels']));
         $data_colors = array_filter(explode(':', $params['data_colors']));

@@ -64,11 +64,11 @@ class DbgCmd_Watch extends DebuggerCommand
         // NOTE: Don't forget to set result type! By default it is NO_RESULT.
         $this->set_result_type(TEXT_RESULT);
         $result = '';
-        $args = explode(' ', trim($params));
+        $args = explode(' ', trim($params, " \n\r\t\v\x00"));
 
         //
         if (count($args) > 0) {
-            $cmd = trim($args[0]);
+            $cmd = trim($args[0], " \n\r\t\v\x00");
 
             if ($cmd == 'add' || $cmd == 'rm') {
                 $a_r = ($cmd == 'add');
@@ -77,8 +77,8 @@ class DbgCmd_Watch extends DebuggerCommand
 
                 if (count($args) > 0) {
                     foreach ($args as $a) {
-                        if (strlen(trim(str_replace('$', '', $a))) > 0) { // Is there smth 'cept '$'??
-                            $a = trim($a);
+                        if (strlen(trim(str_replace('$', '', $a), " \n\r\t\v\x00")) > 0) { // Is there smth 'cept '$'??
+                            $a = trim($a, " \n\r\t\v\x00");
 
                             if ($a_r) {
                                 $result .= "add '" . $a . "' to watch list\n";
@@ -100,7 +100,7 @@ class DbgCmd_Watch extends DebuggerCommand
                 } else {
                     $result .= "ERROR: No variable to add given";
                 }
-            } elseif (strlen(trim($args[0])) > 0) {
+            } elseif (strlen(trim($args[0], " \n\r\t\v\x00")) > 0) {
                 $result .= "ERROR: Unknown subcommand '$arg[0]'";
             } else {
                 $result .= "ERROR: No subcommand for 'watch' given";

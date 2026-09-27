@@ -437,7 +437,7 @@ onDOMElementRemoved("single-spa-application:@vue-mf/duration-picker-" + ' . json
             'minutes' => 0,
             'seconds' => 0,
         ];
-        $data = trim($data);
+        $data = trim($data, " \n\r\t\v\x00");
         if (preg_match('/^[\d\.]+$/', $data)) {
             if ($lowest == 'seconds') {
                 $seconds = intval($data);
