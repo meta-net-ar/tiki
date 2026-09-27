@@ -78,8 +78,13 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $access->output_serialized([]);
         return;
     }
+
+    // Limit autocomplete result sizes
+    $autocompleteLimit = 50;
+    $autocompleteAvatarLimit = 20;
+
     if ($listonly == 'groups') {
-        $listgroups = $userlib->get_groups(0, -1, 'groupName_asc', '', '', 'n');
+        $listgroups = $userlib->get_groups(0, $autocompleteLimit, 'groupName_asc', $query, '', 'n');
 
         // TODO proper perms checking - this looks right but returns nothing for reg, and everything for admin
         // $listgroups['data'] = Perms::filter( array( 'type' => 'group' ), 'object', $listgroups['data'], array( 'object' => 'groupName' ), 'view_group' );
@@ -134,7 +139,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $last_name = trim(end($names_array));
         $groups = $jitRequest->groups->text();
         $groups = $groups ? explode(',', $groups) : [];
-        $listusers = $userlib->get_users_light(0, -1, 'login_asc', $last_name, $groups);
+        $listusers = $userlib->get_users_light(0, $autocompleteLimit, 'login_asc', $last_name, $groups);
         $done = [];
         $finalusers = [];
         foreach ($listusers as $usrId => $usr) {
@@ -162,7 +167,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $last_name = trim(end($names_array));
         $groups = $jitRequest->groups->text();
         $groups = $groups ? explode(',', $groups) : [];
-        $listusers = $userlib->get_users_light(0, -1, 'login_asc', $last_name, $groups);
+        $listusers = $userlib->get_users_light(0, $autocompleteAvatarLimit, 'login_asc', $last_name, $groups);
 
         $finalusers = [];
         foreach ($listusers as $usrId => $usr) {

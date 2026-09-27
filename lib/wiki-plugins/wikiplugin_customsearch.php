@@ -53,6 +53,17 @@ function wikiplugin_customsearch_info()
                 'filter' => 'digits',
                 'default' => 0,
             ],
+            'autosearchminchars' => [
+                'required' => false,
+                'name' => tra('Automatic Search Minimum Characters'),
+                'description' => tr('When %0autosearchdelay%1 is set, do not trigger the automatic search while a text field
+                    contains fewer than this many characters (empty fields are fine). Very short queries are imprecise and
+                    expensive on large sites. Explicit searches (Enter / Search button) are not affected. %00%1 disables and
+                    is the default.', '<code>', '</code>'),
+                'since' => '30.0',
+                'filter' => 'digits',
+                'default' => 0,
+            ],
             'searchfadediv' => [
                 'required' => false,
                 'name' => tra('Fade DIV Id'),
@@ -319,6 +330,7 @@ function wikiplugin_customsearch($data, $params)
         'searchfadediv' => $params['searchfadediv'],
         'results' => empty($params['destdiv']) ? "#customsearch_{$id}_results" : "#{$params['destdiv']}",
         'autosearchdelay' => $autosearchdelay,
+        'autosearchminchars' => ! empty($params['autosearchminchars']) ? max(0, (int) $params['autosearchminchars']) : 0,
         'searchonload' => (int) $params['searchonload'],
         'requireinput' => (bool) $params['requireinput'],
         'origrequireinput' => (bool) $params['requireinput'],
@@ -386,6 +398,15 @@ var customsearch$id = {
             that.auto = delayedExecutor(that.options.autosearchdelay, function () {
                 if (that.options.requireinput && (!$('#customsearch_$id').find(':text').val() || $('#customsearch_$id').find(':text').val().indexOf('...') > 0)) {
                     return false;
+                }
+                if (that.options.autosearchminchars > 0) {
+                    var tooShort = $('#customsearch_$id').find(':text').filter(function () {
+                        var length = $.trim($(this).val()).length;
+                        return length > 0 && length < that.options.autosearchminchars;
+                    }).length > 0;
+                    if (tooShort) {
+                        return false;
+                    }
                 }
                 that.load();
             });
@@ -581,11 +602,21 @@ customsearch$id._load = function (receive, params) {
         return;
     }
 
-    $.ajax({
+    // Cancel the previous search request
+    var isResultsLoad = ! params;
+    if (isResultsLoad && customsearch$id._xhr) {
+        customsearch$id._xhr.abort();
+    }
+    var xhr = $.ajax({
         type: 'POST',
         url: $.service('search_customsearch', 'customsearch'),
         data: datamap,
         dataType: 'html',
+        complete: function () {
+            if (customsearch$id._xhr === xhr) {
+                customsearch$id._xhr = null;
+            }
+        },
         success: function(data) {
             receive(data);
             $('[data-bs-toggle=\'popover\']').attr('data-html', true);
@@ -593,6 +624,9 @@ customsearch$id._load = function (receive, params) {
             $callbackScript;
         },
         error: function ( jqXHR, textStatus, errorThrown ) {
+            if (textStatus === 'abort') {
+                return; // cancelled by a newer search
+            }
             var selector = '#' + customsearch$id.options.searchfadediv;
             if (customsearch$id.options.searchfadediv.length <= 1 && $(selector).length === 0) {
                 selector = '#customsearch_$id';
@@ -602,6 +636,9 @@ customsearch$id._load = function (receive, params) {
             $('#customsearch_$id').showError(jqXHR)
         }
     });
+    if (isResultsLoad) {
+        customsearch$id._xhr = xhr;
+    }
 };
 customsearch$id.sort_mode = " . json_encode($sort_mode) . ";
 customsearch$id.offset = $offset;

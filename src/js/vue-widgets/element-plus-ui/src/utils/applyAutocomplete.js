@@ -14,6 +14,7 @@ export const TEXT = {
  * @param {Array} options.sourceList suggestions to filter from instead of fetching from the remote URL
  * @param {String} options.valueKey key to use as the value from the suggestions objects (only if suggestions are objects, and necessary only if 'transformResult' is not provided)
  * @param {Function} options.selectCb callback function to execute when an autocomplete suggestion is selected, receives the select event as a parameter
+ * @param {Number} options.minChars minimum characters before a remote search, defaults to 1
  * @param {Function} options.transformResultCb callback function to execute on the results returned from the remote URL before they are passed down to the component, receives the results as a parameter and must return the transformed results.
  *
  * @returns {HTMLElement} elementPlusUi element that was created to handle the autocompletion
@@ -25,7 +26,7 @@ export default function applyAutocomplete(element, options) {
         return;
     }
 
-    const { remoteSourceUrl, sourceList = [], valueKey, selectCb, transformResultCb, remoteQueryKey } = options;
+    const { remoteSourceUrl, sourceList = [], valueKey, selectCb, transformResultCb, remoteQueryKey, minChars } = options;
 
     if (!remoteSourceUrl && !sourceList.length) {
         console.error(TEXT.ERROR_NO_SOURCE); // eslint-disable-line no-console
@@ -51,6 +52,10 @@ export default function applyAutocomplete(element, options) {
 
     if (remoteQueryKey) {
         elementPlusUi.setAttribute("remote-query-key", remoteQueryKey);
+    }
+
+    if (minChars) {
+        elementPlusUi.setAttribute("min-chars", String(minChars));
     }
 
     if (valueKey) {

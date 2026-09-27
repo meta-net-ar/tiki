@@ -93,7 +93,7 @@ describe("Autocomplete", () => {
             expect(ElAutocomplete).toHaveBeenCalledWith(
                 expect.objectContaining({
                     modelValue: givenProps.value,
-                    debounce: 500,
+                    debounce: 0,
                     placeholder: givenProps.placeholder,
                     teleported: false,
                     "trigger-on-focus": false,
@@ -160,17 +160,18 @@ describe("Autocomplete", () => {
                 return h("div", {}, h("input", { "data-testid": "autocomplete-input", onChange: (e) => fetchSuggestions(e.target.value, () => {}) }));
             });
 
+            vi.useFakeTimers();
             render(Autocomplete, { props: givenProps });
             const input = screen.getByTestId("autocomplete-input");
             await fireEvent.change(input, { target: { value: "foo" } });
+            vi.runAllTimers();
+            vi.useRealTimers();
 
-            expect(fetchSuggestions).toHaveBeenCalledWith(
-                "foo",
-                expect.any(Function),
-                remoteSourceUrl,
-                sourceList ? JSON.parse(sourceList) : [],
-                givenProps.remoteQueryKey
-            );
+            const expectedArgs = ["foo", expect.any(Function), remoteSourceUrl, sourceList ? JSON.parse(sourceList) : [], givenProps.remoteQueryKey];
+            if (!sourceList) {
+                expectedArgs.push(expect.any(AbortSignal));
+            }
+            expect(fetchSuggestions).toHaveBeenCalledWith(...expectedArgs);
             expect(givenProps._expose).toHaveBeenCalled({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
 
             const fecthSuggestionsCb = fetchSuggestions.mock.calls[0][1];
@@ -180,6 +181,126 @@ describe("Autocomplete", () => {
             if (transformResultFn) {
                 expect(window[transformResultFn]).toHaveBeenCalledWith(mockResults);
             }
+        });
+
+        describe("live search throttling", () => {
+            const renderWithFetchInput = (props) => {
+                let fetchFn;
+                vi.mocked(ElAutocomplete).mockImplementationOnce((p, ctx) => {
+                    fetchFn = p["fetch-suggestions"] ?? p.fetchSuggestions;
+                    return h("div", {}, [
+                        h("input", { "data-testid": "autocomplete-input", onChange: (e) => fetchFn(e.target.value, props.cb ?? (() => {})) }),
+                        h("button", { "data-testid": "autocomplete-clear", onClick: () => ctx.emit("clear") }),
+                    ]);
+                });
+                render(Autocomplete, { props: { _expose: vi.fn(), ...props } });
+                return screen.getByTestId("autocomplete-input");
+            };
+
+            afterEach(() => {
+                vi.useRealTimers();
+            });
+
+            test.each([
+                ["a", 1500],
+                ["abc", 1000],
+                ["abcde", 750],
+                ["abcdefgh", 500],
+            ])("waits before searching for %s (%i ms)", async (query, expectedDelay) => {
+                vi.useFakeTimers();
+                const input = renderWithFetchInput({ remoteSourceUrl: "https://foo/bar" });
+
+                await fireEvent.change(input, { target: { value: query } });
+
+                vi.advanceTimersByTime(expectedDelay - 1);
+                expect(fetchSuggestions).not.toHaveBeenCalled();
+                vi.advanceTimersByTime(1);
+                expect(fetchSuggestions).toHaveBeenCalledTimes(1);
+            });
+
+            test("only searches once for the last query when the user keeps typing", async () => {
+                vi.useFakeTimers();
+                const input = renderWithFetchInput({ remoteSourceUrl: "https://foo/bar" });
+
+                await fireEvent.change(input, { target: { value: "fo" } });
+                vi.advanceTimersByTime(800);
+                await fireEvent.change(input, { target: { value: "foobar" } });
+                vi.runAllTimers();
+
+                expect(fetchSuggestions).toHaveBeenCalledTimes(1);
+                expect(fetchSuggestions.mock.calls[0][0]).toBe("foobar");
+            });
+
+            test("does not search below minChars and returns an empty list right away", async () => {
+                vi.useFakeTimers();
+                const cb = vi.fn();
+                const input = renderWithFetchInput({ remoteSourceUrl: "https://foo/bar", minChars: "3", cb });
+
+                await fireEvent.change(input, { target: { value: "fo" } });
+                vi.runAllTimers();
+
+                expect(fetchSuggestions).not.toHaveBeenCalled();
+                expect(cb).toHaveBeenCalledWith([]);
+            });
+
+            test("filters a local sourceList immediately, without delay", async () => {
+                vi.useFakeTimers();
+                const input = renderWithFetchInput({ sourceList: JSON.stringify([{ value: "foo" }]) });
+
+                await fireEvent.change(input, { target: { value: "f" } });
+
+                expect(fetchSuggestions).toHaveBeenCalledTimes(1);
+            });
+
+            test("aborts the in-flight request and ignores its response when a newer query is typed", async () => {
+                vi.useFakeTimers();
+                const cb = vi.fn();
+                const input = renderWithFetchInput({ remoteSourceUrl: "https://foo/bar", cb });
+
+                await fireEvent.change(input, { target: { value: "foobar" } });
+                vi.runAllTimers();
+                const [, firstCallback, , , , firstSignal] = fetchSuggestions.mock.calls[0];
+
+                await fireEvent.change(input, { target: { value: "foobarbaz" } });
+                expect(firstSignal.aborted).toBe(true);
+
+                firstCallback([{ value: "stale" }]);
+                expect(cb).not.toHaveBeenCalled();
+
+                vi.runAllTimers();
+                const secondCallback = fetchSuggestions.mock.calls[1][1];
+                secondCallback([{ value: "fresh" }]);
+                expect(cb).toHaveBeenCalledTimes(1);
+                expect(cb).toHaveBeenCalledWith([{ value: "fresh" }]);
+            });
+
+            test("serves a repeated query from the cache without a new request", async () => {
+                vi.useFakeTimers();
+                const cb = vi.fn();
+                const input = renderWithFetchInput({ remoteSourceUrl: "https://foo/bar", cb });
+
+                await fireEvent.change(input, { target: { value: "foobar" } });
+                vi.runAllTimers();
+                fetchSuggestions.mock.calls[0][1]([{ value: "foobar" }]);
+
+                await fireEvent.change(input, { target: { value: "foobarb" } });
+                await fireEvent.change(input, { target: { value: "foobar" } });
+                vi.runAllTimers();
+
+                expect(fetchSuggestions).toHaveBeenCalledTimes(1);
+                expect(cb).toHaveBeenLastCalledWith([{ value: "foobar" }]);
+            });
+
+            test("cancels a pending search when the input is cleared", async () => {
+                vi.useFakeTimers();
+                const input = renderWithFetchInput({ remoteSourceUrl: "https://foo/bar" });
+
+                await fireEvent.change(input, { target: { value: "foobar" } });
+                await fireEvent.click(screen.getByTestId("autocomplete-clear"));
+                vi.runAllTimers();
+
+                expect(fetchSuggestions).not.toHaveBeenCalled();
+            });
         });
 
         test("calls props.emitCustomEvent when ElAutocomplete emits a select event", async () => {

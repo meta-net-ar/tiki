@@ -19,6 +19,19 @@ function prefs_elementplus_list()
                 'feature_elementplus'
             ]
         ],
+        'elementplus_autocomplete_search_min_chars' => [
+            'name' => tra('Minimum characters for live search'),
+            'description' => tra('Number of characters that must be typed before the search box autocomplete queries the search index. Very short queries are imprecise and expensive on large sites.'),
+            'type' => 'text',
+            'filter' => 'digits',
+            'size' => '3',
+            'units' => tra('characters'),
+            'help' => $elementPlusHelp,
+            'default' => 3,
+            'dependencies' => [
+                'elementplus_autocomplete'
+            ]
+        ],
         'elementplus_select' => [
             'name' => tra('Element Plus Select'),
             'description' => tra('Provides a more advanced select input with features like clearable, collapsible tags, filterable, allow create, and sortable.'),
