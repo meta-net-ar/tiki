@@ -137,11 +137,6 @@ table.wikiplugin_trackerlist {
     margin-left: 0.3rem;
 }
 
-// /* plugin zones: show which content each wiki plugin produced (see src/js/tiki-plugin-zones) */
-
-// In "Highlight the plugin on mouse over" mode the icon is still in the page, as the click
-// target and the keyboard stop, but it is taken out of sight where there is a mouse to hover
-// with. Devices without hover keep the icons, and tabbing to one brings it back.
 @media (hover: hover) {
     .tiki-plugin-zone-mode .editplugin:not(:focus-visible) {
         position: absolute;
@@ -213,23 +208,29 @@ table.wikiplugin_trackerlist {
 }
 
 .tiki-plugin-zone-edit {
+    // Inside .tiki-plugin-zone-outline, which is the size of the plugin's content, so the
+    // corner is a class. The outline takes no pointer events, this button has to.
+    // Physical sides, not logical ones: the corner follows the pointer, which has no direction.
     position: absolute;
+    left: -3px; // = the outline-offset, so it sits flush on the outline
+    bottom: calc(100% + 3px); // above the content, never covering the plugin's own controls
     z-index: 1041;
     display: none;
-    padding: 3px 10px;
-    border: 0;
-    border-radius: 0.25rem 0.25rem 0 0;
-    background: var(--bs-primary, #0d6efd);
-    color: #fff;
-    font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1.2;
+    pointer-events: auto;
     white-space: nowrap;
-    cursor: pointer;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.15);
 
     &.shown {
-        display: block;
+        display: inline-block;
+    }
+
+    &.is-right {
+        left: auto;
+        right: -3px;
+    }
+
+    &.is-bottom {
+        bottom: auto;
+        top: calc(100% + 3px);
     }
 }
 

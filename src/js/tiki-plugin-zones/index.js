@@ -275,13 +275,10 @@ export default function initPluginZones(options = {}) {
         }
     }
 
-    /** In zone mode nothing is in the page to tab to, so put a button where the icon used to be. */
     function keyboardStop(zone) {
         if (zone.stop) {
             return zone.stop;
         }
-        // The zones are rebuilt from the markers on every refresh, so look in the page
-        // rather than trusting the previous object, or a button is added on every pass.
         const existing = zone.end.nextElementSibling;
         if (existing && existing.classList.contains("tiki-plugin-zone-stop")) {
             zone.stop = existing;
