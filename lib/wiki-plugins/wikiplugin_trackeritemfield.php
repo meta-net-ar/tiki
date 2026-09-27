@@ -16,15 +16,8 @@ function wikiplugin_trackeritemfield_info()
         'introduced' => 2,
         'filter' => 'wikicontent',
         'params' => [
-            'trackerId' => [
-                'required' => false,
-                'name' => tra('Tracker ID'),
-                'description' => tra('Numeric value representing the tracker ID.'),
-                'since' => '2.0',
-                'filter' => 'digits',
-                'default' => '',
-                'profile_reference' => 'tracker',
-            ],
+            'trackerId' => WikiPlugin_Helper::getCommonParameter('trackerId'),
+            'tracker' => WikiPlugin_Helper::getCommonParameter('tracker'),
             'itemId' => [
                 'required' => false,
                 'name' => tra('Item ID'),
@@ -46,6 +39,18 @@ function wikiplugin_trackeritemfield_info()
                 'parent' => 'input[name="params[trackerId]"]',
                 'parentkey' => 'tracker_id',
             ],
+            'field' => [
+                'required' => false,
+                'name' => tra('Field'),
+                'description' => tr('Field ID, or Field Permanent Name representing the field ID displayed or tested'),
+                'since' => '30.2',
+                'filter' => 'text',
+                'default' => '',
+                'profile_reference' => 'tracker_field',
+                'parent' => 'input[name="params[trackerId]"]',
+                'parentkey' => 'tracker_id',
+            ],
+
             'fields' => [
                 'required' => false,
                 'name' => tra('Fields'),
@@ -128,7 +133,7 @@ function wikiplugin_trackeritemfield($data, $params)
 
     $userlib = TikiLib::lib('user');
     $trklib = TikiLib::lib('trk');
-
+    $params['trackerId'] = WikiPlugin_Helper::getTrackerId($params);
     $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_trackeritemfield_info());
     extract($params, EXTR_SKIP);
 
@@ -262,11 +267,16 @@ function wikiplugin_trackeritemfield($data, $params)
                 return $dataelse;
             }
         }
-    } elseif (! empty($fieldId)) {
-        if (! ($field = $trklib->get_tracker_field($fieldId))) {
-            return tra('Incorrect param') . ': fieldId';
+    } elseif (! empty($fieldId) || ! empty($field)) {
+        if (empty($fieldId) && ! empty($field)) {
+            $fieldInfo = is_numeric($field) ? $trklib->get_tracker_field($field) : $trklib->get_field_by_perm_name($field);
+            $fieldId = $fieldInfo['fieldId'] ?? null;
+        } else {
+            $fieldInfo = $trklib->get_tracker_field($fieldId);
         }
-
+        if (empty($fieldInfo)) {
+            return tra('Incorrect param') . ': fieldId or Field';
+        }
         if (! $itemObject->canViewField($fieldId)) {
             return WikiParser_PluginOutput::error(tr('Permission denied'), tr("You don't have permission to view this field."));
         }
@@ -276,7 +286,7 @@ function wikiplugin_trackeritemfield($data, $params)
         }
 
         $val = $trklib->get_item_value($trackerId, $itemId, $fieldId);
-        if ($val !== false || $field['type'] == 'S') {
+        if ($val !== false || $fieldInfo['type'] == 'S') {
             if ($test) {
                 if (empty($value) && empty($val)) {
                     return $data;
@@ -286,7 +296,7 @@ function wikiplugin_trackeritemfield($data, $params)
                 }
                 return $dataelse;
             } else {
-                $field['value'] = $val;
+                $fieldInfo['value'] = $val;
                 if (empty($info)) {
                     if (! empty($memoItemObject)) {
                         $info = $memoItemObject->getData();
@@ -294,9 +304,9 @@ function wikiplugin_trackeritemfield($data, $params)
                         $info = [];
                     }
                 }
-                $handler = $trklib->get_field_handler($field, $info);
-                $field = array_merge($field, $handler->getFieldData());     // some fields (such as DropDown and Category need this)
-                $handler = $trklib->get_field_handler($field, $info);
+                $handler = $trklib->get_field_handler($fieldInfo, $info);
+                $fieldInfo = array_merge($fieldInfo, $handler->getFieldData());     // some fields (such as DropDown and Category need this)
+                $handler = $trklib->get_field_handler($fieldInfo, $info);
                 if (! empty($params['list_mode'])) {
                     $list_mode = $params['list_mode'];
                     $out = $handler->renderOutput(['list_mode' => $list_mode, 'showlinks' => 'n']);

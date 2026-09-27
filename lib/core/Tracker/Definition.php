@@ -48,10 +48,10 @@ class Tracker_Definition
     private array $fieldObjectsCache = [];
     private bool $fieldObjectsCacheComplete = false;
 
-    public static function get($trackerId, bool $useCache = true): Tracker_Definition|false
+    public static function get($tracker, bool $useCache = true): Tracker_Definition|false
     {
-        $trackerId = (int) $trackerId;
-
+        $trklib = TikiLib::lib('trk');
+        $trackerId = (is_string($tracker) && ! ctype_digit($tracker)) ? $trklib->getTrackerIdByPermanentName($tracker) : $tracker;
         if (! $trackerId) {
             throw new InvalidArgumentException(tra("trackerId parameter must be present"));
         }
@@ -60,7 +60,6 @@ class Tracker_Definition
             return self::$definitions[$trackerId];
         }
 
-        $trklib = TikiLib::lib('trk');
         $tracker_info = $trklib->get_tracker($trackerId);
 
         $definition = false;

@@ -60,6 +60,51 @@ class WikiPlugin_Helper
 
         return $result;
     }
+    /**
+     * Get common parameters used by tracker-related plugins.
+     *
+     * @return array Array of common parameters
+     */
+    public static function getCommonParameter($param)
+    {
+        $commonParameters = [
+            'trackerId' => [
+                'required' => true,
+                'name' => tra('Tracker ID'),
+                'description' => tra('Numeric value representing the tracker ID'),
+                'since' => '1',
+                'filter' => 'digits',
+                'profile_reference' => 'tracker',
+            ],
+            'tracker' => [
+                'required' => false,
+                'name' => tr('Tracker'),
+                'description' => tr('Tracker ID, or Tracker Permanent Name'),
+                'since' => '30.2',
+                'filter' => 'text',
+                'profile_reference' => 'tracker',
+            ],
+        ];
+        if (! isset($commonParameters[$param])) {
+            throw new \Exception(tr('The parameter % does not exist.', $param), 409);
+        }
+        return $commonParameters[$param];
+    }
+    /**
+     * Get trackerId by params.
+     *
+     * @return int Tracker ID
+     */
+    public static function getTrackerId($params)
+    {
+        $tracker = ! empty($params['trackerId']) ? $params['trackerId'] : $params['tracker'];
+        if (is_numeric($tracker)) {
+            return (int) $tracker;
+        } else {
+            $definition = Tracker_Definition::get($tracker);
+            return is_object($definition) ? ($definition->getInformation()['trackerId'] ?? null) : null;
+        }
+    }
 
     /**
      * Apply default parameters from plugin info
@@ -72,6 +117,12 @@ class WikiPlugin_Helper
     {
         if (isset($info['params'])) {
             foreach ($info['params'] as $key => $param) {
+                if ((array_key_exists('trackerId', $params) && array_key_exists('tracker', $params)) && empty($params['trackerId']) && empty($params['tracker'])) {
+                    throw new \Exception(tr('You must define either the trackerId or tracker permanent name parameter.'), 409);
+                }
+                if ((array_key_exists('fieldId', $params) && array_key_exists('field', $params)) && empty($params['fieldId']) && empty($params['field'])) {
+                    throw new \Exception(tr('You must define either the fieldId or field permanent name parameter.'), 409);
+                }
                 if (! isset($params[$key])) {
                     if (isset($param['default'])) {
                         $params[$key] = $param['default'];

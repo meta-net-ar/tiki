@@ -151,6 +151,9 @@ class ParserLib extends TikiDb_Bridge
         $missingRequired = [];
         if (isset($info['params'])) {
             foreach ($info['params'] as $key => $param) {
+                if ($key === 'trackerId' && ! empty($params['tracker'])) {
+                    continue;
+                }
                 if (isset($param['required']) && $param['required'] === true) {
                     // Parameter is required and has no default - check if user provided it
                     if (! isset($param['default']) && $params[$key] === null) {

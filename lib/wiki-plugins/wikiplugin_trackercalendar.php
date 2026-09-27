@@ -21,15 +21,7 @@ function wikiplugin_trackercalendar_info()
         'introduced' => 10,
         'body' => tra('Add list plugin style {filter} and {format} blocks'),
         'params' => [
-            'trackerId' => [
-                'name' => tr('Tracker ID'),
-                'description' => tr('Tracker to search from'),
-                'since' => '10.0',
-                'required' => false,
-                'default' => 0,
-                'filter' => 'int',
-                'profile_reference' => 'tracker',
-            ],
+            'trackerId' => WikiPlugin_Helper::getCommonParameter('tracker'),
             'begin' => [
                 'name' => tr('Begin Date Field'),
                 'description' => tr('Permanent name of the field to use for event beginning'),
@@ -402,7 +394,7 @@ function wikiplugin_trackercalendar($data, $params)
 
     static $id = 0;
     $headerlib = TikiLib::lib('header');
-
+    $params['tracker'] = WikiPlugin_Helper::getTrackerId($params);
     $headerlib->add_css('.ec-day-grid > .ec-content, .ec-timeline > .ec-content { white-space: normal; }');
 
     $headerlib->add_css('.ec-day-grid > .ec-content { white-space: normal; }');

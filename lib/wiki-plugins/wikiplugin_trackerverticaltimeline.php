@@ -16,20 +16,13 @@ function wikiplugin_trackerverticaltimeline_info()
         'filter' => 'wikicontent',
         'format' => 'html',
         'params' => [
-            'tracker' => [
-                'required' => true,
-                'name' => tra('Tracker ID'),
-                'description' => tra('Numeric value representing the tracker ID'),
-                'since' => '29.0',
-                'filter' => 'digits',
-                'profile_reference' => 'tracker',
-            ],
+            'tracker' => WikiPlugin_Helper::getCommonParameter('tracker'),
             'title' => [
                 'required' => true,
                 'name' => tra('Title Field'),
-                'description' => tra('Tracker Field ID containing the item title.'),
+                'description' => tr('Tracker Field ID, or Field Permanent Name, containing the item title.'),
                 'since' => '29.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
@@ -51,9 +44,9 @@ function wikiplugin_trackerverticaltimeline_info()
             'url' => [
                 'required' => false,
                 'name' => tra('Url Field'),
-                'description' => tra('Tracker Field ID containing the url or link to go where when we click on the title of the item.'),
+                'description' => tr('Tracker Field ID, or Field Permanent Name, containing the url, link to go where when we click on the title of the item.'),
                 'since' => '29.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
@@ -72,10 +65,10 @@ function wikiplugin_trackerverticaltimeline_info()
             'date' => [
                 'required' => true,
                 'name' => tra('Date of event'),
-                'description' => tra('Tracker Field ID containing the element start date. The field must be a
+                'description' => tr('Tracker Field ID, or Field Permanent Name, containing the element start date. The field must be a
                     datetime/jscalendar field.'),
                 'since' => '29.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -125,9 +118,9 @@ function wikiplugin_trackerverticaltimeline_info()
             'image_field' => [
                 'required' => false,
                 'name' => tra('Image Field'),
-                'description' => tra('Tracker Field ID containing the image file.'),
+                'description' => tr('Tracker Field ID, or Field Permanent Name, containing the image file.'),
                 'since' => '29.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
@@ -143,7 +136,7 @@ function wikiplugin_trackerverticaltimeline($data, $params)
     $smarty = TikiLib::lib('smarty');
     static $instance = 0;
     $instance++;
-
+    $params['tracker'] = WikiPlugin_Helper::getTrackerId($params);
     $urlTarget = "";
     if ($params['urlTarget']) {
         $fieldIds[ $params['urlTarget'] ] = 'urlTarget';
@@ -188,10 +181,13 @@ function wikiplugin_trackerverticaltimeline($data, $params)
     }
 
     $fields = [];
+    $fieldIdsWithRealIds = [];
     foreach ($fieldIds as $id => $label) {
-        $fields[$id] = $trklib->get_tracker_field($id);
+        $tracker_field = $trklib->get_tracker_field($id);
+        $fields[$tracker_field['fieldId']] = $tracker_field;
+        $fieldIdsWithRealIds[ $tracker_field['fieldId'] ] = $label;
     }
-
+    $fieldIds = $fieldIdsWithRealIds;
     $items = $trklib->list_items($params['tracker'], 0, -1, '', $fields);
 
     $data = [];

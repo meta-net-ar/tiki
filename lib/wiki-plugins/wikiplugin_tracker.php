@@ -23,18 +23,12 @@ function wikiplugin_tracker_info()
         'introduced' => 1,
         'format' => 'html',
         'params' => [
-            'trackerId' => [
-                'required' => true,
-                'name' => tra('Tracker ID'),
-                'description' => tra('Numeric value representing the tracker ID'),
-                'since' => '1',
-                'filter' => 'digits',
-                'profile_reference' => 'tracker',
-            ],
+            'trackerId' => WikiPlugin_Helper::getCommonParameter('trackerId'),
+            'tracker' => WikiPlugin_Helper::getCommonParameter('tracker'),
             'fields' => [
                 'required' => false,
                 'name' => tra('Fields'),
-                'description' => tr('Colon-separated list of field IDs to be displayed in the form as input fields.
+                'description' => tr('Colon-separated list of field IDs, or Field Permanent Names, to be displayed in the form as input fields.
                     If empty, all fields will be shown. Example: %0', '<code>2:4:5</code>'),
                 'since' => '1',
                 'separator' => ':',
@@ -45,7 +39,7 @@ function wikiplugin_tracker_info()
             'requiredFields' => [
                 'required' => false,
                 'name' => tra('Required Fields'),
-                'description' => tr('Colon-separated list of field IDs to be required or mandatory in the form as input fields.
+                'description' => tr('Colon-separated list of field IDs, or Field Permanent Names, to be required or mandatory in the form as input fields.
                     If empty, all fields will keep the default behavior defined in the fields admin interface. Example: %0', '<code>2:4:5</code>'),
                 'separator' => ':',
                 'profile_reference' => 'tracker_field',
@@ -182,7 +176,7 @@ function wikiplugin_tracker_info()
             'urlparams' => [
                 'required' => false,
                 'name' => tr('Keep params in URL'),
-                'description' => tr('Input form parameters (or field IDs) separated by a colon (%0:%1) to pass them in the URL after the form is submitted and redirected to the URL specified in the %0url%1 param. Example: %0urlparams="1:2:3:trackit"%1. Enter %0*%1 to keep all the submitted parameters in the URL.', '<code>', '</code>'),
+                'description' => tr('Input form parameters (field IDs, or Field Permanent Names) separated by a colon (%0:%1) to pass them in the URL after the form is submitted and redirected to the URL specified in the %0url%1 param. Example: %0urlparams="1:2:3:trackit"%1. Enter %0*%1 to keep all the submitted parameters in the URL.', '<code>', '</code>'),
                 'since' => '19.0',
                 'filter' => 'url',
                 'separator' => ':',
@@ -429,10 +423,10 @@ function wikiplugin_tracker_info()
             'autosavefields' => [
                 'required' => false,
                 'name' => tra('Autosave Fields'),
-                'description' => tra('Colon-separated list of field IDs to be automatically filled with values upon
+                'description' => tra('Colon-separated list of field IDs, or Field Permanent Names, to be automatically filled with values upon
                     save.'),
                 'since' => '5.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'separator' => ':',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[trackerId]"]',
@@ -461,11 +455,11 @@ function wikiplugin_tracker_info()
                 'required' => false,
                 'name' => tra('Increase-only Fields'),
                 'description' => tr(
-                    'Used with the %0  and %1 parameters. Colon-separated list of field IDs being
+                    'Used with the %0  and %1 parameters. Colon-separated list of field IDs, or Field Permanent Names, being
                     auto-saved where the specified auto-save value will not take effect if it is less than or equal to
                     the current value of the field',
                     '<code>autosavefields</code>',
-                    '<code>autosavevalues</code>'
+                    '<code>autosavevalues</code>',
                 ),
                 'since' => '8.0',
                 'filter' => 'digits',
@@ -579,7 +573,7 @@ function wikiplugin_tracker_info()
             'fieldsfill' => [
                 'required' => false,
                 'name' => tra('Multiple Fill Fields'),
-                'description' => tr('Colon-separated list of field IDs to be filled with multiple values, to create
+                'description' => tr('Colon-separated list of field IDs, or Field Permanent Names, to be filled with multiple values, to create
                     multiple items in one save. If empty, only one item will be created. Only for
                     item creation. Example: %0', '<code>2:4:5</code>'),
                 'since' => '9.0',
@@ -691,7 +685,8 @@ function wikiplugin_tracker($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $captchalib = TikiLib::lib('captcha');
-
+    $params['trackerId'] = WikiPlugin_Helper::getTrackerId($params);
+    $definition = Tracker_Definition::get($params['trackerId']);
     $registrationTrackerId = null;
     $itemId = $params['itemId'] ?? null;
     $newItemRate = null;
@@ -720,6 +715,9 @@ function wikiplugin_tracker($data, $params)
     $registration = BooleanEnglishLetter::tryFrom($registration);
     if (! is_null($fields)) {
         $fields = array_filter((array) $fields);
+        $fields = array_map(function ($fieldId) use ($definition) {
+            return $definition->getField($fieldId)['fieldId'] ?? null;
+        }, $fields);
     }
 
     $nameExist = ! is_null($transactionName);
@@ -779,7 +777,7 @@ function wikiplugin_tracker($data, $params)
     if ($prefs['feature_trackers'] != 'y') {
         return $smarty->fetch("wiki-plugins/error_tracker.tpl");
     }
-    if (empty($trackerId) || ! ($definition = Tracker_Definition::get($trackerId))) {
+    if (empty($trackerId) || ! $definition) {
         return $smarty->fetch("wiki-plugins/error_tracker.tpl");
     }
     $tracker = $definition->getInformation();

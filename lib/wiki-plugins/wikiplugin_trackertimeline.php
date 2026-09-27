@@ -16,20 +16,13 @@ function wikiplugin_trackertimeline_info()
         'filter' => 'wikicontent',
         'format' => 'html',
         'params' => [
-            'tracker' => [
-                'required' => true,
-                'name' => tra('Tracker ID'),
-                'description' => tra('Numeric value representing the tracker ID'),
-                'since' => '3.0',
-                'filter' => 'digits',
-                'profile_reference' => 'tracker',
-            ],
+            'tracker' => WikiPlugin_Helper::getCommonParameter('tracker'),
             'title' => [
                 'required' => true,
                 'name' => tra('Title Field'),
-                'description' => tra('Tracker Field ID containing the item title.'),
+                'description' => tra('Tracker Field ID or Field Permanent Name'),
                 'since' => '3.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
@@ -38,9 +31,9 @@ function wikiplugin_trackertimeline_info()
             'color' => [
                 'required' => false,
                 'name' => tra('Color Field'),
-                'description' => tra('Tracker Field ID containing the item color(that field must contains valid css color like : red, yellow,#FAEBD7,BlanchedAlmond , ... .'),
+                'description' => tra('Tracker Field ID, or Field Permanent Name, containing the item color(that field must contains valid css color like : red, yellow,#FAEBD7,BlanchedAlmond , ... .'),
                 'since' => '29.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -48,9 +41,9 @@ function wikiplugin_trackertimeline_info()
             'type' => [
                 'required' => false,
                 'name' => tra('Type Field'),
-                'description' => tra("Tracker Field ID containing the type of item. The type of the item can be 'box' (default), 'point', 'range', or 'background'. Types 'box' and 'point' need a start date, the types 'range' and 'background' needs both a start and end date."),
+                'description' => tra("Tracker Field ID, or Field Permanent Name, containing the type of item. The type of the item can be 'box' (default), 'point', 'range', or 'background'. Types 'box' and 'point' need a start date, the types 'range' and 'background' needs both a start and end date."),
                 'since' => '29.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -58,10 +51,9 @@ function wikiplugin_trackertimeline_info()
             'summary' => [
                 'required' => true,
                 'name' => tra('Summary Field'),
-                'description' => tra('Tracker Field ID containing the summary of the item. The summary will be displayed
-                    on the timeline when the item is focused.'),
+                'description' => tra('Tracker Field ID, or Field Permanent Name, containing the summary of the item. The summary will be displayed on the timeline when the item is focused.'),
                 'since' => '3.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
@@ -70,10 +62,9 @@ function wikiplugin_trackertimeline_info()
             'start' => [
                 'required' => true,
                 'name' => tra('Start Date'),
-                'description' => tra('Tracker Field ID containing the element start date. The field must be a
-                    datetime/jscalendar field.'),
+                'description' => tra('Tracker Field ID, or Field Permanent Name, containing the element start date. The field must be a datetime/jscalendar field.'),
                 'since' => '3.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'default' => '',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
@@ -82,10 +73,9 @@ function wikiplugin_trackertimeline_info()
             'end' => [
                 'required' => false,
                 'name' => tra('End Date'),
-                'description' => tra('Tracker Field ID containing the element end date. The field must be a
-                    datetime/jscalendar field.'),
+                'description' => tra('Tracker Field ID, or Field Permanent Name, containing the element end date. The field must be a datetime/jscalendar field.'),
                 'since' => '3.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -93,10 +83,9 @@ function wikiplugin_trackertimeline_info()
             'group' => [
                 'required' => false,
                 'name' => tra('Element Group'),
-                'description' => tra('Tracker Field ID containing the element\'s group. Elements of a same group are
-                    displayed on the same row.'),
+                'description' => tra('Tracker Field ID, or Field Permanent Name, containing the element\'s group. Elements of a same group are displayed on the same row.'),
                 'since' => '3.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -203,9 +192,9 @@ function wikiplugin_trackertimeline_info()
             'link_page' => [
                 'required' => false,
                 'name' => tra('Page Link Field'),
-                'description' => tra('Tracker Field ID containing the page name for item details.'),
+                'description' => tra('Tracker Field ID, or Field Permanent Name, containing the page name for item details.'),
                 'since' => '3.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -213,9 +202,9 @@ function wikiplugin_trackertimeline_info()
             'image_field' => [
                 'required' => false,
                 'name' => tra('Image Field'),
-                'description' => tra('Tracker Field ID containing the image file.'),
+                'description' => tra('Tracker Field ID, or Field Permanent Name, containing the image file.'),
                 'since' => '7.0',
-                'filter' => 'digits',
+                'filter' => 'text',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[tracker]"]',
                 'parentkey' => 'tracker_id',
@@ -231,7 +220,7 @@ function wikiplugin_trackertimeline($data, $params)
     $js = '';
     static $instance = 0;
     $instance++;
-
+    $params['tracker'] = WikiPlugin_Helper::getTrackerId($params);
     $max = 0;
     $min = 0;
     $step = ! empty($params['step']) ? ($params['step']) : '1';
@@ -298,10 +287,13 @@ function wikiplugin_trackertimeline($data, $params)
     }
 
     $fields = [];
+    $fieldIdsWithRealIds = [];
     foreach ($fieldIds as $id => $label) {
-        $fields[$id] = $trklib->get_tracker_field($id);
+        $tracker_field = $trklib->get_tracker_field($id);
+        $fields[$tracker_field['fieldId']] = $tracker_field;
+        $fieldIdsWithRealIds[ $tracker_field['fieldId'] ] = $label;
     }
-
+    $fieldIds = $fieldIdsWithRealIds;
     $items = $trklib->list_items($params['tracker'], 0, -1, '', $fields);
 
     $data = [];
