@@ -3581,6 +3581,7 @@ class ParserLib extends TikiDb_Bridge
     {
         global $page_regex, $prefs;
         $tikilib = TikiLib::lib('tiki');
+        $isMarkdown = $prefs['markdown_enabled'] === 'y' && preg_match('~\{syntax\b(?=[^}]*\btype\s*=\s*(?:["\']?markdown["\']?)(?:\s|}|$))[^}]*\}~i', $data);
 
         $matches = WikiParser_PluginMatcher::match($data);
         foreach ($matches as $match) {
@@ -3596,6 +3597,31 @@ class ParserLib extends TikiDb_Bridge
         preg_match_all("/\(([a-z0-9-]+)?\( *($page_regex) *\)\)/", $data, $normal);
         preg_match_all("/\(([a-z0-9-]+)?\( *($page_regex) *\|(.+?)\)\)/", $data, $withDesc);
         preg_match_all("/(?<=\]\()($page_regex)(?=\))/", $data, $markdown);
+        if ($isMarkdown) {
+            preg_match_all('/(?<=\]\()(https?:\/\/[^\s)]+)(?=\))/', $data, $markdownUrls);
+            $markdown[1] = array_values(array_diff($markdown[1], $markdownUrls[1]));
+            foreach ($markdownUrls[1] as $url) {
+                $baseUrl = $tikilib->getMatchBaseUrlSchema($url);
+                if (! $baseUrl) {
+                    continue;
+                }
+
+                $parts = parse_url($url);
+                if (! empty($parts['query'])) {
+                    parse_str($parts['query'], $query);
+                    if (! empty($query['page'])) {
+                        $markdown[1][] = $tikilib->urldecode($query['page']);
+                        continue;
+                    }
+                }
+
+                $path = substr($url, strlen($baseUrl));
+                $path = trim(parse_url($path, PHP_URL_PATH) ?: '', '/');
+                if ($path && $path !== 'tiki-index.php') {
+                    $markdown[1][] = $tikilib->urldecode($path);
+                }
+            }
+        }
         preg_match_all('/<a class="wiki[^\"]*" href="tiki-index\.php\?page=([^\?&"]+)[^"]*"/', $data, $htmlLinks1);
         preg_match_all('/<a href="tiki-index\.php\?page=([^\?&"]+)[^"]*"/', $data, $htmlLinks2);
         $htmlLinks[1] = array_merge($htmlLinks1[1], $htmlLinks2[1]);
