@@ -20,32 +20,8 @@ $access->check_permission('tiki_p_view');
 $commentsType = (string) $jitRequest->type->alphaspace();
 $commentsObjectId = (string) ($commentsType === 'wiki page' ? $jitRequest->objectId->pagename() : $jitRequest->objectId->digits());
 
-// Lands inside an inline <script>, so escape the characters that could break out of it.
-$commentsContext = json_encode(
-    ['type' => $commentsType, 'objectId' => $commentsObjectId],
-    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-);
-
-$headerlib = TikiLib::lib('header');
-$headerlib->add_js_module('
-        import "@vue-mf/comments";
-    ');
-$headerlib->add_jq_onready('
-        window.registerApplication({
-            name: "@vue-mf/comments",
-            app: () => importShim("@vue-mf/comments"),
-            activeWhen: (location) => {
-                let condition = true;
-                return condition;
-            },
-            customProps: {
-                commentsContext: ' . $commentsContext . ',
-            },
-        });
-        onDOMElementRemoved("single-spa-application:@vue-mf/comments", function () {
-            window.unregisterApplication("@vue-mf/comments");
-        });
-');
+$smarty->assign('commentsVueType', $commentsType);
+$smarty->assign('commentsVueObjectId', $commentsObjectId);
 
 $smarty->assign('mid', 'tiki-comments.tpl');
 $smarty->display("tiki.tpl");

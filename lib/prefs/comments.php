@@ -7,6 +7,12 @@
 function prefs_comments_list()
 {
     return [
+        'comments_vue_ui' => [
+            'name' => tra('New comment interface'),
+            'description' => tra('Replace the classic comment display with the Vue interface. Read-only for now: posting, editing and moderating still require the classic display.'),
+            'type' => 'flag',
+            'default' => 'n',
+        ],
         'comments_notitle' => [
             'name' => tra('Disable comment titles'),
             'description' => tra('Don\'t display the title input field on comments and their replies.'),

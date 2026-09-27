@@ -1,1 +1,1 @@
-<div id="single-spa-application:@vue-mf/comments" class="wp-comments-ux"></div>
+{include file='comment/vue_mount.tpl' commentsVueMountId="standalone"}

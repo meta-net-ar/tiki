@@ -27,6 +27,7 @@
     <fieldset>
         <legend class="h3">{tr}Display options{/tr}</legend>
         <div class="admin featurelist">
+            {preference name=comments_vue_ui}
             {preference name=comments_per_page}
             {preference name=comments_sort_mode}
             {preference name=comments_threshold_indent}

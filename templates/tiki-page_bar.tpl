@@ -127,6 +127,9 @@
                 && $tiki_p_wiki_view_comments eq 'y'
                 && $tiki_p_read_comments eq 'y'}
 
+                        {* The Vue module renders its own comments on mount, so it needs neither
+                           the lazy loader nor the toggle button. *}
+                        {if $prefs.comments_vue_ui neq 'y'}
                         {* Auto display comments if display by default preference is set *}
                         {if $prefs.wiki_comments_displayed_default eq 'y' && $show_slideshow eq 'n'}
                         {jq}{literal}
@@ -146,6 +149,7 @@
                         {jq}
                             $('#comment-toggle').comment_toggle();
                         {/jq}
+                        {/if}
             {/if}
 
 
@@ -201,7 +205,14 @@
         {/if}
 
         {if $prefs.feature_wiki_comments eq 'y' and $tiki_p_wiki_view_comments == 'y' and $edit_page ne 'y'}
-            <div id="comment-container" class="my-3 mx-0"></div>
+            {if $prefs.comments_vue_ui eq 'y'}
+                {include file='comment/vue_mount.tpl'
+                    commentsVueType="wiki page"
+                    commentsVueObjectId=$page
+                    commentsVueMountId="wiki"}
+            {else}
+                <div id="comment-container" class="my-3 mx-0"></div>
+            {/if}
         {/if}
 
     {/strip}

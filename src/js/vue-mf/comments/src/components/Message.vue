@@ -4,7 +4,7 @@ import ReplyForm from "./ReplyForm.vue";
 import {inject, onMounted} from "vue";
 import useCommentsStore from "../store/comments";
 import useCommentsUiStore from "../store/commentsUi";
-import {highlightMatches} from "../utils/highlight";
+import {highlightMatches, highlightHtml} from "../utils/highlight";
 
 const tr = inject('tr')
 const store = useCommentsStore();
@@ -35,8 +35,14 @@ export default {
         highlightedTitle() {
             return highlightMatches(this.item.title, this.activeSearchQuery);
         },
-        highlightedMessage() {
-            return highlightMatches(this.item.message, this.activeSearchQuery);
+        // Titles disabled site-wide: the stored title is a backend placeholder, not content.
+        showTitle() {
+            return useCommentsStore().context.showTitles && this.item.title !== "";
+        },
+        // Already HTML, rendered by Tiki's wiki parser — escaping it would show the tags,
+        // so matches are marked through the DOM rather than by rewriting the string.
+        messageBody() {
+            return highlightHtml(this.item.messageHtml, this.activeSearchQuery);
         },
         isSearchMatch() {
             const uiStore = useCommentsUiStore();
@@ -118,11 +124,11 @@ export default {
             <span class="text-muted pt-1">(17:01 their time)</span>
             <span class="text-warning pt-1 float-end me-3" v-if="item.pinned === 1"><i class="fa-solid fa-thumbtack"></i></span>
         </p>
-        <h5 class="card-title thread-title ps-2" v-if="item.title != ''" v-html="highlightedTitle"></h5>
-        <hr class="ms-2" v-if="item.parentId == 0 && item.title != '' && !pinnedTab" />
+        <h5 class="card-title thread-title ps-2" v-if="showTitle" v-html="highlightedTitle"></h5>
+        <hr class="ms-2" v-if="item.parentId == 0 && showTitle && !pinnedTab" />
         <div>
             <div :id="'message-'+item.messageId" class="thread-messages ps-2">
-                <p class="card-text" v-html="highlightedMessage"></p>
+                <p class="card-text" v-html="messageBody"></p>
                 <div class="message-footer ms-3">
                     <i v-if="!pinnedTab" class="icon fa-solid fa-thumbs-up fa-xs mt-3" :class="{ 'text-primary': item.likedBy.includes(uiStore.currentUser) }" @click="store.like(item.messageId, uiStore.currentUser)"></i><span v-if="!pinnedTab" class="like small text-muted mx-1 me-4">{{ item.like }}</span>
                     <i v-if="!pinnedTab" class="icon fa-solid fa-thumbs-down fa-xs mt-3" :class="{ 'text-danger': item.dislikedBy.includes(uiStore.currentUser) }" @click="store.dislike(item.messageId, uiStore.currentUser)"></i><span v-if="!pinnedTab" class="dislike small text-muted mx-1">{{ item.dislike }}</span>

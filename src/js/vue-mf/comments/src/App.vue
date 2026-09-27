@@ -54,8 +54,10 @@
     });
 
     const uiStore = useCommentsUiStore();
+    const store = useCommentsStore();
 
-    useCommentsStore().setContext(props.customProps.commentsContext);
+    store.setContext(props.customProps.commentsContext);
+    store.fetchThreads();
 
     const msgs = computed(() => uiStore.getFilteredParentMessages);
     const pinnedMsgs = computed(() => uiStore.getFilteredPinnedMessages);

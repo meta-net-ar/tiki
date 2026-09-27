@@ -1,6 +1,21 @@
 import { defineStore } from "pinia";
 import useCommentsStore from "./comments";
 
+// Search looks at body and author, plus the title only when titles are shown. With
+// titles hidden the stored value is a backend placeholder ("Untitled"), so matching it
+// would select every comment while highlighting nothing on screen.
+// query is expected already trimmed and lowercased.
+function matchesQuery(item, query) {
+    if (!query) {
+        return false;
+    }
+    const fields = [item.message, item.author];
+    if (useCommentsStore().context.showTitles) {
+        fields.push(item.title);
+    }
+    return fields.some((field) => field.toLowerCase().includes(query));
+}
+
 // Local-only view state for this user's current session: never fetched from,
 // or sent to, the backend. Keep it separate from comments.js (the data store)
 // so backend sync code has no reason to ever import this store.
@@ -16,25 +31,9 @@ export default defineStore("commentsUiStore", {
     }),
     getters: {
         // Whether a single item (not its descendants) matches the current search query.
-        itemMatchesSearch: (state) => (item) => {
-            const query = state.searchQuery.trim().toLowerCase();
-            if (!query) {
-                return false;
-            }
-            return (
-                item.title.toLowerCase().includes(query) || item.message.toLowerCase().includes(query) || item.author.toLowerCase().includes(query)
-            );
-        },
+        itemMatchesSearch: (state) => (item) => matchesQuery(item, state.searchQuery.trim().toLowerCase()),
         // Same as itemMatchesSearch, but for the "pinned only" tab's own filter text.
-        pinnedItemMatchesSearch: (state) => (item) => {
-            const query = state.pinnedSearchQuery.trim().toLowerCase();
-            if (!query) {
-                return false;
-            }
-            return (
-                item.title.toLowerCase().includes(query) || item.message.toLowerCase().includes(query) || item.author.toLowerCase().includes(query)
-            );
-        },
+        pinnedItemMatchesSearch: (state) => (item) => matchesQuery(item, state.pinnedSearchQuery.trim().toLowerCase()),
         // Whether a root thread's reply visibility was manually toggled away from its default.
         isManuallyToggled: (state) => (messageId) => state.manuallyToggledThreads.includes(messageId),
         // Whether an item, or any of its descendants, matches the current search query.
@@ -64,20 +63,14 @@ export default defineStore("commentsUiStore", {
             return parents.filter((root) => this.subtreeMatchesSearch(root.messageId));
         },
         // Pinned messages to display in the "pinned only" tab: all of them when the
-        // pinned filter is empty, otherwise only those whose title, message or author
-        // matches the filter text.
+        // pinned filter is empty, otherwise only those matching the filter text.
         getFilteredPinnedMessages(state) {
             const pinned = useCommentsStore().getPinnedMessages;
             const query = state.pinnedSearchQuery.trim().toLowerCase();
             if (!query) {
                 return pinned;
             }
-            return pinned.filter(
-                (item) =>
-                    item.title.toLowerCase().includes(query) ||
-                    item.message.toLowerCase().includes(query) ||
-                    item.author.toLowerCase().includes(query)
-            );
+            return pinned.filter((item) => matchesQuery(item, query));
         },
         // Whether a root thread's replies should currently be shown: resolved threads default to hidden and
         // others to visible, a manual toggle flips that default either way, and a search match always wins.
