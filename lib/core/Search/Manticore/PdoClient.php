@@ -125,7 +125,10 @@ class PdoClient
         }
         $sql = "CREATE TABLE $index (" . implode(',', $cols) . ")";
         foreach ($settings as $key => $val) {
-            $sql .= ' ' . $key . '=' . "'" . $val . "'";
+            if (! preg_match('/^[a-z_]+$/', $key)) {
+                continue;
+            }
+            $sql .= ' ' . $key . '=' . $this->quote((string) $val);
         }
         $this->prepareAndExecuteWithRetry($sql);
     }

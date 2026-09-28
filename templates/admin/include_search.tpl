@@ -70,6 +70,7 @@
                             {tr}Disadvantages:{/tr} {tr}Needs to be separately installed from Tiki and requires more configuration{/tr} (See this <a class='alert-link' href='http://doc.tiki.org/Elasticsearch'>{tr}link{/tr}</a> {tr}for more information) {/tr}<br>
                             <b>{tr}Manticore Search:{/tr} </b><br>
                             {tr}Advantages:{/tr} {tr}Modern, fast, light-weight and full-featured search engine with outstanding full-text search capabilities. It is a continuation of Sphinx Search engine{/tr}.<br>
+                            <a class='alert-link' href='https://doc.tiki.org/Manticore-Search'>{tr}See the Manticore Search documentation for installation and configuration details.{/tr}</a>
                         {/remarksbox}
                     </div>
 
@@ -103,7 +104,7 @@
                         {preference name="unified_manticore_mysql_port"}
                         {preference name="unified_manticore_index_prefix"}
                         {preference name="unified_manticore_index_current"}
-                        {preference name="unified_manticore_morphology"}
+                        {preference name="unified_manticore_settings"}
                         {preference name="unified_manticore_always_index"}
                     </div>
 
